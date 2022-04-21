@@ -1,62 +1,64 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <script src="../dist/claygl.js"></script>
-    </head>
-    <body style="margin:0px;">
-        <canvas id="main"></canvas>
-        <script>
-            var renderer = new clay.Renderer({
-                canvas: document.getElementById('main'),
-                devicePixelRatio: 1.0
-            });
-            renderer.resize(window.innerWidth, window.innerHeight);
+  <head>
+    <meta charset="utf-8" />
+    <script src="../dist/claygl.js"></script>
+  </head>
+  <body style="margin: 0px">
+    <canvas id="main"></canvas>
+    <script>
+      var renderer = new clay.Renderer({
+        canvas: document.getElementById('main'),
+        devicePixelRatio: 1.0
+      });
+      renderer.resize(window.innerWidth, window.innerHeight);
 
-            var camera = new clay.camera.Perspective();
-            camera.aspect = renderer.getViewportAspect();
-            camera.position.z = 10;
+      var camera = new clay.camera.Perspective();
+      camera.aspect = renderer.getViewportAspect();
+      camera.position.z = 10;
 
-            var scene = new clay.Scene();
+      var scene = new clay.Scene();
 
-            var cubeGeo = new clay.geometry.Cube();
-            for (var i = 0; i < 5; i++) {
-                for (var j = 0; j < 5; j++) {
-                    var material = new clay.Material({
-                        shader : clay.shader.library.get('clay.lambert')
-                    });
-                    material.set('color', [Math.random(), Math.random(), Math.random()]);
-                    var mesh = new clay.Mesh({
-                        material : material,
-                        geometry : cubeGeo
-                    });
-                    mesh.position.set(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * -10)
-                    scene.add(mesh);
-                }
-            }
-            var light = new clay.light.Directional();
-            light.position.set(4, 4, 0);
-            light.lookAt(clay.Vector3.ZERO);
-            scene.add(light);
-            scene.add(new clay.light.Ambient({
-                intensity : 0.5
-            }));
+      var cubeGeo = new clay.geometry.Cube();
+      for (var i = 0; i < 5; i++) {
+        for (var j = 0; j < 5; j++) {
+          var material = new clay.Material({
+            shader: clay.shader.library.get('clay.lambert')
+          });
+          material.set('color', [Math.random(), Math.random(), Math.random()]);
+          var mesh = new clay.Mesh({
+            material: material,
+            geometry: cubeGeo
+          });
+          mesh.position.set(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * -10);
+          scene.add(mesh);
+        }
+      }
+      var light = new clay.light.Directional();
+      light.position.set(4, 4, 0);
+      light.lookAt(clay.Vector3.ZERO);
+      scene.add(light);
+      scene.add(
+        new clay.light.Ambient({
+          intensity: 0.5
+        })
+      );
 
-            var picking = new clay.picking.PixelPicking({
-                renderer : renderer
-            });
+      var picking = new clay.picking.PixelPicking({
+        renderer: renderer
+      });
 
-            var timeline =  new clay.Timeline();
-            timeline.start();
-            timeline.on('frame', function() {
-                picking.update(scene, camera);
-                renderer.render(scene, camera);
-            });
+      var timeline = new clay.Timeline();
+      timeline.start();
+      timeline.on('frame', function () {
+        picking.update(scene, camera);
+        renderer.render(scene, camera);
+      });
 
-            var currentCube;
-            var plane = new clay.Plane();
-            renderer.canvas.addEventListener('click', function(e) {
-                console.log(picking.pick(e.offsetX, e.offsetY));
-            });
-        </script>
-    </body>
+      var currentCube;
+      var plane = new clay.Plane();
+      renderer.canvas.addEventListener('click', function (e) {
+        console.log(picking.pick(e.offsetX, e.offsetY));
+      });
+    </script>
+  </body>
 </html>

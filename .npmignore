@@ -3,4 +3,5 @@
 /build
 /jsdoc-tmpl
 /doc
-/screenshot
+/asset
+/src

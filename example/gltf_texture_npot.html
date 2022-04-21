@@ -1,40 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <script src="../dist/claygl.js"></script>
     <title>None Power of Two Texture Test</title>
-</head>
-<body>
+  </head>
+  <body>
     <style>
-        html, body, #main {
-            height: 100%;
-            margin: 0;
-        }
+      html,
+      body,
+      #main {
+        height: 100%;
+        margin: 0;
+      }
     </style>
     <div id="main"></div>
     <script>
-        var app = clay.application.create('#main', {
-            init: function (app) {
-                // Create camera
-                this._camera = app.createCamera([2, 2, 2], [0, 0, 0]);
-                // Load boombox model. return a load promise to make sure the look will be start after model loaded.
-                return app.loadModel('./assets/models/test/BoxTextured.glb', {
-                    shader: 'clay.basic',
-                    waitTextureLoaded: true,
-                    textureConvertToPOT: true
-                });
-            },
+      var app = clay.application.create('#main', {
+        init: function (app) {
+          // Create camera
+          this._camera = app.createCamera([2, 2, 2], [0, 0, 0]);
+          // Load boombox model. return a load promise to make sure the look will be start after model loaded.
+          return app.loadModel('./assets/models/test/BoxTextured.glb', {
+            shader: 'clay.basic',
+            waitTextureLoaded: true,
+            textureConvertToPOT: true
+          });
+        },
 
-            loop: function (app) {
-            }
-        });
+        loop: function (app) {}
+      });
 
-        window.onresize = function () {
-            app.resize()
-        };
+      window.onresize = function () {
+        app.resize();
+      };
     </script>
-</body>
+  </body>
 </html>

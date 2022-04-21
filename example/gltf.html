@@ -1,82 +1,84 @@
 <html>
-<head>
+  <head>
     <title></title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="../dist/claygl.js"></script>
-</head>
-<body style="margin:0px; background-color: black">
+  </head>
+  <body style="margin: 0px; background-color: black">
     <canvas id="main"></canvas>
 
     <script type="text/javascript">
-        var renderer = new clay.Renderer({
-            canvas: document.getElementById("main")
+      var renderer = new clay.Renderer({
+        canvas: document.getElementById('main')
+      });
+      renderer.resize(window.innerWidth, window.innerHeight);
+      var shadowMapPass = new clay.prePass.ShadowMap();
+      var environmentMap = new clay.TextureCube({
+        width: 256,
+        height: 256
+      });
+      var environmentMapPass = new clay.prePass.EnvironmentMap({
+        texture: environmentMap
+      });
+      var timeline = new clay.Timeline();
+      timeline.start();
+
+      var loader = new clay.loader.GLTF();
+
+      loader.load('assets/models/basic_scene/scene.gltf');
+
+      loader.on('success', function (res) {
+        var scene = res.scene;
+        scene.rotation.rotateX(-Math.PI / 2);
+        var camera = new clay.camera.Perspective({
+          aspect: renderer.getViewportAspect(),
+          far: 100
         });
-        renderer.resize(window.innerWidth, window.innerHeight);
-        var shadowMapPass = new clay.prePass.ShadowMap();
-        var environmentMap = new clay.TextureCube({
-            width: 256,
-            height: 256
+
+        camera.position.set(2, 2, 2);
+        camera.lookAt(scene.position);
+        camera.aspect = renderer.canvas.width / renderer.canvas.height;
+
+        var control = new clay.plugin.OrbitControl({
+          target: camera,
+          domElement: renderer.canvas,
+          sensitivity: 0.4
         });
-        var environmentMapPass = new clay.prePass.EnvironmentMap({
-            texture: environmentMap
+
+        var light = new clay.light.Spot();
+        light.range = 30;
+        light.umbraAngle = 10;
+        light.penumbraAngle = 25;
+        light.shadowResolution = 2048;
+        light.shadowBias = 0.0002;
+        light.position.set(-5, -5, 5);
+        light.lookAt(scene.position);
+        scene.add(light);
+
+        scene.add(
+          new clay.light.Ambient({
+            intensity: 0.3
+          })
+        );
+
+        var suzanne = scene.getNode('Suzanne');
+        var suzanneMaterial = suzanne.material;
+        environmentMapPass.position.set(0, 0.25, 1.5);
+        suzanneMaterial.set('color', [1, 1, 1]);
+        suzanneMaterial.set('metalness', 1);
+        suzanneMaterial.set('roughness', 0.4);
+        environmentMapPass.render(renderer, scene);
+
+        suzanneMaterial.set('environmentMap', environmentMap);
+
+        timeline.on('frame', function (deltaTime) {
+          control.update(deltaTime);
+          shadowMapPass.render(renderer, scene);
+          renderer.render(scene, camera);
+          // shadowMapPass.renderDebug(renderer);
         });
-        var timeline =  new clay.Timeline();
-        timeline.start();
-
-        var loader = new clay.loader.GLTF();
-
-        loader.load("assets/models/basic_scene/scene.gltf");
-
-        loader.on('success', function(res) {
-            var scene = res.scene;
-            scene.rotation.rotateX(-Math.PI / 2);
-            var camera = new clay.camera.Perspective({
-                aspect: renderer.getViewportAspect(),
-                far: 100
-            });
-
-            camera.position.set(2, 2, 2);
-            camera.lookAt(scene.position);
-            camera.aspect = renderer.canvas.width / renderer.canvas.height;
-
-            var control = new clay.plugin.OrbitControl({
-                target: camera,
-                domElement: renderer.canvas,
-                sensitivity: 0.4
-            });
-
-            var light = new clay.light.Spot();
-            light.range = 30;
-            light.umbraAngle = 10;
-            light.penumbraAngle = 25;
-            light.shadowResolution = 2048;
-            light.shadowBias = 0.0002;
-            light.position.set(-5, -5, 5);
-            light.lookAt(scene.position);
-            scene.add(light);
-
-            scene.add(new clay.light.Ambient({
-                intensity: 0.3
-            }));
-
-            var suzanne = scene.getNode('Suzanne');
-            var suzanneMaterial = suzanne.material;
-            environmentMapPass.position.set(0, 0.25, 1.5);
-            suzanneMaterial.set('color', [1,1,1]);
-            suzanneMaterial.set('metalness', 1);
-            suzanneMaterial.set('roughness', 0.4);
-            environmentMapPass.render(renderer, scene);
-
-            suzanneMaterial.set('environmentMap', environmentMap);
-
-            timeline.on('frame', function(deltaTime) {
-                control.update(deltaTime);
-                shadowMapPass.render(renderer, scene);
-                renderer.render(scene, camera);
-                // shadowMapPass.renderDebug(renderer);
-            });
-        });
+      });
     </script>
-</body>
+  </body>
 </html>

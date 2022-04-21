@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+
+    "strict": true,
+    "removeComments": false,
+    "sourceMap": true,
+
+    // https://github.com/ezolenko/rollup-plugin-typescript2/issues/12#issuecomment-536173372
+    "moduleResolution": "node",
+
+    "declaration": true,
+    "declarationMap": false,
+
+    "importHelpers": true,
+
+    "pretty": true,
+
+    "outDir": "lib"
+  },
+  "include": ["src/**/*.ts"]
+}

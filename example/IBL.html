@@ -1,178 +1,179 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script type="text/javascript" src="lib/require.js"></script>
-    </head>
-    <body style="margin:0px;">
-        <canvas id="main"></canvas>
-        <script type="text/javascript">
-            require(['../dist/claygl', 'js/createCompositor'], function(clay, createCompositor) {
-                var renderer = new clay.Renderer({
-                    canvas: document.getElementById('main'),
-                    devicePixelRatio: 1.0
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript" src="lib/require.js"></script>
+  </head>
+  <body style="margin: 0px">
+    <canvas id="main"></canvas>
+    <script type="text/javascript">
+      require(['../dist/claygl', 'js/createCompositor'], function (clay, createCompositor) {
+        var renderer = new clay.Renderer({
+          canvas: document.getElementById('main'),
+          devicePixelRatio: 1.0
+        });
+        renderer.resize(window.innerWidth, window.innerHeight);
+        var camera = new clay.camera.Perspective({
+          aspect: renderer.getViewportAspect()
+        });
+        camera.position.set(0, 0, 20);
+
+        var scene = new clay.Scene();
+        var sphereGeo = new clay.geometry.Sphere({
+          widthSegments: 50,
+          heightSegments: 50
+        });
+
+        var normalDistribution = clay.util.cubemap.generateNormalDistribution();
+        var brdfLookup = clay.util.cubemap.integrateBRDF(renderer, normalDistribution);
+
+        var GLTFLoader = new clay.loader.GLTF();
+        GLTFLoader.load('assets/models/suzanne/suzanne.gltf');
+        var suzanneGeometry;
+        GLTFLoader.on('success', function (res) {
+          suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+
+          var envMap = clay.util.texture.loadTexture(
+            'assets/textures/hdr/pisa.hdr',
+            {
+              exposure: 2
+            },
+            function () {
+              envMap.flipY = false;
+
+              var prefilterResult = clay.util.cubemap.prefilterEnvironmentMap(
+                renderer,
+                envMap,
+                {
+                  width: 128,
+                  height: 128,
+                  encodeRGBM: true
+                  // type: clay.Texture.UNSIGNED_BYTE
+                },
+                normalDistribution,
+                brdfLookup
+              );
+
+              var skybox = new clay.plugin.Skybox({
+                scene: scene
+              });
+              skybox.material.set('environmentMap', prefilterResult.environmentMap);
+              skybox.material.define('fragment', 'RGBM');
+
+              var shader = clay.shader.library.get('clay.standard');
+              for (var i = 0; i < 10; i++) {
+                var material = new clay.Material({
+                  shader: shader
                 });
-                renderer.resize(window.innerWidth, window.innerHeight);
-                var camera = new clay.camera.Perspective({
-                    aspect: renderer.getViewportAspect()
+                var roughness = i / 9;
+                var mesh = new clay.Mesh({
+                  geometry: sphereGeo,
+                  material: material
                 });
-                camera.position.set(0, 0, 20);
+                applyMaterial(material, prefilterResult, roughness);
+                material.set('specularColor', [0.05, 0.05, 0.05]);
+                mesh.position.x = i * 3 - 15;
+                mesh.position.y = 3;
+                mesh.scale.set(1.4, 1.4, 1.4);
+                scene.add(mesh);
+              }
 
-                var scene = new clay.Scene();
-                var sphereGeo = new clay.geometry.Sphere({
-                    widthSegments: 50,
-                    heightSegments: 50
+              for (var i = 0; i < 10; i++) {
+                var material = new clay.Material({
+                  shader: shader
                 });
-
-                var normalDistribution = clay.util.cubemap.generateNormalDistribution();
-                var brdfLookup = clay.util.cubemap.integrateBRDF(renderer, normalDistribution);
-
-                var GLTFLoader = new clay.loader.GLTF();
-                GLTFLoader.load('assets/models/suzanne/suzanne.gltf');
-                var suzanneGeometry;
-                GLTFLoader.on('success', function (res) {
-                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
-
-                    var envMap = clay.util.texture.loadTexture(
-                        'assets/textures/hdr/pisa.hdr',
-                        {
-                            exposure: 2
-                        },
-                        function () {
-                            envMap.flipY = false;
-
-                            var prefilterResult = clay.util.cubemap.prefilterEnvironmentMap(
-                                renderer, envMap, {
-                                    width: 128,
-                                    height: 128,
-                                    encodeRGBM: true
-                                    // type: clay.Texture.UNSIGNED_BYTE
-                                }, normalDistribution, brdfLookup
-                            );
-
-                            var skybox = new clay.plugin.Skybox({
-                                scene: scene
-                            });
-                            skybox.material.set('environmentMap', prefilterResult.environmentMap);
-                            skybox.material.define('fragment', 'RGBM');
-
-                            var shader = clay.shader.library.get('clay.standard');
-                            for (var i = 0; i < 10; i++) {
-                                var material = new clay.Material({
-                                    shader: shader
-                                });
-                                var roughness = i / 9;
-                                var mesh = new clay.Mesh({
-                                    geometry: sphereGeo,
-                                    material: material
-                                });
-                                applyMaterial(
-                                    material,
-                                    prefilterResult,
-                                    roughness
-                                );
-                                material.set('specularColor', [0.05, 0.05, 0.05]);
-                                mesh.position.x = i * 3 - 15;
-                                mesh.position.y = 3;
-                                mesh.scale.set(1.4, 1.4, 1.4);
-                                scene.add(mesh);
-                            }
-
-                            for (var i = 0; i < 10; i++) {
-                                var material = new clay.Material({
-                                    shader: shader
-                                });
-                                var roughness = i / 9;
-                                var mesh = new clay.Mesh({
-                                    geometry: sphereGeo,
-                                    material: material
-                                });
-                                material.set('specularColor', [1.0, 0.71, 0.29]);
-                                applyMaterial(material, prefilterResult, roughness);
-                                mesh.position.x = i * 3 - 15;
-                                mesh.position.y = 6;
-                                mesh.scale.set(1.4, 1.4, 1.4);
-                                scene.add(mesh);
-                            }
-
-                            var monkeys = [];
-                            for (var i = 0; i < 4; i++) {
-                                var material = new clay.Material({
-                                    shader: shader
-                                });
-                                var roughness = 0.4;
-                                var mesh = new clay.Mesh({
-                                    geometry: suzanneGeometry,
-                                    material: material
-                                });
-                                monkeys.push(mesh);
-                                applyMaterial(material, prefilterResult, roughness);
-                                mesh.position.x = i * 8 - 15;
-                                mesh.position.y = -2;
-                                mesh.scale.set(3, 3, 3);
-                                scene.add(mesh);
-                            }
-                            monkeys[0].material.set('specularColor', [1.0, 0.71, 0.29]);
-                            monkeys[1].material.set('specularColor', [0.95, 0.64, 0.54]);
-                            monkeys[2].material.set('specularColor', [0.95, 0.93, 0.88]);
-                            monkeys[3].material.set('specularColor', [0.05, 0.05, 0.05]);
-                            applyMaterial(monkeys[3].material, prefilterResult, 0.2);
-                        }
-                    );
+                var roughness = i / 9;
+                var mesh = new clay.Mesh({
+                  geometry: sphereGeo,
+                  material: material
                 });
+                material.set('specularColor', [1.0, 0.71, 0.29]);
+                applyMaterial(material, prefilterResult, roughness);
+                mesh.position.x = i * 3 - 15;
+                mesh.position.y = 6;
+                mesh.scale.set(1.4, 1.4, 1.4);
+                scene.add(mesh);
+              }
 
-                var control = new clay.plugin.OrbitControl({
-                    target: camera,
-                    domElement: renderer.canvas
+              var monkeys = [];
+              for (var i = 0; i < 4; i++) {
+                var material = new clay.Material({
+                  shader: shader
                 });
-
-                var debugPass = new clay.compositor.Pass({
-                    fragment: clay.Shader.source('clay.compositor.output')
+                var roughness = 0.4;
+                var mesh = new clay.Mesh({
+                  geometry: suzanneGeometry,
+                  material: material
                 });
+                monkeys.push(mesh);
+                applyMaterial(material, prefilterResult, roughness);
+                mesh.position.x = i * 8 - 15;
+                mesh.position.y = -2;
+                mesh.scale.set(3, 3, 3);
+                scene.add(mesh);
+              }
+              monkeys[0].material.set('specularColor', [1.0, 0.71, 0.29]);
+              monkeys[1].material.set('specularColor', [0.95, 0.64, 0.54]);
+              monkeys[2].material.set('specularColor', [0.95, 0.93, 0.88]);
+              monkeys[3].material.set('specularColor', [0.05, 0.05, 0.05]);
+              applyMaterial(monkeys[3].material, prefilterResult, 0.2);
+            }
+          );
+        });
 
-                var compositor = createCompositor({
-                    scene: scene,
-                    camera: camera
-                });
+        var control = new clay.plugin.OrbitControl({
+          target: camera,
+          domElement: renderer.canvas
+        });
 
+        var debugPass = new clay.compositor.Pass({
+          fragment: clay.Shader.source('clay.compositor.output')
+        });
 
-                var timeline =  new clay.Timeline();
-                timeline.start();
-                timeline.on('frame', function(deltaTime) {
-                    control.update(deltaTime);
-                    var viewport = renderer.viewport;
-                    compositor.render(renderer);
+        var compositor = createCompositor({
+          scene: scene,
+          camera: camera
+        });
 
-                    var x = 0, y = 0;
-                    var width = viewport.width / 10;
-                    var height = width;
-                    renderer.clearBit = clay.Renderer.DEPTH_BUFFER_BIT;
-                    renderer.setViewport(x, y, width, height);
-                    debugPass.setUniform('texture', normalDistribution);
-                    debugPass.render(renderer);
-                    x += width + 10;
-                    renderer.setViewport(x, y, width, height);
-                    debugPass.setUniform('texture', brdfLookup);
-                    debugPass.render(renderer);
+        var timeline = new clay.Timeline();
+        timeline.start();
+        timeline.on('frame', function (deltaTime) {
+          control.update(deltaTime);
+          var viewport = renderer.viewport;
+          compositor.render(renderer);
 
-                    renderer.setViewport(viewport);
-                });
+          var x = 0,
+            y = 0;
+          var width = viewport.width / 10;
+          var height = width;
+          renderer.clearBit = clay.Renderer.DEPTH_BUFFER_BIT;
+          renderer.setViewport(x, y, width, height);
+          debugPass.setUniform('texture', normalDistribution);
+          debugPass.render(renderer);
+          x += width + 10;
+          renderer.setViewport(x, y, width, height);
+          debugPass.setUniform('texture', brdfLookup);
+          debugPass.render(renderer);
 
-                function applyMaterial(material, prefilterResult, roughness) {
-                    // Ignore too small mip have seam artifacts
-                    material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel - 2);
-                    material.set('brdfLookup', prefilterResult.brdfLookup);
-                    material.set('environmentMap', prefilterResult.environmentMap);
-                    material.set('glossiness', 1 - roughness);
+          renderer.setViewport(viewport);
+        });
 
-                    material.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
-                    material.define('fragment', 'RGBM');
-                }
+        function applyMaterial(material, prefilterResult, roughness) {
+          // Ignore too small mip have seam artifacts
+          material.set('maxMipmapLevel', prefilterResult.maxMipmapLevel - 2);
+          material.set('brdfLookup', prefilterResult.brdfLookup);
+          material.set('environmentMap', prefilterResult.environmentMap);
+          material.set('glossiness', 1 - roughness);
 
-                window.onresize = function() {
-                    renderer.resize(window.innerWidth, window.innerHeight);
-                    camera.aspect = renderer.getViewportAspect();
-                }
-            });
-        </script>
+          material.define('fragment', 'ENVIRONMENTMAP_PREFILTER');
+          material.define('fragment', 'RGBM');
+        }
+
+        window.onresize = function () {
+          renderer.resize(window.innerWidth, window.innerHeight);
+          camera.aspect = renderer.getViewportAspect();
+        };
+      });
+    </script>
+  </body>
 </html>

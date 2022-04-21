@@ -1,7 +1,7 @@
 {
   "name": "claygl",
   "version": "1.3.0",
-  "description": "WebGL graphic library",
+  "description": "A 3D graphic library focused on WebGL2.0",
   "keywords": [
     "graphic",
     "webgl"
@@ -16,13 +16,13 @@
   "types": "index.d.ts",
   "sideEffects": false,
   "scripts": {
-    "build": "npm run glsl2js && npm run gen:entry && rollup -c && uglifyjs dist/claygl.js -c -m > dist/claygl.min.js",
-    "build:sourcemap": "npm run gen:entry && rollup --sourcemap inline -c",
+    "build": "npm run glsl2js && npm run gen:entry && npx rollup -c && npx terser dist/claygl.js -c -m > dist/claygl.min.js",
+    "build:lib": "npx tsc",
     "dev": "rollup --sourcemap inline -c -w",
     "glsl2js": "node build/glsl2js.js",
     "gen:entry": "node build/genentry.js",
     "gen:fixture": "npm run pretest && electron-mocha --require-main \"./test/genfixture-env.js\" --renderer \"./test/integration/**/*.spec.js\"",
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "debug": "npm run pretest && electron-mocha --debug-brk --renderer \"./test/**/*.spec.js\"",
     "instrument": "istanbul instrument ./dist/claygl.src.js --output ./dist/claygl.js --no-compact --complete-copy --es-modules",
     "pretest": "npm run build:sourcemap",
@@ -39,14 +39,18 @@
   "devDependencies": {
     "electron": "1.7.9",
     "electron-mocha": "^4.0.3",
+    "eslint": "^8.13.0",
+    "eslint-config-prettier": "^8.5.0",
     "glob": "^7.0.0",
     "istanbul": "^1.1.0-alpha.1",
     "minami": "^1.2.3",
     "mocha": "^4.0.1",
     "remap-istanbul": "^0.9.5",
-    "rollup": "^0.49.3",
-    "rollup-plugin-commonjs": "^8.2.6",
-    "rollup-watch": "^4.3.1"
+    "rollup": "^2.70.2",
+    "terser": "^5.12.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@rollup/plugin-typescript": "^8.3.2",
+    "tslib": "^2.3.1"
+  }
 }

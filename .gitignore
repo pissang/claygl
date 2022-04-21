@@ -1,9 +1,10 @@
 node_modules
-claygl.todo
 gh-pages
 .DS_Store
 .idea
-cloc_definitions.txt
 example/unit
 /coverage
 /doc
+/lib
+todo
+claygl.todo

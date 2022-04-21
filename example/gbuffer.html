@@ -1,99 +1,114 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script src="../dist/claygl.js?2"></script>
-        <script type="text/javascript" src="lib/dat.gui.js"></script>
-    </head>
-    <body style="margin:0px;">
-        <canvas id="main"></canvas>
-        <script type="text/javascript">
-            var renderer = new clay.Renderer({
-                canvas: document.getElementById('main')
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="../dist/claygl.js?2"></script>
+    <script type="text/javascript" src="lib/dat.gui.js"></script>
+  </head>
+  <body style="margin: 0px">
+    <canvas id="main"></canvas>
+    <script type="text/javascript">
+      var renderer = new clay.Renderer({
+        canvas: document.getElementById('main')
+      });
+      var gbuffer = new clay.deferred.GBuffer({
+        enableTargetTexture4: true
+      });
+      var camera = new clay.camera.Perspective({
+        aspect: renderer.getViewportAspect()
+      });
+      camera.position.set(0, 0, 6);
+
+      var timeline = new clay.Timeline();
+      timeline.start();
+      var scene = new clay.Scene();
+
+      var loader = new clay.loader.GLTF();
+      loader.load('assets/models/suzanne/suzanne_high.gltf');
+      var suzanneGeometry;
+      loader.on('success', function (res) {
+        suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+
+        var material = new clay.StandardMaterial({
+          metalness: 0.5,
+          uvRepeat: [3, 3],
+          roughness: 0.5
+        });
+        var mesh = new clay.Mesh({
+          geometry: suzanneGeometry,
+          material: material
+        });
+        mesh.geometry.generateTangents();
+
+        [
+          ['diffuseMap', 'basecolor'],
+          ['normalMap', 'normal'],
+          ['metalnessMap', 'metalness'],
+          ['roughnessMap', 'roughness']
+        ].forEach(function (mapInfo) {
+          var tex = new clay.Texture2D({
+            wrapS: clay.Texture.REPEAT,
+            wratT: clay.Texture.REPEAT
+          });
+          tex
+            .load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
+            .success(function () {
+              update();
             });
-            var gbuffer = new clay.deferred.GBuffer({
-                enableTargetTexture4: true
-            });
-            var camera = new clay.camera.Perspective({
-                aspect: renderer.getViewportAspect()
-            });
-            camera.position.set(0, 0, 6);
+          material[mapInfo[0]] = tex;
+        });
 
-            var timeline =  new clay.Timeline();
-            timeline.start();
-            var scene = new clay.Scene();
+        mesh.scale.set(1.4, 1.4, 1.4);
+        scene.add(mesh);
 
-            var loader = new clay.loader.GLTF();
-            loader.load('assets/models/suzanne/suzanne_high.gltf');
-            var suzanneGeometry;
-            loader.on('success', function(res) {
-                suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+        update();
+      });
 
-                var material = new clay.StandardMaterial({
-                    metalness: 0.5,
-                    uvRepeat: [3, 3],
-                    roughness: 0.5
-                });
-                var mesh = new clay.Mesh({
-                    geometry: suzanneGeometry,
-                    material: material
-                });
-                mesh.geometry.generateTangents();
+      var control = new clay.plugin.OrbitControl({
+        target: camera,
+        domElement: renderer.canvas,
+        timeline: timeline
+      });
 
-                [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
-                    var tex = new clay.Texture2D({
-                        wrapS: clay.Texture.REPEAT,
-                        wratT: clay.Texture.REPEAT
-                    });
-                    tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
-                        .success(function () {
-                            update();
-                        });
-                    material[mapInfo[0]] = tex;
-                });
+      control.on('update', update);
 
-                mesh.scale.set(1.4, 1.4, 1.4);
-                scene.add(mesh);
+      function update() {
+        scene.update();
+        camera.update();
+        gbuffer.update(renderer, scene, camera);
+        gbuffer.renderDebug(renderer, camera, config.debugType);
+      }
 
-                update();
-            });
+      window.onresize = function () {
+        renderer.resize(window.innerWidth, window.innerHeight);
+        gbuffer.resize(
+          renderer.getWidth() * renderer.getDevicePixelRatio(),
+          renderer.getHeight() * renderer.getDevicePixelRatio()
+        );
+        camera.aspect = renderer.getViewportAspect();
+      };
+      window.onresize();
 
-            var control = new clay.plugin.OrbitControl({
-                target: camera,
-                domElement: renderer.canvas,
-                timeline: timeline
-            });
+      var config = {
+        debugType: 'normal'
+      };
+      var gui = new dat.GUI();
 
-            control.on('update', update);
+      gui
+        .add(config, 'debugType', [
+          'normal',
+          'depth',
+          'position',
+          'glossiness',
+          'metalness',
+          'albedo',
+          'velocity'
+        ])
+        .onChange(function () {
+          update();
+        });
 
-            function update() {
-                scene.update();
-                camera.update();
-                gbuffer.update(renderer, scene, camera);
-                gbuffer.renderDebug(renderer, camera, config.debugType);
-            }
-
-            window.onresize = function() {
-                renderer.resize(window.innerWidth, window.innerHeight);
-                gbuffer.resize(
-                    renderer.getWidth() * renderer.getDevicePixelRatio(),
-                    renderer.getHeight() * renderer.getDevicePixelRatio()
-                );
-                camera.aspect = renderer.getViewportAspect();
-            };
-            window.onresize();
-
-            var config = {
-                debugType: 'normal'
-            }
-            var gui = new dat.GUI();
-
-            gui.add(config, 'debugType', [
-                'normal', 'depth', 'position', 'glossiness', 'metalness', 'albedo', 'velocity'
-            ]).onChange(function () {
-                update();
-            });
-
-            update();
-        </script>
+      update();
+    </script>
+  </body>
 </html>

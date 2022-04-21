@@ -1,192 +1,204 @@
 <html>
-    <head>
-        <title>Tron Effect</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script type="text/javascript" src="lib/require.js"></script>
-        <script type="text/javascript" src="lib/dat.gui.js"></script>
-    </head>
-    <body>
-        <style>
-            body {
-                margin: 0;
-                overflow: hidden;
+  <head>
+    <title>Tron Effect</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript" src="lib/require.js"></script>
+    <script type="text/javascript" src="lib/dat.gui.js"></script>
+  </head>
+  <body>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+      #main {
+        background-color: #111;
+      }
+      #split-line {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 0;
+        border: 1px solid #fff;
+        height: 100%;
+      }
+    </style>
+    <canvas id="main"></canvas>
+    <!--<div id="split-line"></div>-->
+    <script type="text/javascript">
+      require([
+        '../dist/claygl',
+        'text!./shader/tron.essl',
+        'js/createCompositor',
+        'lib/webvr-polyfill'
+      ], function (clay, tronShader, createCompositor) {
+        var Shader = clay.Shader;
+        Shader.import(tronShader);
+
+        var renderer = new clay.Renderer({
+          canvas: document.getElementById('main'),
+          devicePixelRatio: 1
+        });
+        var scene = new clay.Scene();
+        var camera = new clay.camera.Perspective({
+          aspect: renderer.getViewportAspect(),
+          far: 500
+        });
+        var stereoCamera = new clay.vr.StereoCamera();
+
+        var cube = new clay.geometry.Cube({
+          widthSegments: 1,
+          heightSegments: 1,
+          depthSegments: 1
+        });
+
+        var tronMaterial = new clay.Material({
+          shader: new clay.Shader({
+            vertex: Shader.source('tron.vertex'),
+            fragment: Shader.source('tron.fragment')
+          })
+        });
+        tronMaterial.define('fragment', 'RGBM_ENCODE');
+
+        camera.position.set(0, 0, 7);
+
+        var cubeMeshTronOutline = new clay.Mesh({
+          geometry: cube,
+          material: tronMaterial,
+          culling: false,
+          beforeRender: function (_gl) {
+            _gl.clear(_gl.DEPTH_BUFFER_BIT);
+          }
+        });
+        var cubeMesh = new clay.Mesh({
+          geometry: cube,
+          material: new clay.Material({
+            shader: clay.shader.library.get('clay.standard')
+          })
+        });
+        cubeMesh.material.define('fragment', 'RGBM_ENCODE');
+        cubeMeshTronOutline.scale.set(1.5, 1.5, 1.5);
+        cubeMesh.scale.set(1.5, 1.5, 1.5);
+
+        scene.add(cubeMesh);
+        scene.add(cubeMeshTronOutline);
+
+        var light = new clay.light.Directional({
+          intensity: 0.5
+        });
+        light.position.set(4, 5, 2);
+        light.lookAt(scene.position);
+        scene.add(light);
+
+        var timeline = new clay.Timeline();
+        timeline.start();
+
+        var control = new clay.plugin.OrbitControl({
+          domElement: renderer.canvas,
+          target: camera
+        });
+
+        var sourceTexture = new clay.Texture2D({
+          type: clay.Texture.HALF_FLOAT
+        });
+
+        var compositor = createCompositor({
+          texture: sourceTexture,
+          stereo: true,
+          enableLensflare: false
+        });
+
+        var frameBuffer = new clay.FrameBuffer();
+        frameBuffer.attach(sourceTexture);
+
+        timeline.on('frame', function (dTime) {
+          control.update(dTime);
+        });
+
+        function start(vrDisplay) {
+          timeline.on('frame', function (deltaTime) {
+            var start = new Date().getTime();
+
+            camera.update();
+            if (vrDisplay) {
+              stereoCamera.updateFromVRDisplay(vrDisplay, camera);
+            } else {
+              camera.aspect = renderer.getWidth() / renderer.getHeight();
+              stereoCamera.updateFromCamera(camera);
             }
-            #main {
-                background-color: #111;
+
+            renderer.clearBit = null;
+
+            renderer.saveViewport();
+
+            frameBuffer.bind(renderer);
+            renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT | renderer.gl.COLOR_BUFFER_BIT);
+            renderer.setViewport(0, 0, sourceTexture.width / 2, sourceTexture.height);
+            renderer.render(scene, stereoCamera.getLeftCamera());
+
+            renderer.setViewport(
+              sourceTexture.width / 2,
+              0,
+              sourceTexture.width / 2,
+              sourceTexture.height
+            );
+            renderer.render(scene, stereoCamera.getRightCamera());
+            frameBuffer.unbind(renderer);
+
+            renderer.restoreViewport();
+            compositor.render(renderer);
+
+            if (vrDisplay) {
+              vrDisplay.submitFrame();
             }
-            #split-line {
-                position: absolute;
-                top: 0;
-                left: 50%;
-                width: 0;
-                border: 1px solid #fff;
-                height: 100%;
-            }
-        </style>
-        <canvas id='main'></canvas>
-        <!--<div id="split-line"></div>-->
-        <script type="text/javascript">
-            require(['../dist/claygl', 'text!./shader/tron.essl', 'js/createCompositor', 'lib/webvr-polyfill'], function (clay, tronShader, createCompositor) {
-                var Shader = clay.Shader;
-                Shader.import(tronShader);
+          });
+        }
 
-                var renderer = new clay.Renderer({
-                    canvas: document.getElementById('main'),
-                    devicePixelRatio: 1
-                });
-                var scene = new clay.Scene();
-                var camera = new clay.camera.Perspective({
-                    aspect : renderer.getViewportAspect(),
-                    far : 500
-                });
-                var stereoCamera = new clay.vr.StereoCamera();
+        window.onresize = function () {
+          var width = window.innerWidth;
+          var height = window.innerHeight;
+          renderer.resize(width, height);
+          sourceTexture.width = width;
+          sourceTexture.height = height;
+          sourceTexture.dirty();
+        };
+        window.onresize();
 
-                var cube = new clay.geometry.Cube({
-                    widthSegments : 1,
-                    heightSegments : 1,
-                    depthSegments : 1
-                });
+        tronMaterial.set('sharpness', 10.0);
+        tronMaterial.set('strength', 100.0);
+        tronMaterial.set('substraction', 0.4);
+        compositor.getNodeByName('composite').setParameter('bloomIntensity', 0.5);
 
-                var tronMaterial = new clay.Material({
-                    shader: new clay.Shader({
-                        vertex: Shader.source('tron.vertex'),
-                        fragment: Shader.source('tron.fragment')
-                    })
-                });
-                tronMaterial.define('fragment', 'RGBM_ENCODE');
+        if (navigator.getVRDisplays) {
+          navigator
+            .getVRDisplays()
+            .then(function (displays) {
+              if (displays.length > 0) {
+                var vrDisplay = displays[0];
+                vrDisplay
+                  .requestPresent({
+                    source: renderer.canvas
+                  })
+                  .then(function () {
+                    start(vrDisplay);
+                  })
+                  .catch(function () {
+                    console.error('VRDisplay is not capable of presenting');
 
-                camera.position.set(0, 0, 7);
-
-                var cubeMeshTronOutline = new clay.Mesh({
-                    geometry: cube,
-                    material: tronMaterial,
-                    culling: false,
-                    beforeRender: function (_gl) {
-                        _gl.clear(_gl.DEPTH_BUFFER_BIT);
-                    }
-                });
-                var cubeMesh = new clay.Mesh({
-                    geometry: cube,
-                    material: new clay.Material({
-                        shader: clay.shader.library.get('clay.standard')
-                    })
-                });
-                cubeMesh.material.define('fragment', 'RGBM_ENCODE');
-                cubeMeshTronOutline.scale.set(1.5, 1.5, 1.5);
-                cubeMesh.scale.set(1.5, 1.5, 1.5);
-
-                scene.add(cubeMesh);
-                scene.add(cubeMeshTronOutline);
-
-                var light = new clay.light.Directional({
-                    intensity: 0.5
-                });
-                light.position.set(4, 5, 2);
-                light.lookAt(scene.position);
-                scene.add(light);
-
-                var timeline =  new clay.Timeline();
-                timeline.start();
-
-                var control = new clay.plugin.OrbitControl({
-                    domElement: renderer.canvas,
-                    target: camera
-                });
-
-                var sourceTexture = new clay.Texture2D({
-                    type: clay.Texture.HALF_FLOAT
-                });
-
-                var compositor = createCompositor({
-                    texture: sourceTexture,
-                    stereo: true,
-                    enableLensflare: false
-                });
-
-                var frameBuffer = new clay.FrameBuffer();
-                frameBuffer.attach(sourceTexture);
-
-                timeline.on('frame', function(dTime) {
-                    control.update(dTime);
-                });
-
-                function start(vrDisplay) {
-                    timeline.on('frame', function(deltaTime) {
-                        var start = new Date().getTime();
-
-                        camera.update();
-                        if (vrDisplay) {
-                            stereoCamera.updateFromVRDisplay(vrDisplay, camera);
-                        }
-                        else {
-                            camera.aspect = renderer.getWidth() / renderer.getHeight();
-                            stereoCamera.updateFromCamera(camera);
-                        }
-
-                        renderer.clearBit = null;
-
-                        renderer.saveViewport();
-
-                        frameBuffer.bind(renderer);
-                        renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT | renderer.gl.COLOR_BUFFER_BIT);
-                        renderer.setViewport(0, 0, sourceTexture.width / 2, sourceTexture.height);
-                        renderer.render(scene, stereoCamera.getLeftCamera());
-
-                        renderer.setViewport(sourceTexture.width / 2, 0, sourceTexture.width / 2, sourceTexture.height);
-                        renderer.render(scene, stereoCamera.getRightCamera());
-                        frameBuffer.unbind(renderer);
-
-                        renderer.restoreViewport();
-                        compositor.render(renderer);
-
-                        if (vrDisplay) {
-                            vrDisplay.submitFrame();
-                        }
-                    });
-
-                }
-
-                window.onresize = function () {
-                    var width = window.innerWidth;
-                    var height =  window.innerHeight;
-                    renderer.resize(width, height);
-                    sourceTexture.width = width;
-                    sourceTexture.height = height;
-                    sourceTexture.dirty();
-                }
-                window.onresize();
-
-                tronMaterial.set('sharpness', 10.0);
-                tronMaterial.set('strength', 100.0);
-                tronMaterial.set('substraction', 0.4);
-                compositor.getNodeByName('composite').setParameter('bloomIntensity', 0.5);
-
-                if (navigator.getVRDisplays) {
-                    navigator.getVRDisplays().then(function (displays) {
-                        if (displays.length > 0)  {
-                            var vrDisplay = displays[0];
-                            vrDisplay.requestPresent({
-                                source: renderer.canvas
-                            }).then(function () {
-                                start(vrDisplay);
-                            }).catch(function () {
-                                console.error('VRDisplay is not capable of presenting');
-
-                                start();
-                            });
-                        }
-                    }).catch(function () {
-                        console.error('VRDisplay is not capable of presenting');
-
-                        start();
-                    });
-                }
-                else {
                     start();
-                }
-            });
+                  });
+              }
+            })
+            .catch(function () {
+              console.error('VRDisplay is not capable of presenting');
 
-        </script>
-    </body>
+              start();
+            });
+        } else {
+          start();
+        }
+      });
+    </script>
+  </body>
 </html>

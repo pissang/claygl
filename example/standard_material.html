@@ -1,117 +1,121 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <script type="text/javascript" src="lib/require.js"></script>
-    </head>
-    <body style="margin:0px;">
-        <canvas id="main"></canvas>
-        <script type="text/javascript">
-            require(['../dist/claygl', 'js/createCompositor'], function(clay, createCompositor) {
-                var renderer = new clay.Renderer({
-                    canvas: document.getElementById('main'),
-                    devicePixelRatio: 1.0
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript" src="lib/require.js"></script>
+  </head>
+  <body style="margin: 0px">
+    <canvas id="main"></canvas>
+    <script type="text/javascript">
+      require(['../dist/claygl', 'js/createCompositor'], function (clay, createCompositor) {
+        var renderer = new clay.Renderer({
+          canvas: document.getElementById('main'),
+          devicePixelRatio: 1.0
+        });
+        renderer.resize(window.innerWidth, window.innerHeight);
+        var camera = new clay.camera.Perspective({
+          aspect: renderer.getViewportAspect()
+        });
+        camera.position.set(0, 0, 6);
+
+        var scene = new clay.Scene();
+
+        var loader = new clay.loader.GLTF();
+        loader.load('assets/models/suzanne/suzanne_high.gltf');
+        var suzanneGeometry;
+        loader.on('success', function (res) {
+          suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+
+          var envMap = clay.util.texture.loadTexture(
+            'assets/textures/hdr/pisa.hdr',
+            {
+              exposure: 3
+            },
+            function () {
+              envMap.flipY = false;
+
+              var prefilterResult = clay.util.cubemap.prefilterEnvironmentMap(renderer, envMap, {
+                width: 128,
+                height: 128,
+                encodeRGBM: true
+              });
+
+              var skybox = new clay.plugin.Skybox({
+                scene: scene,
+                environmentMap: prefilterResult.environmentMap
+              });
+              skybox.material.set('lod', 1.0);
+
+              skybox.material.define('fragment', 'RGBM_ENCODE');
+              skybox.material.define('fragment', 'RGBM_DECODE');
+
+              var material = new clay.StandardMaterial({
+                brdfLookup: prefilterResult.brdfLookup,
+                environmentMap: prefilterResult.environmentMap,
+                environmentMapPrefiltered: true,
+                encodeRGBM: true,
+                decodeRGBM: true,
+                linear: true,
+                metalness: 0.5,
+                uvRepeat: [3, 3],
+                roughness: 0.5
+              });
+              var mesh = new clay.Mesh({
+                geometry: suzanneGeometry,
+                material: material
+              });
+              mesh.geometry.generateTangents();
+
+              [
+                ['diffuseMap', 'basecolor'],
+                ['normalMap', 'normal'],
+                ['metalnessMap', 'metalness'],
+                ['roughnessMap', 'roughness']
+              ].forEach(function (mapInfo) {
+                var tex = new clay.Texture2D({
+                  wrapS: clay.Texture.REPEAT,
+                  wratT: clay.Texture.REPEAT
                 });
-                renderer.resize(window.innerWidth, window.innerHeight);
-                var camera = new clay.camera.Perspective({
-                    aspect: renderer.getViewportAspect()
-                });
-                camera.position.set(0, 0, 6);
+                tex
+                  .load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
+                  .success(function () {
+                    // FIXME
+                    tex.wrapS = clay.Texture.REPEAT;
+                    tex.wrapT = clay.Texture.REPEAT;
+                  });
+                material[mapInfo[0]] = tex;
+              });
 
-                var scene = new clay.Scene();
+              mesh.scale.set(1.4, 1.4, 1.4);
+              scene.add(mesh);
+            }
+          );
+        });
 
-                var loader = new clay.loader.GLTF();
-                loader.load('assets/models/suzanne/suzanne_high.gltf');
-                var suzanneGeometry;
-                loader.on('success', function(res) {
-                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+        var control = new clay.plugin.OrbitControl({
+          target: camera,
+          domElement: renderer.canvas
+        });
 
-                    var envMap = clay.util.texture.loadTexture(
-                        'assets/textures/hdr/pisa.hdr',
-                        {
-                            exposure: 3
-                        },
-                        function () {
-                            envMap.flipY = false;
+        var compositor = createCompositor({
+          scene: scene,
+          camera: camera,
+          enableBloom: true
+        });
 
-                            var prefilterResult = clay.util.cubemap.prefilterEnvironmentMap(
-                                renderer, envMap, {
-                                    width: 128,
-                                    height: 128,
-                                    encodeRGBM: true
-                                }
-                            );
+        var timeline = new clay.Timeline();
+        timeline.start();
+        timeline.on('frame', function (deltaTime) {
+          control.update(deltaTime);
+          compositor.render(renderer);
+          // renderer.render(scene, camera);
+        });
 
-                            var skybox = new clay.plugin.Skybox({
-                                scene: scene,
-                                environmentMap: prefilterResult.environmentMap
-                            });
-                            skybox.material.set('lod', 1.0);
-
-                            skybox.material.define('fragment', 'RGBM_ENCODE');
-                            skybox.material.define('fragment', 'RGBM_DECODE');
-
-                            var material = new clay.StandardMaterial({
-                                brdfLookup: prefilterResult.brdfLookup,
-                                environmentMap: prefilterResult.environmentMap,
-                                environmentMapPrefiltered: true,
-                                encodeRGBM: true,
-                                decodeRGBM: true,
-                                linear: true,
-                                metalness: 0.5,
-                                uvRepeat: [3, 3],
-                                roughness: 0.5
-                            });
-                            var mesh = new clay.Mesh({
-                                geometry: suzanneGeometry,
-                                material: material
-                            });
-                            mesh.geometry.generateTangents();
-
-                            [ ['diffuseMap', 'basecolor'], ['normalMap', 'normal'], ['metalnessMap', 'metalness'], ['roughnessMap', 'roughness'] ].forEach(function (mapInfo) {
-                                var tex = new clay.Texture2D({
-                                    wrapS: clay.Texture.REPEAT,
-                                    wratT: clay.Texture.REPEAT
-                                });
-                                tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
-                                    .success(function () {
-                                        // FIXME
-                                        tex.wrapS = clay.Texture.REPEAT;
-                                        tex.wrapT = clay.Texture.REPEAT;
-                                    });
-                                material[mapInfo[0]] = tex;
-                            });
-
-                            mesh.scale.set(1.4, 1.4, 1.4);
-                            scene.add(mesh);
-                        }
-                    );
-                });
-
-                var control = new clay.plugin.OrbitControl({
-                    target: camera,
-                    domElement: renderer.canvas
-                });
-
-                var compositor = createCompositor({
-                    scene: scene,
-                    camera: camera,
-                    enableBloom: true
-                });
-
-
-                var timeline =  new clay.Timeline();
-                timeline.start();
-                timeline.on('frame', function(deltaTime) {
-                    control.update(deltaTime);
-                    compositor.render(renderer);
-                    // renderer.render(scene, camera);
-                });
-
-                window.onresize = function() {
-                    renderer.resize(window.innerWidth, window.innerHeight);
-                    camera.aspect = renderer.getViewportAspect();
-                };
-            });
-        </script>
+        window.onresize = function () {
+          renderer.resize(window.innerWidth, window.innerHeight);
+          camera.aspect = renderer.getViewportAspect();
+        };
+      });
+    </script>
+  </body>
 </html>

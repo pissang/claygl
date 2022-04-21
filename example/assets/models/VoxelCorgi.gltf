@@ -5,11 +5,7 @@
   },
   "scenes": [
     {
-      "nodes": [
-        0,
-        1,
-        2
-      ],
+      "nodes": [0, 1, 2],
       "name": "Scene1"
     }
   ],
@@ -72,12 +68,7 @@
   "materials": [
     {
       "pbrMetallicRoughness": {
-        "baseColorFactor": [
-          0.8470588235294118,
-          0.6392156862745098,
-          0.37254901960784315,
-          1
-        ],
+        "baseColorFactor": [0.8470588235294118, 0.6392156862745098, 0.37254901960784315, 1],
         "metallicFactor": 0.5,
         "roughnessFactor": 0.99
       }
@@ -90,12 +81,7 @@
     },
     {
       "pbrMetallicRoughness": {
-        "baseColorFactor": [
-          0.3137254901960784,
-          0.3137254901960784,
-          0.3137254901960784,
-          1
-        ],
+        "baseColorFactor": [0.3137254901960784, 0.3137254901960784, 0.3137254901960784, 1],
         "metallicFactor": 0.5,
         "roughnessFactor": 0.99
       }
@@ -106,186 +92,96 @@
       "bufferView": 0,
       "componentType": 5126,
       "count": 13248,
-      "max": [
-        22.5,
-        16.5,
-        10.5
-      ],
-      "min": [
-        -16.5,
-        -13.5,
-        -13.5
-      ],
+      "max": [22.5, 16.5, 10.5],
+      "min": [-16.5, -13.5, -13.5],
       "type": "VEC3"
     },
     {
       "bufferView": 1,
       "componentType": 5126,
       "count": 13248,
-      "max": [
-        1,
-        1,
-        1
-      ],
-      "min": [
-        -1,
-        -1,
-        -1
-      ],
+      "max": [1, 1, 1],
+      "min": [-1, -1, -1],
       "type": "VEC3"
     },
     {
       "bufferView": 2,
       "componentType": 5126,
       "count": 13248,
-      "max": [
-        1,
-        1,
-        1
-      ],
-      "min": [
-        1,
-        1,
-        1
-      ],
+      "max": [1, 1, 1],
+      "min": [1, 1, 1],
       "type": "VEC3"
     },
     {
       "bufferView": 3,
       "componentType": 5126,
       "count": 13248,
-      "max": [
-        1,
-        1
-      ],
-      "min": [
-        0,
-        0
-      ],
+      "max": [1, 1],
+      "min": [0, 0],
       "type": "VEC2"
     },
     {
       "bufferView": 4,
       "componentType": 5126,
       "count": 2664,
-      "max": [
-        25.5,
-        10.5,
-        7.5
-      ],
-      "min": [
-        -19.5,
-        -16.5,
-        -10.5
-      ],
+      "max": [25.5, 10.5, 7.5],
+      "min": [-19.5, -16.5, -10.5],
       "type": "VEC3"
     },
     {
       "bufferView": 5,
       "componentType": 5126,
       "count": 2664,
-      "max": [
-        1,
-        1,
-        1
-      ],
-      "min": [
-        -1,
-        -1,
-        -1
-      ],
+      "max": [1, 1, 1],
+      "min": [-1, -1, -1],
       "type": "VEC3"
     },
     {
       "bufferView": 6,
       "componentType": 5126,
       "count": 2664,
-      "max": [
-        1,
-        1,
-        1
-      ],
-      "min": [
-        1,
-        1,
-        1
-      ],
+      "max": [1, 1, 1],
+      "min": [1, 1, 1],
       "type": "VEC3"
     },
     {
       "bufferView": 7,
       "componentType": 5126,
       "count": 2664,
-      "max": [
-        1,
-        1
-      ],
-      "min": [
-        0,
-        0
-      ],
+      "max": [1, 1],
+      "min": [0, 0],
       "type": "VEC2"
     },
     {
       "bufferView": 8,
       "componentType": 5126,
       "count": 144,
-      "max": [
-        -10.5,
-        7.5,
-        4.5
-      ],
-      "min": [
-        -22.5,
-        1.5,
-        -7.5
-      ],
+      "max": [-10.5, 7.5, 4.5],
+      "min": [-22.5, 1.5, -7.5],
       "type": "VEC3"
     },
     {
       "bufferView": 9,
       "componentType": 5126,
       "count": 144,
-      "max": [
-        1,
-        1,
-        1
-      ],
-      "min": [
-        -1,
-        -1,
-        -1
-      ],
+      "max": [1, 1, 1],
+      "min": [-1, -1, -1],
       "type": "VEC3"
     },
     {
       "bufferView": 10,
       "componentType": 5126,
       "count": 144,
-      "max": [
-        1,
-        1,
-        1
-      ],
-      "min": [
-        1,
-        1,
-        1
-      ],
+      "max": [1, 1, 1],
+      "min": [1, 1, 1],
       "type": "VEC3"
     },
     {
       "bufferView": 11,
       "componentType": 5126,
       "count": 144,
-      "max": [
-        1,
-        1
-      ],
-      "min": [
-        0,
-        0
-      ],
+      "max": [1, 1],
+      "min": [0, 0],
       "type": "VEC2"
     }
   ],

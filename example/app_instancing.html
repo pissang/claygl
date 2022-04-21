@@ -1,81 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <script src="../dist/claygl.js"></script>
     <title>Cube Instancing</title>
-</head>
-<body>
+  </head>
+  <body>
     <style>
-        html, body, #main {
-            height: 100%;
-            margin: 0;
-        }
+      html,
+      body,
+      #main {
+        height: 100%;
+        margin: 0;
+      }
     </style>
     <div id="main"></div>
     <script>
-        var app = clay.application.create('#main', {
+      var app = clay.application.create('#main', {
+        graphic: {
+          shadow: true
+        },
+        init: function (app) {
+          // Create camera
+          this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
 
-            graphic: {
-                shadow: true
-            },
-            init: function (app) {
-                // Create camera
-                this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
+          // Create cube
+          var cubeIntancedMesh = new clay.InstancedMesh({
+            geometry: new clay.geometry.Cube(),
+            material: app.createMaterial({
+              color: 'red'
+            }),
+            frustumCulling: false,
+            instances: []
+          });
 
-                // Create cube
-                var cubeIntancedMesh = new clay.InstancedMesh({
-                    geometry: new clay.geometry.Cube(),
-                    material: app.createMaterial({
-                        color: 'red'
-                    }),
-                    frustumCulling: false,
-                    instances: []
-                });
+          this._mesh = cubeIntancedMesh;
 
-                this._mesh = cubeIntancedMesh;
+          app.scene.add(cubeIntancedMesh);
 
-                app.scene.add(cubeIntancedMesh);
+          var CUBE_COUNT = 50;
+          for (var i = 0; i < CUBE_COUNT; i++) {
+            for (var j = 0; j < CUBE_COUNT; j++) {
+              var node = new clay.Node();
+              node.position.x = i - CUBE_COUNT / 2;
+              node.position.z = j - CUBE_COUNT / 2;
+              node.scale.set(0.4, 0.4, 0.4);
 
-                var CUBE_COUNT = 50;
-                for (var i = 0; i < CUBE_COUNT; i++) {
-                    for (var j = 0; j < CUBE_COUNT; j++) {
-                        var node = new clay.Node();
-                        node.position.x = i - CUBE_COUNT / 2;
-                        node.position.z = j - CUBE_COUNT / 2;
-                        node.scale.set(0.4, 0.4, 0.4);
+              node.rotation.rotateX(Math.random());
 
-                        node.rotation.rotateX(Math.random());
-
-                        cubeIntancedMesh.instances.push({
-                            node: node
-                        });
-                        app.scene.add(node);
-                    }
-                }
-
-                cubeIntancedMesh.boundingBox = new clay.BoundingBox(
-                    new clay.Vector3(-25, -1, -25),
-                    new clay.Vector3(25, 1, 25)
-                );
-
-                // Create light
-                this._mainLight = app.createDirectionalLight([-2, -1, -1]);
-                this._mainLight.shadowResolution = 2048;
-            },
-
-            loop: function (app) {
-                this._mesh.instances.forEach(function (instance) {
-                    instance.node.rotation.rotateX(0.01);
-                });
+              cubeIntancedMesh.instances.push({
+                node: node
+              });
+              app.scene.add(node);
             }
-        });
+          }
 
-        window.onresize = function () {
-            app.resize()
-        };
+          cubeIntancedMesh.boundingBox = new clay.BoundingBox(
+            new clay.Vector3(-25, -1, -25),
+            new clay.Vector3(25, 1, 25)
+          );
+
+          // Create light
+          this._mainLight = app.createDirectionalLight([-2, -1, -1]);
+          this._mainLight.shadowResolution = 2048;
+        },
+
+        loop: function (app) {
+          this._mesh.instances.forEach(function (instance) {
+            instance.node.rotation.rotateX(0.01);
+          });
+        }
+      });
+
+      window.onresize = function () {
+        app.resize();
+      };
     </script>
-</body>
+  </body>
 </html>

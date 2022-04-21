@@ -1,137 +1,136 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <script src="../dist/claygl.js"></script>
-    </head>
-    <body>
-        <canvas width="1200" height="640" id="main"></canvas>
-        <script type="text/javascript">
-            var Shader = clay.Shader;
+  <head>
+    <meta charset="utf-8" />
+    <script src="../dist/claygl.js"></script>
+  </head>
+  <body>
+    <canvas width="1200" height="640" id="main"></canvas>
+    <script type="text/javascript">
+      var Shader = clay.Shader;
 
-            var renderer = new clay.Renderer({
-                canvas : document.getElementById('main')
-            });
-            renderer.resize(window.innerWidth, window.innerHeight);
-            var scene = new clay.Scene;
-            var camera = new clay.camera.Perspective({
-                aspect : renderer.getViewportAspect(),
-                far : 500
-            });
+      var renderer = new clay.Renderer({
+        canvas: document.getElementById('main')
+      });
+      renderer.resize(window.innerWidth, window.innerHeight);
+      var scene = new clay.Scene();
+      var camera = new clay.camera.Perspective({
+        aspect: renderer.getViewportAspect(),
+        far: 500
+      });
 
-            var sphere = new clay.geometry.Sphere({
-                widthSegments : 20,
-                heightSegments : 20
-            });
-            var cube = new clay.geometry.Cube({
-                widthSegments : 10,
-                heightSegments : 10,
-                depthSegments : 10
-            });
-            var plane = new clay.geometry.Plane({
-                widthSegments : 10,
-                heightSegments : 10
-            })
-            var cone = new clay.geometry.Cone({
-                heightSegments : 10
-            });
-            var cylinder = new clay.geometry.Cylinder({
-                heightSegments : 10
-            });
-            var parametricSurfae = new clay.geometry.ParametricSurface({
-                generator: {
-                    u: [-Math.PI, Math.PI, Math.PI / 20],
-                    v: [-15, 6, 0.21],
-                    x: function (u, v) {
-                        return Math.pow(1.16, v) * Math.cos(v) * (1 + Math.cos(u));
-                    },
-                    y: function (u, v) {
-                        return -2 * Math.pow(1.16, v) * (1 + Math.sin(u));
-                    },
-                    z: function (u, v) {
-                        return -Math.pow(1.16, v) * Math.sin(v) * (1 + Math.cos(u));
-                    }
-                }
-            })
-            sphere.generateBarycentric();
-            cube.generateBarycentric();
-            plane.generateBarycentric();
-            cone.generateBarycentric();
-            cylinder.generateBarycentric();
-            parametricSurfae.generateBarycentric();
+      var sphere = new clay.geometry.Sphere({
+        widthSegments: 20,
+        heightSegments: 20
+      });
+      var cube = new clay.geometry.Cube({
+        widthSegments: 10,
+        heightSegments: 10,
+        depthSegments: 10
+      });
+      var plane = new clay.geometry.Plane({
+        widthSegments: 10,
+        heightSegments: 10
+      });
+      var cone = new clay.geometry.Cone({
+        heightSegments: 10
+      });
+      var cylinder = new clay.geometry.Cylinder({
+        heightSegments: 10
+      });
+      var parametricSurfae = new clay.geometry.ParametricSurface({
+        generator: {
+          u: [-Math.PI, Math.PI, Math.PI / 20],
+          v: [-15, 6, 0.21],
+          x: function (u, v) {
+            return Math.pow(1.16, v) * Math.cos(v) * (1 + Math.cos(u));
+          },
+          y: function (u, v) {
+            return -2 * Math.pow(1.16, v) * (1 + Math.sin(u));
+          },
+          z: function (u, v) {
+            return -Math.pow(1.16, v) * Math.sin(v) * (1 + Math.cos(u));
+          }
+        }
+      });
+      sphere.generateBarycentric();
+      cube.generateBarycentric();
+      plane.generateBarycentric();
+      cone.generateBarycentric();
+      cylinder.generateBarycentric();
+      parametricSurfae.generateBarycentric();
 
-            var shader = clay.shader.library.get('clay.wireframe');
-            var material = new clay.Material({
-                shader : shader,
-                transparent : true,
-                depthTest : false
-            })
-            material.set("lineWidth", 2);
+      var shader = clay.shader.library.get('clay.wireframe');
+      var material = new clay.Material({
+        shader: shader,
+        transparent: true,
+        depthTest: false
+      });
+      material.set('lineWidth', 2);
 
-            camera.position.set(0, 0, 9);
+      camera.position.set(0, 0, 9);
 
-            var sphereMesh = new clay.Mesh({
-                geometry : sphere,
-                material : material,
-                culling : false
-            });
-            var cubeMesh = new clay.Mesh({
-                geometry : cube,
-                material : material,
-                culling : false
-            });
-            var planeMesh = new clay.Mesh({
-                geometry : plane,
-                material : material,
-                culling : false
-            });
-            var coneMesh = new clay.Mesh({
-                geometry : cone,
-                material : material,
-                culling : false
-            });
-            var cylinderMesh = new clay.Mesh({
-                geometry : cylinder,
-                material : material,
-                culling : false
-            });
-            var parametricSurfaceMesh = new clay.Mesh({
-                geometry : parametricSurfae,
-                material : material,
-                culling : false
-            })
-            sphereMesh.position.x = -3;
-            cubeMesh.position.x = -1.5;
-            cubeMesh.scale.set(0.7, 0.7, 0.7);
-            coneMesh.position.x = 1.5;
-            cylinderMesh.position.x = 3;
-            parametricSurfaceMesh.position.x = 5;
-            parametricSurfaceMesh.scale.set(0.2, 0.2, 0.2);
+      var sphereMesh = new clay.Mesh({
+        geometry: sphere,
+        material: material,
+        culling: false
+      });
+      var cubeMesh = new clay.Mesh({
+        geometry: cube,
+        material: material,
+        culling: false
+      });
+      var planeMesh = new clay.Mesh({
+        geometry: plane,
+        material: material,
+        culling: false
+      });
+      var coneMesh = new clay.Mesh({
+        geometry: cone,
+        material: material,
+        culling: false
+      });
+      var cylinderMesh = new clay.Mesh({
+        geometry: cylinder,
+        material: material,
+        culling: false
+      });
+      var parametricSurfaceMesh = new clay.Mesh({
+        geometry: parametricSurfae,
+        material: material,
+        culling: false
+      });
+      sphereMesh.position.x = -3;
+      cubeMesh.position.x = -1.5;
+      cubeMesh.scale.set(0.7, 0.7, 0.7);
+      coneMesh.position.x = 1.5;
+      cylinderMesh.position.x = 3;
+      parametricSurfaceMesh.position.x = 5;
+      parametricSurfaceMesh.scale.set(0.2, 0.2, 0.2);
 
-            scene.add( sphereMesh );
-            scene.add( planeMesh );
-            scene.add( cubeMesh );
-            scene.add( coneMesh );
-            scene.add( cylinderMesh );
-            scene.add( parametricSurfaceMesh );
+      scene.add(sphereMesh);
+      scene.add(planeMesh);
+      scene.add(cubeMesh);
+      scene.add(coneMesh);
+      scene.add(cylinderMesh);
+      scene.add(parametricSurfaceMesh);
 
-            var timeline =  new clay.Timeline();
-            timeline.start();
+      var timeline = new clay.Timeline();
+      timeline.start();
 
-            var control = new clay.plugin.OrbitControl({
-                domElement: renderer.canvas,
-                target: camera
-            });
-            timeline.on('frame', function(dTime) {
-                renderer.render( scene, camera );
-                control.update(dTime);
-                cubeMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                planeMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                sphereMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                coneMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                cylinderMesh.rotation.rotateY(Math.PI * dTime / 5000);
-                parametricSurfaceMesh.rotation.rotateY(Math.PI * dTime / 5000);
-            });
-
-        </script>
-    </body>
+      var control = new clay.plugin.OrbitControl({
+        domElement: renderer.canvas,
+        target: camera
+      });
+      timeline.on('frame', function (dTime) {
+        renderer.render(scene, camera);
+        control.update(dTime);
+        cubeMesh.rotation.rotateY((Math.PI * dTime) / 5000);
+        planeMesh.rotation.rotateY((Math.PI * dTime) / 5000);
+        sphereMesh.rotation.rotateY((Math.PI * dTime) / 5000);
+        coneMesh.rotation.rotateY((Math.PI * dTime) / 5000);
+        cylinderMesh.rotation.rotateY((Math.PI * dTime) / 5000);
+        parametricSurfaceMesh.rotation.rotateY((Math.PI * dTime) / 5000);
+      });
+    </script>
+  </body>
 </html>

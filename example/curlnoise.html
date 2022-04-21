@@ -1,124 +1,130 @@
 <html>
-<head>
+  <head>
     <title></title>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <script type="text/javascript" src="lib/require.js"></script>
-</head>
-<body style="margin:0px;">
+  </head>
+  <body style="margin: 0px">
     <canvas id="main"></canvas>
     <script type="text/javascript">
-        require(['../dist/claygl', 'text!./assets/fx/curlnoise.essl'], function(clay, esslCode){
+      require(['../dist/claygl', 'text!./assets/fx/curlnoise.essl'], function (clay, esslCode) {
+        var Shader = clay.Shader;
 
-            var Shader = clay.Shader;
+        clay.Shader.import(esslCode);
 
-            clay.Shader.import(esslCode);
+        var SIZE = 1024;
 
-            var SIZE = 1024;
-
-            var renderer = new clay.Renderer({
-                canvas: document.getElementById("main"),
-                devicePixelRatio: 1.0
-            });
-            renderer.resize(window.innerWidth, window.innerHeight);
-            var timeline =  new clay.Timeline();
-            timeline.start();
-
-            var fxLoader = new clay.loader.FX();
-            fxLoader.load('assets/fx/curlnoise.json');
-            fxLoader.on('success', function(compositor) {
-                var time = new Date().getTime();
-                var elapsedTime = 0;
-                var spawnNode = compositor.getNodeByName('spawn');
-                var noiseNode = compositor.getNodeByName('noise');
-                var particleNode = compositor.getNodeByName('particle');
-
-                // Scene
-                var geo = new clay.StaticGeometry();
-                var offset = 0;
-                geo.attributes.position.init(SIZE * SIZE);
-                for (var i = 0; i < SIZE; i++) {
-                    for (var j = 0; j < SIZE; j++) {
-                        geo.attributes.position.set(offset++, [i / SIZE, j / SIZE, 0]);
-                    }
-                }
-                var mat = new clay.Material({
-                    shader: new clay.Shader({
-                        vertex: Shader.source('curlnoise.vertex'),
-                        fragment: Shader.source('curlnoise.fragment')
-                    }),
-                    transparent: true,
-                    depthTest: false,
-                    blend: function(_gl){
-                        _gl.blendEquation(_gl.FUNC_ADD);
-                        _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE);
-                    }
-                });
-                var particleSystem = new clay.Mesh({
-                    geometry: geo,
-                    material: mat,
-                    mode: clay.Mesh.POINTS
-                });
-                var scene = new clay.Scene();
-                scene.add(particleSystem);
-                var camera = new clay.camera.Perspective({
-                    aspect: renderer.getViewportAspect()
-                });
-                camera.position.z = 0.3;
-                camera.position.y = 0.3;
-                camera.lookAt(scene.position);
-
-                var spiritTexture = new clay.Texture2D();
-                spiritTexture.image = generateSprite();
-                mat.set("spiritTexture", spiritTexture);
-                mat.set("color", [0.0, 0.0, 0.0]);
-
-                var control = new clay.plugin.OrbitControl({
-                    target: camera,
-                    domElement: renderer.canvas,
-                    sensitivity: 0.4
-                });
-
-                timeline.on('frame', function () {
-                    control.update();
-                    var currentTime = new Date().getTime();
-                    var deltaTime = (currentTime - time) / 1000;
-                    elapsedTime += deltaTime;
-                    time = currentTime;
-
-                    spawnNode.setParameter("elapsedTime", elapsedTime);
-                    noiseNode.setParameter("elapsedTime", elapsedTime);
-                    particleNode.setParameter("deltaTime", deltaTime);
-                    compositor.render(renderer);
-
-                    mat.set("particleTexture", particleNode._outputTextures['position']);
-                    renderer.render(scene, camera);
-                });
-            });
-
-            function generateSprite(){
-                var canvas = document.createElement('canvas');
-                canvas.width = 128;
-                canvas.height = 128;
-
-                var context = canvas.getContext('2d');
-
-                context.beginPath();
-                context.arc(64, 64, 60, 0, Math.PI * 2, false) ;
-                context.closePath();
-
-                context.restore();
-
-                var gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
-
-                gradient.addColorStop(0, 'rgba(255,255,255,1)');
-                gradient.addColorStop(1, 'rgba(255,255,255,0.0)');
-
-                context.fillStyle = gradient;
-
-                context.fill();
-                return canvas;
-            }
+        var renderer = new clay.Renderer({
+          canvas: document.getElementById('main'),
+          devicePixelRatio: 1.0
         });
+        renderer.resize(window.innerWidth, window.innerHeight);
+        var timeline = new clay.Timeline();
+        timeline.start();
+
+        var fxLoader = new clay.loader.FX();
+        fxLoader.load('assets/fx/curlnoise.json');
+        fxLoader.on('success', function (compositor) {
+          var time = new Date().getTime();
+          var elapsedTime = 0;
+          var spawnNode = compositor.getNodeByName('spawn');
+          var noiseNode = compositor.getNodeByName('noise');
+          var particleNode = compositor.getNodeByName('particle');
+
+          // Scene
+          var geo = new clay.StaticGeometry();
+          var offset = 0;
+          geo.attributes.position.init(SIZE * SIZE);
+          for (var i = 0; i < SIZE; i++) {
+            for (var j = 0; j < SIZE; j++) {
+              geo.attributes.position.set(offset++, [i / SIZE, j / SIZE, 0]);
+            }
+          }
+          var mat = new clay.Material({
+            shader: new clay.Shader({
+              vertex: Shader.source('curlnoise.vertex'),
+              fragment: Shader.source('curlnoise.fragment')
+            }),
+            transparent: true,
+            depthTest: false,
+            blend: function (_gl) {
+              _gl.blendEquation(_gl.FUNC_ADD);
+              _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE);
+            }
+          });
+          var particleSystem = new clay.Mesh({
+            geometry: geo,
+            material: mat,
+            mode: clay.Mesh.POINTS
+          });
+          var scene = new clay.Scene();
+          scene.add(particleSystem);
+          var camera = new clay.camera.Perspective({
+            aspect: renderer.getViewportAspect()
+          });
+          camera.position.z = 0.3;
+          camera.position.y = 0.3;
+          camera.lookAt(scene.position);
+
+          var spiritTexture = new clay.Texture2D();
+          spiritTexture.image = generateSprite();
+          mat.set('spiritTexture', spiritTexture);
+          mat.set('color', [0.0, 0.0, 0.0]);
+
+          var control = new clay.plugin.OrbitControl({
+            target: camera,
+            domElement: renderer.canvas,
+            sensitivity: 0.4
+          });
+
+          timeline.on('frame', function () {
+            control.update();
+            var currentTime = new Date().getTime();
+            var deltaTime = (currentTime - time) / 1000;
+            elapsedTime += deltaTime;
+            time = currentTime;
+
+            spawnNode.setParameter('elapsedTime', elapsedTime);
+            noiseNode.setParameter('elapsedTime', elapsedTime);
+            particleNode.setParameter('deltaTime', deltaTime);
+            compositor.render(renderer);
+
+            mat.set('particleTexture', particleNode._outputTextures['position']);
+            renderer.render(scene, camera);
+          });
+        });
+
+        function generateSprite() {
+          var canvas = document.createElement('canvas');
+          canvas.width = 128;
+          canvas.height = 128;
+
+          var context = canvas.getContext('2d');
+
+          context.beginPath();
+          context.arc(64, 64, 60, 0, Math.PI * 2, false);
+          context.closePath();
+
+          context.restore();
+
+          var gradient = context.createRadialGradient(
+            canvas.width / 2,
+            canvas.height / 2,
+            0,
+            canvas.width / 2,
+            canvas.height / 2,
+            canvas.width / 2
+          );
+
+          gradient.addColorStop(0, 'rgba(255,255,255,1)');
+          gradient.addColorStop(1, 'rgba(255,255,255,0.0)');
+
+          context.fillStyle = gradient;
+
+          context.fill();
+          return canvas;
+        }
+      });
     </script>
-</body>
+  </body>
 </html>

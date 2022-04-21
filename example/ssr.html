@@ -1,166 +1,166 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <script type="text/javascript" src="lib/require.js"></script>
-        <script type="text/javascript" src="lib/stats.js"></script>
-        <script type="text/javascript" src="lib/dat.gui.js"></script>
-    </head>
-    <body style="margin:0px;">
-        <style>
-            #main {
-                background: #000;
+  <head>
+    <meta charset="utf-8" />
+    <script type="text/javascript" src="lib/require.js"></script>
+    <script type="text/javascript" src="lib/stats.js"></script>
+    <script type="text/javascript" src="lib/dat.gui.js"></script>
+  </head>
+  <body style="margin: 0px">
+    <style>
+      #main {
+        background: #000;
+      }
+    </style>
+    <canvas id="main"></canvas>
+    <script type="text/javascript">
+      require(['../dist/claygl', 'js/SSRPass'], function (clay, SSRPass) {
+        var config = {
+          maxIteration: 20,
+          maxBinarySearchIteration: 5,
+          maxRayDistance: 7.5,
+          pixelStride: 16,
+          pixelStrideZCutoff: 50,
+          screenEdgeFadeStart: 0.9,
+          eyeFadeStart: 0.4,
+          eyeFadeEnd: 0.8,
+
+          roughness: 0.5
+        };
+
+        var renderer = new clay.Renderer({
+          canvas: document.getElementById('main'),
+          devicePixelRatio: 1.0
+        });
+        var camera = new clay.camera.Perspective({
+          aspect: renderer.getViewportAspect()
+        });
+        camera.position.set(0, 4, 4);
+        camera.lookAt(clay.Vector3.ZERO);
+
+        var gBuffer = new clay.deferred.GBuffer();
+        var ssrPass = new SSRPass({
+          gBuffer: gBuffer
+        });
+
+        var scene = new clay.Scene();
+        var planeGeo = new clay.geometry.Plane();
+        var plane = new clay.Mesh({
+          geometry: planeGeo,
+          material: new clay.Material({
+            shader: clay.shader.library.get('clay.standard')
+          })
+        });
+        plane.scale.set(14, 14, 1);
+        plane.rotation.rotateX(-Math.PI / 2);
+        // plane.material.set('color', [0.2, 0.2, 0.2]);
+
+        var diffuseTex = new clay.Texture2D({
+          wrapS: clay.Texture.REPEAT,
+          wrapT: clay.Texture.REPEAT
+        });
+        var normalTex = new clay.Texture2D({
+          wrapS: clay.Texture.REPEAT,
+          wrapT: clay.Texture.REPEAT
+        });
+        diffuseTex.load('assets/textures/oakfloor2/oakfloor2_basecolor.png');
+        normalTex.load('assets/textures/oakfloor2/oakfloor2_normal.png');
+        plane.geometry.generateTangents();
+        plane.material.set('diffuseMap', diffuseTex);
+        plane.material.set('normalMap', normalTex);
+        plane.material.set('uvRepeat', [5, 5]);
+
+        scene.add(plane);
+        var mainLight = new clay.light.Directional({
+          intensity: 2
+        });
+        mainLight.position.set(12, 12, 12);
+        mainLight.lookAt(scene.position);
+        scene.add(mainLight);
+
+        var loader = new clay.loader.GLTF();
+        loader.load('assets/models/suzanne/suzanne.gltf');
+        var suzanneGeometry;
+        var monkeys = [];
+        loader.on('success', function (res) {
+          suzanneGeometry = res.scene.getNode('Suzanne').geometry;
+
+          for (var i = 0; i < 8; i++) {
+            for (var j = 0; j < 8; j++) {
+              var mesh = new clay.Mesh({
+                geometry: suzanneGeometry,
+                material: new clay.Material({
+                  shader: clay.shader.library.get('clay.standard')
+                })
+              });
+              mesh.position.set((i - 4) * 3, 1, (j - 4) * 3);
+              scene.add(mesh);
+
+              mesh.material.set('roughness', 0.5);
+              mesh.material.set('color', [0, 0, 0]);
+              mesh.material.set('emission', [Math.random(), Math.random(), Math.random()]);
+              monkeys.push(mesh);
             }
-        </style>
-        <canvas id="main"></canvas>
-        <script type="text/javascript">
-            require(['../dist/claygl', 'js/SSRPass'], function (clay, SSRPass) {
+          }
+        });
 
-                var config = {
-                    maxIteration: 20,
-                    maxBinarySearchIteration: 5,
-                    maxRayDistance: 7.5,
-                    pixelStride: 16,
-                    pixelStrideZCutoff: 50,
-                    screenEdgeFadeStart: 0.9,
-                    eyeFadeStart: 0.4,
-                    eyeFadeEnd: 0.8,
+        var control = new clay.plugin.OrbitControl({
+          target: camera,
+          domElement: renderer.canvas
+        });
 
-                    roughness: 0.5
-                };
+        var frameBuffer = new clay.FrameBuffer();
+        var colorTex = new clay.Texture2D();
+        var timeline = new clay.Timeline();
+        var elpasedTime = 0;
+        timeline.start();
+        timeline.on('frame', function (deltaTime) {
+          elpasedTime += deltaTime;
+          control.update(deltaTime);
 
-                var renderer = new clay.Renderer({
-                    canvas: document.getElementById('main'),
-                    devicePixelRatio: 1.0
-                });
-                var camera = new clay.camera.Perspective({
-                    aspect: renderer.getViewportAspect()
-                });
-                camera.position.set(0, 4, 4);
-                camera.lookAt(clay.Vector3.ZERO);
+          monkeys.forEach(function (monkey, idx) {
+            monkey.position.y = 1 + 0.5 * (Math.sin(elpasedTime / 3e2 + idx) + 1);
+          });
+          frameBuffer.attach(colorTex);
+          frameBuffer.bind(renderer);
+          renderer.render(scene, camera);
+          frameBuffer.unbind(renderer);
 
-                var gBuffer = new clay.deferred.GBuffer();
-                var ssrPass = new SSRPass({
-                    gBuffer: gBuffer
-                });
+          gBuffer.update(renderer, scene, camera);
+          ssrPass.render(renderer, camera, colorTex);
+        });
 
-                var scene = new clay.Scene();
-                var planeGeo = new clay.geometry.Plane();
-                var plane = new clay.Mesh({
-                    geometry: planeGeo,
-                    material: new clay.Material({
-                        shader: clay.shader.library.get('clay.standard')
-                    })
-                });
-                plane.scale.set(14, 14, 1);
-                plane.rotation.rotateX(-Math.PI / 2);
-                // plane.material.set('color', [0.2, 0.2, 0.2]);
+        window.onresize = function () {
+          var width = window.innerWidth;
+          var height = window.innerHeight;
+          renderer.resize(width, height);
+          gBuffer.resize(width, height);
+          colorTex.width = width;
+          colorTex.height = height;
+          colorTex.dirty();
+          camera.aspect = renderer.getViewportAspect();
+        };
+        window.onresize();
 
-                var diffuseTex = new clay.Texture2D({
-                    wrapS: clay.Texture.REPEAT,
-                    wrapT: clay.Texture.REPEAT
-                });
-                var normalTex = new clay.Texture2D({
-                    wrapS: clay.Texture.REPEAT,
-                    wrapT: clay.Texture.REPEAT
-                });
-                diffuseTex.load('assets/textures/oakfloor2/oakfloor2_basecolor.png');
-                normalTex.load('assets/textures/oakfloor2/oakfloor2_normal.png');
-                plane.geometry.generateTangents();
-                plane.material.set('diffuseMap', diffuseTex);
-                plane.material.set('normalMap', normalTex);
-                plane.material.set('uvRepeat', [5, 5]);
+        function updateConfig() {
+          for (var name in config) {
+            ssrPass.setParameter(name, config[name]);
+          }
+        }
+        updateConfig();
 
-                scene.add(plane);
-                var mainLight = new clay.light.Directional({
-                    intensity: 2
-                });
-                mainLight.position.set(12, 12, 12);
-                mainLight.lookAt(scene.position);
-                scene.add(mainLight);
-
-                var loader = new clay.loader.GLTF();
-                loader.load('assets/models/suzanne/suzanne.gltf');
-                var suzanneGeometry;
-                var monkeys = [];
-                loader.on('success', function(res) {
-                    suzanneGeometry = res.scene.getNode('Suzanne').geometry;
-
-                    for (var i = 0; i < 8; i++) {
-                        for (var j = 0; j < 8; j++) {
-                            var mesh = new clay.Mesh({
-                                geometry: suzanneGeometry,
-                                material: new clay.Material({
-                                    shader: clay.shader.library.get('clay.standard')
-                                })
-                            });
-                            mesh.position.set((i - 4) * 3, 1, (j - 4) * 3);
-                            scene.add(mesh);
-
-                            mesh.material.set('roughness', 0.5);
-                            mesh.material.set('color', [0, 0, 0]);
-                            mesh.material.set('emission', [Math.random(), Math.random(), Math.random()]);
-                            monkeys.push(mesh);
-                        }
-                    }
-                });
-
-                var control = new clay.plugin.OrbitControl({
-                    target: camera,
-                    domElement: renderer.canvas
-                });
-
-                var frameBuffer = new clay.FrameBuffer();
-                var colorTex = new clay.Texture2D();
-                var timeline =  new clay.Timeline();
-                var elpasedTime = 0;
-                timeline.start();
-                timeline.on('frame', function(deltaTime) {
-                    elpasedTime += deltaTime;
-                    control.update(deltaTime);
-
-                    monkeys.forEach(function (monkey, idx) {
-                        monkey.position.y = 1 + 0.5 * (Math.sin(elpasedTime / 3e2 + idx) + 1);
-                    });
-                    frameBuffer.attach(colorTex);
-                    frameBuffer.bind(renderer);
-                    renderer.render(scene, camera);
-                    frameBuffer.unbind(renderer);
-
-                    gBuffer.update(renderer, scene, camera);
-                    ssrPass.render(renderer, camera, colorTex);
-                });
-
-                window.onresize = function() {
-                    var width = window.innerWidth;
-                    var height = window.innerHeight;
-                    renderer.resize(width, height);
-                    gBuffer.resize(width, height);
-                    colorTex.width = width;
-                    colorTex.height = height;
-                    colorTex.dirty();
-                    camera.aspect = renderer.getViewportAspect();
-                };
-                window.onresize();
-
-                function updateConfig() {
-                    for (var name in config) {
-                        ssrPass.setParameter(name, config[name]);
-                    }
-                }
-                updateConfig();
-
-                var gui = new dat.GUI();
-                gui.add(config, 'maxIteration', 0, 200).step(1).onChange(updateConfig);
-                gui.add(config, 'maxBinarySearchIteration', 0, 20).step(1).onChange(updateConfig);
-                gui.add(config, 'maxRayDistance', 0, 10).onChange(updateConfig);
-                gui.add(config, 'pixelStride', 0, 32).onChange(updateConfig);
-                gui.add(config, 'pixelStrideZCutoff', 0, 50).onChange(updateConfig);
-                gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
-                gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
-                gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
-                gui.add(config, 'roughness', 0, 1).onChange(function (val) {
-                    plane.material.set('roughness', val);
-                });
-            });
-        </script>
+        var gui = new dat.GUI();
+        gui.add(config, 'maxIteration', 0, 200).step(1).onChange(updateConfig);
+        gui.add(config, 'maxBinarySearchIteration', 0, 20).step(1).onChange(updateConfig);
+        gui.add(config, 'maxRayDistance', 0, 10).onChange(updateConfig);
+        gui.add(config, 'pixelStride', 0, 32).onChange(updateConfig);
+        gui.add(config, 'pixelStrideZCutoff', 0, 50).onChange(updateConfig);
+        gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
+        gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
+        gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
+        gui.add(config, 'roughness', 0, 1).onChange(function (val) {
+          plane.material.set('roughness', val);
+        });
+      });
+    </script>
+  </body>
 </html>

@@ -1,43 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <script src="../dist/claygl.js"></script>
     <title>Standard Material</title>
-</head>
-<body>
+  </head>
+  <body>
     <style>
-        html, body, #main {
-            height: 100%;
-            margin: 0;
-        }
+      html,
+      body,
+      #main {
+        height: 100%;
+        margin: 0;
+      }
     </style>
     <div id="main"></div>
     <script>
-        var app = clay.application.create('#main', {
-            init: function (app) {
-                // Create camera
-                this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
+      var app = clay.application.create('#main', {
+        init: function (app) {
+          // Create camera
+          this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
 
-                // Create cube
-                this._cube = app.createCube({
-                    diffuseMap: 'assets/textures/crate.gif',
-                });
+          // Create cube
+          this._cube = app.createCube({
+            diffuseMap: 'assets/textures/crate.gif'
+          });
 
-                // Create light
-                this._mainLight = app.createDirectionalLight([-1, -1, -1]);
-            },
+          // Create light
+          this._mainLight = app.createDirectionalLight([-1, -1, -1]);
+        },
 
-            loop: function (app) {
-                this._cube.rotation.rotateY(app.frameTime / 1000);
-            }
-        });
+        loop: function (app) {
+          this._cube.rotation.rotateY(app.frameTime / 1000);
+        }
+      });
 
-        window.onresize = function () {
-            app.resize()
-        };
+      window.onresize = function () {
+        app.resize();
+      };
     </script>
-</body>
+  </body>
 </html>

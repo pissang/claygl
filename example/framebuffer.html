@@ -1,81 +1,80 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <script src="../dist/claygl.js"></script>
-    </head>
-    <body>
-        <canvas width="1200" height="640" id="main"></canvas>
-        <script type="text/javascript">
-            var Shader = clay.Shader;
+  <head>
+    <meta charset="utf-8" />
+    <script src="../dist/claygl.js"></script>
+  </head>
+  <body>
+    <canvas width="1200" height="640" id="main"></canvas>
+    <script type="text/javascript">
+      var Shader = clay.Shader;
 
-            var renderer = new clay.Renderer({
-                canvas: document.getElementById('main'),
-                devicePixelRatio: 1.0
-            });
-            //Create scene
-            var scene = new clay.Scene();
-            var camera = new clay.camera.Perspective({
-                aspect: renderer.getViewportAspect(),
-                far: 500
-            });
-            var cube = new clay.geometry.Cube();
-            var shader = new Shader({
-                vertex: Shader.source("clay.standard.vertex"),
-                fragment: Shader.source("clay.standard.fragment")
-            })
-            var material = new clay.Material({
-                shader: shader
-            });
-            var texture = new clay.Texture2D;
-            texture.load('assets/textures/crate.gif');
-            material.set("diffuseMap", texture);
-            var mesh = new clay.Mesh({
-                material: material,
-                geometry: cube
-            })
+      var renderer = new clay.Renderer({
+        canvas: document.getElementById('main'),
+        devicePixelRatio: 1.0
+      });
+      //Create scene
+      var scene = new clay.Scene();
+      var camera = new clay.camera.Perspective({
+        aspect: renderer.getViewportAspect(),
+        far: 500
+      });
+      var cube = new clay.geometry.Cube();
+      var shader = new Shader({
+        vertex: Shader.source('clay.standard.vertex'),
+        fragment: Shader.source('clay.standard.fragment')
+      });
+      var material = new clay.Material({
+        shader: shader
+      });
+      var texture = new clay.Texture2D();
+      texture.load('assets/textures/crate.gif');
+      material.set('diffuseMap', texture);
+      var mesh = new clay.Mesh({
+        material: material,
+        geometry: cube
+      });
 
-            scene.add(mesh);
+      scene.add(mesh);
 
-            camera.position.set(0, 1.5, 3);
-            camera.lookAt(new clay.Vector3(0, 0, 0));
+      camera.position.set(0, 1.5, 3);
+      camera.lookAt(new clay.Vector3(0, 0, 0));
 
-            var light = new clay.light.Point({
-                color: [1.5, 1.5, 1.5]
-            })
-            light.position.set(0, 0, 3);
-            scene.add(light);
+      var light = new clay.light.Point({
+        color: [1.5, 1.5, 1.5]
+      });
+      light.position.set(0, 0, 3);
+      scene.add(light);
 
-            var frameBuffer = new clay.FrameBuffer();
-            var rtt = new clay.Texture2D({
-                width: 1024,
-                height: 1024,
-            });
-            frameBuffer.attach(rtt);
-            var rttShader = clay.shader.library.get("clay.basic");
-            var rttMesh = new clay.Mesh({
-                geometry: new clay.geometry.Plane(),
-                material: new clay.Material({
-                    shader: rttShader
-                })
-            });
-            rttMesh.material.set('diffuseMap', rtt);
-            var rttScene = new clay.Scene();
-            rttScene.add(rttMesh);
+      var frameBuffer = new clay.FrameBuffer();
+      var rtt = new clay.Texture2D({
+        width: 1024,
+        height: 1024
+      });
+      frameBuffer.attach(rtt);
+      var rttShader = clay.shader.library.get('clay.basic');
+      var rttMesh = new clay.Mesh({
+        geometry: new clay.geometry.Plane(),
+        material: new clay.Material({
+          shader: rttShader
+        })
+      });
+      rttMesh.material.set('diffuseMap', rtt);
+      var rttScene = new clay.Scene();
+      rttScene.add(rttMesh);
 
-            var orthCamera = new clay.camera.Orthographic();
+      var orthCamera = new clay.camera.Orthographic();
 
-            var timeline =  new clay.Timeline();
-            timeline.start();
-            timeline.on('frame', function() {
-                frameBuffer.bind(renderer);
-                renderer.render(scene, camera);
-                frameBuffer.unbind(renderer);
+      var timeline = new clay.Timeline();
+      timeline.start();
+      timeline.on('frame', function () {
+        frameBuffer.bind(renderer);
+        renderer.render(scene, camera);
+        frameBuffer.unbind(renderer);
 
-                renderer.render(rttScene, orthCamera);
+        renderer.render(rttScene, orthCamera);
 
-                mesh.rotation.rotateY(Math.PI / 500);
-            });
-
-        </script>
-    </body>
+        mesh.rotation.rotateY(Math.PI / 500);
+      });
+    </script>
+  </body>
 </html>

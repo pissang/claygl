@@ -1,11 +1,9 @@
-import commonjs from 'rollup-plugin-commonjs';
+import typescript from '@rollup/plugin-typescript';
 
 export default {
-    input: 'src/claygl.js',
+    input: 'src/claygl.ts',
     plugins: [
-        commonjs({
-            include: 'src/dep/*',
-        })
+        typescript()
     ],
     // sourceMap: true,
     output: [

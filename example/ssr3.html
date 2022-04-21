@@ -1,187 +1,187 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <script type="text/javascript" src="lib/require.js"></script>
-        <script type="text/javascript" src="lib/stats.js"></script>
-        <script type="text/javascript" src="lib/dat.gui.js"></script>
-    </head>
-    <body style="margin:0px;">
-        <style>
-            #main {
-                background: #000;
-            }
-        </style>
-        <canvas id="main"></canvas>
-        <script type="text/javascript">
-            require(['../dist/claygl', 'js/SSRPass'], function(clay, SSRPass) {
+  <head>
+    <meta charset="utf-8" />
+    <script type="text/javascript" src="lib/require.js"></script>
+    <script type="text/javascript" src="lib/stats.js"></script>
+    <script type="text/javascript" src="lib/dat.gui.js"></script>
+  </head>
+  <body style="margin: 0px">
+    <style>
+      #main {
+        background: #000;
+      }
+    </style>
+    <canvas id="main"></canvas>
+    <script type="text/javascript">
+      require(['../dist/claygl', 'js/SSRPass'], function (clay, SSRPass) {
+        var config = {
+          maxIteration: 32,
+          maxBinarySearchIteration: 5,
+          maxRayDistance: 10,
+          pixelStride: 16,
+          pixelStrideZCutoff: 50,
+          screenEdgeFadeStart: 0.9,
+          eyeFadeStart: 0.8,
+          eyeFadeEnd: 1,
 
-                var config = {
-                    maxIteration: 32,
-                    maxBinarySearchIteration: 5,
-                    maxRayDistance: 10,
-                    pixelStride: 16,
-                    pixelStrideZCutoff: 50,
-                    screenEdgeFadeStart: 0.9,
-                    eyeFadeStart: 0.8,
-                    eyeFadeEnd: 1,
+          glossiness: 1,
+          minGlossiness: 0.55
+        };
 
-                    glossiness: 1,
-                    minGlossiness: 0.55
-                };
+        var renderer = new clay.Renderer({
+          canvas: document.getElementById('main'),
+          devicePixelRatio: 1.0
+        });
+        var camera = new clay.camera.Perspective({
+          aspect: renderer.getViewportAspect()
+        });
+        camera.position.set(0, 4, 4);
+        camera.lookAt(clay.Vector3.ZERO);
 
-                var renderer = new clay.Renderer({
-                    canvas: document.getElementById('main'),
-                    devicePixelRatio: 1.0
-                });
-                var camera = new clay.camera.Perspective({
-                    aspect: renderer.getViewportAspect()
-                });
-                camera.position.set(0, 4, 4);
-                camera.lookAt(clay.Vector3.ZERO);
+        var gBuffer = new clay.deferred.GBuffer();
+        var ssrPass = new SSRPass({
+          gBuffer: gBuffer
+        });
 
-                var gBuffer = new clay.deferred.GBuffer();
-                var ssrPass = new SSRPass({
-                    gBuffer: gBuffer
-                });
+        var scene = new clay.Scene();
+        var planeGeo = new clay.geometry.Plane();
+        var plane = new clay.Mesh({
+          geometry: planeGeo,
+          material: new clay.Material({
+            shader: clay.shader.library.get('clay.standard')
+          }),
+          culling: false
+        });
+        plane.scale.set(10, 10, 1);
+        plane.rotation.rotateX(-Math.PI / 2);
 
-                var scene = new clay.Scene();
-                var planeGeo = new clay.geometry.Plane();
-                var plane = new clay.Mesh({
-                    geometry: planeGeo,
-                    material: new clay.Material({
-                        shader: clay.shader.library.get('clay.standard')
-                    }),
-                    culling: false
-                });
-                plane.scale.set(10, 10, 1);
-                plane.rotation.rotateX(-Math.PI / 2);
+        var diffuseTex = new clay.Texture2D({
+          wrapS: clay.Texture.REPEAT,
+          wrapT: clay.Texture.REPEAT
+        });
+        var normalTex = new clay.Texture2D({
+          wrapS: clay.Texture.REPEAT,
+          wrapT: clay.Texture.REPEAT
+        });
+        var roughnessTex = new clay.Texture2D({
+          wrapS: clay.Texture.REPEAT,
+          wrapT: clay.Texture.REPEAT
+        });
+        diffuseTex.load('assets/textures/oakfloor2/oakfloor2_basecolor.png');
+        normalTex.load('assets/textures/oakfloor2/oakfloor2_normal.png');
+        roughnessTex.load('assets/textures/oakfloor2/oakfloor2_roughness.png');
+        plane.geometry.generateTangents();
+        plane.material.set('diffuseMap', diffuseTex);
+        plane.material.set('normalMap', normalTex);
+        plane.material.set('roughnessMap', roughnessTex);
+        plane.material.set('uvRepeat', [5, 5]);
+        plane.material.set('glossiness', config.glossiness);
 
-                var diffuseTex = new clay.Texture2D({
-                    wrapS: clay.Texture.REPEAT,
-                    wrapT: clay.Texture.REPEAT
-                });
-                var normalTex = new clay.Texture2D({
-                    wrapS: clay.Texture.REPEAT,
-                    wrapT: clay.Texture.REPEAT
-                });
-                var roughnessTex = new clay.Texture2D({
-                    wrapS: clay.Texture.REPEAT,
-                    wrapT: clay.Texture.REPEAT
-                });
-                diffuseTex.load('assets/textures/oakfloor2/oakfloor2_basecolor.png');
-                normalTex.load('assets/textures/oakfloor2/oakfloor2_normal.png');
-                roughnessTex.load('assets/textures/oakfloor2/oakfloor2_roughness.png');
-                plane.geometry.generateTangents();
-                plane.material.set('diffuseMap', diffuseTex);
-                plane.material.set('normalMap', normalTex);
-                plane.material.set('roughnessMap', roughnessTex);
-                plane.material.set('uvRepeat', [5, 5]);
-                plane.material.set('glossiness', config.glossiness);
+        var pic = new clay.Mesh({
+          geometry: planeGeo,
+          material: new clay.Material({
+            shader: clay.shader.library.get('clay.standard')
+          }),
+          culling: false
+        });
+        pic.material.set('color', [4, 4, 4]);
+        pic.material.set('glossiness', 0);
+        var picTex = new clay.Texture2D();
+        picTex.load('assets/scenes/gltf/photo.jpg');
+        pic.material.set('diffuseMap', picTex);
+        scene.add(pic);
+        pic.position.y = 1;
 
-                var pic = new clay.Mesh({
-                    geometry: planeGeo,
-                    material: new clay.Material({
-                        shader: clay.shader.library.get('clay.standard')
-                    }),
-                    culling: false
-                });
-                pic.material.set('color', [4, 4, 4]);
-                pic.material.set('glossiness', 0);
-                var picTex = new clay.Texture2D();
-                picTex.load('assets/scenes/gltf/photo.jpg');
-                pic.material.set('diffuseMap', picTex);
-                scene.add(pic);
-                pic.position.y = 1;
+        var sphereGeo = new clay.geometry.Sphere({
+          widthSegments: 50,
+          heightSegments: 50
+        });
+        var sphere1 = new clay.Mesh({
+          geometry: sphereGeo,
+          material: new clay.Material({
+            shader: clay.shader.library.get('clay.standard')
+          })
+        });
+        sphere1.position.set(2, 1, 0);
+        scene.add(sphere1);
+        var sphere2 = new clay.Mesh({
+          geometry: sphereGeo,
+          material: new clay.Material({
+            shader: clay.shader.library.get('clay.standard')
+          })
+        });
+        sphere2.position.set(-2, 1, 0);
+        scene.add(sphere2);
 
-                var sphereGeo = new clay.geometry.Sphere({
-                    widthSegments: 50,
-                    heightSegments: 50
-                });
-                var sphere1 = new clay.Mesh({
-                    geometry: sphereGeo,
-                    material: new clay.Material({
-                        shader: clay.shader.library.get('clay.standard')
-                    })
-                });
-                sphere1.position.set(2, 1, 0);
-                scene.add(sphere1);
-                var sphere2 = new clay.Mesh({
-                    geometry: sphereGeo,
-                    material: new clay.Material({
-                        shader: clay.shader.library.get('clay.standard')
-                    })
-                });
-                sphere2.position.set(-2, 1, 0);
-                scene.add(sphere2);
+        sphere1.material.set('color', [2, 0, 0]);
+        sphere2.material.set('color', [0, 2, 0]);
 
-                sphere1.material.set('color', [2, 0, 0]);
-                sphere2.material.set('color', [0, 2, 0]);
+        scene.add(plane);
+        var mainLight = new clay.light.Directional({
+          intensity: 0.5
+        });
+        mainLight.position.set(10, 10, 10);
+        mainLight.lookAt(scene.position);
+        scene.add(mainLight);
+        var fillLight = new clay.light.Directional({
+          intensity: 0.3
+        });
+        fillLight.position.set(5, 5, -10);
+        fillLight.lookAt(scene.position);
+        scene.add(fillLight);
 
-                scene.add(plane);
-                var mainLight = new clay.light.Directional({
-                    intensity: 0.5
-                });
-                mainLight.position.set(10, 10, 10);
-                mainLight.lookAt(scene.position);
-                scene.add(mainLight);
-                var fillLight = new clay.light.Directional({
-                    intensity: 0.3
-                });
-                fillLight.position.set(5, 5, -10);
-                fillLight.lookAt(scene.position);
-                scene.add(fillLight);
+        var control = new clay.plugin.OrbitControl({
+          target: camera,
+          domElement: renderer.canvas
+        });
 
-                var control = new clay.plugin.OrbitControl({
-                    target: camera,
-                    domElement: renderer.canvas
-                });
+        var frameBuffer = new clay.FrameBuffer();
+        var colorTex = new clay.Texture2D();
+        var timeline = new clay.Timeline();
+        timeline.start();
 
-                var frameBuffer = new clay.FrameBuffer();
-                var colorTex = new clay.Texture2D();
-                var timeline =  new clay.Timeline();
-                timeline.start();
+        timeline.on('frame', function (deltaTime) {
+          control.update(deltaTime);
 
-                timeline.on('frame', function(deltaTime) {
-                    control.update(deltaTime);
+          frameBuffer.attach(colorTex);
+          frameBuffer.bind(renderer);
+          renderer.render(scene, camera);
+          frameBuffer.unbind(renderer);
 
-                    frameBuffer.attach(colorTex);
-                    frameBuffer.bind(renderer);
-                    renderer.render(scene, camera);
-                    frameBuffer.unbind(renderer);
+          gBuffer.update(renderer, scene, camera);
+          ssrPass.render(renderer, camera, colorTex);
+        });
 
-                    gBuffer.update(renderer, scene, camera);
-                    ssrPass.render(renderer, camera, colorTex);
-                });
+        window.onresize = function () {
+          var width = window.innerWidth;
+          var height = window.innerHeight;
+          renderer.resize(width, height);
+          gBuffer.resize(width, height);
+          colorTex.width = width;
+          colorTex.height = height;
+          colorTex.dirty();
+          camera.aspect = renderer.getViewportAspect();
+        };
+        window.onresize();
 
-                window.onresize = function() {
-                    var width = window.innerWidth;
-                    var height = window.innerHeight;
-                    renderer.resize(width, height);
-                    gBuffer.resize(width, height);
-                    colorTex.width = width;
-                    colorTex.height = height;
-                    colorTex.dirty();
-                    camera.aspect = renderer.getViewportAspect();
-                };
-                window.onresize();
+        function updateConfig() {
+          for (var name in config) {
+            ssrPass.setParameter(name, config[name]);
+          }
+        }
+        updateConfig();
 
-                function updateConfig() {
-                    for (var name in config) {
-                        ssrPass.setParameter(name, config[name]);
-                    }
-                }
-                updateConfig();
-
-                var gui = new dat.GUI();
-                gui.add(config, 'maxIteration', 0, 200).step(1).onChange(updateConfig);
-                gui.add(config, 'maxBinarySearchIteration', 0, 20).step(1).onChange(updateConfig);
-                gui.add(config, 'maxRayDistance', 0, 10).onChange(updateConfig);
-                gui.add(config, 'pixelStride', 0, 32).onChange(updateConfig);
-                gui.add(config, 'pixelStrideZCutoff', 0, 50).onChange(updateConfig);
-                gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
-                gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
-                gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
-                gui.add(config, 'minGlossiness', 0, 1).onChange(updateConfig);
-            });
-        </script>
+        var gui = new dat.GUI();
+        gui.add(config, 'maxIteration', 0, 200).step(1).onChange(updateConfig);
+        gui.add(config, 'maxBinarySearchIteration', 0, 20).step(1).onChange(updateConfig);
+        gui.add(config, 'maxRayDistance', 0, 10).onChange(updateConfig);
+        gui.add(config, 'pixelStride', 0, 32).onChange(updateConfig);
+        gui.add(config, 'pixelStrideZCutoff', 0, 50).onChange(updateConfig);
+        gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
+        gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
+        gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
+        gui.add(config, 'minGlossiness', 0, 1).onChange(updateConfig);
+      });
+    </script>
+  </body>
 </html>

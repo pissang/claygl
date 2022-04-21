@@ -1,6 +1,6 @@
 <h1><img src="./asset/logo.svg" style="height:30px">  ClayGL</h1>
 
-<img width="100%" src="./screenshot/claygl-logo.jpg" />
+<img width="100%" src="./asset/claygl-logo.jpg" />
 
 [![NPM Version](https://img.shields.io/npm/v/claygl.svg)](https://github.com/pissang/claygl)
 [![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/claygl)
@@ -20,20 +20,20 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 [ECharts GL](https://github.com/ecomfe/echarts-gl)
 
 <a href="https://github.com/ecomfe/echarts-gl" target="_blank">
-<img src="./screenshot/echarts-gl.jpg" width="500" />
+<img src="./asset/echarts-gl.jpg" width="500" />
 </a>
 
 [Clay Viewer](https://github.com/pissang/clay-viewer)
 
 <a href="https://github.com/pissang/clay-viewer" target="_blank">
-<img src="./screenshot/clay-viewer.jpg" width="500" />
+<img src="./asset/clay-viewer.jpg" width="500" />
 </a>
 
 
 [DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
 
 <a href="https://github.com/pissang/dota2hero" target="_blank">
-<img src="./screenshot/dota2hero.jpg" width="500" />
+<img src="./asset/dota2hero.jpg" width="500" />
 </a>
 
 [Paper Cut Art Generator](https://github.com/pissang/papercut-box-art)

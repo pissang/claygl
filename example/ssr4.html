@@ -1,139 +1,139 @@
 <html>
-    <head>
-        <meta charset="utf-8">
-        <script type="text/javascript" src="lib/require.js"></script>
-        <script type="text/javascript" src="lib/stats.js"></script>
-        <script type="text/javascript" src="lib/dat.gui.js"></script>
-    </head>
-    <body style="margin:0px;">
-        <style>
-            #main {
-                background: #000;
-            }
-        </style>
-        <canvas id="main"></canvas>
-        <script type="text/javascript">
-            require(['../dist/claygl', 'js/SSRPass'], function(clay, SSRPass) {
+  <head>
+    <meta charset="utf-8" />
+    <script type="text/javascript" src="lib/require.js"></script>
+    <script type="text/javascript" src="lib/stats.js"></script>
+    <script type="text/javascript" src="lib/dat.gui.js"></script>
+  </head>
+  <body style="margin: 0px">
+    <style>
+      #main {
+        background: #000;
+      }
+    </style>
+    <canvas id="main"></canvas>
+    <script type="text/javascript">
+      require(['../dist/claygl', 'js/SSRPass'], function (clay, SSRPass) {
+        var config = {
+          maxIteration: 32,
+          maxBinarySearchIteration: 5,
+          maxRayDistance: 10,
+          pixelStride: 16,
+          pixelStrideZCutoff: 50,
+          screenEdgeFadeStart: 0.9,
+          eyeFadeStart: 0.8,
+          eyeFadeEnd: 1,
 
-                var config = {
-                    maxIteration: 32,
-                    maxBinarySearchIteration: 5,
-                    maxRayDistance: 10,
-                    pixelStride: 16,
-                    pixelStrideZCutoff: 50,
-                    screenEdgeFadeStart: 0.9,
-                    eyeFadeStart: 0.8,
-                    eyeFadeEnd: 1,
+          glossiness: 1,
+          minGlossiness: 0.1,
 
-                    glossiness: 1,
-                    minGlossiness: 0.1,
+          zThicknessThreshold: 0.1
+        };
 
-                    zThicknessThreshold: 0.1
-                };
+        var renderer = new clay.Renderer({
+          canvas: document.getElementById('main'),
+          devicePixelRatio: 1.0
+        });
+        var camera = new clay.camera.Perspective({
+          aspect: renderer.getViewportAspect()
+        });
+        camera.position.set(0, 4, 4);
+        camera.lookAt(clay.Vector3.ZERO);
 
-                var renderer = new clay.Renderer({
-                    canvas: document.getElementById('main'),
-                    devicePixelRatio: 1.0
-                });
-                var camera = new clay.camera.Perspective({
-                    aspect: renderer.getViewportAspect()
-                });
-                camera.position.set(0, 4, 4);
-                camera.lookAt(clay.Vector3.ZERO);
+        var gBuffer = new clay.deferred.GBuffer();
+        var ssrPass = new SSRPass({
+          gBuffer: gBuffer
+        });
 
-                var gBuffer = new clay.deferred.GBuffer();
-                var ssrPass = new SSRPass({
-                    gBuffer: gBuffer
-                });
+        var frameBuffer = new clay.FrameBuffer();
+        var colorTex = new clay.Texture2D();
+        var timeline = new clay.Timeline();
+        timeline.start();
 
-                var frameBuffer = new clay.FrameBuffer();
-                var colorTex = new clay.Texture2D();
-                var timeline =  new clay.Timeline();
-                timeline.start();
+        var camera = new clay.camera.Perspective({
+          aspect: renderer.getViewportAspect(),
+          far: 100
+        });
 
-                var camera = new clay.camera.Perspective({
-                    aspect: renderer.getViewportAspect(),
-                    far: 100
-                });
+        camera.position.set(2, 2, 2);
+        camera.lookAt(clay.Vector3.ZERO);
 
-                camera.position.set(2, 2, 2);
-                camera.lookAt(clay.Vector3.ZERO);
+        var control = new clay.plugin.OrbitControl({
+          target: camera,
+          domElement: renderer.canvas,
+          sensitivity: 0.4,
+          maxPolarAngle: Math.PI / 1.8,
+          minPolarAngle: 0.1
+        });
 
-                var control = new clay.plugin.OrbitControl({
-                    target: camera,
-                    domElement: renderer.canvas,
-                    sensitivity: 0.4,
-                    maxPolarAngle: Math.PI / 1.8,
-                    minPolarAngle: 0.1
-                });
+        var loader = new clay.loader.GLTF();
+        loader.load('assets/models/basic_scene/scene.gltf');
 
-                var loader = new clay.loader.GLTF();
-                loader.load('assets/models/basic_scene/scene.gltf');
+        loader.success(function (res) {
+          var scene = res.scene;
+          scene.rotation.rotateX(-Math.PI / 2);
 
-                loader.success(function (res) {
-                    var scene = res.scene;
-                    scene.rotation.rotateX(-Math.PI / 2);
+          var light = scene.getNode('Spot');
+          light.range = 30;
+          light.umbraAngle = 10;
+          light.penumbraAngle = 25;
+          light.lookAt(scene.position);
 
-                    var light = scene.getNode('Spot');
-                    light.range = 30;
-                    light.umbraAngle = 10;
-                    light.penumbraAngle = 25;
-                    light.lookAt(scene.position);
+          // scene.traverse(function (node) {
+          //     if (node.material) {
+          //         node.material.set('glossiness', 0.8);
+          //     }
+          // });
+          scene.getNode('Plane').culling = false;
+          scene.getNode('Plane_001').culling = false;
 
-                    // scene.traverse(function (node) {
-                    //     if (node.material) {
-                    //         node.material.set('glossiness', 0.8);
-                    //     }
-                    // });
-                    scene.getNode('Plane').culling = false;
-                    scene.getNode('Plane_001').culling = false;
+          scene.getNode('Plane').material.set('glossiness', 0.8);
+          scene.getNode('Plane').material.set('color', [0.4, 0.4, 0.4]);
 
-                    scene.getNode('Plane').material.set('glossiness', 0.8);
-                    scene.getNode('Plane').material.set('color', [0.4, 0.4, 0.4]);
+          timeline.on('frame', function (deltaTime) {
+            control.update(deltaTime);
 
-                    timeline.on('frame', function(deltaTime) {
-                        control.update(deltaTime);
+            frameBuffer.attach(colorTex);
+            frameBuffer.bind(renderer);
+            renderer.render(scene, camera);
+            frameBuffer.unbind(renderer);
 
-                        frameBuffer.attach(colorTex);
-                        frameBuffer.bind(renderer);
-                        renderer.render(scene, camera);
-                        frameBuffer.unbind(renderer);
+            gBuffer.update(renderer, scene, camera);
+            ssrPass.render(renderer, camera, colorTex);
+          });
+        });
 
-                        gBuffer.update(renderer, scene, camera);
-                        ssrPass.render(renderer, camera, colorTex);
-                    });
-                });
+        window.onresize = function () {
+          var width = window.innerWidth;
+          var height = window.innerHeight;
+          renderer.resize(width, height);
+          gBuffer.resize(width, height);
+          colorTex.width = width;
+          colorTex.height = height;
+          colorTex.dirty();
+          camera.aspect = renderer.getViewportAspect();
+        };
+        window.onresize();
 
-                window.onresize = function() {
-                    var width = window.innerWidth;
-                    var height = window.innerHeight;
-                    renderer.resize(width, height);
-                    gBuffer.resize(width, height);
-                    colorTex.width = width;
-                    colorTex.height = height;
-                    colorTex.dirty();
-                    camera.aspect = renderer.getViewportAspect();
-                };
-                window.onresize();
+        function updateConfig() {
+          for (var name in config) {
+            ssrPass.setParameter(name, config[name]);
+          }
+        }
+        updateConfig();
 
-                function updateConfig() {
-                    for (var name in config) {
-                        ssrPass.setParameter(name, config[name]);
-                    }
-                }
-                updateConfig();
-
-                var gui = new dat.GUI();
-                gui.add(config, 'maxIteration', 0, 200).step(1).onChange(updateConfig);
-                gui.add(config, 'maxBinarySearchIteration', 0, 20).step(1).onChange(updateConfig);
-                gui.add(config, 'maxRayDistance', 0, 10).onChange(updateConfig);
-                gui.add(config, 'pixelStride', 0, 32).onChange(updateConfig);
-                gui.add(config, 'pixelStrideZCutoff', 0, 50).onChange(updateConfig);
-                gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
-                gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
-                gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
-                gui.add(config, 'minGlossiness', 0, 1).onChange(updateConfig);
-                gui.add(config, 'zThicknessThreshold', 0, 2).onChange(updateConfig);
-            });
-        </script>
+        var gui = new dat.GUI();
+        gui.add(config, 'maxIteration', 0, 200).step(1).onChange(updateConfig);
+        gui.add(config, 'maxBinarySearchIteration', 0, 20).step(1).onChange(updateConfig);
+        gui.add(config, 'maxRayDistance', 0, 10).onChange(updateConfig);
+        gui.add(config, 'pixelStride', 0, 32).onChange(updateConfig);
+        gui.add(config, 'pixelStrideZCutoff', 0, 50).onChange(updateConfig);
+        gui.add(config, 'screenEdgeFadeStart', 0, 1).onChange(updateConfig);
+        gui.add(config, 'eyeFadeStart', 0, 1).onChange(updateConfig);
+        gui.add(config, 'eyeFadeEnd', 0, 1).onChange(updateConfig);
+        gui.add(config, 'minGlossiness', 0, 1).onChange(updateConfig);
+        gui.add(config, 'zThicknessThreshold', 0, 2).onChange(updateConfig);
+      });
+    </script>
+  </body>
 </html>

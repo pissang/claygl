@@ -1,79 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <script src="../dist/claygl.js"></script>
     <title>Basic Cube</title>
-</head>
-<body>
+  </head>
+  <body>
     <style>
-        html, body, #main {
-            overflow: hidden;
-            background: #111;
-            height: 100%;
-            margin: 0;
-        }
+      html,
+      body,
+      #main {
+        overflow: hidden;
+        background: #111;
+        height: 100%;
+        margin: 0;
+      }
     </style>
     <div id="main"></div>
     <script>
-        var app = clay.application.create('#main', {
+      var app = clay.application.create('#main', {
+        event: true,
 
-            event: true,
+        graphic: {
+          shadow: true
+        },
 
-            graphic: {
-                shadow: true
-            },
+        init: function (app) {
+          // Create camera
+          this._camera = app.createCamera([0, 3, 8], [0, 1, 0]);
 
-            init: function (app) {
-                // Create camera
-                this._camera = app.createCamera([0, 3, 8], [0, 1, 0]);
+          // Create lights
+          app.createDirectionalLight([-1, -1, -1], '#fff', 0.7);
+          app.createAmbientLight('#fff', 0.3);
 
-                // Create lights
-                app.createDirectionalLight([-1, -1, -1], '#fff', 0.7);
-                app.createAmbientLight('#fff', 0.3);
+          // Create geometries.
+          app.createCube();
+          app.createSphere().position.set(2, 0, 0);
+          app.createPlane().position.set(-2, 0, 0);
+          // More geometries can be found under clay.geometry namespace
+          app.createMesh(new clay.geometry.Cone()).position.set(4, 0, 0);
+          app.createMesh(new clay.geometry.Cylinder()).position.set(-4, 0, 0);
 
-                // Create geometries.
-                app.createCube();
-                app.createSphere().position.set(2, 0, 0);
-                app.createPlane().position.set(-2, 0, 0);
-                // More geometries can be found under clay.geometry namespace
-                app.createMesh(new clay.geometry.Cone()).position.set(4, 0, 0);
-                app.createMesh(new clay.geometry.Cylinder()).position.set(-4, 0, 0);
+          // Create a room
+          var roomCube = app.createCubeInside({
+            roughness: 1,
+            color: [0.3, 0.3, 0.3]
+          });
+          roomCube.silent = true;
+          // Cube not cast shadow to reduce the bounding box of scene and increse the shadow resolution.
+          roomCube.castShadow = false;
+          roomCube.scale.set(10, 10, 10);
+          roomCube.position.y = 9;
 
-                // Create a room
-                var roomCube = app.createCubeInside({
-                    roughness: 1,
-                    color: [0.3, 0.3, 0.3]
-                });
-                roomCube.silent = true;
-                // Cube not cast shadow to reduce the bounding box of scene and increse the shadow resolution.
-                roomCube.castShadow = false;
-                roomCube.scale.set(10, 10, 10);
-                roomCube.position.y = 9;
+          // Use orbit control
+          this._control = new clay.plugin.OrbitControl({
+            target: this._camera,
+            domElement: app.container
+          });
 
-                // Use orbit control
-                this._control = new clay.plugin.OrbitControl({
-                    target: this._camera,
-                    domElement: app.container
-                });
+          app.scene
+            .on('mouseover', function (e) {
+              e.target.material.set('color', '#f00');
+            })
+            .on('mouseout', function (e) {
+              e.target.material.set('color', '#fff');
+            });
+        },
 
-                app.scene.on('mouseover', function (e) {
-                    e.target.material.set('color', '#f00');
-                }).on('mouseout', function (e) {
-                    e.target.material.set('color', '#fff');
-                });
-            },
+        loop: function (app) {
+          this._control.update(app.frameTime);
+        }
+      });
 
-            loop: function (app) {
-                this._control.update(app.frameTime);
-            }
-        });
-
-        window.onresize = function () {
-            app.resize()
-        };
+      window.onresize = function () {
+        app.resize();
+      };
     </script>
-</body>
+  </body>
 </html>
