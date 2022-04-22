@@ -19,6 +19,7 @@
     "build": "npm run glsl2js && npm run gen:entry && npx rollup -c && npx terser dist/claygl.js -c -m > dist/claygl.min.js",
     "build:lib": "npx tsc",
     "prepublishOnly": "npm run build && npm run build:lib",
+    "lint": "npx eslint src/**/*.ts",
     "dev": "rollup --sourcemap inline -c -w",
     "glsl2js": "node build/glsl2js.js",
     "gen:entry": "node build/genentry.js",

@@ -1,4 +1,0 @@
-{
-  "parser": "@typescript-eslint/parser",
-  "extends": ["prettier"]
-}
