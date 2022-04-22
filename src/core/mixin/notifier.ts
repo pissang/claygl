@@ -1,4 +1,6 @@
 // @ts-nocheck
+import util from '../util';
+
 function Handler(action, context) {
   this.action = action;
   this.context = context;
@@ -13,17 +15,17 @@ const notifier = {
    * @param  {string} name
    */
   trigger: function (name) {
-    if (!this.hasOwnProperty('__handlers__')) {
+    if (!this.__handlers__) {
       return;
     }
-    if (!this.__handlers__.hasOwnProperty(name)) {
+    if (!util.hasOwn(this.__handlers__, name)) {
       return;
     }
 
     const hdls = this.__handlers__[name];
-    const l = hdls.length,
-      i = -1,
-      args = arguments;
+    const l = hdls.length;
+    const args = arguments;
+    let i = -1;
     // Optimize advise from backbone
     switch (args.length) {
       case 1:
