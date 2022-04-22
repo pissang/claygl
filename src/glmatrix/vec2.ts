@@ -493,7 +493,7 @@ vec2.forEach = (function () {
   var vec = vec2.create();
 
   return function (a, stride, offset, count, fn, arg) {
-    var i, l;
+    let i, l;
     if (!stride) {
       stride = 2;
     }

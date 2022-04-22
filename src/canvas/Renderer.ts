@@ -6,13 +6,13 @@ import vec4 from '../glmatrix/vec4';
 
 import glenum from '../core/glenum';
 
-var vec4Create = vec4.create;
+const vec4Create = vec4.create;
 
-var round = Math.round;
+const round = Math.round;
 
-var PRIMITIVE_TRIANGLE = 1;
-var PRIMITIVE_LINE = 2;
-var PRIMITIVE_POINT = 3;
+const PRIMITIVE_TRIANGLE = 1;
+const PRIMITIVE_LINE = 2;
+const PRIMITIVE_POINT = 3;
 
 function PrimitivePool(constructor) {
   this.ctor = constructor;
@@ -24,9 +24,9 @@ function PrimitivePool(constructor) {
 
 PrimitivePool.prototype = {
   pick: function () {
-    var data = this._data;
-    var size = this._size;
-    var obj = data[size];
+    const data = this._data;
+    const size = this._size;
+    let obj = data[size];
     if (!obj) {
       // Constructor must have no parameters
       obj = new this.ctor();
@@ -104,7 +104,7 @@ function vec4ToColorStr(v4) {
   );
 }
 
-var CanvasRenderer = Base.extend(
+const CanvasRenderer = Base.extend(
   {
     canvas: null,
 
@@ -134,13 +134,13 @@ var CanvasRenderer = Base.extend(
   },
   function () {
     if (!this.canvas) {
-      this.canvas = document.createElement('canvas');
+      this.canvas = window.document.createElement('canvas');
     }
-    var canvas = this.canvas;
+    const canvas = this.canvas;
 
     try {
       this.ctx = canvas.getContext('2d');
-      var ctx = this.ctx;
+      const ctx = this.ctx;
       if (!ctx) {
         throw new Error();
       }
@@ -152,8 +152,8 @@ var CanvasRenderer = Base.extend(
   },
   {
     resize: function (width, height) {
-      var dpr = this.devicePixelRatio;
-      var canvas = this.canvas;
+      const dpr = this.devicePixelRatio;
+      const canvas = this.canvas;
       if (width != null) {
         canvas.style.width = width + 'px';
         canvas.style.height = height + 'px';
@@ -182,11 +182,11 @@ var CanvasRenderer = Base.extend(
 
     render: function (scene, camera) {
       if (this.clear) {
-        var color = this.color;
-        var ctx = this.ctx;
-        var dpr = this.devicePixelRatio;
-        var w = this._width * dpr;
-        var h = this._height * dpr;
+        const color = this.color;
+        const ctx = this.ctx;
+        const dpr = this.devicePixelRatio;
+        const w = this._width * dpr;
+        const h = this._height * dpr;
         if (color && color[3] === 0) {
           ctx.clearRect(0, 0, w, h);
         } else {
@@ -202,42 +202,40 @@ var CanvasRenderer = Base.extend(
       scene.update();
       camera.update();
 
-      var opaqueList = scene.opaqueList;
-      var transparentList = scene.transparentList;
-      var sceneMaterial = scene.material;
+      const opaqueList = scene.opaqueList;
+      const transparentList = scene.transparentList;
 
-      var list = opaqueList.concat(transparentList);
+      const list = opaqueList.concat(transparentList);
 
       this.renderPass(list, camera);
     },
 
     renderPass: function (list, camera) {
-      var viewProj = mat4.create();
+      const viewProj = mat4.create();
       mat4.multiply(viewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
-      var worldViewProjMat = mat4.create();
-      var posViewSpace = vec3.create();
+      const worldViewProjMat = mat4.create();
 
-      var primitives = this._primitives;
-      var trianglesPool = this._triangles;
-      var linesPool = this._lines;
-      var pointsPool = this._points;
+      const primitives = this._primitives;
+      const trianglesPool = this._triangles;
+      const linesPool = this._lines;
+      const pointsPool = this._points;
 
       trianglesPool.reset();
       linesPool.reset();
       pointsPool.reset();
 
-      var nPrimitive = 0;
+      let nPrimitive = 0;
 
-      var indices = [0, 0, 0];
-      var matColor = [];
-      for (var i = 0; i < list.length; i++) {
-        var renderable = list[i];
+      const indices = [0, 0, 0];
+      const matColor = [];
+      for (let i = 0; i < list.length; i++) {
+        const renderable = list[i];
 
         mat4.multiply(worldViewProjMat, viewProj, renderable.worldTransform.array);
 
-        var geometry = renderable.geometry;
-        var material = renderable.material;
-        var attributes = geometry.attributes;
+        const geometry = renderable.geometry;
+        const material = renderable.material;
+        const attributes = geometry.attributes;
 
         // alpha is default 1
         if (material.color.length == 3) {
@@ -247,19 +245,19 @@ var CanvasRenderer = Base.extend(
           vec4.copy(matColor, material.color);
         }
 
-        var nVertex = geometry.vertexCount;
+        const nVertex = geometry.vertexCount;
         // Only support TRIANGLES, LINES, POINTS draw modes
         switch (renderable.mode) {
           case glenum.TRIANGLES:
             if (geometry.isUseIndices()) {
-              var nFace = geometry.triangleCount;
-              for (var j = 0; j < nFace; j++) {
+              const nFace = geometry.triangleCount;
+              for (let j = 0; j < nFace; j++) {
                 geometry.getFace(j, indices);
 
-                var triangle = trianglesPool.pick();
+                const triangle = trianglesPool.pick();
                 triangle.material = material;
 
-                var clipped = this._setPrimitive(
+                const clipped = this._setPrimitive(
                   triangle,
                   indices,
                   3,
@@ -273,15 +271,15 @@ var CanvasRenderer = Base.extend(
                 }
               }
             } else {
-              for (var j = 0; j < nVertex; ) {
+              for (let j = 0; j < nVertex; ) {
                 indices[0] = j++;
                 indices[1] = j++;
                 indices[2] = j++;
 
-                var triangle = trianglesPool.pick();
+                const triangle = trianglesPool.pick();
                 triangle.material = material;
 
-                var clipped = this._setPrimitive(
+                const clipped = this._setPrimitive(
                   triangle,
                   indices,
                   3,
@@ -298,14 +296,14 @@ var CanvasRenderer = Base.extend(
             break;
           case glenum.LINES:
             // LINES mode can't use face
-            for (var j = 0; j < nVertex; ) {
+            for (let j = 0; j < nVertex; ) {
               indices[0] = j++;
               indices[1] = j++;
-              var line = linesPool.pick();
+              const line = linesPool.pick();
               line.material = material;
               line.lineWidth = renderable.lineWidth;
 
-              var clipped = this._setPrimitive(
+              const clipped = this._setPrimitive(
                 line,
                 indices,
                 2,
@@ -320,12 +318,12 @@ var CanvasRenderer = Base.extend(
             }
             break;
           case glenum.POINTS:
-            for (var j = 0; j < nVertex; j++) {
+            for (let j = 0; j < nVertex; j++) {
               indices[0] = j;
-              var point = pointsPool.pick();
+              const point = pointsPool.pick();
               point.material = material;
 
-              var clipped = this._setPrimitive(
+              const clipped = this._setPrimitive(
                 point,
                 indices,
                 1,
@@ -354,22 +352,22 @@ var CanvasRenderer = Base.extend(
     },
 
     _setPrimitive: (function () {
-      var vertexColor = vec4Create();
+      const vertexColor = vec4Create();
       return function (primitive, indices, size, attributes, worldViewProjMat, matColor) {
-        var colorAttrib = attributes.color;
-        var useVertexColor = colorAttrib.value && colorAttrib.value.length > 0;
-        var priColor = primitive.color;
+        const colorAttrib = attributes.color;
+        const useVertexColor = colorAttrib.value && colorAttrib.value.length > 0;
+        const priColor = primitive.color;
 
         primitive.depth = 0;
         if (useVertexColor) {
           vec4.set(priColor, 0, 0, 0, 0);
         }
 
-        var clipped = true;
+        let clipped = true;
 
-        var percent = 1 / size;
-        for (var i = 0; i < size; i++) {
-          var coord = primitive.vertices[i];
+        const percent = 1 / size;
+        for (let i = 0; i < size; i++) {
+          const coord = primitive.vertices[i];
           attributes.position.get(indices[i], coord);
           coord[3] = 1;
           vec4.transformMat4(coord, coord, worldViewProjMat);
@@ -382,17 +380,17 @@ var CanvasRenderer = Base.extend(
           }
 
           // Clipping
-          var x = coord[0];
-          var y = coord[1];
-          var z = coord[2];
-          var w = coord[3];
+          const x = coord[0];
+          const y = coord[1];
+          const z = coord[2];
+          const w = coord[3];
 
           // TODO Point clipping
           if (x > -w && x < w && y > -w && y < w && z > -w && z < w) {
             clipped = false;
           }
 
-          var invW = 1 / w;
+          const invW = 1 / w;
           coord[0] = x * invW;
           coord[1] = y * invW;
           coord[2] = z * invW;
@@ -415,38 +413,39 @@ var CanvasRenderer = Base.extend(
     })(),
 
     _drawPrimitives: function (primitives) {
-      var ctx = this.ctx;
+      const ctx = this.ctx;
       ctx.save();
 
-      var prevMaterial;
+      let prevMaterial;
 
-      var dpr = this.devicePixelRatio;
-      var width = this._width * dpr;
-      var height = this._height * dpr;
-      var halfWidth = width / 2;
-      var halfHeight = height / 2;
+      const dpr = this.devicePixelRatio;
+      const width = this._width * dpr;
+      const height = this._height * dpr;
+      const halfWidth = width / 2;
+      const halfHeight = height / 2;
 
-      var prevLineWidth;
-      var prevStrokeColor;
+      let prevLineWidth;
+      let prevStrokeColor;
 
-      for (var i = 0; i < primitives.length; i++) {
-        var primitive = primitives[i];
-        var vertices = primitive.vertices;
+      for (let i = 0; i < primitives.length; i++) {
+        const primitive = primitives[i];
+        const vertices = primitive.vertices;
 
-        var primitiveType = primitive.type;
-        var material = primitive.material;
+        const primitiveType = primitive.type;
+        const material = primitive.material;
         if (material !== prevMaterial) {
           // Set material
           ctx.globalAlpha = material.opacity;
           prevMaterial = material;
         }
 
-        var colorStr = vec4ToColorStr(primitive.color);
+        const colorStr = vec4ToColorStr(primitive.color);
+        let v0, v1, v2, lineWidth, pointSize, pointShape, halfSize;
         switch (primitiveType) {
           case PRIMITIVE_TRIANGLE:
-            var v0 = vertices[0];
-            var v1 = vertices[1];
-            var v2 = vertices[2];
+            v0 = vertices[0];
+            v1 = vertices[1];
+            v2 = vertices[2];
             ctx.fillStyle = colorStr;
             ctx.beginPath();
             ctx.moveTo((v0[0] + 1) * halfWidth, (-v0[1] + 1) * halfHeight);
@@ -456,9 +455,9 @@ var CanvasRenderer = Base.extend(
             ctx.fill();
             break;
           case PRIMITIVE_LINE:
-            var v0 = vertices[0];
-            var v1 = vertices[1];
-            var lineWidth = primitive.lineWidth;
+            v0 = vertices[0];
+            v1 = vertices[1];
+            lineWidth = primitive.lineWidth;
             if (prevStrokeColor !== colorStr) {
               prevStrokeColor = ctx.strokeStyle = colorStr;
             }
@@ -471,13 +470,13 @@ var CanvasRenderer = Base.extend(
             ctx.stroke();
             break;
           case PRIMITIVE_POINT:
-            var pointSize = material.pointSize;
-            var pointShape = material.pointShape;
-            var halfSize = pointSize / 2;
+            pointSize = material.pointSize;
+            pointShape = material.pointShape;
+            halfSize = pointSize / 2;
             if (pointSize > 0) {
-              var v0 = vertices[0];
-              var cx = (v0[0] + 1) * halfWidth;
-              var cy = (-v0[1] + 1) * halfHeight;
+              const v0 = vertices[0];
+              const cx = (v0[0] + 1) * halfWidth;
+              const cy = (-v0[1] + 1) * halfHeight;
 
               ctx.fillStyle = colorStr;
               if (pointShape === 'rectangle') {

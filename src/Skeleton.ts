@@ -10,13 +10,13 @@ import mat4 from './glmatrix/mat4';
 import vec3 from './glmatrix/vec3';
 import quat from './glmatrix/quat';
 
-var tmpBoundingBox = new BoundingBox();
-var tmpMat4 = new Matrix4();
+const tmpBoundingBox = new BoundingBox();
+const tmpMat4 = new Matrix4();
 
 /**
  * @constructor clay.Skeleton
  */
-var Skeleton = Base.extend(
+const Skeleton = Base.extend(
   function () {
     return /** @lends clay.Skeleton# */ {
       /**
@@ -69,22 +69,22 @@ var Skeleton = Base.extend(
      */
     addClip: function (clip, mapRule) {
       // Clip have been exists in
-      for (var i = 0; i < this._clips.length; i++) {
+      for (let i = 0; i < this._clips.length; i++) {
         if (this._clips[i].clip === clip) {
           return;
         }
       }
       // Map the joint index in skeleton to joint pose index in clip
-      var maps = [];
-      for (var i = 0; i < this.joints.length; i++) {
+      const maps = [];
+      for (let i = 0; i < this.joints.length; i++) {
         maps[i] = -1;
       }
       // Create avatar
-      for (var i = 0; i < clip.tracks.length; i++) {
-        for (var j = 0; j < this.joints.length; j++) {
-          var joint = this.joints[j];
-          var track = clip.tracks[i];
-          var jointName = joint.name;
+      for (let i = 0; i < clip.tracks.length; i++) {
+        for (let j = 0; j < this.joints.length; j++) {
+          const joint = this.joints[j];
+          const track = clip.tracks[i];
+          let jointName = joint.name;
           if (mapRule) {
             jointName = mapRule[jointName];
           }
@@ -107,8 +107,8 @@ var Skeleton = Base.extend(
      * @param {clay.animation.SkinningClip} clip
      */
     removeClip: function (clip) {
-      var idx = -1;
-      for (var i = 0; i < this._clips.length; i++) {
+      let idx = -1;
+      for (let i = 0; i < this._clips.length; i++) {
         if (this._clips[i].clip === clip) {
           idx = i;
           break;
@@ -147,19 +147,19 @@ var Skeleton = Base.extend(
      * @function
      */
     updateJointMatrices: (function () {
-      var m4 = mat4.create();
+      const m4 = mat4.create();
 
       return function () {
         this._invBindPoseMatricesArray = new Float32Array(this.joints.length * 16);
         this._skinMatricesArray = new Float32Array(this.joints.length * 16);
 
-        for (var i = 0; i < this.joints.length; i++) {
-          var joint = this.joints[i];
+        for (let i = 0; i < this.joints.length; i++) {
+          const joint = this.joints[i];
           mat4.copy(m4, joint.node.worldTransform.array);
           mat4.invert(m4, m4);
 
-          var offset = i * 16;
-          for (var j = 0; j < 16; j++) {
+          const offset = i * 16;
+          for (let j = 0; j < 16; j++) {
             this._invBindPoseMatricesArray[offset + j] = m4[j];
           }
         }
@@ -174,33 +174,33 @@ var Skeleton = Base.extend(
      * @param {clay.Geometry} geometry
      */
     updateJointsBoundingBoxes: function (geometry) {
-      var attributes = geometry.attributes;
-      var positionAttr = attributes.position;
-      var jointAttr = attributes.joint;
-      var weightAttr = attributes.weight;
+      const attributes = geometry.attributes;
+      const positionAttr = attributes.position;
+      const jointAttr = attributes.joint;
+      const weightAttr = attributes.weight;
 
-      var jointsBoundingBoxes = [];
-      for (var i = 0; i < this.joints.length; i++) {
+      const jointsBoundingBoxes = [];
+      for (let i = 0; i < this.joints.length; i++) {
         jointsBoundingBoxes[i] = new BoundingBox();
         jointsBoundingBoxes[i].__updated = false;
       }
 
-      var vtxJoint = [];
-      var vtxPos = [];
-      var vtxWeight = [];
-      var maxJointIdx = 0;
-      for (var i = 0; i < geometry.vertexCount; i++) {
+      const vtxJoint = [];
+      const vtxPos = [];
+      const vtxWeight = [];
+      let maxJointIdx = 0;
+      for (let i = 0; i < geometry.vertexCount; i++) {
         jointAttr.get(i, vtxJoint);
         positionAttr.get(i, vtxPos);
         weightAttr.get(i, vtxWeight);
 
-        for (var k = 0; k < 4; k++) {
+        for (let k = 0; k < 4; k++) {
           if (vtxWeight[k] > 0.01) {
-            var jointIdx = vtxJoint[k];
+            const jointIdx = vtxJoint[k];
             maxJointIdx = Math.max(maxJointIdx, jointIdx);
 
-            var min = jointsBoundingBoxes[jointIdx].min.array;
-            var max = jointsBoundingBoxes[jointIdx].max.array;
+            let min = jointsBoundingBoxes[jointIdx].min.array;
+            let max = jointsBoundingBoxes[jointIdx].max.array;
 
             jointsBoundingBoxes[jointIdx].__updated = true;
 
@@ -226,7 +226,7 @@ var Skeleton = Base.extend(
     },
 
     updateMatricesSubArrays: function () {
-      for (var i = 0; i < this.joints.length; i++) {
+      for (let i = 0; i < this.joints.length; i++) {
         this._jointMatricesSubArrays[i] = this._invBindPoseMatricesArray.subarray(
           i * 16,
           (i + 1) * 16
@@ -241,10 +241,10 @@ var Skeleton = Base.extend(
     update: function () {
       this._setPose();
 
-      var jointsBoundingBoxes = this._jointsBoundingBoxes;
+      const jointsBoundingBoxes = this._jointsBoundingBoxes;
 
-      for (var i = 0; i < this.joints.length; i++) {
-        var joint = this.joints[i];
+      for (let i = 0; i < this.joints.length; i++) {
+        const joint = this.joints[i];
         mat4.multiply(
           this._skinMatricesSubArrays[i],
           joint.node.worldTransform.array,
@@ -254,9 +254,9 @@ var Skeleton = Base.extend(
       if (this.boundingBox) {
         this.boundingBox.min.set(Infinity, Infinity, Infinity);
         this.boundingBox.max.set(-Infinity, -Infinity, -Infinity);
-        for (var i = 0; i < this.joints.length; i++) {
-          var joint = this.joints[i];
-          var bbox = jointsBoundingBoxes[i];
+        for (let i = 0; i < this.joints.length; i++) {
+          const joint = this.joints[i];
+          const bbox = jointsBoundingBoxes[i];
           if (bbox.__updated) {
             tmpBoundingBox.copy(bbox);
             tmpMat4.array = this._skinMatricesSubArrays[i];
@@ -269,14 +269,14 @@ var Skeleton = Base.extend(
     },
 
     getSubSkinMatrices: function (meshId, joints) {
-      var subArray = this._subSkinMatricesArray[meshId];
+      let subArray = this._subSkinMatricesArray[meshId];
       if (!subArray) {
         subArray = this._subSkinMatricesArray[meshId] = new Float32Array(joints.length * 16);
       }
-      var cursor = 0;
-      for (var i = 0; i < joints.length; i++) {
-        var idx = joints[i];
-        for (var j = 0; j < 16; j++) {
+      let cursor = 0;
+      for (let i = 0; i < joints.length; i++) {
+        const idx = joints[i];
+        for (let j = 0; j < 16; j++) {
           subArray[cursor++] = this._skinMatricesArray[idx * 16 + j];
         }
       }
@@ -284,9 +284,9 @@ var Skeleton = Base.extend(
     },
 
     getSubSkinMatricesTexture: function (meshId, joints) {
-      var skinMatrices = this.getSubSkinMatrices(meshId, joints);
-      var size;
-      var numJoints = this.joints.length;
+      const skinMatrices = this.getSubSkinMatrices(meshId, joints);
+      let size;
+      const numJoints = this.joints.length;
       if (numJoints > 256) {
         size = 64;
       } else if (numJoints > 64) {
@@ -297,7 +297,7 @@ var Skeleton = Base.extend(
         size = 8;
       }
 
-      var texture = (this._skinMatricesTexture =
+      const texture = (this._skinMatricesTexture =
         this._skinMatricesTexture ||
         new Texture2D({
           type: Texture.FLOAT,
@@ -324,15 +324,15 @@ var Skeleton = Base.extend(
 
     _setPose: function () {
       if (this._clips[0]) {
-        var clip = this._clips[0].clip;
-        var maps = this._clips[0].maps;
+        const clip = this._clips[0].clip;
+        const maps = this._clips[0].maps;
 
-        for (var i = 0; i < this.joints.length; i++) {
-          var joint = this.joints[i];
+        for (let i = 0; i < this.joints.length; i++) {
+          const joint = this.joints[i];
           if (maps[i] === -1) {
             continue;
           }
-          var pose = clip.tracks[maps[i]];
+          const pose = clip.tracks[maps[i]];
 
           // Not update if there is no data.
           // PENDING If sync pose.position, pose.rotation, pose.scale
@@ -354,17 +354,17 @@ var Skeleton = Base.extend(
     },
 
     clone: function (clonedNodesMap) {
-      var skeleton = new Skeleton();
+      const skeleton = new Skeleton();
       skeleton.name = this.name;
 
-      for (var i = 0; i < this.joints.length; i++) {
-        var newJoint = new Joint();
-        var joint = this.joints[i];
+      for (let i = 0; i < this.joints.length; i++) {
+        const newJoint = new Joint();
+        const joint = this.joints[i];
         newJoint.name = joint.name;
         newJoint.index = joint.index;
 
         if (clonedNodesMap) {
-          var newNode = clonedNodesMap[joint.node.__uid__];
+          const newNode = clonedNodesMap[joint.node.__uid__];
 
           if (!newNode) {
             // PENDING
@@ -380,9 +380,9 @@ var Skeleton = Base.extend(
       }
 
       if (this._invBindPoseMatricesArray) {
-        var len = this._invBindPoseMatricesArray.length;
+        const len = this._invBindPoseMatricesArray.length;
         skeleton._invBindPoseMatricesArray = new Float32Array(len);
-        for (var i = 0; i < len; i++) {
+        for (let i = 0; i < len; i++) {
           skeleton._invBindPoseMatricesArray[i] = this._invBindPoseMatricesArray[i];
         }
 

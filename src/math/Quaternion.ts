@@ -10,7 +10,7 @@ import mat3 from '../glmatrix/mat3';
  * @param {number} z
  * @param {number} w
  */
-var Quaternion = function (x, y, z, w) {
+const Quaternion = function (x, y, z, w) {
   x = x || 0;
   y = y || 0;
   z = z || 0;
@@ -149,7 +149,7 @@ Quaternion.prototype = {
    * @return {clay.Quaternion}
    */
   fromMat4: (function () {
-    var m3 = mat3.create();
+    const m3 = mat3.create();
     return function (m) {
       mat3.fromMat4(m3, m.array);
       // TODO Not like mat4, mat3 in glmatrix seems to be row-based
@@ -378,10 +378,10 @@ Quaternion.prototype = {
   }
 };
 
-var defineProperty = Object.defineProperty;
+const defineProperty = Object.defineProperty;
 // Getter and Setter
 if (defineProperty) {
-  var proto = Quaternion.prototype;
+  const proto = Quaternion.prototype;
   /**
    * @name x
    * @type {number}
@@ -714,15 +714,15 @@ Quaternion.fromEuler = function (out, v, order) {
   out._dirty = true;
 
   v = v.array;
-  var target = out.array;
-  var c1 = Math.cos(v[0] / 2);
-  var c2 = Math.cos(v[1] / 2);
-  var c3 = Math.cos(v[2] / 2);
-  var s1 = Math.sin(v[0] / 2);
-  var s2 = Math.sin(v[1] / 2);
-  var s3 = Math.sin(v[2] / 2);
+  const target = out.array;
+  const c1 = Math.cos(v[0] / 2);
+  const c2 = Math.cos(v[1] / 2);
+  const c3 = Math.cos(v[2] / 2);
+  const s1 = Math.sin(v[0] / 2);
+  const s2 = Math.sin(v[1] / 2);
+  const s3 = Math.sin(v[2] / 2);
 
-  var order = (order || 'XYZ').toUpperCase();
+  order = (order || 'XYZ').toUpperCase();
 
   // http://www.mathworks.com/matlabcentral/fileexchange/
   //  20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/

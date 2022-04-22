@@ -10,7 +10,7 @@ import mat4 from '../glmatrix/mat4';
 /**
  * @namespace clay.util.mesh
  */
-var meshUtil = {
+const meshUtil = {
   /**
    * Merge multiple meshes to one.
    * Note that these meshes must have the same material
@@ -25,32 +25,32 @@ var meshUtil = {
       return;
     }
 
-    var templateMesh = meshes[0];
-    var templateGeo = templateMesh.geometry;
-    var material = templateMesh.material;
+    const templateMesh = meshes[0];
+    const templateGeo = templateMesh.geometry;
+    const material = templateMesh.material;
 
-    var geometry = new Geometry({
+    const geometry = new Geometry({
       dynamic: false
     });
     geometry.boundingBox = new BoundingBox();
 
-    var attributeNames = templateGeo.getEnabledAttributes();
+    const attributeNames = templateGeo.getEnabledAttributes();
 
-    for (var i = 0; i < attributeNames.length; i++) {
-      var name = attributeNames[i];
-      var attr = templateGeo.attributes[name];
+    for (let i = 0; i < attributeNames.length; i++) {
+      const name = attributeNames[i];
+      const attr = templateGeo.attributes[name];
       // Extend custom attributes
       if (!geometry.attributes[name]) {
         geometry.attributes[name] = attr.clone(false);
       }
     }
 
-    var inverseTransposeMatrix = mat4.create();
+    const inverseTransposeMatrix = mat4.create();
     // Initialize the array data and merge bounding box
-    var nVertex = 0;
-    var nFace = 0;
-    for (var k = 0; k < meshes.length; k++) {
-      var currentGeo = meshes[k].geometry;
+    let nVertex = 0;
+    let nFace = 0;
+    for (let k = 0; k < meshes.length; k++) {
+      const currentGeo = meshes[k].geometry;
       if (currentGeo.boundingBox) {
         currentGeo.boundingBox.applyTransform(
           applyWorldTransform ? meshes[k].worldTransform : meshes[k].localTransform
@@ -60,9 +60,9 @@ var meshUtil = {
       nVertex += currentGeo.vertexCount;
       nFace += currentGeo.triangleCount;
     }
-    for (var n = 0; n < attributeNames.length; n++) {
-      var name = attributeNames[n];
-      var attrib = geometry.attributes[name];
+    for (let n = 0; n < attributeNames.length; n++) {
+      const name = attributeNames[n];
+      const attrib = geometry.attributes[name];
       attrib.init(nVertex);
     }
     if (nVertex >= 0xffff) {
@@ -71,33 +71,33 @@ var meshUtil = {
       geometry.indices = new Uint16Array(nFace * 3);
     }
 
-    var vertexOffset = 0;
-    var indicesOffset = 0;
-    var useIndices = templateGeo.isUseIndices();
+    let vertexOffset = 0;
+    let indicesOffset = 0;
+    const useIndices = templateGeo.isUseIndices();
 
-    for (var mm = 0; mm < meshes.length; mm++) {
-      var mesh = meshes[mm];
-      var currentGeo = mesh.geometry;
+    for (let mm = 0; mm < meshes.length; mm++) {
+      const mesh = meshes[mm];
+      const currentGeo = mesh.geometry;
 
-      var nVertex = currentGeo.vertexCount;
+      const nVertex = currentGeo.vertexCount;
 
-      var matrix = applyWorldTransform ? mesh.worldTransform.array : mesh.localTransform.array;
+      const matrix = applyWorldTransform ? mesh.worldTransform.array : mesh.localTransform.array;
       mat4.invert(inverseTransposeMatrix, matrix);
       mat4.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
 
-      for (var nn = 0; nn < attributeNames.length; nn++) {
-        var name = attributeNames[nn];
-        var currentAttr = currentGeo.attributes[name];
-        var targetAttr = geometry.attributes[name];
+      for (let nn = 0; nn < attributeNames.length; nn++) {
+        const name = attributeNames[nn];
+        const currentAttr = currentGeo.attributes[name];
+        const targetAttr = geometry.attributes[name];
         // Skip the unused attributes;
         if (!currentAttr.value.length) {
           continue;
         }
-        var len = currentAttr.value.length;
-        var size = currentAttr.size;
-        var offset = vertexOffset * size;
-        var count = len / size;
-        for (var i = 0; i < len; i++) {
+        const len = currentAttr.value.length;
+        const size = currentAttr.size;
+        const offset = vertexOffset * size;
+        const count = len / size;
+        for (let i = 0; i < len; i++) {
           targetAttr.value[offset + i] = currentAttr.value[i];
         }
         // Transform position, normal and tangent
@@ -116,8 +116,8 @@ var meshUtil = {
       }
 
       if (useIndices) {
-        var len = currentGeo.indices.length;
-        for (var i = 0; i < len; i++) {
+        const len = currentGeo.indices.length;
+        for (let i = 0; i < len; i++) {
           geometry.indices[i + indicesOffset] = currentGeo.indices[i] + vertexOffset;
         }
         indicesOffset += len;
@@ -144,10 +144,10 @@ var meshUtil = {
 
   // FIXME, Have issues on some models
   splitByJoints: function (mesh, maxJointNumber, inPlace) {
-    var geometry = mesh.geometry;
-    var skeleton = mesh.skeleton;
-    var material = mesh.material;
-    var joints = mesh.joints;
+    const geometry = mesh.geometry;
+    const skeleton = mesh.skeleton;
+    const material = mesh.material;
+    const joints = mesh.joints;
     if (!geometry || !skeleton || !joints.length) {
       return;
     }
@@ -155,41 +155,41 @@ var meshUtil = {
       return mesh;
     }
 
-    var indices = geometry.indices;
+    const indices = geometry.indices;
 
-    var faceLen = geometry.triangleCount;
-    var rest = faceLen;
-    var isFaceAdded = [];
-    var jointValues = geometry.attributes.joint.value;
-    for (var i = 0; i < faceLen; i++) {
+    const faceLen = geometry.triangleCount;
+    let rest = faceLen;
+    const isFaceAdded = [];
+    const jointValues = geometry.attributes.joint.value;
+    for (let i = 0; i < faceLen; i++) {
       isFaceAdded[i] = false;
     }
-    var addedJointIdxPerFace = [];
+    const addedJointIdxPerFace = [];
 
-    var buckets = [];
+    const buckets = [];
 
-    var getJointByIndex = function (idx) {
+    const getJointByIndex = function (idx) {
       return joints[idx];
     };
     while (rest > 0) {
-      var bucketTriangles = [];
-      var bucketJointReverseMap = [];
-      var bucketJoints = [];
-      var subJointNumber = 0;
-      for (var i = 0; i < joints.length; i++) {
+      const bucketTriangles = [];
+      const bucketJointReverseMap = [];
+      const bucketJoints = [];
+      let subJointNumber = 0;
+      for (let i = 0; i < joints.length; i++) {
         bucketJointReverseMap[i] = -1;
       }
-      for (var f = 0; f < faceLen; f++) {
+      for (let f = 0; f < faceLen; f++) {
         if (isFaceAdded[f]) {
           continue;
         }
-        var canAddToBucket = true;
-        var addedNumber = 0;
-        for (var i = 0; i < 3; i++) {
-          var idx = indices[f * 3 + i];
+        let canAddToBucket = true;
+        let addedNumber = 0;
+        for (let i = 0; i < 3; i++) {
+          const idx = indices[f * 3 + i];
 
-          for (var j = 0; j < 4; j++) {
-            var jointIdx = jointValues[idx * 4 + j];
+          for (let j = 0; j < 4; j++) {
+            const jointIdx = jointValues[idx * 4 + j];
 
             if (jointIdx >= 0) {
               if (bucketJointReverseMap[jointIdx] === -1) {
@@ -206,7 +206,7 @@ var meshUtil = {
         }
         if (!canAddToBucket) {
           // Reverse operation
-          for (var i = 0; i < addedNumber; i++) {
+          for (let i = 0; i < addedNumber; i++) {
             bucketJointReverseMap[addedJointIdxPerFace[i]] = -1;
             bucketJoints.pop();
             subJointNumber--;
@@ -225,48 +225,47 @@ var meshUtil = {
       });
     }
 
-    var root = new Node({
+    const root = new Node({
       name: mesh.name
     });
-    var attribNames = geometry.getEnabledAttributes();
+    const attribNames = geometry.getEnabledAttributes();
 
     attribNames.splice(attribNames.indexOf('joint'), 1);
     // Map from old vertex index to new vertex index
-    var newIndices = [];
-    for (var b = 0; b < buckets.length; b++) {
-      var bucket = buckets[b];
-      var jointReverseMap = bucket.jointReverseMap;
-      var subJointNumber = bucket.joints.length;
+    const newIndices = [];
+    for (let b = 0; b < buckets.length; b++) {
+      const bucket = buckets[b];
+      const jointReverseMap = bucket.jointReverseMap;
 
-      var subGeo = new Geometry();
+      const subGeo = new Geometry();
 
-      var subMesh = new Mesh({
-        name: [mesh.name, i].join('-'),
+      const subMesh = new Mesh({
+        name: [mesh.name, b].join('-'),
         // DON'T clone material.
         material: material,
         geometry: subGeo,
         skeleton: skeleton,
         joints: bucket.joints.slice()
       });
-      var nVertex = 0;
-      var nVertex2 = geometry.vertexCount;
-      for (var i = 0; i < nVertex2; i++) {
+      let nVertex = 0;
+      const nVertex2 = geometry.vertexCount;
+      for (let i = 0; i < nVertex2; i++) {
         newIndices[i] = -1;
       }
       // Count sub geo number
-      for (var f = 0; f < bucket.triangles.length; f++) {
-        var face = bucket.triangles[f];
-        for (var i = 0; i < 3; i++) {
-          var idx = face[i];
+      for (let f = 0; f < bucket.triangles.length; f++) {
+        const face = bucket.triangles[f];
+        for (let i = 0; i < 3; i++) {
+          const idx = face[i];
           if (newIndices[idx] === -1) {
             newIndices[idx] = nVertex;
             nVertex++;
           }
         }
       }
-      for (var a = 0; a < attribNames.length; a++) {
-        var attribName = attribNames[a];
-        var subAttrib = subGeo.attributes[attribName];
+      for (let a = 0; a < attribNames.length; a++) {
+        const attribName = attribNames[a];
+        const subAttrib = subGeo.attributes[attribName];
         subAttrib.init(nVertex);
       }
       subGeo.attributes.joint.value = new Float32Array(nVertex * 4);
@@ -277,32 +276,32 @@ var meshUtil = {
         subGeo.indices = new Uint16Array(bucket.triangles.length * 3);
       }
 
-      var indicesOffset = 0;
+      let indicesOffset = 0;
       nVertex = 0;
-      for (var i = 0; i < nVertex2; i++) {
+      for (let i = 0; i < nVertex2; i++) {
         newIndices[i] = -1;
       }
 
-      for (var f = 0; f < bucket.triangles.length; f++) {
-        var triangle = bucket.triangles[f];
-        for (var i = 0; i < 3; i++) {
-          var idx = triangle[i];
+      for (let f = 0; f < bucket.triangles.length; f++) {
+        const triangle = bucket.triangles[f];
+        for (let i = 0; i < 3; i++) {
+          const idx = triangle[i];
 
           if (newIndices[idx] === -1) {
             newIndices[idx] = nVertex;
-            for (var a = 0; a < attribNames.length; a++) {
-              var attribName = attribNames[a];
-              var attrib = geometry.attributes[attribName];
-              var subAttrib = subGeo.attributes[attribName];
-              var size = attrib.size;
+            for (let a = 0; a < attribNames.length; a++) {
+              const attribName = attribNames[a];
+              const attrib = geometry.attributes[attribName];
+              const subAttrib = subGeo.attributes[attribName];
+              const size = attrib.size;
 
-              for (var j = 0; j < size; j++) {
+              for (let j = 0; j < size; j++) {
                 subAttrib.value[nVertex * size + j] = attrib.value[idx * size + j];
               }
             }
-            for (var j = 0; j < 4; j++) {
-              var jointIdx = geometry.attributes.joint.value[idx * 4 + j];
-              var offset = nVertex * 4 + j;
+            for (let j = 0; j < 4; j++) {
+              const jointIdx = geometry.attributes.joint.value[idx * 4 + j];
+              const offset = nVertex * 4 + j;
               if (jointIdx >= 0) {
                 subGeo.attributes.joint.value[offset] = jointReverseMap[jointIdx];
               } else {
@@ -318,8 +317,8 @@ var meshUtil = {
 
       root.add(subMesh);
     }
-    var children = mesh.children();
-    for (var i = 0; i < children.length; i++) {
+    const children = mesh.children();
+    for (let i = 0; i < children.length; i++) {
       root.add(children[i]);
     }
     root.position.copy(mesh.position);
@@ -328,7 +327,7 @@ var meshUtil = {
 
     if (inPlace) {
       if (mesh.getParent()) {
-        var parent = mesh.getParent();
+        const parent = mesh.getParent();
         parent.remove(mesh);
         parent.add(root);
       }

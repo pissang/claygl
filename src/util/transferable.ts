@@ -4,7 +4,7 @@ import Geometry from '../Geometry';
 import BoundingBox from '../math/BoundingBox';
 import Vector3 from '../math/Vector3';
 
-var META = {
+const META = {
   version: 1.0,
   type: 'Geometry',
   generator: 'util.transferable.toObject'
@@ -13,7 +13,7 @@ var META = {
 /**
  * @alias clay.util.transferable
  */
-var transferableUtil = {
+const transferableUtil = {
   /**
    * Convert geometry to a object containing transferable data
    * @param {Geometry} geometry geometry
@@ -24,11 +24,11 @@ var transferableUtil = {
     if (!geometry) {
       return null;
     }
-    var data = {
+    const data = {
       metadata: util.extend({}, META)
     };
     //transferable buffers
-    var buffers = [];
+    const buffers = [];
 
     //dynamic
     data.dynamic = geometry.dynamic;
@@ -49,9 +49,9 @@ var transferableUtil = {
 
     //attributes
     data.attributes = {};
-    for (var p in geometry.attributes) {
-      if (geometry.attributes.hasOwnProperty(p)) {
-        var attr = geometry.attributes[p];
+    for (const p in geometry.attributes) {
+      if (util.hasOwn(geometry.attributes, p)) {
+        let attr = geometry.attributes[p];
         //ignore empty attributes
         if (attr && attr.value && attr.value.length > 0) {
           attr = data.attributes[p] = copyAttribute(attr, shallow);
@@ -85,23 +85,23 @@ var transferableUtil = {
     }
 
     //basic options
-    var options = {
+    const options = {
       dynamic: object.dynamic,
       indices: object.indices
     };
 
     if (object.boundingBox) {
-      var min = new Vector3().setArray(object.boundingBox.min);
-      var max = new Vector3().setArray(object.boundingBox.max);
+      const min = new Vector3().setArray(object.boundingBox.min);
+      const max = new Vector3().setArray(object.boundingBox.max);
       options.boundingBox = new BoundingBox(min, max);
     }
 
-    var geometry = new Geometry(options);
+    const geometry = new Geometry(options);
 
     //attributes
-    for (var p in object.attributes) {
-      if (object.attributes.hasOwnProperty(p)) {
-        var attr = object.attributes[p];
+    for (const p in object.attributes) {
+      if (util.hasOwn(object.attributes, p)) {
+        const attr = object.attributes[p];
         geometry.attributes[p] = new Geometry.Attribute(
           attr.name,
           attr.type,

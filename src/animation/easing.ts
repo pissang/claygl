@@ -4,7 +4,7 @@
 /**
  * @namespace clay.animation.easing
  */
-var easing = {
+const easing = {
   /**
    * @alias clay.animation.easing.linear
    * @param {number} k
@@ -211,7 +211,7 @@ var easing = {
    * @return {number}
    */
   elasticIn: function (k) {
-    var s,
+    let s,
       a = 0.1,
       p = 0.4;
     if (k === 0) {
@@ -234,7 +234,7 @@ var easing = {
    * @return {number}
    */
   elasticOut: function (k) {
-    var s,
+    let s,
       a = 0.1,
       p = 0.4;
     if (k === 0) {
@@ -257,7 +257,7 @@ var easing = {
    * @return {number}
    */
   elasticInOut: function (k) {
-    var s,
+    let s,
       a = 0.1,
       p = 0.4;
     if (k === 0) {
@@ -283,7 +283,7 @@ var easing = {
    * @return {number}
    */
   backIn: function (k) {
-    var s = 1.70158;
+    const s = 1.70158;
     return k * k * ((s + 1) * k - s);
   },
   /**
@@ -292,7 +292,7 @@ var easing = {
    * @return {number}
    */
   backOut: function (k) {
-    var s = 1.70158;
+    const s = 1.70158;
     return --k * k * ((s + 1) * k + s) + 1;
   },
   /**
@@ -301,7 +301,7 @@ var easing = {
    * @return {number}
    */
   backInOut: function (k) {
-    var s = 1.70158 * 1.525;
+    const s = 1.70158 * 1.525;
     if ((k *= 2) < 1) {
       return 0.5 * (k * k * ((s + 1) * k - s));
     }

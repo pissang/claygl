@@ -7,7 +7,7 @@ import Vector2 from './Vector2';
  * @constructor
  * @alias clay.Value
  */
-var Value = function () {};
+const Value = function () {};
 
 /**
  * @function
@@ -17,7 +17,7 @@ var Value = function () {};
 Value.prototype.get = function (out) {};
 
 // Constant
-var ConstantValue = function (val) {
+const ConstantValue = function (val) {
   this.get = function () {
     return val;
   };
@@ -26,8 +26,8 @@ ConstantValue.prototype = new Value();
 ConstantValue.prototype.constructor = ConstantValue;
 
 // Vector
-var VectorValue = function (val) {
-  var Constructor = val.constructor;
+const VectorValue = function (val) {
+  const Constructor = val.constructor;
   this.get = function (out) {
     if (!out) {
       out = new Constructor();
@@ -39,8 +39,8 @@ var VectorValue = function (val) {
 VectorValue.prototype = new Value();
 VectorValue.prototype.constructor = VectorValue;
 //Random 1D
-var Random1D = function (min, max) {
-  var range = max - min;
+const Random1D = function (min, max) {
+  const range = max - min;
   this.get = function () {
     return Math.random() * range + min;
   };
@@ -49,9 +49,9 @@ Random1D.prototype = new Value();
 Random1D.prototype.constructor = Random1D;
 
 // Random2D
-var Random2D = function (min, max) {
-  var rangeX = max.x - min.x;
-  var rangeY = max.y - min.y;
+const Random2D = function (min, max) {
+  const rangeX = max.x - min.x;
+  const rangeY = max.y - min.y;
 
   this.get = function (out) {
     if (!out) {
@@ -65,10 +65,10 @@ var Random2D = function (min, max) {
 Random2D.prototype = new Value();
 Random2D.prototype.constructor = Random2D;
 
-var Random3D = function (min, max) {
-  var rangeX = max.x - min.x;
-  var rangeY = max.y - min.y;
-  var rangeZ = max.z - min.z;
+const Random3D = function (min, max) {
+  const rangeX = max.x - min.x;
+  const rangeY = max.y - min.y;
+  const rangeZ = max.z - min.z;
 
   this.get = function (out) {
     if (!out) {

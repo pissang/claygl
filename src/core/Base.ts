@@ -9,7 +9,7 @@ import util from './util';
  * @alias clay.core.Base
  * @mixes clay.core.mixin.notifier
  */
-var Base = function () {
+const Base = function () {
   /**
    * @type {number}
    */

@@ -7,7 +7,7 @@ function Handler(action, context) {
  * @mixin
  * @alias clay.core.mixin.notifier
  */
-var notifier = {
+const notifier = {
   /**
    * Trigger event
    * @param  {string} name
@@ -20,8 +20,8 @@ var notifier = {
       return;
     }
 
-    var hdls = this.__handlers__[name];
-    var l = hdls.length,
+    const hdls = this.__handlers__[name];
+    const l = hdls.length,
       i = -1,
       args = arguments;
     // Optimize advise from backbone
@@ -69,7 +69,7 @@ var notifier = {
     if (!name || !action) {
       return;
     }
-    var handlers = this.__handlers__ || (this.__handlers__ = {});
+    const handlers = this.__handlers__ || (this.__handlers__ = {});
     if (!handlers[name]) {
       handlers[name] = [];
     } else {
@@ -77,7 +77,7 @@ var notifier = {
         return;
       }
     }
-    var handler = new Handler(action, context || this);
+    const handler = new Handler(action, context || this);
     handlers[name].push(handler);
 
     return this;
@@ -94,7 +94,7 @@ var notifier = {
     if (!name || !action) {
       return;
     }
-    var self = this;
+    const self = this;
     function wrapper() {
       self.off(name, wrapper);
       action.apply(this, arguments);
@@ -159,16 +159,16 @@ var notifier = {
    * @chainable
    */
   off: function (name, action) {
-    var handlers = this.__handlers__ || (this.__handlers__ = {});
+    const handlers = this.__handlers__ || (this.__handlers__ = {});
 
     if (!action) {
       handlers[name] = [];
       return;
     }
     if (handlers[name]) {
-      var hdls = handlers[name];
-      var retains = [];
-      for (var i = 0; i < hdls.length; i++) {
+      const hdls = handlers[name];
+      const retains = [];
+      for (let i = 0; i < hdls.length; i++) {
         if (action && hdls[i].action !== action) {
           retains.push(hdls[i]);
         }
@@ -186,13 +186,13 @@ var notifier = {
    * @return {boolean}
    */
   has: function (name, action) {
-    var handlers = this.__handlers__;
+    const handlers = this.__handlers__;
 
     if (!handlers || !handlers[name]) {
       return false;
     }
-    var hdls = handlers[name];
-    for (var i = 0; i < hdls.length; i++) {
+    const hdls = handlers[name];
+    for (let i = 0; i < hdls.length; i++) {
       if (hdls[i].action === action) {
         return true;
       }

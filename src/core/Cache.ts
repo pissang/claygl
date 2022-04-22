@@ -1,7 +1,9 @@
 // @ts-nocheck
-var DIRTY_PREFIX = '__dt__';
+import util from './util';
 
-var Cache = function () {
+const DIRTY_PREFIX = '__dt__';
+
+const Cache = function () {
   this._contextId = 0;
 
   this._caches = [];
@@ -11,7 +13,7 @@ var Cache = function () {
 
 Cache.prototype = {
   use: function (contextId, documentSchema) {
-    var caches = this._caches;
+    const caches = this._caches;
     if (!caches[contextId]) {
       caches[contextId] = {};
 
@@ -34,15 +36,15 @@ Cache.prototype = {
 
   dirty: function (field) {
     field = field || '';
-    var key = DIRTY_PREFIX + field;
+    const key = DIRTY_PREFIX + field;
     this.put(key, true);
   },
 
   dirtyAll: function (field) {
     field = field || '';
-    var key = DIRTY_PREFIX + field;
-    var caches = this._caches;
-    for (var i = 0; i < caches.length; i++) {
+    const key = DIRTY_PREFIX + field;
+    const caches = this._caches;
+    for (let i = 0; i < caches.length; i++) {
       if (caches[i]) {
         caches[i][key] = true;
       }
@@ -51,15 +53,15 @@ Cache.prototype = {
 
   fresh: function (field) {
     field = field || '';
-    var key = DIRTY_PREFIX + field;
+    const key = DIRTY_PREFIX + field;
     this.put(key, false);
   },
 
   freshAll: function (field) {
     field = field || '';
-    var key = DIRTY_PREFIX + field;
-    var caches = this._caches;
-    for (var i = 0; i < caches.length; i++) {
+    const key = DIRTY_PREFIX + field;
+    const caches = this._caches;
+    for (let i = 0; i < caches.length; i++) {
       if (caches[i]) {
         caches[i][key] = false;
       }
@@ -68,9 +70,9 @@ Cache.prototype = {
 
   isDirty: function (field) {
     field = field || '';
-    var key = DIRTY_PREFIX + field;
-    var context = this._context;
-    return !context.hasOwnProperty(key) || context[key] === true;
+    const key = DIRTY_PREFIX + field;
+    const context = this._context;
+    return !util.hasOwn(context, key) || context[key] === true;
   },
 
   deleteContext: function (contextId) {
@@ -91,14 +93,14 @@ Cache.prototype = {
   },
 
   eachContext: function (cb, context) {
-    var keys = Object.keys(this._caches);
+    const keys = Object.keys(this._caches);
     keys.forEach(function (key) {
       cb && cb.call(context, key);
     });
   },
 
   miss: function (key) {
-    return !this._context.hasOwnProperty(key);
+    return !util.hasOwn(this._context, key);
   }
 };
 

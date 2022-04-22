@@ -4,9 +4,9 @@
  */
 import LRU from '../core/LRU';
 
-var colorUtil = {};
+const colorUtil = {};
 
-var kCSSColorTable = {
+const kCSSColorTable = {
   transparent: [0, 0, 0, 0],
   aliceblue: [240, 248, 255, 1],
   antiquewhite: [250, 235, 215, 1],
@@ -228,8 +228,8 @@ function copyRgba(out, a) {
   return out;
 }
 
-var colorCache = new LRU(20);
-var lastRemovedArr = null;
+const colorCache = new LRU(20);
+let lastRemovedArr = null;
 
 function putToCache(colorStr, rgbaArr) {
   // Reuse removed array
@@ -251,7 +251,7 @@ colorUtil.parse = function (colorStr, rgbaArr) {
   }
   rgbaArr = rgbaArr || [];
 
-  var cached = colorCache.get(colorStr);
+  const cached = colorCache.get(colorStr);
   if (cached) {
     return copyRgba(rgbaArr, cached);
   }
@@ -259,7 +259,7 @@ colorUtil.parse = function (colorStr, rgbaArr) {
   // colorStr may be not string
   colorStr = colorStr + '';
   // Remove all whitespace, not compliant, but should just be more accepting.
-  var str = colorStr.replace(/ /g, '').toLowerCase();
+  const str = colorStr.replace(/ /g, '').toLowerCase();
 
   // Color keywords (and transparent) lookup.
   if (str in kCSSColorTable) {
@@ -271,7 +271,7 @@ colorUtil.parse = function (colorStr, rgbaArr) {
   // #abc and #abc123 syntax.
   if (str.charAt(0) === '#') {
     if (str.length === 4) {
-      var iv = parseInt(str.substr(1), 16); // TODO(deanm): Stricter parsing.
+      const iv = parseInt(str.substr(1), 16); // TODO(deanm): Stricter parsing.
       if (!(iv >= 0 && iv <= 0xfff)) {
         setRgba(rgbaArr, 0, 0, 0, 1);
         return; // Covers NaN.
@@ -286,7 +286,7 @@ colorUtil.parse = function (colorStr, rgbaArr) {
       putToCache(colorStr, rgbaArr);
       return rgbaArr;
     } else if (str.length === 7) {
-      var iv = parseInt(str.substr(1), 16); // TODO(deanm): Stricter parsing.
+      const iv = parseInt(str.substr(1), 16); // TODO(deanm): Stricter parsing.
       if (!(iv >= 0 && iv <= 0xffffff)) {
         setRgba(rgbaArr, 0, 0, 0, 1);
         return; // Covers NaN.
@@ -298,12 +298,12 @@ colorUtil.parse = function (colorStr, rgbaArr) {
 
     return;
   }
-  var op = str.indexOf('('),
+  const op = str.indexOf('('),
     ep = str.indexOf(')');
   if (op !== -1 && ep + 1 === str.length) {
-    var fname = str.substr(0, op);
-    var params = str.substr(op + 1, ep - (op + 1)).split(',');
-    var alpha = 1; // To allow case fallthrough.
+    const fname = str.substr(0, op);
+    const params = str.substr(op + 1, ep - (op + 1)).split(',');
+    let alpha = 1; // To allow case fallthrough.
     switch (fname) {
       case 'rgba':
         if (params.length !== 4) {
@@ -370,13 +370,13 @@ colorUtil.parseToFloat = function (colorStr, rgbaArr) {
  * @return {Array.<number>} rgba
  */
 function hsla2rgba(hsla, rgba) {
-  var h = (((parseFloat(hsla[0]) % 360) + 360) % 360) / 360; // 0 .. 1
+  const h = (((parseFloat(hsla[0]) % 360) + 360) % 360) / 360; // 0 .. 1
   // NOTE(deanm): According to the CSS spec s/l should only be
   // percentages, but we don't bother and let float or percentage.
-  var s = parseCssFloat(hsla[1]);
-  var l = parseCssFloat(hsla[2]);
-  var m2 = l <= 0.5 ? l * (s + 1) : l + s - l * s;
-  var m1 = l * 2 - m2;
+  const s = parseCssFloat(hsla[1]);
+  const l = parseCssFloat(hsla[2]);
+  const m2 = l <= 0.5 ? l * (s + 1) : l + s - l * s;
+  const m1 = l * 2 - m2;
 
   rgba = rgba || [];
   setRgba(
@@ -405,17 +405,17 @@ function rgba2hsla(rgba) {
   }
 
   // RGB from 0 to 255
-  var R = rgba[0] / 255;
-  var G = rgba[1] / 255;
-  var B = rgba[2] / 255;
+  const R = rgba[0] / 255;
+  const G = rgba[1] / 255;
+  const B = rgba[2] / 255;
 
-  var vMin = Math.min(R, G, B); // Min. value of RGB
-  var vMax = Math.max(R, G, B); // Max. value of RGB
-  var delta = vMax - vMin; // Delta RGB value
+  const vMin = Math.min(R, G, B); // Min. value of RGB
+  const vMax = Math.max(R, G, B); // Max. value of RGB
+  const delta = vMax - vMin; // Delta RGB value
 
-  var L = (vMax + vMin) / 2;
-  var H;
-  var S;
+  const L = (vMax + vMin) / 2;
+  let H;
+  let S;
   // HSL results from 0 to 1
   if (delta === 0) {
     H = 0;
@@ -427,9 +427,9 @@ function rgba2hsla(rgba) {
       S = delta / (2 - vMax - vMin);
     }
 
-    var deltaR = ((vMax - R) / 6 + delta / 2) / delta;
-    var deltaG = ((vMax - G) / 6 + delta / 2) / delta;
-    var deltaB = ((vMax - B) / 6 + delta / 2) / delta;
+    const deltaR = ((vMax - R) / 6 + delta / 2) / delta;
+    const deltaG = ((vMax - G) / 6 + delta / 2) / delta;
+    const deltaB = ((vMax - B) / 6 + delta / 2) / delta;
 
     if (R === vMax) {
       H = deltaB - deltaG;
@@ -448,7 +448,7 @@ function rgba2hsla(rgba) {
     }
   }
 
-  var hsla = [H * 360, S, L];
+  const hsla = [H * 360, S, L];
 
   if (rgba[3] != null) {
     hsla.push(rgba[3]);
@@ -464,9 +464,9 @@ function rgba2hsla(rgba) {
  * @return {string}
  */
 colorUtil.lift = function (color, level) {
-  var colorArr = colorUtil.parse(color);
+  const colorArr = colorUtil.parse(color);
   if (colorArr) {
-    for (var i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
       if (level < 0) {
         colorArr[i] = (colorArr[i] * (1 - level)) | 0;
       } else {
@@ -483,7 +483,7 @@ colorUtil.lift = function (color, level) {
  * @return {string}
  */
 colorUtil.toHex = function (color) {
-  var colorArr = colorUtil.parse(color);
+  const colorArr = colorUtil.parse(color);
   if (colorArr) {
     return ((1 << 24) + (colorArr[0] << 16) + (colorArr[1] << 8) + +colorArr[2])
       .toString(16)
@@ -506,12 +506,12 @@ colorUtil.fastLerp = function (normalizedValue, colors, out) {
 
   out = out || [];
 
-  var value = normalizedValue * (colors.length - 1);
-  var leftIndex = Math.floor(value);
-  var rightIndex = Math.ceil(value);
-  var leftColor = colors[leftIndex];
-  var rightColor = colors[rightIndex];
-  var dv = value - leftIndex;
+  const value = normalizedValue * (colors.length - 1);
+  const leftIndex = Math.floor(value);
+  const rightIndex = Math.ceil(value);
+  const leftColor = colors[leftIndex];
+  const rightColor = colors[rightIndex];
+  const dv = value - leftIndex;
   out[0] = clampCssByte(lerpNumber(leftColor[0], rightColor[0], dv));
   out[1] = clampCssByte(lerpNumber(leftColor[1], rightColor[1], dv));
   out[2] = clampCssByte(lerpNumber(leftColor[2], rightColor[2], dv));
@@ -534,14 +534,14 @@ colorUtil.lerp = function (normalizedValue, colors, fullOutput) {
     return;
   }
 
-  var value = normalizedValue * (colors.length - 1);
-  var leftIndex = Math.floor(value);
-  var rightIndex = Math.ceil(value);
-  var leftColor = colorUtil.parse(colors[leftIndex]);
-  var rightColor = colorUtil.parse(colors[rightIndex]);
-  var dv = value - leftIndex;
+  const value = normalizedValue * (colors.length - 1);
+  const leftIndex = Math.floor(value);
+  const rightIndex = Math.ceil(value);
+  const leftColor = colorUtil.parse(colors[leftIndex]);
+  const rightColor = colorUtil.parse(colors[rightIndex]);
+  const dv = value - leftIndex;
 
-  var color = colorUtil.stringify(
+  const color = colorUtil.stringify(
     [
       clampCssByte(lerpNumber(leftColor[0], rightColor[0], dv)),
       clampCssByte(lerpNumber(leftColor[1], rightColor[1], dv)),
@@ -610,7 +610,7 @@ colorUtil.stringify = function (arrColor, type) {
   if (!arrColor || !arrColor.length) {
     return;
   }
-  var colorStr = arrColor[0] + ',' + arrColor[1] + ',' + arrColor[2];
+  let colorStr = arrColor[0] + ',' + arrColor[1] + ',' + arrColor[2];
   if (type === 'rgba' || type === 'hsva' || type === 'hsla') {
     colorStr += ',' + arrColor[3];
   }

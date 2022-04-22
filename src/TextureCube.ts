@@ -4,9 +4,9 @@ import glenum from './core/glenum';
 import util from './core/util';
 import mathUtil from './math/util';
 import vendor from './core/vendor';
-var isPowerOfTwo = mathUtil.isPowerOfTwo;
+const isPowerOfTwo = mathUtil.isPowerOfTwo;
 
-var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
+const targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
 /**
  * @constructor clay.TextureCube
@@ -14,10 +14,10 @@ var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *
  * @example
  *     ...
- *     var mat = new clay.Material({
+ *     const mat = new clay.Material({
  *         shader: clay.shader.library.get('clay.phong', 'environmentMap')
  *     });
- *     var envMap = new clay.TextureCube();
+ *     const envMap = new clay.TextureCube();
  *     envMap.load({
  *         'px': 'assets/textures/sky/px.jpg',
  *         'nx': 'assets/textures/sky/nx.jpg'
@@ -35,7 +35,7 @@ var targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *         });
  *     });
  */
-var TextureCube = Texture.extend(
+const TextureCube = Texture.extend(
   function () {
     return /** @lends clay.TextureCube# */ {
       /**
@@ -91,13 +91,13 @@ var TextureCube = Texture.extend(
     textureType: 'textureCube',
 
     update: function (renderer) {
-      var _gl = renderer.gl;
+      const _gl = renderer.gl;
       _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
 
       this.updateCommon(renderer);
 
-      var glFormat = this.format;
-      var glType = this.type;
+      const glFormat = this.format;
+      let glType = this.type;
 
       _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, this.getAvailableWrapS());
       _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, this.getAvailableWrapT());
@@ -105,7 +105,7 @@ var TextureCube = Texture.extend(
       _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, this.getAvailableMagFilter());
       _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, this.getAvailableMinFilter());
 
-      var anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
+      const anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
       if (anisotropicExt && this.anisotropic > 1) {
         _gl.texParameterf(
           _gl.TEXTURE_CUBE_MAP,
@@ -116,17 +116,17 @@ var TextureCube = Texture.extend(
 
       // Fallback to float type if browser don't have half float extension
       if (glType === 36193) {
-        var halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
+        const halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
         if (!halfFloatExt) {
           glType = glenum.FLOAT;
         }
       }
 
       if (this.mipmaps.length) {
-        var width = this.width;
-        var height = this.height;
-        for (var i = 0; i < this.mipmaps.length; i++) {
-          var mipmap = this.mipmaps[i];
+        let width = this.width;
+        let height = this.height;
+        for (let i = 0; i < this.mipmaps.length; i++) {
+          const mipmap = this.mipmaps[i];
           this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType);
           width /= 2;
           height /= 2;
@@ -143,9 +143,9 @@ var TextureCube = Texture.extend(
     },
 
     _updateTextureData: function (_gl, data, level, width, height, glFormat, glType) {
-      for (var i = 0; i < 6; i++) {
-        var target = targetList[i];
-        var img = data.image && data.image[target];
+      for (let i = 0; i < 6; i++) {
+        const target = targetList[i];
+        let img = data.image && data.image[target];
         if (img) {
           _gl.texImage2D(
             _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -176,7 +176,7 @@ var TextureCube = Texture.extend(
      * @memberOf clay.TextureCube.prototype
      */
     generateMipmap: function (renderer) {
-      var _gl = renderer.gl;
+      const _gl = renderer.gl;
       if (this.useMipmap && !this.NPOT) {
         _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
         _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
@@ -216,10 +216,10 @@ var TextureCube = Texture.extend(
     },
 
     load: function (imageList, crossOrigin) {
-      var loading = 0;
-      var self = this;
+      let loading = 0;
+      const self = this;
       util.each(imageList, function (src, target) {
-        var image = vendor.createImage();
+        const image = vendor.createImage();
         if (crossOrigin) {
           image.crossOrigin = crossOrigin;
         }

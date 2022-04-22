@@ -7,7 +7,7 @@ import FrameBuffer from '../FrameBuffer';
  * @constructor clay.compositor.SceneNode
  * @extends clay.compositor.CompositorNode
  */
-var SceneNode = CompositorNode.extend(
+const SceneNode = CompositorNode.extend(
   /** @lends clay.compositor.SceneNode# */
   {
     name: 'scene',
@@ -34,23 +34,23 @@ var SceneNode = CompositorNode.extend(
   {
     render: function (renderer) {
       this._rendering = true;
-      var _gl = renderer.gl;
+      const _gl = renderer.gl;
 
       this.trigger('beforerender');
 
-      var renderInfo;
+      let renderInfo;
 
       if (!this.outputs) {
         renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
       } else {
-        var frameBuffer = this.frameBuffer;
-        for (var name in this.outputs) {
-          var parameters = this.updateParameter(name, renderer);
-          var outputInfo = this.outputs[name];
-          var texture = this._compositor.allocateTexture(parameters);
+        const frameBuffer = this.frameBuffer;
+        for (const name in this.outputs) {
+          const parameters = this.updateParameter(name, renderer);
+          const outputInfo = this.outputs[name];
+          const texture = this._compositor.allocateTexture(parameters);
           this._outputTextures[name] = texture;
 
-          var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
+          let attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
           if (typeof attachment == 'string') {
             attachment = _gl[attachment];
           }
@@ -60,10 +60,10 @@ var SceneNode = CompositorNode.extend(
 
         // MRT Support in chrome
         // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-        var ext = renderer.getGLExtension('EXT_draw_buffers');
+        const ext = renderer.getGLExtension('EXT_draw_buffers');
         if (ext) {
-          var bufs = [];
-          for (var attachment in this.outputs) {
+          const bufs = [];
+          for (let attachment in this.outputs) {
             attachment = parseInt(attachment);
             if (attachment >= _gl.COLOR_ATTACHMENT0 && attachment <= _gl.COLOR_ATTACHMENT0 + 8) {
               bufs.push(attachment);

@@ -1,11 +1,11 @@
 // @ts-nocheck
 import calcAmbientSHLightEssl from './calcAmbientSHLight.glsl.js';
 
-var uniformVec3Prefix = 'uniform vec3 ';
-var uniformFloatPrefix = 'uniform float ';
-var exportHeaderPrefix = '@export clay.header.';
-var exportEnd = '@end';
-var unconfigurable = ':unconfigurable;';
+const uniformVec3Prefix = 'uniform vec3 ';
+const uniformFloatPrefix = 'uniform float ';
+const exportHeaderPrefix = '@export clay.header.';
+const exportEnd = '@end';
+const unconfigurable = ':unconfigurable;';
 export default [
   exportHeaderPrefix + 'directional_light',
   uniformVec3Prefix + 'directionalLightDirection[DIRECTIONAL_LIGHT_COUNT]' + unconfigurable,

@@ -619,7 +619,7 @@ vec3.forEach = (function () {
   var vec = vec3.create();
 
   return function (a, stride, offset, count, fn, arg) {
-    var i, l;
+    let i, l;
     if (!stride) {
       stride = 3;
     }

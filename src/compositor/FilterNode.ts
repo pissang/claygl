@@ -15,7 +15,7 @@ import CompositorNode from './CompositorNode';
  * @extends clay.compositor.CompositorNode
  *
  * @example
-    var node = new clay.compositor.FilterNode({
+    const node = new clay.compositor.FilterNode({
         name: 'fxaa',
         shader: clay.Shader.source('clay.compositor.fxaa'),
         inputs: {
@@ -42,7 +42,7 @@ import CompositorNode from './CompositorNode';
     });
     *
     */
-var FilterNode = CompositorNode.extend(
+const FilterNode = CompositorNode.extend(
   function () {
     return /** @lends clay.compositor.FilterNode# */ {
       /**
@@ -108,7 +108,7 @@ var FilterNode = CompositorNode.extend(
     };
   },
   function () {
-    var pass = new Pass({
+    const pass = new Pass({
       fragment: this.shader
     });
     this.pass = pass;
@@ -123,11 +123,11 @@ var FilterNode = CompositorNode.extend(
 
       this._rendering = true;
 
-      var _gl = renderer.gl;
+      const _gl = renderer.gl;
 
-      for (var inputName in this.inputLinks) {
-        var link = this.inputLinks[inputName];
-        var inputTexture = link.node.getOutput(renderer, link.pin);
+      for (let inputName in this.inputLinks) {
+        const link = this.inputLinks[inputName];
+        const inputTexture = link.node.getOutput(renderer, link.pin);
         this.pass.setUniform(inputName, inputTexture);
       }
       // Output
@@ -140,16 +140,16 @@ var FilterNode = CompositorNode.extend(
       } else {
         this.pass.outputs = {};
 
-        var attachedTextures = {};
-        for (var name in this.outputs) {
-          var parameters = this.updateParameter(name, renderer);
+        const attachedTextures = {};
+        for (const name in this.outputs) {
+          const parameters = this.updateParameter(name, renderer);
           if (isNaN(parameters.width)) {
             this.updateParameter(name, renderer);
           }
-          var outputInfo = this.outputs[name];
-          var texture = this._compositor.allocateTexture(parameters);
+          const outputInfo = this.outputs[name];
+          const texture = this._compositor.allocateTexture(parameters);
           this._outputTextures[name] = texture;
-          var attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
+          let attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
           if (typeof attachment === 'string') {
             attachment = _gl[attachment];
           }
@@ -157,7 +157,7 @@ var FilterNode = CompositorNode.extend(
         }
         this._compositor.getFrameBuffer().bind(renderer);
 
-        for (var attachment in attachedTextures) {
+        for (const attachment in attachedTextures) {
           // FIXME attachment changes in different nodes
           this._compositor.getFrameBuffer().attach(attachedTextures[attachment], attachment);
         }
@@ -169,8 +169,8 @@ var FilterNode = CompositorNode.extend(
         this._compositor.getFrameBuffer().updateMipmap(renderer);
       }
 
-      for (var inputName in this.inputLinks) {
-        var link = this.inputLinks[inputName];
+      for (let inputName in this.inputLinks) {
+        const link = this.inputLinks[inputName];
         link.node.removeReference(link.pin);
       }
 
@@ -182,20 +182,20 @@ var FilterNode = CompositorNode.extend(
 
     // TODO Remove parameter function callback
     updateParameter: function (outputName, renderer) {
-      var outputInfo = this.outputs[outputName];
-      var parameters = outputInfo.parameters;
-      var parametersCopy = outputInfo._parametersCopy;
+      const outputInfo = this.outputs[outputName];
+      const parameters = outputInfo.parameters;
+      let parametersCopy = outputInfo._parametersCopy;
       if (!parametersCopy) {
         parametersCopy = outputInfo._parametersCopy = {};
       }
       if (parameters) {
-        for (var key in parameters) {
+        for (const key in parameters) {
           if (key !== 'width' && key !== 'height') {
             parametersCopy[key] = parameters[key];
           }
         }
       }
-      var width, height;
+      let width, height;
       if (typeof parameters.width === 'function') {
         width = parameters.width.call(this, renderer);
       } else {
@@ -240,7 +240,7 @@ var FilterNode = CompositorNode.extend(
      * @param {Object} obj
      */
     setParameters: function (obj) {
-      for (var name in obj) {
+      for (const name in obj) {
         this.setParameter(name, obj[name]);
       }
     },
@@ -249,7 +249,7 @@ var FilterNode = CompositorNode.extend(
     //  * @param {string} shaderStr
     //  */
     // setShader: function (shaderStr) {
-    //     var material = this.pass.material;
+    //     const material = this.pass.material;
     //     material.shader.setFragment(shaderStr);
     //     material.attachShader(material.shader, true);
     // },
@@ -273,7 +273,7 @@ var FilterNode = CompositorNode.extend(
     removeReference: function (outputName) {
       this._outputReferences[outputName]--;
       if (this._outputReferences[outputName] === 0) {
-        var outputInfo = this.outputs[outputName];
+        const outputInfo = this.outputs[outputName];
         if (outputInfo.keepLastFrame) {
           if (this._prevOutputTextures[outputName]) {
             this._compositor.releaseTexture(this._prevOutputTextures[outputName]);

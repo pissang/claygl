@@ -11,7 +11,7 @@ import vec3 from './glmatrix/vec3';
  * @constructor clay.Camera
  * @extends clay.Node
  */
-var Camera = Node.extend(
+const Camera = Node.extend(
   function () {
     return /** @lends clay.Camera# */ {
       /**
@@ -90,11 +90,11 @@ var Camera = Node.extend(
      * @return {clay.Ray}
      */
     castRay: (function () {
-      var v4 = vec4.create();
+      const v4 = vec4.create();
       return function (ndc, out) {
-        var ray = out !== undefined ? out : new Ray();
-        var x = ndc.array[0];
-        var y = ndc.array[1];
+        const ray = out !== undefined ? out : new Ray();
+        const x = ndc.array[0];
+        const y = ndc.array[1];
         vec4.set(v4, x, y, -1, 1);
         vec4.transformMat4(v4, v4, this.invProjectionMatrix.array);
         vec4.transformMat4(v4, v4, this.worldTransform.array);

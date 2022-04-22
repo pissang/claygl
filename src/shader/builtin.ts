@@ -12,16 +12,16 @@ import prezEssl from './source/prez.glsl.js';
 import library from './library';
 import Shader from '../Shader';
 
-Shader['import'](lightEssl);
-Shader['import'](utilEssl);
+Shader.import(lightEssl);
+Shader.import(utilEssl);
 
 // Some build in shaders
-Shader['import'](basicEssl);
-Shader['import'](lambertEssl);
-Shader['import'](standardEssl);
-Shader['import'](wireframeEssl);
-Shader['import'](skyboxEssl);
-Shader['import'](prezEssl);
+Shader.import(basicEssl);
+Shader.import(lambertEssl);
+Shader.import(standardEssl);
+Shader.import(wireframeEssl);
+Shader.import(skyboxEssl);
+Shader.import(prezEssl);
 
 library.template(
   'clay.basic',

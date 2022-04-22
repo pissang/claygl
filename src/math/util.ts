@@ -1,5 +1,5 @@
 // @ts-nocheck
-var mathUtil = {};
+const mathUtil = {};
 
 mathUtil.isPowerOfTwo = function (value) {
   return (value & (value - 1)) === 0;

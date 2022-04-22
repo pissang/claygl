@@ -5,7 +5,7 @@ import Light from '../Light';
  * @constructor clay.light.Sphere
  * @extends {clay.Light}
  */
-var SphereLight = Light.extend(
+const SphereLight = Light.extend(
   /** @lends clay.light.Sphere# */
   {
     /**
@@ -43,8 +43,8 @@ var SphereLight = Light.extend(
       sphereLightColor: {
         type: '3f',
         value: function (instance) {
-          var color = instance.color;
-          var intensity = instance.intensity;
+          const color = instance.color;
+          const intensity = instance.intensity;
           return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
         }
       }

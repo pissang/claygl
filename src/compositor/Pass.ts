@@ -8,20 +8,20 @@ import Mesh from '../Mesh';
 import glenum from '../core/glenum';
 import vertexGlsl from '../shader/source/compositor/vertex.glsl.js';
 
-Shader['import'](vertexGlsl);
+Shader.import(vertexGlsl);
 
-var planeGeo = new Plane();
-var mesh = new Mesh({
+const planeGeo = new Plane();
+const mesh = new Mesh({
   geometry: planeGeo,
   frustumCulling: false
 });
-var camera = new OrthoCamera();
+const camera = new OrthoCamera();
 
 /**
  * @constructor clay.compositor.Pass
  * @extends clay.core.Base
  */
-var Pass = Base.extend(
+const Pass = Base.extend(
   function () {
     return /** @lends clay.compositor.Pass# */ {
       /**
@@ -58,8 +58,8 @@ var Pass = Base.extend(
     };
   },
   function () {
-    var shader = new Shader(Shader.source('clay.compositor.vertex'), this.fragment);
-    var material = new Material({
+    const shader = new Shader(Shader.source('clay.compositor.vertex'), this.fragment);
+    const material = new Material({
       shader: shader
     });
     material.enableTexturesAll();
@@ -80,7 +80,7 @@ var Pass = Base.extend(
      * @return {}
      */
     getUniform: function (name) {
-      var uniform = this.material.uniforms[name];
+      const uniform = this.material.uniforms[name];
       if (uniform) {
         return uniform.value;
       }
@@ -100,7 +100,7 @@ var Pass = Base.extend(
      * @param  {clay.Texture} texture
      */
     detachOutput: function (texture) {
-      for (var attachment in this.outputs) {
+      for (const attachment in this.outputs) {
         if (this.outputs[attachment] === texture) {
           this.outputs[attachment] = null;
         }
@@ -109,8 +109,8 @@ var Pass = Base.extend(
 
     bind: function (renderer, frameBuffer) {
       if (this.outputs) {
-        for (var attachment in this.outputs) {
-          var texture = this.outputs[attachment];
+        for (const attachment in this.outputs) {
+          const texture = this.outputs[attachment];
           if (texture) {
             frameBuffer.attach(texture, attachment);
           }
@@ -130,16 +130,16 @@ var Pass = Base.extend(
      * @param  {clay.FrameBuffer} [frameBuffer]
      */
     render: function (renderer, frameBuffer) {
-      var _gl = renderer.gl;
+      const _gl = renderer.gl;
 
       if (frameBuffer) {
         this.bind(renderer, frameBuffer);
         // MRT Support in chrome
         // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-        var ext = renderer.getGLExtension('EXT_draw_buffers');
+        const ext = renderer.getGLExtension('EXT_draw_buffers');
         if (ext && this.outputs) {
-          var bufs = [];
-          for (var attachment in this.outputs) {
+          const bufs = [];
+          for (let attachment in this.outputs) {
             attachment = +attachment;
             if (attachment >= _gl.COLOR_ATTACHMENT0 && attachment <= _gl.COLOR_ATTACHMENT0 + 8) {
               bufs.push(attachment);
@@ -153,12 +153,12 @@ var Pass = Base.extend(
 
       // FIXME Don't clear in each pass in default, let the color overwrite the buffer
       // FIXME pixels may be discard
-      var clearBit = this.clearDepth ? _gl.DEPTH_BUFFER_BIT : 0;
+      let clearBit = this.clearDepth ? _gl.DEPTH_BUFFER_BIT : 0;
       _gl.depthMask(true);
       if (this.clearColor) {
         clearBit = clearBit | _gl.COLOR_BUFFER_BIT;
         _gl.colorMask(true, true, true, true);
-        var cc = this.clearColor;
+        const cc = this.clearColor;
         if (Array.isArray(cc)) {
           _gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
         }

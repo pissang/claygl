@@ -7,7 +7,7 @@ import Task from './Task';
  * @alias clay.async.TaskGroup
  * @extends clay.async.Task
  */
-var TaskGroup = function () {
+const TaskGroup = function () {
   Task.apply(this, arguments);
 
   this._tasks = [];
@@ -17,7 +17,7 @@ var TaskGroup = function () {
   this._rejectedNumber = 0;
 };
 
-var Ctor = function () {};
+const Ctor = function () {};
 Ctor.prototype = Task.prototype;
 TaskGroup.prototype = new Ctor();
 
@@ -29,21 +29,21 @@ TaskGroup.prototype.constructor = TaskGroup;
  * @chainable
  * @example
  *     // Load texture list
- *     var list = ['a.jpg', 'b.jpg', 'c.jpg']
- *     var textures = list.map(function (src) {
- *         var texture = new clay.Texture2D();
+ *     const list = ['a.jpg', 'b.jpg', 'c.jpg']
+ *     const textures = list.map(function (src) {
+ *         const texture = new clay.Texture2D();
  *         texture.load(src);
  *         return texture;
  *     });
- *     var taskGroup = new clay.async.TaskGroup();
+ *     const taskGroup = new clay.async.TaskGroup();
  *     taskGroup.all(textures).success(function () {
  *         // Do some thing after all textures loaded
  *     });
  */
 TaskGroup.prototype.all = function (tasks) {
-  var count = 0;
-  var self = this;
-  var data = [];
+  let count = 0;
+  const self = this;
+  const data = [];
   this._tasks = tasks;
   this._fulfilledNumber = 0;
   this._rejectedNumber = 0;
@@ -91,9 +91,9 @@ TaskGroup.prototype.all = function (tasks) {
  * @return {clay.async.TaskGroup}
  */
 TaskGroup.prototype.allSettled = function (tasks) {
-  var count = 0;
-  var self = this;
-  var data = [];
+  let count = 0;
+  const self = this;
+  const data = [];
   if (tasks.length === 0) {
     setTimeout(function () {
       self.trigger('success', data);
@@ -120,7 +120,7 @@ TaskGroup.prototype.allSettled = function (tasks) {
         self.resolve(data);
       }
     });
-    task.once('error', function (err) {
+    task.once('error', function () {
       count--;
 
       self._rejectedNumber++;
@@ -144,9 +144,9 @@ TaskGroup.prototype.allSettled = function (tasks) {
  */
 TaskGroup.prototype.getFulfilledNumber = function (recursive) {
   if (recursive) {
-    var nFulfilled = 0;
-    for (var i = 0; i < this._tasks.length; i++) {
-      var task = this._tasks[i];
+    let nFulfilled = 0;
+    for (let i = 0; i < this._tasks.length; i++) {
+      const task = this._tasks[i];
       if (task instanceof TaskGroup) {
         nFulfilled += task.getFulfilledNumber(recursive);
       } else if (task._fulfilled) {
@@ -166,9 +166,9 @@ TaskGroup.prototype.getFulfilledNumber = function (recursive) {
  */
 TaskGroup.prototype.getRejectedNumber = function (recursive) {
   if (recursive) {
-    var nRejected = 0;
-    for (var i = 0; i < this._tasks.length; i++) {
-      var task = this._tasks[i];
+    let nRejected = 0;
+    for (let i = 0; i < this._tasks.length; i++) {
+      const task = this._tasks[i];
       if (task instanceof TaskGroup) {
         nRejected += task.getRejectedNumber(recursive);
       } else if (task._rejected) {
@@ -188,9 +188,9 @@ TaskGroup.prototype.getRejectedNumber = function (recursive) {
  */
 TaskGroup.prototype.getSettledNumber = function (recursive) {
   if (recursive) {
-    var nSettled = 0;
-    for (var i = 0; i < this._tasks.length; i++) {
-      var task = this._tasks[i];
+    let nSettled = 0;
+    for (let i = 0; i < this._tasks.length; i++) {
+      const task = this._tasks[i];
       if (task instanceof TaskGroup) {
         nSettled += task.getSettledNumber(recursive);
       } else if (task._rejected || task._fulfilled) {
@@ -210,9 +210,9 @@ TaskGroup.prototype.getSettledNumber = function (recursive) {
  */
 TaskGroup.prototype.getTaskNumber = function (recursive) {
   if (recursive) {
-    var nTask = 0;
-    for (var i = 0; i < this._tasks.length; i++) {
-      var task = this._tasks[i];
+    let nTask = 0;
+    for (let i = 0; i < this._tasks.length; i++) {
+      const task = this._tasks[i];
       if (task instanceof TaskGroup) {
         nTask += task.getTaskNumber(recursive);
       } else {

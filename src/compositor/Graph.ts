@@ -6,7 +6,7 @@ import GraphNode from './CompositorNode';
  * @constructor clay.compositor.Graph
  * @extends clay.core.Base
  */
-var Graph = Base.extend(
+const Graph = Base.extend(
   function () {
     return /** @lends clay.compositor.Graph# */ {
       /**
@@ -42,7 +42,7 @@ var Graph = Base.extend(
       if (typeof node === 'string') {
         node = this.getNodeByName(node);
       }
-      var idx = this.nodes.indexOf(node);
+      const idx = this.nodes.indexOf(node);
       if (idx >= 0) {
         this.nodes.splice(idx, 1);
         this._dirty = true;
@@ -53,7 +53,7 @@ var Graph = Base.extend(
      * @return {clay.compositor.CompositorNode}
      */
     getNodeByName: function (name) {
-      for (var i = 0; i < this.nodes.length; i++) {
+      for (let i = 0; i < this.nodes.length; i++) {
         if (this.nodes[i].name === name) {
           return this.nodes[i];
         }
@@ -63,17 +63,17 @@ var Graph = Base.extend(
      * Update links of graph
      */
     update: function () {
-      for (var i = 0; i < this.nodes.length; i++) {
+      for (let i = 0; i < this.nodes.length; i++) {
         this.nodes[i].clear();
       }
       // Traverse all the nodes and build the graph
-      for (var i = 0; i < this.nodes.length; i++) {
-        var node = this.nodes[i];
+      for (let i = 0; i < this.nodes.length; i++) {
+        const node = this.nodes[i];
 
         if (!node.inputs) {
           continue;
         }
-        for (var inputName in node.inputs) {
+        for (const inputName in node.inputs) {
           if (!node.inputs[inputName]) {
             continue;
           }
@@ -81,9 +81,9 @@ var Graph = Base.extend(
             console.warn('Pin ' + node.name + '.' + inputName + ' not used.');
             continue;
           }
-          var fromPinInfo = node.inputs[inputName];
+          const fromPinInfo = node.inputs[inputName];
 
-          var fromPin = this.findPin(fromPinInfo);
+          const fromPin = this.findPin(fromPinInfo);
           if (fromPin) {
             node.link(inputName, fromPin.node, fromPin.pin);
           } else {
@@ -98,7 +98,7 @@ var Graph = Base.extend(
     },
 
     findPin: function (input) {
-      var node;
+      let node;
       // Try to take input as a directly a node
       if (typeof input === 'string' || input instanceof GraphNode) {
         input = {
@@ -107,8 +107,8 @@ var Graph = Base.extend(
       }
 
       if (typeof input.node === 'string') {
-        for (var i = 0; i < this.nodes.length; i++) {
-          var tmp = this.nodes[i];
+        for (let i = 0; i < this.nodes.length; i++) {
+          const tmp = this.nodes[i];
           if (tmp.name === input.node) {
             node = tmp;
           }
@@ -117,7 +117,7 @@ var Graph = Base.extend(
         node = input.node;
       }
       if (node) {
-        var inputPin = input.pin;
+        let inputPin = input.pin;
         if (!inputPin) {
           // Use first pin defaultly
           if (node.outputs) {

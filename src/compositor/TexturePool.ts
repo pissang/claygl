@@ -3,7 +3,7 @@ import Texture2D from '../Texture2D';
 import glenum from '../core/glenum';
 import util from '../core/util';
 
-var TexturePool = function () {
+const TexturePool = function () {
   this._pool = {};
 
   this._allocatedTextures = [];
@@ -13,13 +13,13 @@ TexturePool.prototype = {
   constructor: TexturePool,
 
   get: function (parameters) {
-    var key = generateKey(parameters);
-    if (!this._pool.hasOwnProperty(key)) {
+    const key = generateKey(parameters);
+    if (!util.hasOwn(this._pool, key)) {
       this._pool[key] = [];
     }
-    var list = this._pool[key];
+    const list = this._pool[key];
     if (!list.length) {
-      var texture = new Texture2D(parameters);
+      const texture = new Texture2D(parameters);
       this._allocatedTextures.push(texture);
       return texture;
     }
@@ -27,16 +27,16 @@ TexturePool.prototype = {
   },
 
   put: function (texture) {
-    var key = generateKey(texture);
-    if (!this._pool.hasOwnProperty(key)) {
+    const key = generateKey(texture);
+    if (!util.hasOwn(this._pool, key)) {
       this._pool[key] = [];
     }
-    var list = this._pool[key];
+    const list = this._pool[key];
     list.push(texture);
   },
 
   clear: function (renderer) {
-    for (var i = 0; i < this._allocatedTextures.length; i++) {
+    for (let i = 0; i < this._allocatedTextures.length; i++) {
       this._allocatedTextures[i].dispose(renderer);
     }
     this._pool = {};
@@ -44,7 +44,7 @@ TexturePool.prototype = {
   }
 };
 
-var defaultParams = {
+const defaultParams = {
   width: 512,
   height: 512,
   type: glenum.UNSIGNED_BYTE,
@@ -60,23 +60,23 @@ var defaultParams = {
   premultiplyAlpha: false
 };
 
-var defaultParamPropList = Object.keys(defaultParams);
+const defaultParamPropList = Object.keys(defaultParams);
 
 function generateKey(parameters) {
   util.defaultsWithPropList(parameters, defaultParams, defaultParamPropList);
   fallBack(parameters);
 
-  var key = '';
-  for (var i = 0; i < defaultParamPropList.length; i++) {
-    var name = defaultParamPropList[i];
-    var chunk = parameters[name].toString();
+  let key = '';
+  for (let i = 0; i < defaultParamPropList.length; i++) {
+    const name = defaultParamPropList[i];
+    const chunk = parameters[name].toString();
     key += chunk;
   }
   return key;
 }
 
 function fallBack(target) {
-  var IPOT = isPowerOfTwo(target.width, target.height);
+  const IPOT = isPowerOfTwo(target.width, target.height);
 
   if (target.format === glenum.DEPTH_COMPONENT) {
     target.useMipmap = false;

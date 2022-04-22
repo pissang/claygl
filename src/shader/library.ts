@@ -1,24 +1,22 @@
 // @ts-nocheck
 import Shader from '../Shader';
 
-var _library = {};
+const _library = {};
 
 function ShaderLibrary() {
   this._pool = {};
 }
 
-ShaderLibrary.prototype.get = function (name) {
-  var key = name;
-
+ShaderLibrary.prototype.get = function (key) {
   if (this._pool[key]) {
     return this._pool[key];
   } else {
-    var source = _library[name];
+    const source = _library[key];
     if (!source) {
-      console.error('Shader "' + name + '"' + ' is not in the library');
+      console.error('Shader "' + key + '"' + ' is not in the library');
       return;
     }
-    var shader = new Shader(source.vertex, source.fragment);
+    const shader = new Shader(source.vertex, source.fragment);
     this._pool[key] = shader;
     return shader;
   }
@@ -35,7 +33,7 @@ function template(name, vertex, fragment) {
   };
 }
 
-var defaultLibrary = new ShaderLibrary();
+const defaultLibrary = new ShaderLibrary();
 
 /**
  * ### Builin shaders

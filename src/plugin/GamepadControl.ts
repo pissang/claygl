@@ -20,7 +20,7 @@ import vendor from '../core/vendor';
  *     this._gamepadControl.update(app.frameTime);
  *   }
  */
-var GamepadControl = Base.extend(
+const GamepadControl = Base.extend(
   function () {
     return /** @lends clay.plugin.GamepadControl# */ {
       /**
@@ -97,6 +97,7 @@ var GamepadControl = Base.extend(
     this.update = this.update.bind(this);
 
     // If browser supports Gamepad API:
+    /* global navigator */
     if (typeof navigator.getGamepads === 'function') {
       this.init();
     }
@@ -149,13 +150,13 @@ var GamepadControl = Base.extend(
 
       // Update target depending on user input.
 
-      var target = this.target;
+      const target = this.target;
 
-      var position = this.target.position;
-      var xAxis = target.localTransform.x.normalize();
-      var zAxis = target.localTransform.z.normalize();
+      const position = this.target.position;
+      let xAxis = target.localTransform.x.normalize();
+      const zAxis = target.localTransform.z.normalize();
 
-      var moveSpeed = (this.moveSpeed * frameTime) / 20;
+      const moveSpeed = (this.moveSpeed * frameTime) / 20;
 
       if (this._moveForward) {
         // Opposite direction of z.
@@ -176,7 +177,7 @@ var GamepadControl = Base.extend(
         this.up,
         (-this._offsetPitch * frameTime * Math.PI) / 360
       );
-      var xAxis = target.localTransform.x;
+      xAxis = target.localTransform.x;
       target.rotateAround(target.position, xAxis, (-this._offsetRoll * frameTime * Math.PI) / 360);
 
       /*
@@ -227,12 +228,12 @@ var GamepadControl = Base.extend(
     },
 
     _scanPressedGamepadButtons: function () {
-      var gamepadButtons = this._getStandardGamepad().buttons;
+      const gamepadButtons = this._getStandardGamepad().buttons;
 
       // For each gamepad button:
-      for (var gamepadButtonId = 0; gamepadButtonId < gamepadButtons.length; gamepadButtonId++) {
+      for (let gamepadButtonId = 0; gamepadButtonId < gamepadButtons.length; gamepadButtonId++) {
         // Get user input.
-        var gamepadButton = gamepadButtons[gamepadButtonId];
+        const gamepadButton = gamepadButtons[gamepadButtonId];
 
         if (gamepadButton.pressed) {
           switch (gamepadButtonId) {
@@ -261,12 +262,12 @@ var GamepadControl = Base.extend(
     },
 
     _scanInclinedGamepadAxes: function () {
-      var gamepadAxes = this._getStandardGamepad().axes;
+      const gamepadAxes = this._getStandardGamepad().axes;
 
       // For each gamepad axis:
-      for (var gamepadAxisId = 0; gamepadAxisId < gamepadAxes.length; gamepadAxisId++) {
+      for (let gamepadAxisId = 0; gamepadAxisId < gamepadAxes.length; gamepadAxisId++) {
         // Get user input.
-        var gamepadAxis = gamepadAxes[gamepadAxisId];
+        const gamepadAxis = gamepadAxes[gamepadAxisId];
 
         // XXX We use a threshold because axes are never neutral.
         if (Math.abs(gamepadAxis) > this._gamepadAxisThreshold) {

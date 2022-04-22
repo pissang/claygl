@@ -8,7 +8,7 @@ import Value from '../math/Value';
  * @constructor clay.particle.Emitter
  * @extends clay.core.Base
  */
-var Emitter = Base.extend(
+const Emitter = Base.extend(
   /** @lends clay.particle.Emitter# */ {
     /**
      * Maximum number of particles created by this emitter
@@ -64,8 +64,8 @@ var Emitter = Base.extend(
     this._particlePool = [];
 
     // TODO Reduce heap memory
-    for (var i = 0; i < this.max; i++) {
-      var particle = new Particle();
+    for (let i = 0; i < this.max; i++) {
+      const particle = new Particle();
       particle.emitter = this;
       this._particlePool.push(particle);
 
@@ -84,10 +84,10 @@ var Emitter = Base.extend(
      * @param  {Array.<clay.particle.Particle>} out
      */
     emit: function (out) {
-      var amount = Math.min(this._particlePool.length, this.amount);
+      const amount = Math.min(this._particlePool.length, this.amount);
 
-      var particle;
-      for (var i = 0; i < amount; i++) {
+      let particle;
+      for (let i = 0; i < amount; i++) {
         particle = this._particlePool.pop();
         // Initialize particle status
         if (this.position) {

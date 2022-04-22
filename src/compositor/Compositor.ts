@@ -10,7 +10,7 @@ import FrameBuffer from '../FrameBuffer';
  * @extends clay.compositor.Graph
  *
  */
-var Compositor = Graph.extend(
+const Compositor = Graph.extend(
   function () {
     return {
       // Output node
@@ -38,27 +38,27 @@ var Compositor = Graph.extend(
         this._dirty = false;
 
         this._outputs.length = 0;
-        for (var i = 0; i < this.nodes.length; i++) {
+        for (let i = 0; i < this.nodes.length; i++) {
           if (!this.nodes[i].outputs) {
             this._outputs.push(this.nodes[i]);
           }
         }
       }
 
-      for (var i = 0; i < this.nodes.length; i++) {
+      for (let i = 0; i < this.nodes.length; i++) {
         // Update the reference number of each output texture
         this.nodes[i].beforeFrame();
       }
 
-      for (var i = 0; i < this._outputs.length; i++) {
+      for (let i = 0; i < this._outputs.length; i++) {
         this._outputs[i].updateReference();
       }
 
-      for (var i = 0; i < this._outputs.length; i++) {
+      for (let i = 0; i < this._outputs.length; i++) {
         this._outputs[i].render(renderer, frameBuffer);
       }
 
-      for (var i = 0; i < this.nodes.length; i++) {
+      for (let i = 0; i < this.nodes.length; i++) {
         // Clear up
         this.nodes[i].afterFrame();
       }

@@ -4,7 +4,7 @@ import Vector3 from '../math/Vector3';
 import PerspectiveCamera from '../camera/Perspective';
 import FrameBuffer from '../FrameBuffer';
 
-var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
+const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
 /**
  * Pass rendering scene to a environment cube map
@@ -13,15 +13,15 @@ var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  * @extends clay.core.Base
  * @example
  *     // Example of car reflection
- *     var envMap = new clay.TextureCube({
+ *     const envMap = new clay.TextureCube({
  *         width: 256,
  *         height: 256
  *     });
- *     var envPass = new clay.prePass.EnvironmentMap({
+ *     const envPass = new clay.prePass.EnvironmentMap({
  *         position: car.position,
  *         texture: envMap
  *     });
- *     var carBody = car.getChildByName('body');
+ *     const carBody = car.getChildByName('body');
  *     carBody.material.enableTexture('environmentMap');
  *     carBody.material.set('environmentMap', envMap);
  *     ...
@@ -30,9 +30,9 @@ var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *         renderer.render(scene, camera);
  *     });
  */
-var EnvironmentMapPass = Base.extend(
+const EnvironmentMapPass = Base.extend(
   function () {
-    var ret = /** @lends clay.prePass.EnvironmentMap# */ {
+    const ret = /** @lends clay.prePass.EnvironmentMap# */ {
       /**
        * Camera position
        * @type {clay.Vector3}
@@ -64,7 +64,7 @@ var EnvironmentMapPass = Base.extend(
        */
       shadowMapPass: null
     };
-    var cameras = (ret._cameras = {
+    const cameras = (ret._cameras = {
       px: new PerspectiveCamera({ fov: 90 }),
       nx: new PerspectiveCamera({ fov: 90 }),
       py: new PerspectiveCamera({ fov: 90 }),
@@ -98,18 +98,18 @@ var EnvironmentMapPass = Base.extend(
      * @param  {boolean} [notUpdateScene=false]
      */
     render: function (renderer, scene, notUpdateScene) {
-      var _gl = renderer.gl;
+      const _gl = renderer.gl;
       if (!notUpdateScene) {
         scene.update();
       }
       // Tweak fov
       // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
-      var n = this.texture.width;
-      var fov = ((2 * Math.atan(n / (n - 0.5))) / Math.PI) * 180;
+      const n = this.texture.width;
+      const fov = ((2 * Math.atan(n / (n - 0.5))) / Math.PI) * 180;
 
-      for (var i = 0; i < 6; i++) {
-        var target = targets[i];
-        var camera = this._cameras[target];
+      for (let i = 0; i < 6; i++) {
+        const target = targets[i];
+        const camera = this._cameras[target];
         Vector3.copy(camera.position, this.position);
 
         camera.far = this.far;
@@ -120,7 +120,7 @@ var EnvironmentMapPass = Base.extend(
           camera.update();
 
           // update boundingBoxLastFrame
-          var bbox = scene.getBoundingBox();
+          const bbox = scene.getBoundingBox();
           bbox.applyTransform(camera.viewMatrix);
           scene.viewBoundingBoxLastFrame.copy(bbox);
 

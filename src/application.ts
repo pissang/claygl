@@ -41,12 +41,12 @@ import textureUtil from './util/texture';
 import vendor from './core/vendor';
 
 import colorUtil from './core/color';
-var parseColor = colorUtil.parseToFloat;
+const parseColor = colorUtil.parseToFloat;
 
 import shaderLibrary from './shader/builtin';
 import Shader from './Shader';
 
-var EVE_NAMES = [
+const EVE_NAMES = [
   'click',
   'dblclick',
   'mouseover',
@@ -135,7 +135,7 @@ var EVE_NAMES = [
  * Here is a basic example to create a rotating cube.
  *
 ```js
-var app = clay.application.create('#viewport', {
+const app = clay.application.create('#viewport', {
     init: function (app) {
         // Create a perspective camera.
         // First parameter is the camera position. Which is in front of the cube.
@@ -168,18 +168,18 @@ function App3D(dom, appNS) {
   }
 
   if (typeof dom === 'string') {
-    dom = document.querySelector(dom);
+    dom = window.document.querySelector(dom);
   }
 
   if (!dom) {
     throw new Error('Invalid dom');
   }
 
-  var isDomCanvas =
+  const isDomCanvas =
     !dom.nodeName || // Not in dom environment
     dom.nodeName.toUpperCase() === 'CANVAS';
 
-  var rendererOpts = {};
+  const rendererOpts = {};
   isDomCanvas && (rendererOpts.canvas = dom);
   appNS.devicePixelRatio && (rendererOpts.devicePixelRatio = appNS.devicePixelRatio);
 
@@ -191,14 +191,14 @@ function App3D(dom, appNS) {
     }
   );
 
-  var gRenderer = new Renderer(rendererOpts);
-  var gWidth = appNS.width || dom.clientWidth;
-  var gHeight = appNS.height || dom.clientHeight;
+  const gRenderer = new Renderer(rendererOpts);
+  const gWidth = appNS.width || dom.clientWidth;
+  const gHeight = appNS.height || dom.clientHeight;
 
-  var gScene = new Scene();
-  var gTimeline = new Timeline();
-  var gShadowPass = appNS.graphic.shadow && new ShadowMapPass();
-  var gRayPicking =
+  const gScene = new Scene();
+  const gTimeline = new Timeline();
+  const gShadowPass = appNS.graphic.shadow && new ShadowMapPass();
+  const gRayPicking =
     appNS.event &&
     new RayPicking({
       scene: gScene,
@@ -209,13 +209,13 @@ function App3D(dom, appNS) {
 
   gRenderer.resize(gWidth, gHeight);
 
-  var gFrameTime = 0;
-  var gElapsedTime = 0;
+  let gFrameTime = 0;
+  let gElapsedTime = 0;
 
   gTimeline.start();
 
-  var userMethods = {};
-  for (var key in appNS.methods) {
+  const userMethods = {};
+  for (const key in appNS.methods) {
     userMethods[key] = appNS.methods[key].bind(appNS, this);
   }
 
@@ -331,8 +331,8 @@ function App3D(dom, appNS) {
    * @param {number} [height]
    */
   this.resize = function (width, height) {
-    gWidth = width || appNS.width || dom.clientWidth;
-    gHeight = height || appNS.height || dom.clientHeight;
+    const gWidth = width || appNS.width || dom.clientWidth;
+    const gHeight = height || appNS.height || dom.clientHeight;
     gRenderer.resize(gWidth, gHeight);
   };
 
@@ -366,7 +366,7 @@ function App3D(dom, appNS) {
   this._geometriesList = {};
 
   // Do init the application.
-  var initPromise = Promise.resolve(appNS.init && appNS.init(this));
+  const initPromise = Promise.resolve(appNS.init && appNS.init(this));
   // Use the inited camera.
   gRayPicking && (gRayPicking.camera = gScene.getMainCamera());
 
@@ -374,7 +374,7 @@ function App3D(dom, appNS) {
     console.warn('Miss loop method.');
   }
 
-  var self = this;
+  const self = this;
   initPromise.then(function () {
     gTimeline.on(
       'frame',
@@ -382,7 +382,7 @@ function App3D(dom, appNS) {
         gFrameTime = frameTime;
         gElapsedTime += frameTime;
 
-        var camera = gScene.getMainCamera();
+        const camera = gScene.getMainCamera();
         if (camera) {
           camera.aspect = gRenderer.getViewportAspect();
         }
@@ -414,6 +414,7 @@ function App3D(dom, appNS) {
 }
 
 function isImageLikeElement(val) {
+  /* global Image, HTMLCanvasElement, HTMLVideoElement */
   return (
     (typeof Image !== 'undefined' && val instanceof Image) ||
     (typeof HTMLCanvasElement !== 'undefined' && val instanceof HTMLCanvasElement) ||
@@ -430,7 +431,7 @@ function makeHandlerName(eveType) {
 }
 
 function packageEvent(eventType, pickResult, offsetX, offsetY, wheelDelta) {
-  var event = util.clone(pickResult);
+  const event = util.clone(pickResult);
   event.type = eventType;
   event.offsetX = offsetX;
   event.offsetY = offsetY;
@@ -448,9 +449,9 @@ function bubblingEvent(target, event) {
 }
 
 App3D.prototype._initMouseEvents = function (rayPicking) {
-  var dom = this.container;
+  const dom = this.container;
 
-  var oldTarget = null;
+  let oldTarget = null;
   EVE_NAMES.forEach(function (_eveType) {
     vendor.addEventListener(
       dom,
@@ -462,12 +463,12 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
         }
         e.preventDefault && e.preventDefault();
 
-        var box = dom.getBoundingClientRect();
-        var offsetX, offsetY;
-        var eveType = _eveType;
+        const box = dom.getBoundingClientRect();
+        let offsetX, offsetY;
+        let eveType = _eveType;
 
         if (eveType.indexOf('touch') >= 0) {
-          var touch = eveType !== 'touchend' ? e.targetTouches[0] : e.changedTouches[0];
+          const touch = eveType !== 'touchend' ? e.targetTouches[0] : e.changedTouches[0];
           if (eveType === 'touchstart') {
             eveType = 'mousedown';
           } else if (eveType === 'touchend') {
@@ -482,9 +483,9 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
           offsetY = e.clientY - box.top;
         }
 
-        var pickResult = rayPicking.pick(offsetX, offsetY);
+        const pickResult = rayPicking.pick(offsetX, offsetY);
 
-        var delta;
+        let delta;
         if (eveType === 'DOMMouseScroll' || eveType === 'mousewheel') {
           delta = e.wheelDelta ? e.wheelDelta / 120 : -(e.detail || 0) / 3;
         }
@@ -497,7 +498,7 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
 
           if (eveType === 'mousemove') {
             // PENDING touchdown should trigger mouseover event ?
-            var targetChanged = pickResult.target !== oldTarget;
+            const targetChanged = pickResult.target !== oldTarget;
             if (targetChanged) {
               oldTarget &&
                 bubblingEvent(
@@ -549,13 +550,13 @@ App3D.prototype._initMouseEvents = function (rayPicking) {
 };
 
 App3D.prototype._updateGraphicOptions = function (graphicOpts, list, isSkybox) {
-  var enableTonemapping = !!graphicOpts.tonemapping;
-  var isLinearSpace = !!graphicOpts.linear;
+  const enableTonemapping = !!graphicOpts.tonemapping;
+  const isLinearSpace = !!graphicOpts.linear;
 
-  var prevMaterial;
+  let prevMaterial;
 
-  for (var i = 0; i < list.length; i++) {
-    var mat = list[i].material;
+  for (let i = 0; i < list.length; i++) {
+    const mat = list[i].material;
     if (mat === prevMaterial) {
       continue;
     }
@@ -564,7 +565,7 @@ App3D.prototype._updateGraphicOptions = function (graphicOpts, list, isSkybox) {
       ? mat.define('fragment', 'TONEMAPPING')
       : mat.undefine('fragment', 'TONEMAPPING');
     if (isLinearSpace) {
-      var decodeSRGB = true;
+      let decodeSRGB = true;
       if (isSkybox && mat.get('environmentMap') && !mat.get('environmentMap').sRGB) {
         decodeSRGB = false;
       }
@@ -580,7 +581,7 @@ App3D.prototype._updateGraphicOptions = function (graphicOpts, list, isSkybox) {
 };
 
 App3D.prototype._doRender = function (renderer, scene) {
-  var camera = scene.getMainCamera();
+  const camera = scene.getMainCamera();
   renderer.render(scene, camera, true);
 };
 
@@ -589,15 +590,15 @@ App3D.prototype._doRender = function (renderer, scene) {
  */
 App3D.prototype.render = function () {
   this._inRender = true;
-  var appNS = this._appNS;
-  appNS.beforeRender && appNS.beforeRender(self);
+  const appNS = this._appNS;
+  appNS.beforeRender && appNS.beforeRender(this);
 
-  var scene = this.scene;
-  var renderer = this.renderer;
-  var shadowPass = this._shadowPass;
+  const scene = this.scene;
+  const renderer = this.renderer;
+  const shadowPass = this._shadowPass;
 
   scene.update();
-  var skyboxList = [];
+  const skyboxList = [];
   scene.skybox && skyboxList.push(scene.skybox);
   scene.skydome && skyboxList.push(scene.skydome);
 
@@ -607,22 +608,22 @@ App3D.prototype.render = function () {
 
   this._doRender(renderer, scene, true);
 
-  appNS.afterRender && appNS.afterRender(self);
+  appNS.afterRender && appNS.afterRender(this);
   this._inRender = false;
 };
 
 App3D.prototype.collectResources = function () {
-  var renderer = this.renderer;
-  var scene = this.scene;
-  var texturesList = this._texturesList;
-  var geometriesList = this._geometriesList;
+  const renderer = this.renderer;
+  const scene = this.scene;
+  const texturesList = this._texturesList;
+  const geometriesList = this._geometriesList;
   // Mark all resources unused;
   markUnused(texturesList);
   markUnused(geometriesList);
 
   // Collect resources used in this frame.
-  var newTexturesList = [];
-  var newGeometriesList = [];
+  const newTexturesList = [];
+  const newGeometriesList = [];
   collectResources(scene, newTexturesList, newGeometriesList);
 
   // Dispose those unsed resources.
@@ -634,13 +635,13 @@ App3D.prototype.collectResources = function () {
 };
 
 function markUnused(resourceList) {
-  for (var i = 0; i < resourceList.length; i++) {
+  for (let i = 0; i < resourceList.length; i++) {
     resourceList[i].__used = 0;
   }
 }
 
 function checkAndDispose(renderer, resourceList) {
-  for (var i = 0; i < resourceList.length; i++) {
+  for (let i = 0; i < resourceList.length; i++) {
     if (!resourceList[i].__used) {
       resourceList[i].dispose(renderer);
     }
@@ -656,27 +657,27 @@ function updateUsed(resource, list) {
   }
 }
 function collectResources(scene, textureResourceList, geometryResourceList) {
-  var prevMaterial;
-  var prevGeometry;
+  let prevMaterial;
+  let prevGeometry;
   scene.traverse(function (renderable) {
     if (renderable.isRenderable()) {
-      var geometry = renderable.geometry;
-      var material = renderable.material;
+      const geometry = renderable.geometry;
+      const material = renderable.material;
 
       // TODO optimize!!
       if (material !== prevMaterial) {
-        var textureUniforms = material.getTextureUniforms();
-        for (var u = 0; u < textureUniforms.length; u++) {
-          var uniformName = textureUniforms[u];
-          var val = material.uniforms[uniformName].value;
-          var uniformType = material.uniforms[uniformName].type;
+        const textureUniforms = material.getTextureUniforms();
+        for (let u = 0; u < textureUniforms.length; u++) {
+          const uniformName = textureUniforms[u];
+          const val = material.uniforms[uniformName].value;
+          const uniformType = material.uniforms[uniformName].type;
           if (!val) {
             continue;
           }
           if (uniformType === 't') {
             updateUsed(val, textureResourceList);
           } else if (uniformType === 'tv') {
-            for (var k = 0; k < val.length; k++) {
+            for (let k = 0; k < val.length; k++) {
               if (val[k]) {
                 updateUsed(val[k], textureResourceList);
               }
@@ -693,7 +694,7 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
     }
   });
 
-  for (var k = 0; k < scene.lights.length; k++) {
+  for (let k = 0; k < scene.lights.length; k++) {
     // Track AmbientCubemap
     if (scene.lights[k].cubemap) {
       updateUsed(scene.lights[k].cubemap, textureResourceList);
@@ -721,16 +722,16 @@ function collectResources(scene, textureResourceList, geometryResourceList) {
  *      });
  */
 App3D.prototype.loadTexture = function (urlOrImg, opts, useCache) {
-  var self = this;
-  var key = getKeyFromImageLike(urlOrImg);
+  const self = this;
+  const key = getKeyFromImageLike(urlOrImg);
   if (useCache) {
     if (this._texCache.get(key)) {
       return this._texCache.get(key);
     }
   }
   // TODO Promise ?
-  var promise = new Promise(function (resolve, reject) {
-    var texture = self.loadTextureSync(urlOrImg, opts);
+  const promise = new Promise(function (resolve, reject) {
+    const texture = self.loadTextureSync(urlOrImg, opts);
     if (!texture.isRenderable()) {
       texture.success(function () {
         if (self._disposed) {
@@ -768,14 +769,14 @@ App3D.prototype.loadTexture = function (urlOrImg, opts, useCache) {
  * @param {number} [opts.exposure] Only be used when source is a HDR image.
  * @return {clay.Texture2D}
  * @example
- *  var texture = app.loadTexture('diffuseMap.jpg', {
+ *  const texture = app.loadTexture('diffuseMap.jpg', {
  *      anisotropic: 8,
  *      flipY: false
  *  });
  *  material.set('diffuseMap', texture);
  */
 App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
-  var texture = new Texture2D(opts);
+  let texture = new Texture2D(opts);
   if (typeof urlOrImg === 'string') {
     if (urlOrImg.match(/.hdr$|^data:application\/octet-stream/)) {
       texture = textureUtil.loadTexture(
@@ -789,7 +790,7 @@ App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
           texture.trigger('success');
         }
       );
-      for (var key in opts) {
+      for (const key in opts) {
         texture[key] = opts[key];
       }
     } else {
@@ -817,7 +818,7 @@ App3D.prototype.loadTextureSync = function (urlOrImg, opts) {
  *  })
  */
 App3D.prototype.loadTextureCube = function (imgList, opts) {
-  var textureCube = this.loadTextureCubeSync(imgList, opts);
+  const textureCube = this.loadTextureCubeSync(imgList, opts);
   return new Promise(function (resolve, reject) {
     if (textureCube.isRenderable()) {
       resolve(textureCube);
@@ -840,7 +841,7 @@ App3D.prototype.loadTextureCube = function (imgList, opts) {
  * @param {boolean} [opts.flipY=false] If flipY. See {@link clay.Texture.flipY}
  * @return {clay.TextureCube}
  * @example
- *  var texture = app.loadTextureCubeSync({
+ *  const texture = app.loadTextureCubeSync({
  *      px: 'skybox/px.jpg', py: 'skybox/py.jpg', pz: 'skybox/pz.jpg',
  *      nx: 'skybox/nx.jpg', ny: 'skybox/ny.jpg', nz: 'skybox/nz.jpg'
  *  });
@@ -849,7 +850,7 @@ App3D.prototype.loadTextureCube = function (imgList, opts) {
 App3D.prototype.loadTextureCubeSync = function (imgList, opts) {
   opts = opts || {};
   opts.flipY = opts.flipY || false;
-  var textureCube = new TextureCube(opts);
+  const textureCube = new TextureCube(opts);
   if (
     !imgList ||
     !imgList.px ||
@@ -884,16 +885,16 @@ App3D.prototype.loadTextureCubeSync = function (imgList, opts) {
 App3D.prototype.createMaterial = function (matConfig) {
   matConfig = matConfig || {};
   matConfig.shader = matConfig.shader || 'clay.standardMR';
-  var shader =
+  const shader =
     matConfig.shader instanceof Shader ? matConfig.shader : shaderLibrary.get(matConfig.shader);
-  var material = new Material({
+  const material = new Material({
     shader: shader
   });
   if (matConfig.name) {
     material.name = matConfig.name;
   }
 
-  var texturesLoading = [];
+  const texturesLoading = [];
   function makeTextureSetter(key) {
     return function (texture) {
       material.setUniform(key, texture);
@@ -901,9 +902,9 @@ App3D.prototype.createMaterial = function (matConfig) {
       return texture;
     };
   }
-  for (var key in matConfig) {
+  for (const key in matConfig) {
     if (material.uniforms[key]) {
-      var val = matConfig[key];
+      const val = matConfig[key];
       if (
         (material.uniforms[key].type === 't' || isImageLikeElement(val)) &&
         !(val instanceof Texture)
@@ -954,8 +955,8 @@ App3D.prototype.createCube = function (material, parentNode, subdiv) {
     subdiv = [subdiv, subdiv, subdiv];
   }
 
-  var geoKey = 'cube-' + subdiv.join('-');
-  var cube = this._geoCache.get(geoKey);
+  const geoKey = 'cube-' + subdiv.join('-');
+  let cube = this._geoCache.get(geoKey);
   if (!cube) {
     cube = new CubeGeo({
       widthSegments: subdiv[0],
@@ -987,8 +988,8 @@ App3D.prototype.createCubeInside = function (material, parentNode, subdiv) {
   if (typeof subdiv === 'number') {
     subdiv = [subdiv, subdiv, subdiv];
   }
-  var geoKey = 'cubeInside-' + subdiv.join('-');
-  var cube = this._geoCache.get(geoKey);
+  const geoKey = 'cubeInside-' + subdiv.join('-');
+  let cube = this._geoCache.get(geoKey);
   if (!cube) {
     cube = new CubeGeo({
       inside: true,
@@ -1022,8 +1023,8 @@ App3D.prototype.createSphere = function (material, parentNode, subdivision) {
   if (subdivision == null) {
     subdivision = 20;
   }
-  var geoKey = 'sphere-' + subdivision;
-  var sphere = this._geoCache.get(geoKey);
+  const geoKey = 'sphere-' + subdivision;
+  let sphere = this._geoCache.get(geoKey);
   if (!sphere) {
     sphere = new SphereGeo({
       widthSegments: subdivision * 2,
@@ -1057,8 +1058,8 @@ App3D.prototype.createPlane = function (material, parentNode, subdiv) {
   if (typeof subdiv === 'number') {
     subdiv = [subdiv, subdiv];
   }
-  var geoKey = 'plane-' + subdiv.join('-');
-  var planeGeo = this._geoCache.get(geoKey);
+  const geoKey = 'plane-' + subdiv.join('-');
+  let planeGeo = this._geoCache.get(geoKey);
   if (!planeGeo) {
     planeGeo = new PlaneGeo({
       widthSegments: subdiv[0],
@@ -1083,7 +1084,7 @@ App3D.prototype.createPlane = function (material, parentNode, subdiv) {
  * @return {clay.Mesh}
  */
 App3D.prototype.createParametricSurface = function (material, parentNode, generator) {
-  var geo = new ParametricSurfaceGeo({
+  const geo = new ParametricSurfaceGeo({
     generator: generator
   });
   geo.generateTangents();
@@ -1096,7 +1097,7 @@ App3D.prototype.createParametricSurface = function (material, parentNode, genera
  * @return {clay.Mesh}
  */
 App3D.prototype.createMesh = function (geometry, mat, parentNode) {
-  var mesh = new Mesh({
+  const mesh = new Mesh({
     geometry: geometry,
     material: mat instanceof Material ? mat : this.createMaterial(mat)
   });
@@ -1111,7 +1112,7 @@ App3D.prototype.createMesh = function (geometry, mat, parentNode) {
  * @return {clay.Node}
  */
 App3D.prototype.createNode = function (parentNode) {
-  var node = new Node();
+  const node = new Node();
   parentNode = parentNode || this.scene;
   parentNode.add(node);
   return node;
@@ -1126,8 +1127,8 @@ App3D.prototype.createNode = function (parentNode) {
  * @return {clay.camera.Perspective|clay.camera.Orthographic}
  */
 App3D.prototype.createCamera = function (position, target, type, extent) {
-  var CameraCtor;
-  var isOrtho = false;
+  let CameraCtor;
+  let isOrtho = false;
   if (type === 'ortho' || type === 'orthographic') {
     isOrtho = true;
     CameraCtor = OrthographicCamera;
@@ -1138,7 +1139,7 @@ App3D.prototype.createCamera = function (position, target, type, extent) {
     CameraCtor = PerspectiveCamera;
   }
 
-  var camera = new CameraCtor();
+  const camera = new CameraCtor();
   if (position instanceof Vector3) {
     camera.position.copy(position);
   } else if (position instanceof Array) {
@@ -1179,7 +1180,7 @@ App3D.prototype.createCamera = function (position, target, type, extent) {
  *  app.createDirectionalLight([-1, -1, -1], '#fff', 2);
  */
 App3D.prototype.createDirectionalLight = function (dir, color, intensity) {
-  var light = new DirectionalLight();
+  const light = new DirectionalLight();
   if (dir instanceof Vector3) {
     dir = dir.array;
   }
@@ -1217,7 +1218,7 @@ App3D.prototype.createSpotLight = function (
   umbraAngle,
   penumbraAngle
 ) {
-  var light = new SpotLight();
+  const light = new SpotLight();
   light.position.setArray(position instanceof Vector3 ? position.array : position);
 
   if (target instanceof Array) {
@@ -1249,7 +1250,7 @@ App3D.prototype.createSpotLight = function (
  * @param {number} [intensity=1] Intensity of point light.
  */
 App3D.prototype.createPointLight = function (position, range, color, intensity) {
-  var light = new PointLight();
+  const light = new PointLight();
   light.position.setArray(position instanceof Vector3 ? position.array : position);
 
   if (typeof color === 'string') {
@@ -1270,7 +1271,7 @@ App3D.prototype.createPointLight = function (position, range, color, intensity) 
  * @param {number} [intensity=1] Intensity of ambient light.
  */
 App3D.prototype.createAmbientLight = function (color, intensity) {
-  var light = new AmbientLight();
+  const light = new AmbientLight();
 
   if (typeof color === 'string') {
     color = parseColor(color);
@@ -1300,7 +1301,7 @@ App3D.prototype.createAmbientCubemapLight = function (
   exposure,
   prefilteredCubemapSize
 ) {
-  var self = this;
+  const self = this;
   if (exposure == null) {
     exposure = 0;
   }
@@ -1308,13 +1309,13 @@ App3D.prototype.createAmbientCubemapLight = function (
     prefilteredCubemapSize = 32;
   }
 
-  var scene = this.scene;
+  const scene = this.scene;
 
-  var loadPromise;
+  let loadPromise;
   if (envImage.textureType === 'textureCube') {
     loadPromise = envImage.isRenderable()
       ? Promise.resolve(envImage)
-      : new Promise(function (resolve, reject) {
+      : new Promise(function (resolve) {
           envImage.success(function () {
             resolve(envImage);
           });
@@ -1326,7 +1327,7 @@ App3D.prototype.createAmbientCubemapLight = function (
   }
 
   return loadPromise.then(function (envTexture) {
-    var specLight = new AmbientCubemapLight({
+    const specLight = new AmbientCubemapLight({
       intensity: specIntensity != null ? specIntensity : 0.7
     });
     specLight.cubemap = envTexture;
@@ -1334,7 +1335,7 @@ App3D.prototype.createAmbientCubemapLight = function (
     // TODO Cache prefilter ?
     specLight.prefilter(self.renderer, 32);
 
-    var diffLight = new AmbientSHLight({
+    const diffLight = new AmbientSHLight({
       intensity: diffIntensity != null ? diffIntensity : 0.7,
       coefficients: shUtil.projectEnvironmentMap(self.renderer, specLight.cubemap, {
         lod: 1
@@ -1377,9 +1378,9 @@ App3D.prototype.loadModel = function (url, opts, parentNode) {
   if (opts.autoPlayAnimation == null) {
     opts.autoPlayAnimation = true;
   }
-  var shader = opts.shader || 'clay.standard';
+  const shader = opts.shader || 'clay.standard';
 
-  var loaderOpts = {
+  const loaderOpts = {
     rootNode: new Node(),
     shader: shader,
     textureRootPath: opts.textureRootPath,
@@ -1391,11 +1392,11 @@ App3D.prototype.loadModel = function (url, opts, parentNode) {
     loaderOpts.rootNode.rotation.identity().rotateX(-Math.PI / 2);
   }
 
-  var loader = new GLTFLoader(loaderOpts);
+  const loader = new GLTFLoader(loaderOpts);
 
   parentNode = parentNode || this.scene;
-  var timeline = this.timeline;
-  var self = this;
+  const timeline = this.timeline;
+  const self = this;
 
   return new Promise(function (resolve, reject) {
     function afterLoad(result) {
@@ -1459,7 +1460,7 @@ App3D.prototype.loadModel = function (url, opts, parentNode) {
 App3D.prototype.cloneNode = function (node, parentNode) {
   parentNode = parentNode || node.getParent();
 
-  var newNode = this.scene.cloneNode(node, parentNode);
+  const newNode = this.scene.cloneNode(node, parentNode);
   if (parentNode) {
     parentNode.add(newNode);
   }
@@ -1485,7 +1486,7 @@ export default {
    *  clay.application.create('#app', {
    *      init: function (app) {
    *          app.createCube();
-   *          var camera = app.createCamera();
+   *          const camera = app.createCamera();
    *          camera.position.set(0, 0, 2);
    *      },
    *      loop: function () { // noop }

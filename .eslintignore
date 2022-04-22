@@ -2,4 +2,6 @@
 /test
 /tools
 /example
+/src/glmatrix
 .eslintrc.js
+rollup.config.js

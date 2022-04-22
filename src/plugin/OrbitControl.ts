@@ -6,19 +6,11 @@ import GestureMgr from './GestureMgr';
 import vendor from '../core/vendor';
 import PerspectiveCamera from '../camera/Perspective';
 
-var MOUSE_BUTTON_KEY_MAP = {
+const MOUSE_BUTTON_KEY_MAP = {
   left: 0,
   middle: 1,
   right: 2
 };
-
-function firstNotNull() {
-  for (var i = 0, len = arguments.length; i < len; i++) {
-    if (arguments[i] != null) {
-      return arguments[i];
-    }
-  }
-}
 
 function convertToArray(val) {
   if (!Array.isArray(val)) {
@@ -32,7 +24,7 @@ function convertToArray(val) {
  * @alias clay.plugin.OrbitControl
  * @extends clay.core.Base
  */
-var OrbitControl = Base.extend(
+const OrbitControl = Base.extend(
   function () {
     return /** @lends clay.plugin.OrbitControl# */ {
       /**
@@ -197,7 +189,7 @@ var OrbitControl = Base.extend(
      * Mouse event binding
      */
     init: function () {
-      var dom = this.domElement;
+      const dom = this.domElement;
 
       vendor.addEventListener(dom, 'touchstart', this._mouseDownHandler);
 
@@ -217,7 +209,7 @@ var OrbitControl = Base.extend(
      * Mouse event unbinding
      */
     dispose: function () {
-      var dom = this.domElement;
+      const dom = this.domElement;
 
       vendor.removeEventListener(dom, 'touchstart', this._mouseDownHandler);
       vendor.removeEventListener(dom, 'touchmove', this._mouseMoveHandler);
@@ -390,11 +382,11 @@ var OrbitControl = Base.extend(
      * @param {number} [opts.done]
      */
     animateTo: function (opts) {
-      var self = this;
+      const self = this;
 
-      var obj = {};
-      var target = {};
-      var timeline = this.timeline;
+      const obj = {};
+      const target = {};
+      const timeline = this.timeline;
       if (!timeline) {
         return;
       }
@@ -449,7 +441,7 @@ var OrbitControl = Base.extend(
      * Stop all animations
      */
     stopAllAnimation: function () {
-      for (var i = 0; i < this._animators.length; i++) {
+      for (let i = 0; i < this._animators.length; i++) {
         this._animators[i].stop();
       }
       this._animators.length = 0;
@@ -466,7 +458,7 @@ var OrbitControl = Base.extend(
       deltaTime = deltaTime || 16;
 
       if (this._rotating) {
-        var radian =
+        const radian =
           (((this.autoRotateDirection === 'cw' ? 1 : -1) * this.autoRotateSpeed) / 180) * Math.PI;
         this._phi -= (radian * deltaTime) / 1000;
         this._needsUpdate = true;
@@ -498,7 +490,7 @@ var OrbitControl = Base.extend(
     },
 
     _updateRotate: function (deltaTime) {
-      var velocity = this._rotateVelocity;
+      const velocity = this._rotateVelocity;
       this._phi = (velocity.y * deltaTime) / 20 + this._phi;
       this._theta = (velocity.x * deltaTime) / 20 + this._theta;
 
@@ -526,10 +518,10 @@ var OrbitControl = Base.extend(
         Math.min(size, this.maxOrthographicSize),
         this.minOrthographicSize
       );
-      var camera = this.target;
-      var cameraHeight = this._orthoSize;
+      const camera = this.target;
+      const cameraHeight = this._orthoSize;
       // TODO
-      var cameraWidth = cameraHeight * this.orthographicAspect;
+      const cameraWidth = cameraHeight * this.orthographicAspect;
       camera.left = -cameraWidth / 2;
       camera.right = cameraWidth / 2;
       camera.top = cameraHeight / 2;
@@ -537,12 +529,12 @@ var OrbitControl = Base.extend(
     },
 
     _updatePan: function (deltaTime) {
-      var velocity = this._panVelocity;
-      var len = this._distance;
+      const velocity = this._panVelocity;
+      const len = this._distance;
 
-      var target = this.target;
-      var yAxis = target.worldTransform.y;
-      var xAxis = target.worldTransform.x;
+      const target = this.target;
+      const yAxis = target.worldTransform.y;
+      const xAxis = target.worldTransform.x;
 
       // PENDING
       this._center
@@ -555,12 +547,12 @@ var OrbitControl = Base.extend(
     },
 
     _updateTransform: function () {
-      var camera = this.target;
+      const camera = this.target;
 
-      var dir = new Vector3();
-      var theta = this._theta + Math.PI / 2;
-      var phi = this._phi + Math.PI / 2;
-      var r = Math.sin(theta);
+      const dir = new Vector3();
+      const theta = this._theta + Math.PI / 2;
+      const phi = this._phi + Math.PI / 2;
+      const r = Math.sin(theta);
 
       dir.x = r * Math.cos(phi);
       dir.y = -Math.cos(theta);
@@ -577,8 +569,8 @@ var OrbitControl = Base.extend(
     _startCountingStill: function () {
       clearTimeout(this._stillTimeout);
 
-      var time = this.autoRotateAfterStill;
-      var self = this;
+      const time = this.autoRotateAfterStill;
+      const self = this;
       if (!isNaN(time) && time > 0) {
         this._stillTimeout = setTimeout(function () {
           self._rotating = true;
@@ -587,7 +579,7 @@ var OrbitControl = Base.extend(
     },
 
     _vectorDamping: function (v, damping) {
-      var speed = v.len();
+      let speed = v.len();
       speed = speed * damping;
       if (speed < 1e-4) {
         speed = 0;
@@ -602,9 +594,9 @@ var OrbitControl = Base.extend(
 
       this.target.updateWorldTransform();
 
-      var forward = this.target.worldTransform.z;
-      var alpha = Math.asin(forward.y);
-      var beta = Math.atan2(forward.x, forward.z);
+      const forward = this.target.worldTransform.z;
+      const alpha = Math.asin(forward.y);
+      const beta = Math.atan2(forward.x, forward.z);
 
       this._theta = alpha;
       this._phi = -beta;
@@ -622,11 +614,11 @@ var OrbitControl = Base.extend(
       if (this._isAnimating()) {
         return;
       }
-      var x = e.clientX;
-      var y = e.clientY;
+      let x = e.clientX;
+      let y = e.clientY;
       // Touch
       if (e.targetTouches) {
-        var touch = e.targetTouches[0];
+        const touch = e.targetTouches[0];
         x = touch.clientX;
         y = touch.clientY;
 
@@ -651,7 +643,7 @@ var OrbitControl = Base.extend(
         }
       }
 
-      var dom = this.domElement;
+      const dom = this.domElement;
       vendor.addEventListener(dom, 'touchmove', this._mouseMoveHandler);
       vendor.addEventListener(dom, 'touchend', this._mouseUpHandler);
 
@@ -674,21 +666,21 @@ var OrbitControl = Base.extend(
       if (this._isAnimating()) {
         return;
       }
-      var x = e.clientX;
-      var y = e.clientY;
+      let x = e.clientX;
+      let y = e.clientY;
 
-      var haveGesture;
+      let haveGesture;
       // Touch
       if (e.targetTouches) {
-        var touch = e.targetTouches[0];
+        const touch = e.targetTouches[0];
         x = touch.clientX;
         y = touch.clientY;
 
         haveGesture = this._processGesture(e, 'change');
       }
 
-      var panSensitivity = convertToArray(this.panSensitivity);
-      var rotateSensitivity = convertToArray(this.rotateSensitivity);
+      const panSensitivity = convertToArray(this.panSensitivity);
+      const rotateSensitivity = convertToArray(this.rotateSensitivity);
 
       if (!haveGesture) {
         if (this._mode === 'rotate') {
@@ -714,7 +706,7 @@ var OrbitControl = Base.extend(
       if (this._isAnimating()) {
         return;
       }
-      var delta = e.deltaY;
+      const delta = e.deltaY;
       if (delta === 0) {
         return;
       }
@@ -734,7 +726,7 @@ var OrbitControl = Base.extend(
     },
 
     _zoomHandler: function (e, delta) {
-      var speed;
+      let speed;
       if (this.target instanceof PerspectiveCamera) {
         speed = Math.max(
           Math.max(Math.min(this._distance - this.minDistance, this.maxDistance - this._distance)) /
@@ -765,7 +757,7 @@ var OrbitControl = Base.extend(
     },
 
     _mouseUpHandler: function (event) {
-      var dom = this.domElement;
+      const dom = this.domElement;
       vendor.removeEventListener(dom, 'touchmove', this._mouseMoveHandler);
       vendor.removeEventListener(dom, 'touchend', this._mouseUpHandler);
       vendor.removeEventListener(dom, 'mousemove', this._mouseMoveHandler);
@@ -776,10 +768,10 @@ var OrbitControl = Base.extend(
     },
 
     _addAnimator: function (animator) {
-      var animators = this._animators;
+      const animators = this._animators;
       animators.push(animator);
       animator.done(function () {
-        var idx = animators.indexOf(animator);
+        const idx = animators.indexOf(animator);
         if (idx >= 0) {
           animators.splice(idx, 1);
         }
@@ -788,17 +780,17 @@ var OrbitControl = Base.extend(
     },
 
     _processGesture: function (event, stage) {
-      var gestureMgr = this._gestureMgr;
+      const gestureMgr = this._gestureMgr;
 
       stage === 'start' && gestureMgr.clear();
 
-      var gestureInfo = gestureMgr.recognize(event, null, this.domElement);
+      const gestureInfo = gestureMgr.recognize(event, null, this.domElement);
 
       stage === 'end' && gestureMgr.clear();
 
       // Do not do any preventDefault here. Upper application do that if necessary.
       if (gestureInfo) {
-        var type = gestureInfo.type;
+        const type = gestureInfo.type;
         event.gestureEvent = type;
 
         this._pinchHandler(gestureInfo.event);

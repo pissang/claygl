@@ -10,6 +10,13 @@ module.exports = {
     'no-array-constructor': 2,
     'no-label-var': 2,
     'no-undef-init': 2,
-    '@typescript-eslint/no-unused-vars': [1, { vars: 'all', args: 'after-used' }]
+    'no-unused-vars': 1
+  },
+  globals: {
+    console: true,
+    window: true,
+    setTimeout: true,
+    clearTimeout: true,
+    requestAnimationFrame: true
   }
 };

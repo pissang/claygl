@@ -7,7 +7,7 @@ import createCompositor from '../createCompositor';
  * @constructor clay.loader.FX
  * @extends clay.core.Base
  */
-var FXLoader = Base.extend(
+const FXLoader = Base.extend(
   /** @lends clay.loader.FX# */ {
     /**
      * @type {string}
@@ -38,7 +38,7 @@ var FXLoader = Base.extend(
      * @param  {string} url
      */
     load: function (url) {
-      var self = this;
+      const self = this;
 
       if (!this.rootPath) {
         this.rootPath = url.slice(0, url.lastIndexOf('/'));

@@ -11,7 +11,7 @@ import ConeGeometry from './Cone';
  * @param {number} [opt.capSegments]
  * @param {number} [opt.heightSegments]
  */
-var Cylinder = Geometry.extend(
+const Cylinder = Geometry.extend(
   /** @lends clay.geometry.Cylinder# */
   {
     dynamic: false,
@@ -44,7 +44,7 @@ var Cylinder = Geometry.extend(
      * Build cylinder geometry
      */
     build: function () {
-      var cone = new ConeGeometry({
+      const cone = new ConeGeometry({
         topRadius: this.radius,
         bottomRadius: this.radius,
         capSegments: this.capSegments,

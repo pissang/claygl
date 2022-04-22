@@ -1,9 +1,9 @@
 // @ts-nocheck
 import request from './request';
 
-var supportWebGL;
+let supportWebGL;
 
-var vendor = {};
+const vendor = {};
 
 /**
  * If support WebGL
@@ -12,8 +12,9 @@ var vendor = {};
 vendor.supportWebGL = function () {
   if (supportWebGL == null) {
     try {
-      var canvas = document.createElement('canvas');
-      var gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      /* global document */
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       if (!gl) {
         throw new Error();
       }
@@ -38,10 +39,11 @@ vendor.Float32Array = typeof Float32Array === 'undefined' ? Array : Float32Array
 
 vendor.Float64Array = typeof Float64Array === 'undefined' ? Array : Float64Array;
 
-var g = {};
+let g = {};
 if (typeof window !== 'undefined') {
   g = window;
 } else if (typeof global !== 'undefined') {
+  /* global global */
   g = global;
 }
 

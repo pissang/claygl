@@ -10,7 +10,7 @@ import vec4 from '../glmatrix/vec4';
  * @param {clay.Vector3} [normal]
  * @param {number} [distance]
  */
-var Plane = function (normal, distance) {
+const Plane = function (normal, distance) {
   /**
    * Normal of the plane
    * @type {clay.Vector3}
@@ -46,7 +46,7 @@ Plane.prototype = {
     if (!out) {
       out = new Vector3();
     }
-    var d = this.distanceToPoint(point);
+    const d = this.distanceToPoint(point);
     vec3.scaleAndAdd(out.array, point.array, this.normal.array, -d);
     out._dirty = true;
     return out;
@@ -56,7 +56,7 @@ Plane.prototype = {
    * Normalize the plane's normal and calculate the distance
    */
   normalize: function () {
-    var invLen = 1 / vec3.len(this.normal.array);
+    let invLen = 1 / vec3.len(this.normal.array);
     vec3.scale(this.normal.array, invLen);
     this.distance *= invLen;
   },
@@ -68,10 +68,10 @@ Plane.prototype = {
    */
   intersectFrustum: function (frustum) {
     // Check if all coords of frustum is on plane all under plane
-    var coords = frustum.vertices;
-    var normal = this.normal.array;
-    var onPlane = vec3.dot(coords[0].array, normal) > this.distance;
-    for (var i = 1; i < 8; i++) {
+    const coords = frustum.vertices;
+    const normal = this.normal.array;
+    const onPlane = vec3.dot(coords[0].array, normal) > this.distance;
+    for (let i = 1; i < 8; i++) {
       if (vec3.dot(coords[i].array, normal) > this.distance != onPlane) {
         return true;
       }
@@ -87,22 +87,22 @@ Plane.prototype = {
    * @return {clay.Vector3}
    */
   intersectLine: (function () {
-    var rd = vec3.create();
+    const rd = vec3.create();
     return function (start, end, out) {
-      var d0 = this.distanceToPoint(start);
-      var d1 = this.distanceToPoint(end);
+      const d0 = this.distanceToPoint(start);
+      const d1 = this.distanceToPoint(end);
       if ((d0 > 0 && d1 > 0) || (d0 < 0 && d1 < 0)) {
         return null;
       }
       // Ray intersection
-      var pn = this.normal.array;
-      var d = this.distance;
-      var ro = start.array;
+      const pn = this.normal.array;
+      const d = this.distance;
+      const ro = start.array;
       // direction
       vec3.sub(rd, end.array, start.array);
       vec3.normalize(rd, rd);
 
-      var divider = vec3.dot(pn, rd);
+      const divider = vec3.dot(pn, rd);
       // ray is parallel to the plane
       if (divider === 0) {
         return null;
@@ -110,7 +110,7 @@ Plane.prototype = {
       if (!out) {
         out = new Vector3();
       }
-      var t = (vec3.dot(pn, ro) - d) / divider;
+      const t = (vec3.dot(pn, ro) - d) / divider;
       vec3.scaleAndAdd(out.array, ro, rd, -t);
       out._dirty = true;
       return out;
@@ -123,9 +123,9 @@ Plane.prototype = {
    * @return {clay.Matrix4}
    */
   applyTransform: (function () {
-    var inverseTranspose = mat4.create();
-    var normalv4 = vec4.create();
-    var pointv4 = vec4.create();
+    const inverseTranspose = mat4.create();
+    const normalv4 = vec4.create();
+    const pointv4 = vec4.create();
     pointv4[3] = 1;
     return function (m4) {
       m4 = m4.array;
@@ -158,7 +158,7 @@ Plane.prototype = {
    * @return {clay.Plane}
    */
   clone: function () {
-    var plane = new Plane();
+    const plane = new Plane();
     plane.copy(this);
     return plane;
   }

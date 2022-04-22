@@ -5,7 +5,7 @@ import mat2 from '../glmatrix/mat2';
  * @constructor
  * @alias clay.Matrix2
  */
-var Matrix2 = function () {
+const Matrix2 = function () {
   /**
    * Storage of Matrix2
    * @name array
@@ -30,7 +30,7 @@ Matrix2.prototype = {
    * @param  {Float32Array|number[]} arr
    */
   setArray: function (arr) {
-    for (var i = 0; i < this.array.length; i++) {
+    for (let i = 0; i < this.array.length; i++) {
       this.array[i] = arr[i];
     }
     this._dirty = true;

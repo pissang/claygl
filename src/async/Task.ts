@@ -55,7 +55,7 @@ Task.prototype.isSettled = function () {
 util.extend(Task.prototype, notifier);
 
 function makeRequestTask(url, responseType) {
-  var task = new Task();
+  const task = new Task();
   vendor.request.get({
     url: url,
     responseType: responseType,
@@ -73,13 +73,13 @@ function makeRequestTask(url, responseType) {
  * @param  {string|object|object[]|string[]} url
  * @param  {string} [responseType]
  * @example
- *     var task = Task.makeRequestTask('./a.json');
- *     var task = Task.makeRequestTask({
+ *     const task = Task.makeRequestTask('./a.json');
+ *     const task = Task.makeRequestTask({
  *         url: 'b.bin',
  *         responseType: 'arraybuffer'
  *     });
- *     var tasks = Task.makeRequestTask(['./a.json', './b.json']);
- *     var tasks = Task.makeRequestTask([
+ *     const tasks = Task.makeRequestTask(['./a.json', './b.json']);
+ *     const tasks = Task.makeRequestTask([
  *         {url: 'a.json'},
  *         {url: 'b.bin', responseType: 'arraybuffer'}
  *     ]);
@@ -90,14 +90,14 @@ Task.makeRequestTask = function (url, responseType) {
     return makeRequestTask(url, responseType);
   } else if (url.url) {
     //  Configure object
-    var obj = url;
+    const obj = url;
     return makeRequestTask(obj.url, obj.responseType);
   } else if (Array.isArray(url)) {
     // Url list
-    var urlList = url;
-    var tasks = [];
+    const urlList = url;
+    const tasks = [];
     urlList.forEach(function (obj) {
-      var url, responseType;
+      let url, responseType;
       if (typeof obj === 'string') {
         url = obj;
       } else if (Object(obj) === obj) {

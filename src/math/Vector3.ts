@@ -8,7 +8,7 @@ import vec3 from '../glmatrix/vec3';
  * @param {number} y
  * @param {number} z
  */
-var Vector3 = function (x, y, z) {
+const Vector3 = function (x, y, z) {
   x = x || 0;
   y = y || 0;
   z = z || 0;
@@ -375,12 +375,12 @@ Vector3.prototype = {
    * @return {clay.Vector3}
    */
   applyProjection: function (m) {
-    var v = this.array;
+    const v = this.array;
     m = m.array;
 
     // Perspective projection
     if (m[15] === 0) {
-      var w = -1 / v[2];
+      const w = -1 / v[2];
       v[0] = m[0] * v[0] * w;
       v[1] = m[5] * v[1] * w;
       v[2] = (m[10] * v[2] + m[14]) * w;
@@ -411,10 +411,10 @@ Vector3.prototype = {
   }
 };
 
-var defineProperty = Object.defineProperty;
+const defineProperty = Object.defineProperty;
 // Getter and Setter
 if (defineProperty) {
-  var proto = Vector3.prototype;
+  const proto = Vector3.prototype;
   /**
    * @name x
    * @type {number}
@@ -764,9 +764,9 @@ Vector3.transformQuat = function (out, a, q) {
 function clamp(val, min, max) {
   return val < min ? min : val > max ? max : val;
 }
-var atan2 = Math.atan2;
-var asin = Math.asin;
-var abs = Math.abs;
+const atan2 = Math.atan2;
+const asin = Math.asin;
+const abs = Math.abs;
 /**
  * Convert quaternion to euler angle
  * Quaternion must be normalized
@@ -776,17 +776,17 @@ Vector3.eulerFromQuat = function (out, q, order) {
   out._dirty = true;
   q = q.array;
 
-  var target = out.array;
-  var x = q[0],
+  const target = out.array;
+  const x = q[0],
     y = q[1],
     z = q[2],
     w = q[3];
-  var x2 = x * x;
-  var y2 = y * y;
-  var z2 = z * z;
-  var w2 = w * w;
+  const x2 = x * x;
+  const y2 = y * y;
+  const z2 = z * z;
+  const w2 = w * w;
 
-  var order = (order || 'XYZ').toUpperCase();
+  order = (order || 'XYZ').toUpperCase();
 
   switch (order) {
     case 'XYZ':
@@ -831,19 +831,19 @@ Vector3.eulerFromQuat = function (out, q, order) {
  */
 Vector3.eulerFromMat3 = function (out, m, order) {
   // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
-  var te = m.array;
-  var m11 = te[0],
+  const te = m.array;
+  const m11 = te[0],
     m12 = te[3],
     m13 = te[6];
-  var m21 = te[1],
+  const m21 = te[1],
     m22 = te[4],
     m23 = te[7];
-  var m31 = te[2],
+  const m31 = te[2],
     m32 = te[5],
     m33 = te[8];
-  var target = out.array;
+  const target = out.array;
 
-  var order = (order || 'XYZ').toUpperCase();
+  order = (order || 'XYZ').toUpperCase();
 
   switch (order) {
     case 'XYZ':

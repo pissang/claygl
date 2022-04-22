@@ -9,7 +9,7 @@ import vec4 from '../glmatrix/vec4';
  * @param {number} z
  * @param {number} w
  */
-var Vector4 = function (x, y, z, w) {
+const Vector4 = function (x, y, z, w) {
   x = x || 0;
   y = y || 0;
   z = z || 0;
@@ -360,10 +360,10 @@ Vector4.prototype = {
   }
 };
 
-var defineProperty = Object.defineProperty;
+const defineProperty = Object.defineProperty;
 // Getter and Setter
 if (defineProperty) {
-  var proto = Vector4.prototype;
+  const proto = Vector4.prototype;
   /**
    * @name x
    * @type {number}

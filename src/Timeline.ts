@@ -9,8 +9,8 @@ import Animator from './animation/Animator';
  * @extends clay.core.Base
  *
  * @example
- * var animation = new clay.Timeline();
- * var node = new clay.Node();
+ * const animation = new clay.Timeline();
+ * const node = new clay.Node();
  * animation.animate(node.position)
  *     .when(1000, {
  *         x: 500,
@@ -25,7 +25,7 @@ import Animator from './animation/Animator';
  *     })
  *     .start('spline');
  */
-var Timeline = Base.extend(
+const Timeline = Base.extend(
   function () {
     return /** @lends clay.Timeline# */ {
       /**
@@ -53,8 +53,8 @@ var Timeline = Base.extend(
      */
     addAnimator: function (animator) {
       animator.animation = this;
-      var clips = animator.getClips();
-      for (var i = 0; i < clips.length; i++) {
+      const clips = animator.getClips();
+      for (let i = 0; i < clips.length; i++) {
         this.addClip(clips[i]);
       }
     },
@@ -72,7 +72,7 @@ var Timeline = Base.extend(
      * @param  {clay.animation.Clip} clip
      */
     removeClip: function (clip) {
-      var idx = this._clips.indexOf(clip);
+      const idx = this._clips.indexOf(clip);
       if (idx >= 0) {
         this._clips.splice(idx, 1);
       }
@@ -83,24 +83,24 @@ var Timeline = Base.extend(
      * @param {clay.animate.Animator} animator
      */
     removeAnimator: function (animator) {
-      var clips = animator.getClips();
-      for (var i = 0; i < clips.length; i++) {
+      const clips = animator.getClips();
+      for (let i = 0; i < clips.length; i++) {
         this.removeClip(clips[i]);
       }
       animator.animation = null;
     },
 
     _update: function () {
-      var time = Date.now() - this._pausedTime;
-      var delta = time - this._time;
-      var clips = this._clips;
-      var len = clips.length;
+      const time = Date.now() - this._pausedTime;
+      const delta = time - this._time;
+      const clips = this._clips;
+      let len = clips.length;
 
-      var deferredEvents = [];
-      var deferredClips = [];
-      for (var i = 0; i < len; i++) {
-        var clip = clips[i];
-        var e = clip.step(time, delta, false);
+      const deferredEvents = [];
+      const deferredClips = [];
+      for (let i = 0; i < len; i++) {
+        const clip = clips[i];
+        const e = clip.step(time, delta, false);
         // Throw out the events need to be called after
         // stage.render, like finish
         if (e) {
@@ -110,7 +110,7 @@ var Timeline = Base.extend(
       }
 
       // Remove the finished clip
-      for (var i = 0; i < len; ) {
+      for (let i = 0; i < len; ) {
         if (clips[i]._needsRemove) {
           clips[i] = clips[len - 1];
           clips.pop();
@@ -121,7 +121,7 @@ var Timeline = Base.extend(
       }
 
       len = deferredEvents.length;
-      for (var i = 0; i < len; i++) {
+      for (let i = 0; i < len; i++) {
         deferredClips[i].fire(deferredEvents[i]);
       }
 
@@ -137,14 +137,14 @@ var Timeline = Base.extend(
      * Start running animation
      */
     start: function () {
-      var self = this;
+      const self = this;
 
       this._running = true;
       this._time = Date.now();
 
       this._pausedTime = 0;
 
-      var requestAnimationFrame = vendor.requestAnimationFrame;
+      const requestAnimationFrame = vendor.requestAnimationFrame;
 
       function step() {
         if (self._running) {
@@ -203,7 +203,7 @@ var Timeline = Base.extend(
      */
     animate: function (target, options) {
       options = options || {};
-      var animator = new Animator(
+      const animator = new Animator(
         target,
         options.loop,
         options.getter,

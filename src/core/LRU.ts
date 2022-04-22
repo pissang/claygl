@@ -1,12 +1,13 @@
 // @ts-nocheck
 import LinkedList from './LinkedList';
+import util from './util';
 
 /**
  * LRU Cache
  * @constructor
  * @alias clay.core.LRU
  */
-var LRU = function (maxSize) {
+const LRU = function (maxSize) {
   this._list = new LinkedList();
 
   this._map = {};
@@ -27,16 +28,16 @@ LRU.prototype.setMaxSize = function (size) {
  * @param  {} value
  */
 LRU.prototype.put = function (key, value) {
-  if (!this._map.hasOwnProperty(key)) {
-    var len = this._list.length();
+  if (!util.hasOwn(this._map, key)) {
+    const len = this._list.length();
     if (len >= this._maxSize && len > 0) {
       // Remove the least recently used
-      var leastUsedEntry = this._list.head;
+      const leastUsedEntry = this._list.head;
       this._list.remove(leastUsedEntry);
       delete this._map[leastUsedEntry.key];
     }
 
-    var entry = this._list.insert(value);
+    const entry = this._list.insert(value);
     entry.key = key;
     this._map[key] = entry;
   }
@@ -47,8 +48,8 @@ LRU.prototype.put = function (key, value) {
  * @return {}
  */
 LRU.prototype.get = function (key) {
-  var entry = this._map[key];
-  if (this._map.hasOwnProperty(key)) {
+  const entry = this._map[key];
+  if (util.hasOwn(this._map, key)) {
     // Put the latest used entry in the tail
     if (entry !== this._list.tail) {
       this._list.remove(entry);
@@ -63,7 +64,7 @@ LRU.prototype.get = function (key) {
  * @param {string} key
  */
 LRU.prototype.remove = function (key) {
-  var entry = this._map[key];
+  const entry = this._map[key];
   if (typeof entry !== 'undefined') {
     delete this._map[key];
     this._list.remove(entry);

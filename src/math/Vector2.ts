@@ -7,7 +7,7 @@ import vec2 from '../glmatrix/vec2';
  * @param {number} x
  * @param {number} y
  */
-var Vector2 = function (x, y) {
+const Vector2 = function (x, y) {
   x = x || 0;
   y = y || 0;
 
@@ -388,7 +388,7 @@ Vector2.prototype = {
 
 // Getter and Setter
 if (Object.defineProperty) {
-  var proto = Vector2.prototype;
+  const proto = Vector2.prototype;
   /**
    * @name x
    * @type {number}

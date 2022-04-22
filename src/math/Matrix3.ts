@@ -5,7 +5,7 @@ import mat3 from '../glmatrix/mat3';
  * @constructor
  * @alias clay.Matrix3
  */
-var Matrix3 = function () {
+const Matrix3 = function () {
   /**
    * Storage of Matrix3
    * @name array
@@ -30,7 +30,7 @@ Matrix3.prototype = {
    * @param  {Float32Array|number[]} arr
    */
   setArray: function (arr) {
-    for (var i = 0; i < this.array.length; i++) {
+    for (let i = 0; i < this.array.length; i++) {
       this.array[i] = arr[i];
     }
     this._dirty = true;

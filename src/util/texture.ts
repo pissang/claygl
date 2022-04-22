@@ -12,7 +12,7 @@ import hdr from './hdr';
 /**
  * @alias clay.util.texture
  */
-var textureUtil = {
+const textureUtil = {
   /**
    * @param  {string|object} path
    * @param  {object} [option]
@@ -21,7 +21,7 @@ var textureUtil = {
    * @return {clay.Texture}
    */
   loadTexture: function (path, option, onsuccess, onerror) {
-    var texture;
+    let texture;
     if (typeof option === 'function') {
       onsuccess = option;
       onerror = onsuccess;
@@ -87,7 +87,7 @@ var textureUtil = {
    * @param  {Function} [onerror]
    */
   loadPanorama: function (renderer, path, cubeMap, option, onsuccess, onerror) {
-    var self = this;
+    const self = this;
 
     if (typeof option === 'function') {
       onsuccess = option;
@@ -120,8 +120,8 @@ var textureUtil = {
    * @param  {boolean} [option.encodeRGBM]
    */
   panoramaToCubeMap: function (renderer, panoramaMap, cubeMap, option) {
-    var environmentMapPass = new EnvironmentMapPass();
-    var skydome = new Skydome({
+    const environmentMapPass = new EnvironmentMapPass();
+    const skydome = new Skydome({
       scene: new Scene()
     });
     skydome.setEnvironmentMap(panoramaMap);
@@ -148,27 +148,28 @@ var textureUtil = {
    * @return {HTMLCanvasElement}
    */
   heightToNormal: function (image, checkBump) {
-    var canvas = document.createElement('canvas');
-    var width = (canvas.width = image.width);
-    var height = (canvas.height = image.height);
-    var ctx = canvas.getContext('2d');
+    /* global document */
+    const canvas = document.createElement('canvas');
+    const width = (canvas.width = image.width);
+    const height = (canvas.height = image.height);
+    const ctx = canvas.getContext('2d');
     ctx.drawImage(image, 0, 0, width, height);
     checkBump = checkBump || false;
-    var srcData = ctx.getImageData(0, 0, width, height);
-    var dstData = ctx.createImageData(width, height);
-    for (var i = 0; i < srcData.data.length; i += 4) {
+    const srcData = ctx.getImageData(0, 0, width, height);
+    const dstData = ctx.createImageData(width, height);
+    for (let i = 0; i < srcData.data.length; i += 4) {
       if (checkBump) {
-        var r = srcData.data[i];
-        var g = srcData.data[i + 1];
-        var b = srcData.data[i + 2];
-        var diff = Math.abs(r - g) + Math.abs(g - b);
+        const r = srcData.data[i];
+        const g = srcData.data[i + 1];
+        const b = srcData.data[i + 2];
+        const diff = Math.abs(r - g) + Math.abs(g - b);
         if (diff > 20) {
           console.warn('Given image is not a height map');
           return image;
         }
       }
       // Modified from http://mrdoob.com/lab/javascript/height2normal/
-      var x1, y1, x2, y2;
+      let x1, y1, x2, y2;
       if (i % (width * 4) === 0) {
         // left edge
         x1 = srcData.data[i];
@@ -216,18 +217,18 @@ var textureUtil = {
       return false;
     }
 
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-    var size = downScaleSize || 32;
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const size = downScaleSize || 32;
     threshold = threshold || 20;
     canvas.width = canvas.height = size;
     ctx.drawImage(img, 0, 0, size, size);
-    var srcData = ctx.getImageData(0, 0, size, size);
-    for (var i = 0; i < srcData.data.length; i += 4) {
-      var r = srcData.data[i];
-      var g = srcData.data[i + 1];
-      var b = srcData.data[i + 2];
-      var diff = Math.abs(r - g) + Math.abs(g - b);
+    const srcData = ctx.getImageData(0, 0, size, size);
+    for (let i = 0; i < srcData.data.length; i += 4) {
+      const r = srcData.data[i];
+      const g = srcData.data[i + 1];
+      const b = srcData.data[i + 2];
+      const diff = Math.abs(r - g) + Math.abs(g - b);
       if (diff > threshold) {
         return false;
       }
@@ -258,26 +259,26 @@ var textureUtil = {
     color1 = color1 || 'black';
     color2 = color2 || 'white';
 
-    var repeat = Math.ceil(size / unitSize);
+    const repeat = Math.ceil(size / unitSize);
 
-    var canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
-    var ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
     ctx.fillStyle = color2;
     ctx.fillRect(0, 0, size, size);
 
     ctx.fillStyle = color1;
-    for (var i = 0; i < repeat; i++) {
-      for (var j = 0; j < repeat; j++) {
-        var isFill = j % 2 ? i % 2 : (i % 2) - 1;
+    for (let i = 0; i < repeat; i++) {
+      for (let j = 0; j < repeat; j++) {
+        let isFill = j % 2 ? i % 2 : (i % 2) - 1;
         if (isFill) {
           ctx.fillRect(i * unitSize, j * unitSize, unitSize, unitSize);
         }
       }
     }
 
-    var texture = new Texture2D({
+    const texture = new Texture2D({
       image: canvas,
       anisotropic: 8
     });
@@ -291,14 +292,14 @@ var textureUtil = {
    * @return {clay.Texture2D}
    */
   createBlank: function (color) {
-    var canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     canvas.width = 1;
     canvas.height = 1;
-    var ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, 1, 1);
 
-    var texture = new Texture2D({
+    const texture = new Texture2D({
       image: canvas
     });
 

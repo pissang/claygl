@@ -3,12 +3,13 @@ import Base from '../core/Base';
 import Vector3 from '../math/Vector3';
 import vendor from '../core/vendor';
 
-var doc = typeof document === 'undefined' ? {} : document;
+/* global document */
+const doc = typeof document === 'undefined' ? {} : document;
 
 /**
  * @constructor clay.plugin.FreeControl
  * @example
- *     var control = new clay.plugin.FreeControl({
+ *     const control = new clay.plugin.FreeControl({
  *         target: camera,
  *         domElement: renderer.canvas
  *     });
@@ -18,7 +19,7 @@ var doc = typeof document === 'undefined' ? {} : document;
  *         renderer.render(scene, camera);
  *     });
  */
-var FreeControl = Base.extend(
+const FreeControl = Base.extend(
   function () {
     return /** @lends clay.plugin.FreeControl# */ {
       /**
@@ -89,7 +90,7 @@ var FreeControl = Base.extend(
     init: function () {
       // Use pointer lock
       // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
-      var el = this.domElement;
+      const el = this.domElement;
 
       //Must request pointer lock after click event, can't not do it directly
       //Why ? ?
@@ -111,7 +112,7 @@ var FreeControl = Base.extend(
      * Dispose control
      */
     dispose: function () {
-      var el = this.domElement;
+      const el = this.domElement;
 
       el.exitPointerLock = el.exitPointerLock || el.mozExitPointerLock || el.webkitExitPointerLock;
 
@@ -134,7 +135,7 @@ var FreeControl = Base.extend(
     },
 
     _requestPointerLock: function () {
-      var el = this;
+      const el = this;
       el.requestPointerLock =
         el.requestPointerLock || el.mozRequestPointerLock || el.webkitRequestPointerLock;
 
@@ -146,18 +147,18 @@ var FreeControl = Base.extend(
      * @param {number} frameTime Frame time
      */
     update: function (frameTime) {
-      var target = this.target;
+      const target = this.target;
 
-      var position = this.target.position;
-      var xAxis = target.localTransform.x.normalize();
-      var zAxis = target.localTransform.z.normalize();
+      const position = this.target.position;
+      let xAxis = target.localTransform.x.normalize();
+      const zAxis = target.localTransform.z.normalize();
 
       if (this.verticalMoveLock) {
         zAxis.y = 0;
         zAxis.normalize();
       }
 
-      var speed = (this.speed * frameTime) / 20;
+      const speed = (this.speed * frameTime) / 20;
 
       if (this._moveForward) {
         // Opposite direction of z
@@ -178,7 +179,7 @@ var FreeControl = Base.extend(
         this.up,
         (-this._offsetPitch * frameTime * Math.PI) / 360
       );
-      var xAxis = target.localTransform.x;
+      xAxis = target.localTransform.x;
       target.rotateAround(target.position, xAxis, (-this._offsetRoll * frameTime * Math.PI) / 360);
 
       this._offsetRoll = this._offsetPitch = 0;
@@ -197,8 +198,8 @@ var FreeControl = Base.extend(
     },
 
     _mouseMove: function (e) {
-      var dx = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
-      var dy = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
+      const dx = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
+      const dy = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
 
       this._offsetPitch += (dx * this.sensitivity) / 200;
       this._offsetRoll += (dy * this.sensitivity) / 200;
@@ -217,7 +218,7 @@ var FreeControl = Base.extend(
     _keyDown: function (e) {
       switch (e.keyCode) {
         case 87: //w
-        case 37: //up arrow
+        case 38: //up arrow
           this._moveForward = true;
           break;
         case 83: //s
@@ -240,7 +241,7 @@ var FreeControl = Base.extend(
     _keyUp: function (e) {
       switch (e.keyCode) {
         case 87: //w
-        case 37: //up arrow
+        case 38: //up arrow
           this._moveForward = false;
           break;
         case 83: //s

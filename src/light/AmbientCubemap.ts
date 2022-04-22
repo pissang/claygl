@@ -9,7 +9,7 @@ import cubemapUtil from '../util/cubemap';
  * @constructor clay.light.AmbientCubemap
  * @extends clay.Light
  */
-var AmbientCubemapLight = Light.extend(
+const AmbientCubemapLight = Light.extend(
   {
     /**
      * @type {clay.TextureCube}
@@ -42,12 +42,12 @@ var AmbientCubemapLight = Light.extend(
         this._normalDistribution = cubemapUtil.generateNormalDistribution();
         this._brdfLookup = cubemapUtil.integrateBRDF(renderer, this._normalDistribution);
       }
-      var cubemap = this.cubemap;
+      const cubemap = this.cubemap;
       if (cubemap.__prefiltered) {
         return;
       }
 
-      var result = cubemapUtil.prefilterEnvironmentMap(
+      const result = cubemapUtil.prefilterEnvironmentMap(
         renderer,
         cubemap,
         {
@@ -72,8 +72,8 @@ var AmbientCubemapLight = Light.extend(
       ambientCubemapLightColor: {
         type: '3f',
         value: function (instance) {
-          var color = instance.color;
-          var intensity = instance.intensity;
+          const color = instance.color;
+          const intensity = instance.intensity;
           return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
         }
       },

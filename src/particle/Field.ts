@@ -4,7 +4,7 @@ import Base from '../core/Base';
  * @constructor clay.particle.Field
  * @extends clay.core.Base
  */
-var Field = Base.extend(
+const Field = Base.extend(
   {},
   {
     /**

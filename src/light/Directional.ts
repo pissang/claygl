@@ -7,7 +7,7 @@ import Vector3 from '../math/Vector3';
  * @extends clay.Light
  *
  * @example
- *     var light = new clay.light.Directional({
+ *     const light = new clay.light.Directional({
  *         intensity: 0.5,
  *         color: [1.0, 0.0, 0.0]
  *     });
@@ -15,7 +15,7 @@ import Vector3 from '../math/Vector3';
  *     light.lookAt(clay.Vector3.ZERO);
  *     scene.add(light);
  */
-var DirectionalLight = Light.extend(
+const DirectionalLight = Light.extend(
   /** @lends clay.light.Directional# */ {
     /**
      * @type {number}
@@ -53,8 +53,8 @@ var DirectionalLight = Light.extend(
       directionalLightColor: {
         type: '3f',
         value: function (instance) {
-          var color = instance.color;
-          var intensity = instance.intensity;
+          const color = instance.color;
+          const intensity = instance.intensity;
           return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
         }
       }
@@ -64,7 +64,7 @@ var DirectionalLight = Light.extend(
      * @memberOf clay.light.Directional.prototype
      */
     clone: function () {
-      var light = Light.prototype.clone.call(this);
+      const light = Light.prototype.clone.call(this);
       light.shadowBias = this.shadowBias;
       light.shadowSlopeScale = this.shadowSlopeScale;
       return light;

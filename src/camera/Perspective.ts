@@ -5,7 +5,7 @@ import Camera from '../Camera';
  * @constructor clay.camera.Perspective
  * @extends clay.Camera
  */
-var Perspective = Camera.extend(
+const Perspective = Camera.extend(
   /** @lends clay.camera.Perspective# */ {
     /**
      * Vertical field of view in degrees
@@ -31,12 +31,12 @@ var Perspective = Camera.extend(
   /** @lends clay.camera.Perspective.prototype */
   {
     updateProjectionMatrix: function () {
-      var rad = (this.fov / 180) * Math.PI;
+      const rad = (this.fov / 180) * Math.PI;
       this.projectionMatrix.perspective(rad, this.aspect, this.near, this.far);
     },
     decomposeProjectionMatrix: function () {
-      var m = this.projectionMatrix.array;
-      var rad = Math.atan(1 / m[5]) * 2;
+      const m = this.projectionMatrix.array;
+      const rad = Math.atan(1 / m[5]) * 2;
       this.fov = (rad / Math.PI) * 180;
       this.aspect = m[5] / m[0];
       this.near = m[14] / (m[10] - 1);
@@ -46,7 +46,7 @@ var Perspective = Camera.extend(
      * @return {clay.camera.Perspective}
      */
     clone: function () {
-      var camera = Camera.prototype.clone.call(this);
+      const camera = Camera.prototype.clone.call(this);
       camera.fov = this.fov;
       camera.aspect = this.aspect;
       camera.near = this.near;

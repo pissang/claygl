@@ -2,7 +2,7 @@
 import Clip from './Clip';
 import easingFuncs from './easing';
 
-var arraySlice = Array.prototype.slice;
+const arraySlice = Array.prototype.slice;
 
 function defaultGetter(target, key) {
   return target[key];
@@ -16,15 +16,15 @@ function interpolateNumber(p0, p1, percent) {
 }
 
 function interpolateArray(p0, p1, percent, out, arrDim) {
-  var len = p0.length;
+  const len = p0.length;
   if (arrDim == 1) {
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       out[i] = interpolateNumber(p0[i], p1[i], percent);
     }
   } else {
-    var len2 = p0[0].length;
-    for (var i = 0; i < len; i++) {
-      for (var j = 0; j < len2; j++) {
+    const len2 = p0[0].length;
+    for (let i = 0; i < len; i++) {
+      for (let j = 0; j < len2; j++) {
         out[i][j] = interpolateNumber(p0[i][j], p1[i][j], percent);
       }
     }
@@ -43,10 +43,10 @@ function isArrayLike(data) {
 
 function cloneValue(value) {
   if (isArrayLike(value)) {
-    var len = value.length;
+    const len = value.length;
     if (isArrayLike(value[0])) {
-      var ret = [];
-      for (var i = 0; i < len; i++) {
+      const ret = [];
+      for (let i = 0; i < len; i++) {
         ret.push(arraySlice.call(value[i]));
       }
       return ret;
@@ -59,15 +59,15 @@ function cloneValue(value) {
 }
 
 function catmullRomInterpolateArray(p0, p1, p2, p3, t, t2, t3, out, arrDim) {
-  var len = p0.length;
+  const len = p0.length;
   if (arrDim == 1) {
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       out[i] = catmullRomInterpolate(p0[i], p1[i], p2[i], p3[i], t, t2, t3);
     }
   } else {
-    var len2 = p0[0].length;
-    for (var i = 0; i < len; i++) {
-      for (var j = 0; j < len2; j++) {
+    const len2 = p0[0].length;
+    for (let i = 0; i < len; i++) {
+      for (let j = 0; j < len2; j++) {
         out[i][j] = catmullRomInterpolate(p0[i][j], p1[i][j], p2[i][j], p3[i][j], t, t2, t3);
       }
     }
@@ -75,38 +75,38 @@ function catmullRomInterpolateArray(p0, p1, p2, p3, t, t2, t3, out, arrDim) {
 }
 
 function catmullRomInterpolate(p0, p1, p2, p3, t, t2, t3) {
-  var v0 = (p2 - p0) * 0.5;
-  var v1 = (p3 - p1) * 0.5;
+  const v0 = (p2 - p0) * 0.5;
+  const v1 = (p3 - p1) * 0.5;
   return (2 * (p1 - p2) + v0 + v1) * t3 + (-3 * (p1 - p2) - 2 * v0 - v1) * t2 + v0 * t + p1;
 }
 
 // arr0 is source array, arr1 is target array.
 // Do some preprocess to avoid error happened when interpolating from arr0 to arr1
 function fillArr(arr0, arr1, arrDim) {
-  var arr0Len = arr0.length;
-  var arr1Len = arr1.length;
+  const arr0Len = arr0.length;
+  const arr1Len = arr1.length;
   if (arr0Len !== arr1Len) {
     // FIXME Not work for TypedArray
-    var isPreviousLarger = arr0Len > arr1Len;
+    const isPreviousLarger = arr0Len > arr1Len;
     if (isPreviousLarger) {
       // Cut the previous
       arr0.length = arr1Len;
     } else {
       // Fill the previous
-      for (var i = arr0Len; i < arr1Len; i++) {
+      for (let i = arr0Len; i < arr1Len; i++) {
         arr0.push(arrDim === 1 ? arr1[i] : arraySlice.call(arr1[i]));
       }
     }
   }
   // Handling NaN value
-  var len2 = arr0[0] && arr0[0].length;
-  for (var i = 0; i < arr0.length; i++) {
+  const len2 = arr0[0] && arr0[0].length;
+  for (let i = 0; i < arr0.length; i++) {
     if (arrDim === 1) {
       if (isNaN(arr0[i])) {
         arr0[i] = arr1[i];
       }
     } else {
-      for (var j = 0; j < len2; j++) {
+      for (let j = 0; j < len2; j++) {
         if (isNaN(arr0[i][j])) {
           arr0[i][j] = arr1[i][j];
         }
@@ -119,20 +119,20 @@ function isArraySame(arr0, arr1, arrDim) {
   if (arr0 === arr1) {
     return true;
   }
-  var len = arr0.length;
+  const len = arr0.length;
   if (len !== arr1.length) {
     return false;
   }
   if (arrDim === 1) {
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       if (arr0[i] !== arr1[i]) {
         return false;
       }
     }
   } else {
-    var len2 = arr0[0].length;
-    for (var i = 0; i < len; i++) {
-      for (var j = 0; j < len2; j++) {
+    const len2 = arr0[0].length;
+    for (let i = 0; i < len; i++) {
+      for (let j = 0; j < len2; j++) {
         if (arr0[i][j] !== arr1[i][j]) {
           return false;
         }
@@ -151,39 +151,39 @@ function createTrackClip(
   interpolater,
   maxTime
 ) {
-  var getter = animator._getter;
-  var setter = animator._setter;
-  var useSpline = globalEasing === 'spline';
+  const getter = animator._getter;
+  const setter = animator._setter;
+  const useSpline = globalEasing === 'spline';
 
-  var trackLen = keyframes.length;
+  const trackLen = keyframes.length;
   if (!trackLen) {
     return;
   }
   // Guess data type
-  var firstVal = keyframes[0].value;
-  var isValueArray = isArrayLike(firstVal);
+  const firstVal = keyframes[0].value;
+  const isValueArray = isArrayLike(firstVal);
 
   // For vertices morphing
-  var arrDim = isValueArray && isArrayLike(firstVal[0]) ? 2 : 1;
+  const arrDim = isValueArray && isArrayLike(firstVal[0]) ? 2 : 1;
   // Sort keyframe as ascending
   keyframes.sort(function (a, b) {
     return a.time - b.time;
   });
 
   // Percents of each keyframe
-  var kfPercents = [];
+  const kfPercents = [];
   // Value of each keyframe
-  var kfValues = [];
+  const kfValues = [];
   // Easing funcs of each keyframe.
-  var kfEasings = [];
+  const kfEasings = [];
 
-  var prevValue = keyframes[0].value;
-  var isAllValueEqual = true;
-  for (var i = 0; i < trackLen; i++) {
+  let prevValue = keyframes[0].value;
+  let isAllValueEqual = true;
+  for (let i = 0; i < trackLen; i++) {
     kfPercents.push(keyframes[i].time / maxTime);
 
     // Assume value is a color when it is a string
-    var value = keyframes[i].value;
+    const value = keyframes[i].value;
 
     // Check if value is equal, deep check if value is array
     if (
@@ -203,9 +203,9 @@ function createTrackClip(
     return;
   }
 
-  var lastValue = kfValues[trackLen - 1];
+  const lastValue = kfValues[trackLen - 1];
   // Polyfill array and NaN value
-  for (var i = 0; i < trackLen - 1; i++) {
+  for (let i = 0; i < trackLen - 1; i++) {
     if (isValueArray) {
       fillArr(kfValues[i], lastValue, arrDim);
     } else {
@@ -218,13 +218,13 @@ function createTrackClip(
 
   // Cache the key of last frame to speed up when
   // animation playback is sequency
-  var cacheKey = 0;
-  var cachePercent = 0;
-  var start;
-  var i, w;
-  var p0, p1, p2, p3;
+  let cacheKey = 0;
+  let cachePercent = 0;
+  let start;
+  let i, w;
+  let p0, p1, p2, p3;
 
-  var onframe = function (target, percent) {
+  const onframe = function (target, percent) {
     // Find the range keyframes
     // kf1-----kf2---------current--------kf3
     // find kf2(i) and kf3(i + 1) and do interpolation
@@ -248,7 +248,7 @@ function createTrackClip(
     cacheKey = i;
     cachePercent = percent;
 
-    var range = kfPercents[i + 1] - kfPercents[i];
+    const range = kfPercents[i + 1] - kfPercents[i];
     if (range === 0) {
       return;
     } else {
@@ -295,7 +295,7 @@ function createTrackClip(
     }
   };
 
-  var clip = new Clip({
+  const clip = new Clip({
     target: animator._target,
     life: maxTime,
     loop: animator._loop,
@@ -366,7 +366,7 @@ Animator.prototype = {
     this._maxTime = Math.max(time, this._maxTime);
 
     easing = (typeof easing === 'function' ? easing : easingFuncs[easing]) || noopEasing;
-    for (var propName in props) {
+    for (const propName in props) {
       if (!this._tracks[propName]) {
         this._tracks[propName] = [];
         // If time is 0
@@ -418,9 +418,9 @@ Animator.prototype = {
     // Clear all clips
     this._clipList.length = 0;
 
-    var doneList = this._doneList;
-    var len = doneList.length;
-    for (var i = 0; i < len; i++) {
+    const doneList = this._doneList;
+    const len = doneList.length;
+    for (let i = 0; i < len; i++) {
       doneList[i].call(this);
     }
   },
@@ -431,20 +431,20 @@ Animator.prototype = {
    * @memberOf clay.animation.Animator.prototype
    */
   start: function (globalEasing) {
-    var self = this;
-    var clipCount = 0;
+    const self = this;
+    let clipCount = 0;
 
-    var oneTrackDone = function () {
+    const oneTrackDone = function () {
       clipCount--;
       if (clipCount === 0) {
         self._doneCallback();
       }
     };
 
-    var lastClip;
-    var clipMaxTime = 0;
-    for (var propName in this._tracks) {
-      var clip = createTrackClip(
+    let lastClip;
+    let clipMaxTime = 0;
+    for (const propName in this._tracks) {
+      const clip = createTrackClip(
         this,
         globalEasing,
         oneTrackDone,
@@ -469,11 +469,11 @@ Animator.prototype = {
 
     // Add during callback on the last clip
     if (lastClip) {
-      var oldOnFrame = lastClip.onframe;
+      const oldOnFrame = lastClip.onframe;
       lastClip.onframe = function (target, percent) {
         oldOnFrame(target, percent);
 
-        for (var i = 0; i < self._onframeList.length; i++) {
+        for (let i = 0; i < self._onframeList.length; i++) {
           self._onframeList[i](target, percent);
         }
       };
@@ -490,8 +490,8 @@ Animator.prototype = {
    * @memberOf clay.animation.Animator.prototype
    */
   stop: function () {
-    for (var i = 0; i < this._clipList.length; i++) {
-      var clip = this._clipList[i];
+    for (let i = 0; i < this._clipList.length; i++) {
+      const clip = this._clipList[i];
       this.animation.removeClip(clip);
     }
     this._clipList = [];

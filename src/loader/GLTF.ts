@@ -34,7 +34,7 @@ import Geometry from '../Geometry';
 import '../shader/builtin';
 import Shader from '../Shader';
 
-var semanticAttributeMap = {
+const semanticAttributeMap = {
   NORMAL: 'normal',
   POSITION: 'position',
   TEXCOORD_0: 'texcoord0',
@@ -44,7 +44,7 @@ var semanticAttributeMap = {
   COLOR_0: 'color'
 };
 
-var ARRAY_CTOR_MAP = {
+const ARRAY_CTOR_MAP = {
   5120: vendor.Int8Array,
   5121: vendor.Uint8Array,
   5122: vendor.Int16Array,
@@ -52,7 +52,7 @@ var ARRAY_CTOR_MAP = {
   5125: vendor.Uint32Array,
   5126: vendor.Float32Array
 };
-var SIZE_MAP = {
+const SIZE_MAP = {
   SCALAR: 1,
   VEC2: 2,
   VEC3: 3,
@@ -63,33 +63,32 @@ var SIZE_MAP = {
 };
 
 function getAccessorData(json, lib, accessorIdx, isIndices) {
-  var accessorInfo = json.accessors[accessorIdx];
+  const accessorInfo = json.accessors[accessorIdx];
 
-  var buffer = lib.bufferViews[accessorInfo.bufferView];
-  var byteOffset = accessorInfo.byteOffset || 0;
-  var ArrayCtor = ARRAY_CTOR_MAP[accessorInfo.componentType] || vendor.Float32Array;
+  const buffer = lib.bufferViews[accessorInfo.bufferView];
+  const byteOffset = accessorInfo.byteOffset || 0;
+  const ArrayCtor = ARRAY_CTOR_MAP[accessorInfo.componentType] || vendor.Float32Array;
 
-  var size = SIZE_MAP[accessorInfo.type];
+  let size = SIZE_MAP[accessorInfo.type];
   if (size == null && isIndices) {
     size = 1;
   }
-  var arr = new ArrayCtor(buffer, byteOffset, size * accessorInfo.count);
+  let arr = new ArrayCtor(buffer, byteOffset, size * accessorInfo.count);
 
-  var quantizeExtension =
+  const quantizeExtension =
+    // eslint-disable-next-line
     accessorInfo.extensions && accessorInfo.extensions['WEB3D_quantized_attributes'];
   if (quantizeExtension) {
-    var decodedArr = new vendor.Float32Array(size * accessorInfo.count);
-    var decodeMatrix = quantizeExtension.decodeMatrix;
-    var decodeOffset;
-    var decodeScale;
-    var decodeOffset = new Array(size);
-    var decodeScale = new Array(size);
-    for (var k = 0; k < size; k++) {
+    const decodedArr = new vendor.Float32Array(size * accessorInfo.count);
+    const decodeMatrix = quantizeExtension.decodeMatrix;
+    const decodeOffset = [];
+    const decodeScale = [];
+    for (let k = 0; k < size; k++) {
       decodeOffset[k] = decodeMatrix[size * (size + 1) + k];
       decodeScale[k] = decodeMatrix[k * (size + 1) + k];
     }
-    for (var i = 0; i < accessorInfo.count; i++) {
-      for (var k = 0; k < size; k++) {
+    for (let i = 0; i < accessorInfo.count; i++) {
+      for (let k = 0; k < size; k++) {
         decodedArr[i * size + k] = arr[i * size + k] * decodeScale[k] + decodeOffset[k];
       }
     }
@@ -100,13 +99,13 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
 }
 
 function base64ToBinary(input, charStart) {
-  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-  var lookup = new Uint8Array(130);
-  for (var i = 0; i < chars.length; i++) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const lookup = new Uint8Array(130);
+  for (let i = 0; i < chars.length; i++) {
     lookup[chars.charCodeAt(i)] = i;
   }
   // Ignore
-  var len = input.length - charStart;
+  let len = input.length - charStart;
   if (input.charAt(len - 1) === '=') {
     len--;
   }
@@ -114,13 +113,13 @@ function base64ToBinary(input, charStart) {
     len--;
   }
 
-  var uarray = new Uint8Array((len / 4) * 3);
+  const uarray = new Uint8Array((len / 4) * 3);
 
-  for (var i = 0, j = charStart; i < uarray.length; ) {
-    var c1 = lookup[input.charCodeAt(j++)];
-    var c2 = lookup[input.charCodeAt(j++)];
-    var c3 = lookup[input.charCodeAt(j++)];
-    var c4 = lookup[input.charCodeAt(j++)];
+  for (let i = 0, j = charStart; i < uarray.length; ) {
+    const c1 = lookup[input.charCodeAt(j++)];
+    const c2 = lookup[input.charCodeAt(j++)];
+    const c3 = lookup[input.charCodeAt(j++)];
+    const c4 = lookup[input.charCodeAt(j++)];
 
     uarray[i++] = (c1 << 2) | (c2 >> 4);
     uarray[i++] = ((c2 & 15) << 4) | (c3 >> 2);
@@ -148,7 +147,7 @@ function base64ToBinary(input, charStart) {
  * @constructor clay.loader.GLTF
  * @extends clay.core.Base
  */
-var GLTFLoader = Base.extend(
+const GLTFLoader = Base.extend(
   /** @lends clay.loader.GLTF# */ {
     /**
      *
@@ -237,8 +236,8 @@ var GLTFLoader = Base.extend(
      * @param {string} url
      */
     load: function (url) {
-      var self = this;
-      var isBinary = url.endsWith('.glb');
+      const self = this;
+      const isBinary = url.endsWith('.glb');
 
       if (this.rootPath == null) {
         this.rootPath = url.slice(0, url.lastIndexOf('/'));
@@ -272,7 +271,7 @@ var GLTFLoader = Base.extend(
      * @return {clay.loader.GLTF.Result}
      */
     parseBinary: function (buffer) {
-      var header = new Uint32Array(buffer, 0, 4);
+      const header = new Uint32Array(buffer, 0, 4);
       if (header[0] !== 0x46546c67) {
         this.trigger('error', 'Invalid glTF binary format: Invalid header');
         return;
@@ -282,23 +281,24 @@ var GLTFLoader = Base.extend(
         return;
       }
 
-      var dataView = new DataView(buffer, 12);
+      const dataView = new DataView(buffer, 12);
 
-      var json;
-      var buffers = [];
+      let json;
+      const buffers = [];
       // Read chunks
-      for (var i = 0; i < dataView.byteLength; ) {
-        var chunkLength = dataView.getUint32(i, true);
+      for (let i = 0; i < dataView.byteLength; ) {
+        const chunkLength = dataView.getUint32(i, true);
         i += 4;
-        var chunkType = dataView.getUint32(i, true);
+        const chunkType = dataView.getUint32(i, true);
         i += 4;
 
         // json
         if (chunkType === 0x4e4f534a) {
-          var arr = new Uint8Array(buffer, i + 12, chunkLength);
+          const arr = new Uint8Array(buffer, i + 12, chunkLength);
           // TODO, for the browser not support TextDecoder.
-          var decoder = new TextDecoder();
-          var str = decoder.decode(arr);
+          /* global TextDecoder */
+          const decoder = new TextDecoder();
+          const str = decoder.decode(arr);
           try {
             json = JSON.parse(str);
           } catch (e) {
@@ -325,9 +325,9 @@ var GLTFLoader = Base.extend(
      * @return {clay.loader.GLTF.Result}
      */
     parse: function (json, buffers) {
-      var self = this;
+      const self = this;
 
-      var lib = {
+      const lib = {
         json: json,
         buffers: [],
         bufferViews: [],
@@ -341,9 +341,9 @@ var GLTFLoader = Base.extend(
         clips: []
       };
       // Mount on the root node if given
-      var rootNode = this.rootNode || new Scene();
+      const rootNode = this.rootNode || new Scene();
 
-      var loading = 0;
+      let loading = 0;
       function checkLoad() {
         loading--;
         if (loading === 0) {
@@ -358,7 +358,7 @@ var GLTFLoader = Base.extend(
         // Load buffers
         util.each(json.buffers, function (bufferInfo, idx) {
           loading++;
-          var path = bufferInfo.uri;
+          const path = bufferInfo.uri;
 
           self._loadBuffers(
             path,
@@ -414,10 +414,10 @@ var GLTFLoader = Base.extend(
 
         // Only support one scene.
         if (json.scenes) {
-          var sceneInfo = json.scenes[json.scene || 0]; // Default use the first scene.
+          const sceneInfo = json.scenes[json.scene || 0]; // Default use the first scene.
           if (sceneInfo) {
-            for (var i = 0; i < sceneInfo.nodes.length; i++) {
-              var node = lib.nodes[sceneInfo.nodes[i]];
+            for (let i = 0; i < sceneInfo.nodes.length; i++) {
+              const node = lib.nodes[sceneInfo.nodes[i]];
               node.update();
               rootNode.add(node);
             }
@@ -452,7 +452,7 @@ var GLTFLoader = Base.extend(
         return path;
       }
 
-      var rootPath = this.bufferRootPath;
+      let rootPath = this.bufferRootPath;
       if (rootPath == null) {
         rootPath = this.rootPath;
       }
@@ -468,7 +468,7 @@ var GLTFLoader = Base.extend(
         return path;
       }
 
-      var rootPath = this.textureRootPath;
+      let rootPath = this.textureRootPath;
       if (rootPath == null) {
         rootPath = this.rootPath;
       }
@@ -503,8 +503,8 @@ var GLTFLoader = Base.extend(
     },
 
     _loadBuffers: function (path, onsuccess, onerror) {
-      var base64Prefix = 'data:application/octet-stream;base64,';
-      var strStart = path.substr(0, base64Prefix.length);
+      const base64Prefix = 'data:application/octet-stream;base64,';
+      const strStart = path.substr(0, base64Prefix.length);
       if (strStart === base64Prefix) {
         onsuccess(base64ToBinary(path, base64Prefix.length));
       } else {
@@ -516,17 +516,16 @@ var GLTFLoader = Base.extend(
     // https://github.com/KhronosGroup/glTF/issues/193
     _parseSkins: function (json, lib) {
       // Create skeletons and joints
-      var haveInvBindMatrices = false;
       util.each(
         json.skins,
         function (skinInfo, idx) {
-          var skeleton = new Skeleton({
+          const skeleton = new Skeleton({
             name: skinInfo.name
           });
-          for (var i = 0; i < skinInfo.joints.length; i++) {
-            var nodeIdx = skinInfo.joints[i];
-            var node = lib.nodes[nodeIdx];
-            var joint = new Joint({
+          for (let i = 0; i < skinInfo.joints.length; i++) {
+            const nodeIdx = skinInfo.joints[i];
+            const node = lib.nodes[nodeIdx];
+            const joint = new Joint({
               name: node.name,
               node: node,
               index: skeleton.joints.length
@@ -535,14 +534,13 @@ var GLTFLoader = Base.extend(
           }
           skeleton.relativeRootNode = lib.nodes[skinInfo.skeleton] || this.rootNode;
           if (skinInfo.inverseBindMatrices) {
-            haveInvBindMatrices = true;
-            var IBMInfo = json.accessors[skinInfo.inverseBindMatrices];
-            var buffer = lib.bufferViews[IBMInfo.bufferView];
+            const IBMInfo = json.accessors[skinInfo.inverseBindMatrices];
+            const buffer = lib.bufferViews[IBMInfo.bufferView];
 
-            var offset = IBMInfo.byteOffset || 0;
-            var size = IBMInfo.count * 16;
+            const offset = IBMInfo.byteOffset || 0;
+            const size = IBMInfo.count * 16;
 
-            var array = new vendor.Float32Array(buffer, offset, size);
+            const array = new vendor.Float32Array(buffer, offset, size);
 
             skeleton.setJointMatricesArray(array);
           } else {
@@ -570,17 +568,17 @@ var GLTFLoader = Base.extend(
         json.nodes,
         function (nodeInfo, nodeIdx) {
           if (nodeInfo.skin != null) {
-            var skinIdx = nodeInfo.skin;
-            var skeleton = lib.skeletons[skinIdx];
+            const skinIdx = nodeInfo.skin;
+            const skeleton = lib.skeletons[skinIdx];
 
-            var node = lib.nodes[nodeIdx];
-            var jointIndices = skeleton.joints.map(getJointIndex);
+            const node = lib.nodes[nodeIdx];
+            const jointIndices = skeleton.joints.map(getJointIndex);
             if (node instanceof Mesh) {
               enableSkinningForMesh(node, skeleton, jointIndices);
             } else {
               // Mesh have multiple primitives
-              var children = node.children();
-              for (var i = 0; i < children.length; i++) {
+              const children = node.children();
+              for (let i = 0; i < children.length; i++) {
                 enableSkinningForMesh(children[i], skeleton, jointIndices);
               }
             }
@@ -595,10 +593,10 @@ var GLTFLoader = Base.extend(
         json.textures,
         function (textureInfo, idx) {
           // samplers is optional
-          var samplerInfo = (json.samplers && json.samplers[textureInfo.sampler]) || {};
-          var parameters = {};
+          const samplerInfo = (json.samplers && json.samplers[textureInfo.sampler]) || {};
+          const parameters = {};
           ['wrapS', 'wrapT', 'magFilter', 'minFilter'].forEach(function (name) {
-            var value = samplerInfo[name];
+            const value = samplerInfo[name];
             if (value != null) {
               parameters[name] = value;
             }
@@ -610,19 +608,20 @@ var GLTFLoader = Base.extend(
             convertToPOT: this.textureConvertToPOT
           });
 
-          var target = textureInfo.target || glenum.TEXTURE_2D;
-          var format = textureInfo.format;
+          const target = textureInfo.target || glenum.TEXTURE_2D;
+          const format = textureInfo.format;
           if (format != null) {
             parameters.format = format;
           }
 
           if (target === glenum.TEXTURE_2D) {
-            var texture = new Texture2D(parameters);
-            var imageInfo = json.images[textureInfo.source];
-            var uri;
+            const texture = new Texture2D(parameters);
+            const imageInfo = json.images[textureInfo.source];
+            let uri;
             if (imageInfo.uri) {
               uri = this.resolveTexturePath(imageInfo.uri);
             } else if (imageInfo.bufferView != null) {
+              /* global URL Blob */
               uri = URL.createObjectURL(
                 new Blob([lib.bufferViews[imageInfo.bufferView]], {
                   type: imageInfo.mimeType
@@ -640,9 +639,9 @@ var GLTFLoader = Base.extend(
     },
 
     _KHRCommonMaterialToStandard: function (materialInfo, lib) {
-      var uniforms = {};
-      var commonMaterialInfo = materialInfo.extensions['KHR_materials_common'];
-      uniforms = commonMaterialInfo.values || {};
+      /* eslint-disable-next-line */
+      const commonMaterialInfo = materialInfo.extensions['KHR_materials_common'];
+      const uniforms = commonMaterialInfo.values || {};
 
       if (typeof uniforms.diffuse === 'number') {
         uniforms.diffuse = lib.textures[uniforms.diffuse] || null;
@@ -651,18 +650,18 @@ var GLTFLoader = Base.extend(
         uniforms.emission = lib.textures[uniforms.emission] || null;
       }
 
-      var enabledTextures = [];
-      if (uniforms['diffuse'] instanceof Texture2D) {
+      const enabledTextures = [];
+      if (uniforms.diffuse instanceof Texture2D) {
         enabledTextures.push('diffuseMap');
       }
       if (materialInfo.normalTexture) {
         enabledTextures.push('normalMap');
       }
-      if (uniforms['emission'] instanceof Texture2D) {
+      if (uniforms.emission instanceof Texture2D) {
         enabledTextures.push('emissiveMap');
       }
-      var material;
-      var isStandardMaterial = this.useStandardMaterial;
+      let material;
+      const isStandardMaterial = this.useStandardMaterial;
       if (isStandardMaterial) {
         material = new StandardMaterial({
           name: materialInfo.name,
@@ -688,7 +687,7 @@ var GLTFLoader = Base.extend(
         material.transparent = true;
       }
 
-      var diffuseProp = uniforms['diffuse'];
+      let diffuseProp = uniforms.diffuse;
       if (diffuseProp) {
         // Color
         if (Array.isArray(diffuseProp)) {
@@ -701,7 +700,7 @@ var GLTFLoader = Base.extend(
             : material.set('diffuseMap', diffuseProp);
         }
       }
-      var emissionProp = uniforms['emission'];
+      let emissionProp = uniforms.emission;
       if (emissionProp != null) {
         // Color
         if (Array.isArray(emissionProp)) {
@@ -718,15 +717,15 @@ var GLTFLoader = Base.extend(
       }
       if (materialInfo.normalTexture != null) {
         // TODO texCoord
-        var normalTextureIndex = materialInfo.normalTexture.index;
+        const normalTextureIndex = materialInfo.normalTexture.index;
         if (isStandardMaterial) {
           material.normalMap = lib.textures[normalTextureIndex] || null;
         } else {
           material.set('normalMap', lib.textures[normalTextureIndex] || null);
         }
       }
-      if (uniforms['shininess'] != null) {
-        var glossiness = Math.log(uniforms['shininess']) / Math.log(8192);
+      if (uniforms.shininess != null) {
+        const glossiness = Math.log(uniforms.shininess) / Math.log(8192);
         // Uniform glossiness
         material.set('glossiness', glossiness);
         material.set('roughness', 1 - glossiness);
@@ -734,23 +733,23 @@ var GLTFLoader = Base.extend(
         material.set('glossiness', 0.3);
         material.set('roughness', 0.3);
       }
-      if (uniforms['specular'] != null) {
-        material.set('specularColor', uniforms['specular'].slice(0, 3));
+      if (uniforms.specular != null) {
+        material.set('specularColor', uniforms.specular.slice(0, 3));
       }
-      if (uniforms['transparency'] != null) {
-        material.set('alpha', uniforms['transparency']);
+      if (uniforms.transparency != null) {
+        material.set('alpha', uniforms.transparency);
       }
 
       return material;
     },
 
     _pbrMetallicRoughnessToStandard: function (materialInfo, metallicRoughnessMatInfo, lib) {
-      var alphaTest = materialInfo.alphaMode === 'MASK';
+      const alphaTest = materialInfo.alphaMode === 'MASK';
 
-      var isStandardMaterial = this.useStandardMaterial;
-      var material;
-      var diffuseMap, roughnessMap, metalnessMap, normalMap, emissiveMap, occlusionMap;
-      var enabledTextures = [];
+      const isStandardMaterial = this.useStandardMaterial;
+      let material;
+      let diffuseMap, roughnessMap, metalnessMap, normalMap, emissiveMap, occlusionMap;
+      const enabledTextures = [];
 
       /**
        * The scalar multiplier applied to each normal vector of the normal texture.
@@ -759,7 +758,7 @@ var GLTFLoader = Base.extend(
        *
        * XXX This value is ignored if `materialInfo.normalTexture` is not specified.
        */
-      var normalScale = 1.0;
+      let normalScale = 1.0;
 
       // TODO texCoord
       if (metallicRoughnessMatInfo.baseColorTexture) {
@@ -787,9 +786,9 @@ var GLTFLoader = Base.extend(
         occlusionMap = lib.textures[materialInfo.occlusionTexture.index] || null;
         occlusionMap && enabledTextures.push('occlusionMap');
       }
-      var baseColor = metallicRoughnessMatInfo.baseColorFactor || [1, 1, 1, 1];
+      const baseColor = metallicRoughnessMatInfo.baseColorFactor || [1, 1, 1, 1];
 
-      var commonProperties = {
+      const commonProperties = {
         diffuseMap: diffuseMap || null,
         roughnessMap: roughnessMap || null,
         metalnessMap: metalnessMap || null,
@@ -859,15 +858,14 @@ var GLTFLoader = Base.extend(
     },
 
     _pbrSpecularGlossinessToStandard: function (materialInfo, specularGlossinessMatInfo, lib) {
-      var alphaTest = materialInfo.alphaMode === 'MASK';
+      const alphaTest = materialInfo.alphaMode === 'MASK';
 
       if (this.useStandardMaterial) {
         console.error("StandardMaterial doesn't support specular glossiness workflow yet");
       }
 
-      var material;
-      var diffuseMap, glossinessMap, specularMap, normalMap, emissiveMap, occlusionMap;
-      var enabledTextures = [];
+      let diffuseMap, glossinessMap, specularMap, normalMap, emissiveMap, occlusionMap;
+      const enabledTextures = [];
       // TODO texCoord
       if (specularGlossinessMatInfo.diffuseTexture) {
         diffuseMap = lib.textures[specularGlossinessMatInfo.diffuseTexture.index] || null;
@@ -890,9 +888,9 @@ var GLTFLoader = Base.extend(
         occlusionMap = lib.textures[materialInfo.occlusionTexture.index] || null;
         occlusionMap && enabledTextures.push('occlusionMap');
       }
-      var diffuseColor = specularGlossinessMatInfo.diffuseFactor || [1, 1, 1, 1];
+      const diffuseColor = specularGlossinessMatInfo.diffuseFactor || [1, 1, 1, 1];
 
-      var commonProperties = {
+      const commonProperties = {
         diffuseMap: diffuseMap || null,
         glossinessMap: glossinessMap || null,
         specularMap: specularMap || null,
@@ -916,7 +914,7 @@ var GLTFLoader = Base.extend(
         commonProperties.specularColor = [1, 1, 1];
       }
 
-      material = new Material({
+      const material = new Material({
         name: materialInfo.name,
         shader: this._getShader()
       });
@@ -946,14 +944,17 @@ var GLTFLoader = Base.extend(
       util.each(
         json.materials,
         function (materialInfo, idx) {
+          /* eslint-disable-next-line */
           if (materialInfo.extensions && materialInfo.extensions['KHR_materials_common']) {
             lib.materials[idx] = this._KHRCommonMaterialToStandard(materialInfo, lib);
           } else if (
             materialInfo.extensions &&
+            /* eslint-disable-next-line */
             materialInfo.extensions['KHR_materials_pbrSpecularGlossiness']
           ) {
             lib.materials[idx] = this._pbrSpecularGlossinessToStandard(
               materialInfo,
+              /* eslint-disable-next-line */
               materialInfo.extensions['KHR_materials_pbrSpecularGlossiness'],
               lib
             );
@@ -970,33 +971,33 @@ var GLTFLoader = Base.extend(
     },
 
     _parseMeshes: function (json, lib) {
-      var self = this;
+      const self = this;
 
       util.each(
         json.meshes,
         function (meshInfo, idx) {
           lib.meshes[idx] = [];
           // Geometry
-          for (var pp = 0; pp < meshInfo.primitives.length; pp++) {
-            var primitiveInfo = meshInfo.primitives[pp];
-            var geometry = new Geometry({
+          for (let pp = 0; pp < meshInfo.primitives.length; pp++) {
+            const primitiveInfo = meshInfo.primitives[pp];
+            const geometry = new Geometry({
               dynamic: false,
               // PENDIGN
               name: meshInfo.name,
               boundingBox: new BoundingBox()
             });
             // Parse attributes
-            var semantics = Object.keys(primitiveInfo.attributes);
-            for (var ss = 0; ss < semantics.length; ss++) {
-              var semantic = semantics[ss];
-              var accessorIdx = primitiveInfo.attributes[semantic];
-              var attributeInfo = json.accessors[accessorIdx];
-              var attributeName = semanticAttributeMap[semantic];
+            const semantics = Object.keys(primitiveInfo.attributes);
+            for (let ss = 0; ss < semantics.length; ss++) {
+              const semantic = semantics[ss];
+              const accessorIdx = primitiveInfo.attributes[semantic];
+              const attributeInfo = json.accessors[accessorIdx];
+              const attributeName = semanticAttributeMap[semantic];
               if (!attributeName) {
                 continue;
               }
-              var size = SIZE_MAP[attributeInfo.type];
-              var attributeArray = getAccessorData(json, lib, accessorIdx);
+              const size = SIZE_MAP[attributeInfo.type];
+              let attributeArray = getAccessorData(json, lib, accessorIdx);
               // WebGL attribute buffer not support uint32.
               // Direct use Float32Array may also have issue.
               if (attributeArray instanceof vendor.Uint32Array) {
@@ -1004,24 +1005,24 @@ var GLTFLoader = Base.extend(
               }
               if (semantic === 'WEIGHTS_0' && size === 4) {
                 // Weight data in QTEK has only 3 component, the last component can be evaluated since it is normalized
-                var weightArray = new attributeArray.constructor(attributeInfo.count * 3);
-                for (var i = 0; i < attributeInfo.count; i++) {
-                  var i4 = i * 4,
+                const weightArray = new attributeArray.constructor(attributeInfo.count * 3);
+                for (let i = 0; i < attributeInfo.count; i++) {
+                  const i4 = i * 4,
                     i3 = i * 3;
-                  var w1 = attributeArray[i4],
+                  const w1 = attributeArray[i4],
                     w2 = attributeArray[i4 + 1],
                     w3 = attributeArray[i4 + 2],
                     w4 = attributeArray[i4 + 3];
-                  var wSum = w1 + w2 + w3 + w4;
+                  const wSum = w1 + w2 + w3 + w4;
                   weightArray[i3] = w1 / wSum;
                   weightArray[i3 + 1] = w2 / wSum;
                   weightArray[i3 + 2] = w3 / wSum;
                 }
                 geometry.attributes[attributeName].value = weightArray;
               } else if (semantic === 'COLOR_0' && size === 3) {
-                var colorArray = new attributeArray.constructor(attributeInfo.count * 4);
-                for (var i = 0; i < attributeInfo.count; i++) {
-                  var i4 = i * 4,
+                const colorArray = new attributeArray.constructor(attributeInfo.count * 4);
+                for (let i = 0; i < attributeInfo.count; i++) {
+                  const i4 = i * 4,
                     i3 = i * 3;
                   colorArray[i4] = attributeArray[i3];
                   colorArray[i4 + 1] = attributeArray[i3 + 1];
@@ -1033,7 +1034,7 @@ var GLTFLoader = Base.extend(
                 geometry.attributes[attributeName].value = attributeArray;
               }
 
-              var attributeType = 'float';
+              let attributeType = 'float';
               if (attributeArray instanceof vendor.Uint16Array) {
                 attributeType = 'ushort';
               } else if (attributeArray instanceof vendor.Int16Array) {
@@ -1047,8 +1048,8 @@ var GLTFLoader = Base.extend(
 
               if (semantic === 'POSITION') {
                 // Bounding Box
-                var min = attributeInfo.min;
-                var max = attributeInfo.max;
+                const min = attributeInfo.min;
+                const max = attributeInfo.max;
                 if (min) {
                   geometry.boundingBox.min.set(min[0], min[1], min[2]);
                 }
@@ -1072,15 +1073,15 @@ var GLTFLoader = Base.extend(
               }
             }
 
-            var material = lib.materials[primitiveInfo.material];
-            var materialInfo = (json.materials || [])[primitiveInfo.material];
+            let material = lib.materials[primitiveInfo.material];
+            const materialInfo = (json.materials || [])[primitiveInfo.material];
             // Use default material
             if (!material) {
               material = new Material({
                 shader: self._getShader()
               });
             }
-            var mesh = new Mesh({
+            const mesh = new Mesh({
               geometry: geometry,
               material: material,
               mode:
@@ -1123,10 +1124,10 @@ var GLTFLoader = Base.extend(
     },
 
     _instanceCamera: function (json, nodeInfo) {
-      var cameraInfo = json.cameras[nodeInfo.camera];
+      const cameraInfo = json.cameras[nodeInfo.camera];
 
       if (cameraInfo.type === 'perspective') {
-        var perspectiveInfo = cameraInfo.perspective || {};
+        const perspectiveInfo = cameraInfo.perspective || {};
         return new PerspectiveCamera({
           name: nodeInfo.name,
           aspect: perspectiveInfo.aspectRatio,
@@ -1135,7 +1136,7 @@ var GLTFLoader = Base.extend(
           near: perspectiveInfo.znear
         });
       } else {
-        var orthographicInfo = cameraInfo.orthographic || {};
+        const orthographicInfo = cameraInfo.orthographic || {};
         return new OrthographicCamera({
           name: nodeInfo.name,
           top: orthographicInfo.ymag,
@@ -1164,12 +1165,12 @@ var GLTFLoader = Base.extend(
       util.each(
         json.nodes,
         function (nodeInfo, idx) {
-          var node;
+          let node;
           if (nodeInfo.camera != null && this.includeCamera) {
             node = this._instanceCamera(json, nodeInfo);
             lib.cameras.push(node);
           } else if (nodeInfo.mesh != null && this.includeMesh) {
-            var primitives = lib.meshes[nodeInfo.mesh];
+            const primitives = lib.meshes[nodeInfo.mesh];
             if (primitives) {
               if (primitives.length === 1) {
                 // Replace the node with mesh directly
@@ -1179,8 +1180,8 @@ var GLTFLoader = Base.extend(
               } else {
                 node = new Node();
                 node.setName(nodeInfo.name);
-                for (var j = 0; j < primitives.length; j++) {
-                  var newMesh = instanceMesh(primitives[j]);
+                for (let j = 0; j < primitives.length; j++) {
+                  const newMesh = instanceMesh(primitives[j]);
                   node.add(newMesh);
                   lib.instancedMeshes.push(newMesh);
                 }
@@ -1213,11 +1214,11 @@ var GLTFLoader = Base.extend(
 
       // Build hierarchy
       util.each(json.nodes, function (nodeInfo, idx) {
-        var node = lib.nodes[idx];
+        const node = lib.nodes[idx];
         if (nodeInfo.children) {
-          for (var i = 0; i < nodeInfo.children.length; i++) {
-            var childIdx = nodeInfo.children[i];
-            var child = lib.nodes[childIdx];
+          for (let i = 0; i < nodeInfo.children.length; i++) {
+            const childIdx = nodeInfo.children[i];
+            const child = lib.nodes[childIdx];
             node.add(child);
           }
         }
@@ -1237,23 +1238,23 @@ var GLTFLoader = Base.extend(
         return channelInfo.target.node + '_' + animationInfo.samplers[channelInfo.sampler].input;
       }
 
-      var timeAccessorMultiplied = {};
+      const timeAccessorMultiplied = {};
       util.each(
         json.animations,
         function (animationInfo, idx) {
-          var channels = animationInfo.channels.filter(checkChannelPath);
+          const channels = animationInfo.channels.filter(checkChannelPath);
 
           if (!channels.length) {
             return;
           }
-          var tracks = {};
-          for (var i = 0; i < channels.length; i++) {
-            var channelInfo = channels[i];
-            var channelHash = getChannelHash(channelInfo, animationInfo);
+          const tracks = {};
+          for (let i = 0; i < channels.length; i++) {
+            const channelInfo = channels[i];
+            const channelHash = getChannelHash(channelInfo, animationInfo);
 
-            var targetNode = lib.nodes[channelInfo.target.node];
-            var track = tracks[channelHash];
-            var samplerInfo = animationInfo.samplers[channelInfo.sampler];
+            const targetNode = lib.nodes[channelInfo.target.node];
+            let track = tracks[channelHash];
+            const samplerInfo = animationInfo.samplers[channelInfo.sampler];
 
             if (!track) {
               track = tracks[channelHash] = new SamplerTrack({
@@ -1262,32 +1263,32 @@ var GLTFLoader = Base.extend(
               });
               track.targetNodeIndex = channelInfo.target.node;
               track.channels.time = getAccessorData(json, lib, samplerInfo.input);
-              var frameLen = track.channels.time.length;
+              const frameLen = track.channels.time.length;
               if (!timeAccessorMultiplied[samplerInfo.input]) {
-                for (var k = 0; k < frameLen; k++) {
+                for (let k = 0; k < frameLen; k++) {
                   track.channels.time[k] *= 1000;
                 }
                 timeAccessorMultiplied[samplerInfo.input] = true;
               }
             }
 
-            var interpolation = samplerInfo.interpolation || 'LINEAR';
+            const interpolation = samplerInfo.interpolation || 'LINEAR';
             if (interpolation !== 'LINEAR') {
               console.warn('GLTFLoader only support LINEAR interpolation.');
             }
 
-            var path = channelInfo.target.path;
+            let path = channelInfo.target.path;
             if (path === 'translation') {
               path = 'position';
             }
 
             track.channels[path] = getAccessorData(json, lib, samplerInfo.output);
           }
-          var tracksList = [];
-          for (var hash in tracks) {
+          const tracksList = [];
+          for (const hash in tracks) {
             tracksList.push(tracks[hash]);
           }
-          var clip = new TrackClip({
+          const clip = new TrackClip({
             name: animationInfo.name,
             loop: true,
             tracks: tracksList
@@ -1298,7 +1299,7 @@ var GLTFLoader = Base.extend(
       );
 
       // PENDING
-      var maxLife = lib.clips.reduce(function (maxTime, clip) {
+      const maxLife = lib.clips.reduce(function (maxTime, clip) {
         return Math.max(maxTime, clip.life);
       }, 0);
       lib.clips.forEach(function (clip) {
@@ -1311,8 +1312,8 @@ var GLTFLoader = Base.extend(
 );
 
 GLTFLoader.generateMeshName = function (meshes, idx, primitiveIdx) {
-  var meshInfo = meshes[idx];
-  var meshName = meshInfo.name || 'mesh_' + idx;
+  const meshInfo = meshes[idx];
+  const meshName = meshInfo.name || 'mesh_' + idx;
   return primitiveIdx === 0 ? meshName : meshName + '$' + primitiveIdx;
 };
 

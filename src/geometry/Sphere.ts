@@ -14,7 +14,7 @@ import BoundingBox from '../math/BoundingBox';
  * @param {number} [thetaLength]
  * @param {number} [radius]
  */
-var Sphere = Geometry.extend(
+const Sphere = Geometry.extend(
   /** @lends clay.geometry.Sphere# */ {
     dynamic: false,
     /**
@@ -58,34 +58,33 @@ var Sphere = Geometry.extend(
      * Build sphere geometry
      */
     build: function () {
-      var heightSegments = this.heightSegments;
-      var widthSegments = this.widthSegments;
+      const heightSegments = this.heightSegments;
+      const widthSegments = this.widthSegments;
 
-      var positionAttr = this.attributes.position;
-      var texcoordAttr = this.attributes.texcoord0;
-      var normalAttr = this.attributes.normal;
+      const positionAttr = this.attributes.position;
+      const texcoordAttr = this.attributes.texcoord0;
+      const normalAttr = this.attributes.normal;
 
-      var vertexCount = (widthSegments + 1) * (heightSegments + 1);
+      const vertexCount = (widthSegments + 1) * (heightSegments + 1);
       positionAttr.init(vertexCount);
       texcoordAttr.init(vertexCount);
       normalAttr.init(vertexCount);
 
-      var IndicesCtor = vertexCount > 0xffff ? Uint32Array : Uint16Array;
-      var indices = (this.indices = new IndicesCtor(widthSegments * heightSegments * 6));
+      const IndicesCtor = vertexCount > 0xffff ? Uint32Array : Uint16Array;
+      const indices = (this.indices = new IndicesCtor(widthSegments * heightSegments * 6));
 
-      var x, y, z, u, v, i, j;
+      let x, y, z, u, v, i, j;
 
-      var radius = this.radius;
-      var phiStart = this.phiStart;
-      var phiLength = this.phiLength;
-      var thetaStart = this.thetaStart;
-      var thetaLength = this.thetaLength;
-      var radius = this.radius;
+      const radius = this.radius;
+      const phiStart = this.phiStart;
+      const phiLength = this.phiLength;
+      const thetaStart = this.thetaStart;
+      const thetaLength = this.thetaLength;
 
-      var pos = [];
-      var uv = [];
-      var offset = 0;
-      var divider = 1 / radius;
+      const pos = [];
+      const uv = [];
+      let offset = 0;
+      const divider = 1 / radius;
       for (j = 0; j <= heightSegments; j++) {
         for (i = 0; i <= widthSegments; i++) {
           u = i / widthSegments;
@@ -111,11 +110,11 @@ var Sphere = Geometry.extend(
         }
       }
 
-      var i1, i2, i3, i4;
+      let i1, i2, i3, i4;
 
-      var len = widthSegments + 1;
+      const len = widthSegments + 1;
 
-      var n = 0;
+      let n = 0;
       for (j = 0; j < heightSegments; j++) {
         for (i = 0; i < widthSegments; i++) {
           i2 = j * len + i;

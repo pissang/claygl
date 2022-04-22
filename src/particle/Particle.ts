@@ -6,7 +6,7 @@ import vec3 from '../glmatrix/vec3';
  * @constructor
  * @alias clay.particle.Particle
  */
-var Particle = function () {
+const Particle = function () {
   /**
    * @type {clay.Vector3}
    */

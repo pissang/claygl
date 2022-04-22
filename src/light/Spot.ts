@@ -6,7 +6,7 @@ import Vector3 from '../math/Vector3';
  * @constructor clay.light.Spot
  * @extends clay.Light
  */
-var SpotLight = Light.extend(
+const SpotLight = Light.extend(
   /**@lends clay.light.Spot */ {
     /**
      * @type {number}
@@ -78,8 +78,8 @@ var SpotLight = Light.extend(
       spotLightColor: {
         type: '3f',
         value: function (instance) {
-          var color = instance.color;
-          var intensity = instance.intensity;
+          const color = instance.color;
+          const intensity = instance.intensity;
           return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
         }
       }
@@ -89,7 +89,7 @@ var SpotLight = Light.extend(
      * @memberOf clay.light.Spot.prototype
      */
     clone: function () {
-      var light = Light.prototype.clone.call(this);
+      const light = Light.prototype.clone.call(this);
       light.range = this.range;
       light.umbraAngle = this.umbraAngle;
       light.penumbraAngle = this.penumbraAngle;

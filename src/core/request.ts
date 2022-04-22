@@ -1,6 +1,7 @@
 // @ts-nocheck
 function get(options) {
-  var xhr = new XMLHttpRequest();
+  /* global XMLHttpRequest */
+  const xhr = new XMLHttpRequest();
 
   xhr.open('get', options.url);
   // With response type set browser can get and put binary data
@@ -13,7 +14,7 @@ function get(options) {
     //https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Using_XMLHttpRequest
     xhr.onprogress = function (e) {
       if (e.lengthComputable) {
-        var percent = e.loaded / e.total;
+        const percent = e.loaded / e.total;
         options.onprogress(percent, e.loaded, e.total);
       } else {
         options.onprogress(null);

@@ -9,7 +9,7 @@ import Vector3 from './Vector3';
  * @constructor
  * @alias clay.Matrix4
  */
-var Matrix4 = function () {
+const Matrix4 = function () {
   this._axisX = new Vector3();
   this._axisY = new Vector3();
   this._axisZ = new Vector3();
@@ -38,7 +38,7 @@ Matrix4.prototype = {
    * @param  {Float32Array|number[]} arr
    */
   setArray: function (arr) {
-    for (var i = 0; i < this.array.length; i++) {
+    for (let i = 0; i < this.array.length; i++) {
       this.array[i] = arr[i];
     }
     this._dirty = true;
@@ -328,24 +328,24 @@ Matrix4.prototype = {
    * @see http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.matrix.decompose.aspx
    */
   decomposeMatrix: (function () {
-    var x = vec3.create();
-    var y = vec3.create();
-    var z = vec3.create();
+    const x = vec3.create();
+    const y = vec3.create();
+    const z = vec3.create();
 
-    var m3 = mat3.create();
+    const m3 = mat3.create();
 
     return function (scale, rotation, position) {
-      var el = this.array;
+      const el = this.array;
       vec3.set(x, el[0], el[1], el[2]);
       vec3.set(y, el[4], el[5], el[6]);
       vec3.set(z, el[8], el[9], el[10]);
 
-      var sx = vec3.length(x);
-      var sy = vec3.length(y);
-      var sz = vec3.length(z);
+      let sx = vec3.length(x);
+      const sy = vec3.length(y);
+      const sz = vec3.length(z);
 
       // if determine is negative, we need to invert one scale
-      var det = this.determinant();
+      const det = this.determinant();
       if (det < 0) {
         sx = -sx;
       }
@@ -391,10 +391,10 @@ Matrix4.prototype = {
   }
 };
 
-var defineProperty = Object.defineProperty;
+const defineProperty = Object.defineProperty;
 
 if (defineProperty) {
-  var proto = Matrix4.prototype;
+  const proto = Matrix4.prototype;
   /**
    * Z Axis of local transform
    * @name z
@@ -404,14 +404,14 @@ if (defineProperty) {
    */
   defineProperty(proto, 'z', {
     get: function () {
-      var el = this.array;
+      const el = this.array;
       this._axisZ.set(el[8], el[9], el[10]);
       return this._axisZ;
     },
     set: function (v) {
       // TODO Here has a problem
       // If only set an item of vector will not work
-      var el = this.array;
+      const el = this.array;
       v = v.array;
       el[8] = v[0];
       el[9] = v[1];
@@ -430,12 +430,12 @@ if (defineProperty) {
    */
   defineProperty(proto, 'y', {
     get: function () {
-      var el = this.array;
+      const el = this.array;
       this._axisY.set(el[4], el[5], el[6]);
       return this._axisY;
     },
     set: function (v) {
-      var el = this.array;
+      const el = this.array;
       v = v.array;
       el[4] = v[0];
       el[5] = v[1];
@@ -454,12 +454,12 @@ if (defineProperty) {
    */
   defineProperty(proto, 'x', {
     get: function () {
-      var el = this.array;
+      const el = this.array;
       this._axisX.set(el[0], el[1], el[2]);
       return this._axisX;
     },
     set: function (v) {
-      var el = this.array;
+      const el = this.array;
       v = v.array;
       el[0] = v[0];
       el[1] = v[1];
@@ -615,8 +615,8 @@ Matrix4.fromRotationTranslation = function (out, q, v) {
  */
 Matrix4.fromMat2d = function (m4, m2d) {
   m4._dirty = true;
-  var m2d = m2d.array;
-  var m4 = m4.array;
+  m2d = m2d.array;
+  m4 = m4.array;
 
   m4[0] = m2d[0];
   m4[4] = m2d[2];

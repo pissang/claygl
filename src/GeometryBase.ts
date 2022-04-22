@@ -90,18 +90,18 @@ function Attribute(name, type, size, semantic) {
       break;
     case 2:
       this.get = function (idx, out) {
-        var arr = this.value;
+        const arr = this.value;
         out[0] = arr[idx * 2];
         out[1] = arr[idx * 2 + 1];
         return out;
       };
       this.set = function (idx, val) {
-        var arr = this.value;
+        const arr = this.value;
         arr[idx * 2] = val[0];
         arr[idx * 2 + 1] = val[1];
       };
       this.copy = function (target, source) {
-        var arr = this.value;
+        const arr = this.value;
         source *= 2;
         target *= 2;
         arr[target] = arr[source];
@@ -110,22 +110,22 @@ function Attribute(name, type, size, semantic) {
       break;
     case 3:
       this.get = function (idx, out) {
-        var idx3 = idx * 3;
-        var arr = this.value;
+        const idx3 = idx * 3;
+        const arr = this.value;
         out[0] = arr[idx3];
         out[1] = arr[idx3 + 1];
         out[2] = arr[idx3 + 2];
         return out;
       };
       this.set = function (idx, val) {
-        var idx3 = idx * 3;
-        var arr = this.value;
+        const idx3 = idx * 3;
+        const arr = this.value;
         arr[idx3] = val[0];
         arr[idx3 + 1] = val[1];
         arr[idx3 + 2] = val[2];
       };
       this.copy = function (target, source) {
-        var arr = this.value;
+        const arr = this.value;
         source *= 3;
         target *= 3;
         arr[target] = arr[source];
@@ -135,8 +135,8 @@ function Attribute(name, type, size, semantic) {
       break;
     case 4:
       this.get = function (idx, out) {
-        var arr = this.value;
-        var idx4 = idx * 4;
+        const arr = this.value;
+        const idx4 = idx * 4;
         out[0] = arr[idx4];
         out[1] = arr[idx4 + 1];
         out[2] = arr[idx4 + 2];
@@ -144,15 +144,15 @@ function Attribute(name, type, size, semantic) {
         return out;
       };
       this.set = function (idx, val) {
-        var arr = this.value;
-        var idx4 = idx * 4;
+        const arr = this.value;
+        const idx4 = idx * 4;
         arr[idx4] = val[0];
         arr[idx4 + 1] = val[1];
         arr[idx4 + 2] = val[2];
         arr[idx4 + 3] = val[3];
       };
       this.copy = function (target, source) {
-        var arr = this.value;
+        const arr = this.value;
         source *= 4;
         target *= 4;
         // copyWithin is extremely slow
@@ -190,7 +190,7 @@ function Attribute(name, type, size, semantic) {
  */
 Attribute.prototype.init = function (nVertex) {
   if (!this.value || this.value.length !== nVertex * this.size) {
-    var ArrayConstructor = getArrayCtorByType(this.type);
+    const ArrayConstructor = getArrayCtorByType(this.type);
     this.value = new ArrayConstructor(nVertex * this.size);
   }
 };
@@ -207,15 +207,15 @@ Attribute.prototype.init = function (nVertex) {
  *  );
  */
 Attribute.prototype.fromArray = function (array) {
-  var ArrayConstructor = getArrayCtorByType(this.type);
-  var value;
+  const ArrayConstructor = getArrayCtorByType(this.type);
+  let value;
   // Convert 2d array to flat
   if (array[0] && array[0].length) {
-    var n = 0;
-    var size = this.size;
+    let n = 0;
+    const size = this.size;
     value = new ArrayConstructor(array.length * size);
-    for (var i = 0; i < array.length; i++) {
-      for (var j = 0; j < size; j++) {
+    for (let i = 0; i < array.length; i++) {
+      for (let j = 0; j < size; j++) {
         value[n++] = array[i][j];
       }
     }
@@ -226,7 +226,7 @@ Attribute.prototype.fromArray = function (array) {
 };
 
 Attribute.prototype.clone = function (copyValue) {
-  var ret = new Attribute(this.name, this.type, this.size, this.semantic);
+  const ret = new Attribute(this.name, this.type, this.size, this.semantic);
   // FIXME
   if (copyValue) {
     console.warn('todo');
@@ -259,7 +259,7 @@ function IndicesBuffer(buffer) {
  * @constructor clay.GeometryBase
  * @extends clay.core.Base
  */
-var GeometryBase = Base.extend(
+const GeometryBase = Base.extend(
   function () {
     return /** @lends clay.GeometryBase# */ {
       /**
@@ -329,8 +329,8 @@ var GeometryBase = Base.extend(
      * Usually called after you change the data in attributes.
      */
     dirty: function () {
-      var enabledAttributes = this.getEnabledAttributes();
-      for (var i = 0; i < enabledAttributes.length; i++) {
+      const enabledAttributes = this.getEnabledAttributes();
+      for (let i = 0; i < enabledAttributes.length; i++) {
         this.dirtyAttribute(enabledAttributes[i]);
       }
       this.dirtyIndices();
@@ -363,7 +363,7 @@ var GeometryBase = Base.extend(
         if (!out) {
           out = [];
         }
-        var indices = this.indices;
+        const indices = this.indices;
         out[0] = indices[idx * 3];
         out[1] = indices[idx * 3 + 1];
         out[2] = indices[idx * 3 + 2];
@@ -377,7 +377,7 @@ var GeometryBase = Base.extend(
      * @param {Array.<number>} arr
      */
     setTriangleIndices: function (idx, arr) {
-      var indices = this.indices;
+      const indices = this.indices;
       indices[idx * 3] = arr[0];
       indices[idx * 3 + 1] = arr[1];
       indices[idx * 3 + 2] = arr[2];
@@ -392,16 +392,16 @@ var GeometryBase = Base.extend(
      * @param {Array} array
      */
     initIndicesFromArray: function (array) {
-      var value;
-      var ArrayConstructor = this.vertexCount > 0xffff ? vendor.Uint32Array : vendor.Uint16Array;
+      let value;
+      const ArrayConstructor = this.vertexCount > 0xffff ? vendor.Uint32Array : vendor.Uint16Array;
       // Convert 2d array to flat
       if (array[0] && array[0].length) {
-        var n = 0;
-        var size = 3;
+        let n = 0;
+        const size = 3;
 
         value = new ArrayConstructor(array.length * size);
-        for (var i = 0; i < array.length; i++) {
-          for (var j = 0; j < size; j++) {
+        for (let i = 0; i < array.length; i++) {
+          for (let j = 0; j < size; j++) {
             value[n++] = array[i][j];
           }
         }
@@ -419,7 +419,7 @@ var GeometryBase = Base.extend(
      * @param {string} [semantic]
      */
     createAttribute: function (name, type, size, semantic) {
-      var attrib = new Attribute(name, type, size, semantic);
+      const attrib = new Attribute(name, type, size, semantic);
       if (this.attributes[name]) {
         this.removeAttribute(name);
       }
@@ -432,8 +432,8 @@ var GeometryBase = Base.extend(
      * @param {string} name
      */
     removeAttribute: function (name) {
-      var attributeList = this._attributeList;
-      var idx = attributeList.indexOf(name);
+      const attributeList = this._attributeList;
+      const idx = attributeList.indexOf(name);
       if (idx >= 0) {
         attributeList.splice(idx, 1);
         delete this.attributes[name];
@@ -457,19 +457,19 @@ var GeometryBase = Base.extend(
      * @return {string[]}
      */
     getEnabledAttributes: function () {
-      var enabledAttributes = this._enabledAttributes;
-      var attributeList = this._attributeList;
+      const enabledAttributes = this._enabledAttributes;
+      const attributeList = this._attributeList;
       // Cache
       if (enabledAttributes) {
         return enabledAttributes;
       }
 
-      var result = [];
-      var nVertex = this.vertexCount;
+      const result = [];
+      const nVertex = this.vertexCount;
 
-      for (var i = 0; i < attributeList.length; i++) {
-        var name = attributeList[i];
-        var attrib = this.attributes[name];
+      for (let i = 0; i < attributeList.length; i++) {
+        const name = attributeList[i];
+        const attrib = this.attributes[name];
         if (attrib.value) {
           if (attrib.value.length === nVertex * attrib.size) {
             result.push(name);
@@ -483,14 +483,14 @@ var GeometryBase = Base.extend(
     },
 
     getBufferChunks: function (renderer) {
-      var cache = this._cache;
+      const cache = this._cache;
       cache.use(renderer.__uid__);
-      var isAttributesDirty = cache.isDirty('attributes');
-      var isIndicesDirty = cache.isDirty('indices');
+      const isAttributesDirty = cache.isDirty('attributes');
+      const isIndicesDirty = cache.isDirty('indices');
       if (isAttributesDirty || isIndicesDirty) {
         this._updateBuffer(renderer.gl, isAttributesDirty, isIndicesDirty);
-        var enabledAttributes = this.getEnabledAttributes();
-        for (var i = 0; i < enabledAttributes.length; i++) {
+        const enabledAttributes = this.getEnabledAttributes();
+        for (let i = 0; i < enabledAttributes.length; i++) {
           cache.fresh(makeAttrKey(enabledAttributes[i]));
         }
         cache.fresh('attributes');
@@ -501,9 +501,9 @@ var GeometryBase = Base.extend(
     },
 
     _updateBuffer: function (_gl, isAttributesDirty, isIndicesDirty) {
-      var cache = this._cache;
-      var chunks = cache.get('chunks');
-      var firstUpdate = false;
+      const cache = this._cache;
+      let chunks = cache.get('chunks');
+      let firstUpdate = false;
       if (!chunks) {
         chunks = [];
         // Intialize
@@ -515,30 +515,31 @@ var GeometryBase = Base.extend(
         firstUpdate = true;
       }
 
-      var chunk = chunks[0];
-      var attributeBuffers = chunk.attributeBuffers;
-      var indicesBuffer = chunk.indicesBuffer;
+      const chunk = chunks[0];
+      const attributeBuffers = chunk.attributeBuffers;
+      let indicesBuffer = chunk.indicesBuffer;
 
       if (isAttributesDirty || firstUpdate) {
-        var attributeList = this.getEnabledAttributes();
+        const attributeList = this.getEnabledAttributes();
 
-        var attributeBufferMap = {};
+        const attributeBufferMap = {};
         if (!firstUpdate) {
-          for (var i = 0; i < attributeBuffers.length; i++) {
+          for (let i = 0; i < attributeBuffers.length; i++) {
             attributeBufferMap[attributeBuffers[i].name] = attributeBuffers[i];
           }
         }
+        let k;
         // FIXME If some attributes removed
-        for (var k = 0; k < attributeList.length; k++) {
-          var name = attributeList[k];
-          var attribute = this.attributes[name];
+        for (k = 0; k < attributeList.length; k++) {
+          const name = attributeList[k];
+          const attribute = this.attributes[name];
 
-          var bufferInfo;
+          let bufferInfo;
 
           if (!firstUpdate) {
             bufferInfo = attributeBufferMap[name];
           }
-          var buffer;
+          let buffer;
           if (bufferInfo) {
             buffer = bufferInfo.buffer;
           } else {
@@ -565,7 +566,7 @@ var GeometryBase = Base.extend(
         }
         // Remove unused attributes buffers.
         // PENDING
-        for (var i = k; i < attributeBuffers.length; i++) {
+        for (let i = k; i < attributeBuffers.length; i++) {
           _gl.deleteBuffer(attributeBuffers[i].buffer);
         }
         attributeBuffers.length = k;
@@ -591,16 +592,16 @@ var GeometryBase = Base.extend(
      * @param {clay.Renderer} renderer
      */
     dispose: function (renderer) {
-      var cache = this._cache;
+      const cache = this._cache;
 
       cache.use(renderer.__uid__);
-      var chunks = cache.get('chunks');
+      const chunks = cache.get('chunks');
       if (chunks) {
-        for (var c = 0; c < chunks.length; c++) {
-          var chunk = chunks[c];
+        for (let c = 0; c < chunks.length; c++) {
+          const chunk = chunks[c];
 
-          for (var k = 0; k < chunk.attributeBuffers.length; k++) {
-            var attribs = chunk.attributeBuffers[k];
+          for (let k = 0; k < chunk.attributeBuffers.length; k++) {
+            const attribs = chunk.attributeBuffers[k];
             renderer.gl.deleteBuffer(attribs.buffer);
           }
 
@@ -610,9 +611,9 @@ var GeometryBase = Base.extend(
         }
       }
       if (this.__vaoCache) {
-        var vaoExt = renderer.getGLExtension('OES_vertex_array_object');
-        for (var id in this.__vaoCache) {
-          var vao = this.__vaoCache[id].vao;
+        const vaoExt = renderer.getGLExtension('OES_vertex_array_object');
+        for (const id in this.__vaoCache) {
+          const vao = this.__vaoCache[id].vao;
           if (vao) {
             vaoExt.deleteVertexArrayOES(vao);
           }
@@ -634,7 +635,7 @@ if (Object.defineProperty) {
     enumerable: false,
 
     get: function () {
-      var mainAttribute = this.attributes[this.mainAttribute];
+      let mainAttribute = this.attributes[this.mainAttribute];
 
       if (!mainAttribute) {
         mainAttribute = this.attributes[this._attributeList[0]];
@@ -655,7 +656,7 @@ if (Object.defineProperty) {
     enumerable: false,
 
     get: function () {
-      var indices = this.indices;
+      const indices = this.indices;
       if (!indices) {
         return 0;
       } else {

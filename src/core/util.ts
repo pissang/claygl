@@ -1,14 +1,14 @@
 // @ts-nocheck
-var guid = 0;
+let guid = 0;
 
-var ArrayProto = Array.prototype;
-var nativeForEach = ArrayProto.forEach;
+const ArrayProto = Array.prototype;
+const nativeForEach = ArrayProto.forEach;
 
 /**
  * Util functions
  * @namespace clay.core.util
  */
-var util = {
+const util = {
   /**
    * Generate GUID
    * @return {number}
@@ -28,10 +28,10 @@ var util = {
     if (!basePath || path.match(/^\//)) {
       return path;
     }
-    var pathParts = path.split('/');
-    var basePathParts = basePath.split('/');
+    const pathParts = path.split('/');
+    const basePathParts = basePath.split('/');
 
-    var item = pathParts[0];
+    let item = pathParts[0];
     while (item === '.' || item === '..') {
       if (item === '..') {
         basePathParts.pop();
@@ -51,8 +51,8 @@ var util = {
    */
   extend: function (target, source) {
     if (source) {
-      for (var name in source) {
-        if (source.hasOwnProperty(name)) {
+      for (const name in source) {
+        if (util.hasOwn(source, name)) {
           target[name] = source[name];
         }
       }
@@ -69,7 +69,7 @@ var util = {
    */
   defaults: function (target, source) {
     if (source) {
-      for (var propName in source) {
+      for (const propName in source) {
         if (target[propName] === undefined) {
           target[propName] = source[propName];
         }
@@ -87,8 +87,8 @@ var util = {
    */
   extendWithPropList: function (target, source, propList) {
     if (source) {
-      for (var i = 0; i < propList.length; i++) {
-        var propName = propList[i];
+      for (let i = 0; i < propList.length; i++) {
+        const propName = propList[i];
         target[propName] = source[propName];
       }
     }
@@ -104,8 +104,8 @@ var util = {
    */
   defaultsWithPropList: function (target, source, propList) {
     if (source) {
-      for (var i = 0; i < propList.length; i++) {
-        var propName = propList[i];
+      for (let i = 0; i < propList.length; i++) {
+        const propName = propList[i];
         if (target[propName] == null) {
           target[propName] = source[propName];
         }
@@ -126,12 +126,12 @@ var util = {
     if (obj.forEach && obj.forEach === nativeForEach) {
       obj.forEach(iterator, context);
     } else if (obj.length === +obj.length) {
-      for (var i = 0, len = obj.length; i < len; i++) {
+      for (let i = 0, len = obj.length; i < len; i++) {
         iterator.call(context, obj[i], i, obj);
       }
     } else {
-      for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
+      for (const key in obj) {
+        if (util.hasOwn(obj, key)) {
           iterator.call(context, obj[key], key, obj);
         }
       }
@@ -184,14 +184,18 @@ var util = {
       return obj.slice();
     } else if (util.isArrayLike(obj)) {
       // is typed array
-      var ret = new obj.constructor(obj.length);
-      for (var i = 0; i < obj.length; i++) {
+      const ret = new obj.constructor(obj.length);
+      for (let i = 0; i < obj.length; i++) {
         ret[i] = obj[i];
       }
       return ret;
     } else {
       return util.extend({}, obj);
     }
+  },
+
+  hasOwn: function (obj, key) {
+    return obj != null && Object.prototype.hasOwnProperty.call(obj, key);
   }
 };
 

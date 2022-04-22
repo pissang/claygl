@@ -2,19 +2,19 @@
 import vendor from '../core/vendor';
 import Base from '../core/Base';
 
-var SHADER_STATE_TO_ENABLE = 1;
-var SHADER_STATE_KEEP_ENABLE = 2;
-var SHADER_STATE_PENDING = 3;
+const SHADER_STATE_TO_ENABLE = 1;
+const SHADER_STATE_KEEP_ENABLE = 2;
+const SHADER_STATE_PENDING = 3;
 
 // Enable attribute operation is global to all programs
 // Here saved the list of all enabled attribute index
 // http://www.mjbshaw.com/2013/03/webgl-fixing-invalidoperation.html
-var enabledAttributeList = {};
+const enabledAttributeList = {};
 
 // some util functions
 function addLineNumbers(string) {
-  var chunks = string.split('\n');
-  for (var i = 0, il = chunks.length; i < il; i++) {
+  const chunks = string.split('\n');
+  for (let i = 0, il = chunks.length; i < il; i++) {
     // Chrome reports shader errors on lines
     // starting counting from 1
     chunks[i] = i + 1 + ': ' + chunks[i];
@@ -29,9 +29,9 @@ function checkShaderErrorMsg(_gl, shader, shaderString) {
   }
 }
 
-var tmpFloat32Array16 = new vendor.Float32Array(16);
+const tmpFloat32Array16 = new vendor.Float32Array(16);
 
-var GLProgram = Base.extend(
+const GLProgram = Base.extend(
   {
     uniformSemantics: {},
     attributes: {}
@@ -50,7 +50,7 @@ var GLProgram = Base.extend(
     },
 
     hasUniform: function (symbol) {
-      var location = this._locations[symbol];
+      const location = this._locations[symbol];
       return location !== null && location !== undefined;
     },
 
@@ -76,7 +76,7 @@ var GLProgram = Base.extend(
     },
 
     takeCurrentTextureSlot: function (renderer, texture) {
-      var textureSlot = this._textureSlot;
+      const textureSlot = this._textureSlot;
 
       this.useTextureSlot(renderer, texture, textureSlot);
 
@@ -86,8 +86,8 @@ var GLProgram = Base.extend(
     },
 
     setUniform: function (_gl, type, symbol, value) {
-      var locationMap = this._locations;
-      var location = locationMap[symbol];
+      const locationMap = this._locations;
+      const location = locationMap[symbol];
       // Uniform is not existed in the shader
       if (location === null || location === undefined) {
         return false;
@@ -97,7 +97,7 @@ var GLProgram = Base.extend(
         case 'm4':
           if (!(value instanceof Float32Array)) {
             // Use Float32Array is much faster than array when uniformMatrix4fv.
-            for (var i = 0; i < value.length; i++) {
+            for (let i = 0; i < value.length; i++) {
               tmpFloat32Array16[i] = value[i];
             }
             value = tmpFloat32Array16;
@@ -163,11 +163,11 @@ var GLProgram = Base.extend(
         case 'm4v':
           // Raw value
           if (Array.isArray(value) && Array.isArray(value[0])) {
-            var array = new vendor.Float32Array(value.length * 16);
-            var cursor = 0;
-            for (var i = 0; i < value.length; i++) {
-              var item = value[i];
-              for (var j = 0; j < 16; j++) {
+            const array = new vendor.Float32Array(value.length * 16);
+            let cursor = 0;
+            for (let i = 0; i < value.length; i++) {
+              const item = value[i];
+              for (let j = 0; j < 16; j++) {
                 array[cursor++] = item[j];
               }
             }
@@ -182,7 +182,7 @@ var GLProgram = Base.extend(
     },
 
     setUniformOfSemantic: function (_gl, semantic, val) {
-      var semanticInfo = this.uniformSemantics[semantic];
+      const semanticInfo = this.uniformSemantics[semantic];
       if (semanticInfo) {
         return this.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, val);
       }
@@ -194,12 +194,12 @@ var GLProgram = Base.extend(
     // Example Usage:
     // enableAttributes(renderer, ["position", "texcoords"])
     enableAttributes: function (renderer, attribList, vao) {
-      var _gl = renderer.gl;
-      var program = this._program;
+      const _gl = renderer.gl;
+      const program = this._program;
 
-      var locationMap = this._locations;
+      const locationMap = this._locations;
 
-      var enabledAttributeListInContext;
+      let enabledAttributeListInContext;
       if (vao) {
         enabledAttributeListInContext = vao.__enabledAttributeList;
       } else {
@@ -214,14 +214,14 @@ var GLProgram = Base.extend(
           enabledAttributeListInContext = enabledAttributeList[renderer.__uid__] = [];
         }
       }
-      var locationList = [];
-      for (var i = 0; i < attribList.length; i++) {
-        var symbol = attribList[i];
+      const locationList = [];
+      for (let i = 0; i < attribList.length; i++) {
+        const symbol = attribList[i];
         if (!this.attributes[symbol]) {
           locationList[i] = -1;
           continue;
         }
-        var location = locationMap[symbol];
+        let location = locationMap[symbol];
         if (location == null) {
           location = _gl.getAttribLocation(program, symbol);
           // Attrib location is a number from 0 to ...
@@ -240,7 +240,7 @@ var GLProgram = Base.extend(
         }
       }
 
-      for (var i = 0; i < enabledAttributeListInContext.length; i++) {
+      for (let i = 0; i < enabledAttributeListInContext.length; i++) {
         switch (enabledAttributeListInContext[i]) {
           case SHADER_STATE_TO_ENABLE:
             _gl.enableVertexAttribArray(i);
@@ -261,9 +261,9 @@ var GLProgram = Base.extend(
     },
 
     getAttribLocation: function (_gl, symbol) {
-      var locationMap = this._locations;
+      const locationMap = this._locations;
 
-      var location = locationMap[symbol];
+      let location = locationMap[symbol];
       if (location == null) {
         location = _gl.getAttribLocation(this._program, symbol);
         locationMap[symbol] = location;
@@ -273,23 +273,23 @@ var GLProgram = Base.extend(
     },
 
     isAttribEnabled: function (renderer, location) {
-      var enabledAttributeListInContext = enabledAttributeList[renderer.__uid__] || [];
+      const enabledAttributeListInContext = enabledAttributeList[renderer.__uid__] || [];
 
       return !!enabledAttributeListInContext[location];
     },
 
     buildProgram: function (_gl, shader, vertexShaderCode, fragmentShaderCode) {
-      var vertexShader = _gl.createShader(_gl.VERTEX_SHADER);
-      var program = _gl.createProgram();
+      const vertexShader = _gl.createShader(_gl.VERTEX_SHADER);
+      const program = _gl.createProgram();
 
       _gl.shaderSource(vertexShader, vertexShaderCode);
       _gl.compileShader(vertexShader);
 
-      var fragmentShader = _gl.createShader(_gl.FRAGMENT_SHADER);
+      const fragmentShader = _gl.createShader(_gl.FRAGMENT_SHADER);
       _gl.shaderSource(fragmentShader, fragmentShaderCode);
       _gl.compileShader(fragmentShader);
 
-      var msg = checkShaderErrorMsg(_gl, vertexShader, vertexShaderCode);
+      let msg = checkShaderErrorMsg(_gl, vertexShader, vertexShaderCode);
       if (msg) {
         return msg;
       }
@@ -301,11 +301,11 @@ var GLProgram = Base.extend(
       _gl.attachShader(program, vertexShader);
       _gl.attachShader(program, fragmentShader);
       // Force the position bind to location 0;
-      if (shader.attributeSemantics['POSITION']) {
-        _gl.bindAttribLocation(program, 0, shader.attributeSemantics['POSITION'].symbol);
+      if (shader.attributeSemantics.POSITION) {
+        _gl.bindAttribLocation(program, 0, shader.attributeSemantics.POSITION.symbol);
       } else {
         // Else choose an attribute and bind to location 0;
-        var keys = Object.keys(this.attributes);
+        const keys = Object.keys(this.attributes);
         _gl.bindAttribLocation(program, 0, keys[0]);
       }
 
@@ -325,8 +325,8 @@ var GLProgram = Base.extend(
       }
 
       // Cache uniform locations
-      for (var i = 0; i < shader.uniforms.length; i++) {
-        var uniformSymbol = shader.uniforms[i];
+      for (let i = 0; i < shader.uniforms.length; i++) {
+        const uniformSymbol = shader.uniforms[i];
         this._locations[uniformSymbol] = _gl.getUniformLocation(program, uniformSymbol);
       }
     }

@@ -4,23 +4,23 @@ import Plane from './Plane';
 
 import vec3 from '../glmatrix/vec3';
 
-var vec3Set = vec3.set;
-var vec3Copy = vec3.copy;
-var vec3TranformMat4 = vec3.transformMat4;
-var mathMin = Math.min;
-var mathMax = Math.max;
+const vec3Set = vec3.set;
+const vec3Copy = vec3.copy;
+const vec3TranformMat4 = vec3.transformMat4;
+const mathMin = Math.min;
+const mathMax = Math.max;
 /**
  * @constructor
  * @alias clay.Frustum
  */
-var Frustum = function () {
+const Frustum = function () {
   /**
    * Eight planes to enclose the frustum
    * @type {clay.Plane[]}
    */
   this.planes = [];
 
-  for (var i = 0; i < 6; i++) {
+  for (let i = 0; i < 6; i++) {
     this.planes.push(new Plane());
   }
 
@@ -35,7 +35,7 @@ var Frustum = function () {
    * @type {Float32Array[]}
    */
   this.vertices = [];
-  for (var i = 0; i < 8; i++) {
+  for (let i = 0; i < 8; i++) {
     this.vertices[i] = vec3.fromValues(0, 0, 0);
   }
 };
@@ -47,21 +47,21 @@ Frustum.prototype = {
    * @param {clay.Matrix4} projectionMatrix
    */
   setFromProjection: function (projectionMatrix) {
-    var planes = this.planes;
-    var m = projectionMatrix.array;
-    var m0 = m[0],
+    const planes = this.planes;
+    const m = projectionMatrix.array;
+    const m0 = m[0],
       m1 = m[1],
       m2 = m[2],
       m3 = m[3];
-    var m4 = m[4],
+    const m4 = m[4],
       m5 = m[5],
       m6 = m[6],
       m7 = m[7];
-    var m8 = m[8],
+    const m8 = m[8],
       m9 = m[9],
       m10 = m[10],
       m11 = m[11];
-    var m12 = m[12],
+    const m12 = m[12],
       m13 = m[13],
       m14 = m[14],
       m15 = m[15];
@@ -92,14 +92,14 @@ Frustum.prototype = {
     planes[5].normalize();
 
     // Perspective projection
-    var boundingBox = this.boundingBox;
-    var vertices = this.vertices;
+    const boundingBox = this.boundingBox;
+    const vertices = this.vertices;
     if (m15 === 0) {
-      var aspect = m5 / m0;
-      var zNear = -m14 / (m10 - 1);
-      var zFar = -m14 / (m10 + 1);
-      var farY = -zFar / m5;
-      var nearY = -zNear / m5;
+      const aspect = m5 / m0;
+      const zNear = -m14 / (m10 - 1);
+      const zFar = -m14 / (m10 + 1);
+      const farY = -zFar / m5;
+      const nearY = -zNear / m5;
       // Update bounding box
       boundingBox.min.set(-farY * aspect, -farY, zFar);
       boundingBox.max.set(farY * aspect, farY, zNear);
@@ -118,18 +118,18 @@ Frustum.prototype = {
       vec3Set(vertices[7], nearY * aspect, nearY, zNear);
     } else {
       // Orthographic projection
-      var left = (-1 - m12) / m0;
-      var right = (1 - m12) / m0;
-      var top = (1 - m13) / m5;
-      var bottom = (-1 - m13) / m5;
-      var near = (-1 - m14) / m10;
-      var far = (1 - m14) / m10;
+      const left = (-1 - m12) / m0;
+      const right = (1 - m12) / m0;
+      const top = (1 - m13) / m5;
+      const bottom = (-1 - m13) / m5;
+      const near = (-1 - m14) / m10;
+      const far = (1 - m14) / m10;
 
       boundingBox.min.set(Math.min(left, right), Math.min(bottom, top), Math.min(far, near));
       boundingBox.max.set(Math.max(right, left), Math.max(top, bottom), Math.max(near, far));
 
-      var min = boundingBox.min.array;
-      var max = boundingBox.max.array;
+      const min = boundingBox.min.array;
+      const max = boundingBox.max.array;
       //--- min z
       // min x
       vec3Set(vertices[0], min[0], min[1], min[2]);
@@ -153,22 +153,22 @@ Frustum.prototype = {
    * @return {clay.BoundingBox}
    */
   getTransformedBoundingBox: (function () {
-    var tmpVec3 = vec3.create();
+    const tmpVec3 = vec3.create();
 
     return function (bbox, matrix) {
-      var vertices = this.vertices;
+      const vertices = this.vertices;
 
-      var m4 = matrix.array;
-      var min = bbox.min;
-      var max = bbox.max;
-      var minArr = min.array;
-      var maxArr = max.array;
-      var v = vertices[0];
+      const m4 = matrix.array;
+      const min = bbox.min;
+      const max = bbox.max;
+      const minArr = min.array;
+      const maxArr = max.array;
+      let v = vertices[0];
       vec3TranformMat4(tmpVec3, v, m4);
       vec3Copy(minArr, tmpVec3);
       vec3Copy(maxArr, tmpVec3);
 
-      for (var i = 1; i < 8; i++) {
+      for (let i = 1; i < 8; i++) {
         v = vertices[i];
         vec3TranformMat4(tmpVec3, v, m4);
 

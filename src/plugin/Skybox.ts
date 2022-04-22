@@ -14,7 +14,7 @@ Shader.import(skyboxEssl);
  * @constructor clay.plugin.Skybox
  *
  * @example
- *     var skyTex = new clay.TextureCube();
+ *     const skyTex = new clay.TextureCube();
  *     skyTex.load({
  *         'px': 'assets/textures/sky/px.jpg',
  *         'nx': 'assets/textures/sky/nx.jpg'
@@ -23,18 +23,18 @@ Shader.import(skyboxEssl);
  *         'pz': 'assets/textures/sky/pz.jpg'
  *         'nz': 'assets/textures/sky/nz.jpg'
  *     });
- *     var skybox = new clay.plugin.Skybox({
+ *     const skybox = new clay.plugin.Skybox({
  *         scene: scene
  *     });
  *     skybox.material.set('environmentMap', skyTex);
  */
-var Skybox = Mesh.extend(
+const Skybox = Mesh.extend(
   function () {
-    var skyboxShader = new Shader({
+    const skyboxShader = new Shader({
       vertex: Shader.source('clay.skybox.vertex'),
       fragment: Shader.source('clay.skybox.fragment')
     });
-    var material = new Material({
+    const material = new Material({
       shader: skyboxShader,
       depthMask: false
     });
@@ -58,7 +58,7 @@ var Skybox = Mesh.extend(
     };
   },
   function () {
-    var scene = this.scene;
+    const scene = this.scene;
     if (scene) {
       this.attachScene(scene);
     }
@@ -126,7 +126,7 @@ var Skybox = Mesh.extend(
     },
 
     renderSkybox: function (renderer, camera) {
-      var dummyCamera = this._dummyCamera;
+      const dummyCamera = this._dummyCamera;
       dummyCamera.aspect = renderer.getViewportAspect();
       dummyCamera.fov = camera.fov || 50;
       dummyCamera.updateProjectionMatrix();

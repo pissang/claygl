@@ -3,13 +3,13 @@ import Node from './Node';
 import Shader from './Shader';
 
 import lightShader from './shader/source/header/light';
-Shader['import'](lightShader);
+Shader.import(lightShader);
 
 /**
  * @constructor clay.Light
  * @extends clay.Node
  */
-var Light = Node.extend(
+const Light = Node.extend(
   function () {
     return /** @lends clay.Light# */ {
       /**
@@ -60,7 +60,7 @@ var Light = Node.extend(
      * @memberOf clay.Light.prototype
      */
     clone: function () {
-      var light = Node.prototype.clone.call(this);
+      const light = Node.prototype.clone.call(this);
       light.color = Array.prototype.slice.call(this.color);
       light.intensity = this.intensity;
       light.castShadow = this.castShadow;

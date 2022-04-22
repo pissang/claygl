@@ -6,7 +6,7 @@ import Vector3 from '../math/Vector3';
 import BoundingBox from '../math/BoundingBox';
 import vendor from '../core/vendor';
 
-var planeMatrix = new Matrix4();
+const planeMatrix = new Matrix4();
 
 /**
  * @constructor clay.geometry.Cube
@@ -17,7 +17,7 @@ var planeMatrix = new Matrix4();
  * @param {number} [opt.depthSegments]
  * @param {boolean} [opt.inside]
  */
-var Cube = Geometry.extend(
+const Cube = Geometry.extend(
   /**@lends clay.geometry.Cube# */
   {
     dynamic: false,
@@ -47,7 +47,7 @@ var Cube = Geometry.extend(
      * Build cube geometry
      */
     build: function () {
-      var planes = {
+      const planes = {
         px: createPlane('px', this.depthSegments, this.heightSegments),
         nx: createPlane('nx', this.depthSegments, this.heightSegments),
         py: createPlane('py', this.widthSegments, this.depthSegments),
@@ -56,36 +56,36 @@ var Cube = Geometry.extend(
         nz: createPlane('nz', this.widthSegments, this.heightSegments)
       };
 
-      var attrList = ['position', 'texcoord0', 'normal'];
-      var vertexNumber = 0;
-      var faceNumber = 0;
-      for (var pos in planes) {
+      const attrList = ['position', 'texcoord0', 'normal'];
+      let vertexNumber = 0;
+      let faceNumber = 0;
+      for (const pos in planes) {
         vertexNumber += planes[pos].vertexCount;
         faceNumber += planes[pos].indices.length;
       }
-      for (var k = 0; k < attrList.length; k++) {
+      for (let k = 0; k < attrList.length; k++) {
         this.attributes[attrList[k]].init(vertexNumber);
       }
       this.indices = new vendor.Uint16Array(faceNumber);
-      var faceOffset = 0;
-      var vertexOffset = 0;
-      for (var pos in planes) {
-        var plane = planes[pos];
-        for (var k = 0; k < attrList.length; k++) {
-          var attrName = attrList[k];
-          var attrArray = plane.attributes[attrName].value;
-          var attrSize = plane.attributes[attrName].size;
-          var isNormal = attrName === 'normal';
-          for (var i = 0; i < attrArray.length; i++) {
-            var value = attrArray[i];
+      let faceOffset = 0;
+      let vertexOffset = 0;
+      for (const pos in planes) {
+        const plane = planes[pos];
+        for (let k = 0; k < attrList.length; k++) {
+          const attrName = attrList[k];
+          const attrArray = plane.attributes[attrName].value;
+          const attrSize = plane.attributes[attrName].size;
+          const isNormal = attrName === 'normal';
+          for (let i = 0; i < attrArray.length; i++) {
+            let value = attrArray[i];
             if (this.inside && isNormal) {
               value = -value;
             }
             this.attributes[attrName].value[i + attrSize * vertexOffset] = value;
           }
         }
-        var len = plane.indices.length;
-        for (var i = 0; i < plane.indices.length; i++) {
+        const len = plane.indices.length;
+        for (let i = 0; i < plane.indices.length; i++) {
           this.indices[i + faceOffset] =
             vertexOffset + plane.indices[this.inside ? len - i - 1 : i];
         }
@@ -103,7 +103,7 @@ var Cube = Geometry.extend(
 function createPlane(pos, widthSegments, heightSegments) {
   planeMatrix.identity();
 
-  var plane = new Plane({
+  const plane = new Plane({
     widthSegments: widthSegments,
     heightSegments: heightSegments
   });

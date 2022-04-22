@@ -1,5 +1,5 @@
 // @ts-nocheck
-var EXTENSION_LIST = [
+const EXTENSION_LIST = [
   'OES_texture_float',
   'OES_texture_half_float',
   'OES_texture_float_linear',
@@ -22,20 +22,20 @@ var EXTENSION_LIST = [
   'ANGLE_instanced_arrays'
 ];
 
-var PARAMETER_NAMES = ['MAX_TEXTURE_SIZE', 'MAX_CUBE_MAP_TEXTURE_SIZE'];
+const PARAMETER_NAMES = ['MAX_TEXTURE_SIZE', 'MAX_CUBE_MAP_TEXTURE_SIZE'];
 
 function GLInfo(_gl) {
-  var extensions = {};
-  var parameters = {};
+  const extensions = {};
+  const parameters = {};
 
   // Get webgl extension
-  for (var i = 0; i < EXTENSION_LIST.length; i++) {
-    var extName = EXTENSION_LIST[i];
+  for (let i = 0; i < EXTENSION_LIST.length; i++) {
+    const extName = EXTENSION_LIST[i];
     createExtension(extName);
   }
   // Get parameters
-  for (var i = 0; i < PARAMETER_NAMES.length; i++) {
-    var name = PARAMETER_NAMES[i];
+  for (let i = 0; i < PARAMETER_NAMES.length; i++) {
+    const name = PARAMETER_NAMES[i];
     parameters[name] = _gl.getParameter(_gl[name]);
   }
 
@@ -52,7 +52,7 @@ function GLInfo(_gl) {
 
   function createExtension(name) {
     if (_gl.getExtension) {
-      var ext = _gl.getExtension(name);
+      let ext = _gl.getExtension(name);
       if (!ext) {
         ext = _gl.getExtension('MOZ_' + name);
       }

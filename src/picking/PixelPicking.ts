@@ -14,7 +14,7 @@ Shader.import(colorEssl);
  * @constructor clay.picking.PixelPicking
  * @extends clay.core.Base
  */
-var PixelPicking = Base.extend(
+const PixelPicking = Base.extend(
   function () {
     return /** @lends clay.picking.PixelPicking# */ {
       /**
@@ -86,7 +86,7 @@ var PixelPicking = Base.extend(
      * @param {number} ratio
      */
     update: function (scene, camera) {
-      var renderer = this.renderer;
+      const renderer = this.renderer;
       if (renderer.getWidth() !== this.width || renderer.getHeight() !== this.height) {
         this.resize(renderer.width, renderer.height);
       }
@@ -101,17 +101,17 @@ var PixelPicking = Base.extend(
     },
 
     _setMaterial: function (root) {
-      for (var i = 0; i < root._children.length; i++) {
-        var child = root._children[i];
+      for (let i = 0; i < root._children.length; i++) {
+        const child = root._children[i];
         if (child.geometry && child.material && child.material.shader) {
-          var id = this._idOffset++;
-          var idx = id - this.lookupOffset;
-          var material = this._idMaterials[idx];
+          let id = this._idOffset++;
+          let idx = id - this.lookupOffset;
+          let material = this._idMaterials[idx];
           if (!material) {
             material = new Material({
               shader: this._shader
             });
-            var color = packID(id);
+            const color = packID(id);
             color[0] /= 255;
             color[1] /= 255;
             color[2] /= 255;
@@ -136,31 +136,31 @@ var PixelPicking = Base.extend(
      * @return {clay.Node}
      */
     pick: function (x, y) {
-      var renderer = this.renderer;
+      const renderer = this.renderer;
 
-      var ratio = this.downSampleRatio;
+      const ratio = this.downSampleRatio;
       x = Math.ceil(ratio * x);
       y = Math.ceil(ratio * (this.height - y));
 
       this._frameBuffer.bind(renderer);
-      var pixel = new Uint8Array(4);
-      var _gl = renderer.gl;
+      const pixel = new Uint8Array(4);
+      const _gl = renderer.gl;
       // TODO out of bounds ?
       // preserveDrawingBuffer ?
       _gl.readPixels(x, y, 1, 1, _gl.RGBA, _gl.UNSIGNED_BYTE, pixel);
       this._frameBuffer.unbind(renderer);
       // Skip interpolated pixel because of anti alias
       if (pixel[3] === 255) {
-        var id = unpackID(pixel[0], pixel[1], pixel[2]);
+        let id = unpackID(pixel[0], pixel[1], pixel[2]);
         if (id) {
-          var el = this._lookupTable[id - this.lookupOffset];
+          const el = this._lookupTable[id - this.lookupOffset];
           return el;
         }
       }
     },
 
     _restoreMaterial: function () {
-      for (var i = 0; i < this._lookupTable.length; i++) {
+      for (let i = 0; i < this._lookupTable.length; i++) {
         this._lookupTable[i].material = this._meshMaterials[i];
       }
     },
@@ -172,9 +172,9 @@ var PixelPicking = Base.extend(
 );
 
 function packID(id) {
-  var r = id >> 16;
-  var g = (id - (r << 16)) >> 8;
-  var b = id - (r << 16) - (g << 8);
+  const r = id >> 16;
+  const g = (id - (r << 16)) >> 8;
+  const b = id - (r << 16) - (g << 8);
   return [r, g, b];
 }
 

@@ -35,7 +35,7 @@ import Vector2 from '../math/Vector2';
  * @param {clay.Vector2} [opts.position]
  * @param {clay.animation.Clip} [opts.output]
  */
-var Blend2DClip = function (opts) {
+const Blend2DClip = function (opts) {
   opts = opts || {};
 
   Clip.call(this, opts);
@@ -69,7 +69,7 @@ Blend2DClip.prototype.constructor = Blend2DClip;
  * @return {clay.animation.Blend2DClip.IClipInput}
  */
 Blend2DClip.prototype.addInput = function (position, inputClip, offset) {
-  var obj = {
+  const obj = {
     position: position,
     clip: inputClip,
     offset: offset || 0
@@ -84,14 +84,14 @@ Blend2DClip.prototype.addInput = function (position, inputClip, offset) {
 
 // Delaunay triangulate
 Blend2DClip.prototype._updateTriangles = function () {
-  var inputs = this.inputs.map(function (a) {
+  let inputs = this.inputs.map(function (a) {
     return a.position;
   });
   this._triangles = delaunay.triangulate(inputs, 'array');
 };
 
 Blend2DClip.prototype.step = function (time, dTime, silent) {
-  var ret = Clip.prototype.step.call(this, time);
+  const ret = Clip.prototype.step.call(this, time);
 
   if (ret !== 'finish') {
     this.setTime(this.getElapsedTime());
@@ -105,30 +105,30 @@ Blend2DClip.prototype.step = function (time, dTime, silent) {
 };
 
 Blend2DClip.prototype.setTime = function (time) {
-  var res = this._findTriangle(this.position);
+  const res = this._findTriangle(this.position);
   if (!res) {
     return;
   }
   // In Barycentric
-  var a = res[1]; // Percent of clip2
-  var b = res[2]; // Percent of clip3
+  const a = res[1]; // Percent of clip2
+  const b = res[2]; // Percent of clip3
 
-  var tri = res[0];
+  const tri = res[0];
 
-  var in1 = this.inputs[tri.indices[0]];
-  var in2 = this.inputs[tri.indices[1]];
-  var in3 = this.inputs[tri.indices[2]];
-  var clip1 = in1.clip;
-  var clip2 = in2.clip;
-  var clip3 = in3.clip;
+  let in1 = this.inputs[tri.indices[0]];
+  let in2 = this.inputs[tri.indices[1]];
+  let in3 = this.inputs[tri.indices[2]];
+  const clip1 = in1.clip;
+  const clip2 = in2.clip;
+  const clip3 = in3.clip;
 
   clip1.setTime((time + in1.offset) % clip1.life);
   clip2.setTime((time + in2.offset) % clip2.life);
   clip3.setTime((time + in3.offset) % clip3.life);
 
-  var c1 = clip1.output instanceof Clip ? clip1.output : clip1;
-  var c2 = clip2.output instanceof Clip ? clip2.output : clip2;
-  var c3 = clip3.output instanceof Clip ? clip3.output : clip3;
+  const c1 = clip1.output instanceof Clip ? clip1.output : clip1;
+  const c2 = clip2.output instanceof Clip ? clip2.output : clip2;
+  const c3 = clip3.output instanceof Clip ? clip3.output : clip3;
 
   this.output.blend2D(c1, c2, c3, a, b);
 };
@@ -139,10 +139,10 @@ Blend2DClip.prototype.setTime = function (time) {
  * @return {clay.animation.Blend2DClip}
  */
 Blend2DClip.prototype.clone = function (cloneInputs) {
-  var clip = Clip.prototype.clone.call(this);
+  const clip = Clip.prototype.clone.call(this);
   clip.output = this.output.clone();
-  for (var i = 0; i < this.inputs.length; i++) {
-    var inputClip = cloneInputs ? this.inputs[i].clip.clone(true) : this.inputs[i].clip;
+  for (let i = 0; i < this.inputs.length; i++) {
+    let inputClip = cloneInputs ? this.inputs[i].clip.clone(true) : this.inputs[i].clip;
     clip.addInput(this.inputs[i].position, inputClip, this.inputs[i].offset);
   }
   return clip;
@@ -150,14 +150,14 @@ Blend2DClip.prototype.clone = function (cloneInputs) {
 
 Blend2DClip.prototype._findTriangle = function (position) {
   if (this._cacheTriangle) {
-    var res = delaunay.contains(this._cacheTriangle.vertices, position.array);
+    const res = delaunay.contains(this._cacheTriangle.vertices, position.array);
     if (res) {
       return [this._cacheTriangle, res[0], res[1]];
     }
   }
-  for (var i = 0; i < this._triangles.length; i++) {
-    var tri = this._triangles[i];
-    var res = delaunay.contains(tri.vertices, this.position.array);
+  for (let i = 0; i < this._triangles.length; i++) {
+    const tri = this._triangles[i];
+    const res = delaunay.contains(tri.vertices, this.position.array);
     if (res) {
       this._cacheTriangle = tri;
       return [tri, res[0], res[1]];

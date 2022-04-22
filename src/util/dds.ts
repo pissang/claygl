@@ -5,36 +5,36 @@ import TextureCube from '../TextureCube';
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb943991(v=vs.85).aspx
 // https://github.com/toji/webgl-texture-utils/blob/master/texture-util/dds.js
-var DDS_MAGIC = 0x20534444;
+const DDS_MAGIC = 0x20534444;
 
-var DDSD_CAPS = 0x1;
-var DDSD_HEIGHT = 0x2;
-var DDSD_WIDTH = 0x4;
-var DDSD_PITCH = 0x8;
-var DDSD_PIXELFORMAT = 0x1000;
-var DDSD_MIPMAPCOUNT = 0x20000;
-var DDSD_LINEARSIZE = 0x80000;
-var DDSD_DEPTH = 0x800000;
+const DDSD_CAPS = 0x1;
+const DDSD_HEIGHT = 0x2;
+const DDSD_WIDTH = 0x4;
+const DDSD_PITCH = 0x8;
+const DDSD_PIXELFORMAT = 0x1000;
+const DDSD_MIPMAPCOUNT = 0x20000;
+const DDSD_LINEARSIZE = 0x80000;
+const DDSD_DEPTH = 0x800000;
 
-var DDSCAPS_COMPLEX = 0x8;
-var DDSCAPS_MIPMAP = 0x400000;
-var DDSCAPS_TEXTURE = 0x1000;
+const DDSCAPS_COMPLEX = 0x8;
+const DDSCAPS_MIPMAP = 0x400000;
+const DDSCAPS_TEXTURE = 0x1000;
 
-var DDSCAPS2_CUBEMAP = 0x200;
-var DDSCAPS2_CUBEMAP_POSITIVEX = 0x400;
-var DDSCAPS2_CUBEMAP_NEGATIVEX = 0x800;
-var DDSCAPS2_CUBEMAP_POSITIVEY = 0x1000;
-var DDSCAPS2_CUBEMAP_NEGATIVEY = 0x2000;
-var DDSCAPS2_CUBEMAP_POSITIVEZ = 0x4000;
-var DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x8000;
-var DDSCAPS2_VOLUME = 0x200000;
+const DDSCAPS2_CUBEMAP = 0x200;
+const DDSCAPS2_CUBEMAP_POSITIVEX = 0x400;
+const DDSCAPS2_CUBEMAP_NEGATIVEX = 0x800;
+const DDSCAPS2_CUBEMAP_POSITIVEY = 0x1000;
+const DDSCAPS2_CUBEMAP_NEGATIVEY = 0x2000;
+const DDSCAPS2_CUBEMAP_POSITIVEZ = 0x4000;
+const DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x8000;
+const DDSCAPS2_VOLUME = 0x200000;
 
-var DDPF_ALPHAPIXELS = 0x1;
-var DDPF_ALPHA = 0x2;
-var DDPF_FOURCC = 0x4;
-var DDPF_RGB = 0x40;
-var DDPF_YUV = 0x200;
-var DDPF_LUMINANCE = 0x20000;
+const DDPF_ALPHAPIXELS = 0x1;
+const DDPF_ALPHA = 0x2;
+const DDPF_FOURCC = 0x4;
+const DDPF_RGB = 0x40;
+const DDPF_YUV = 0x200;
+const DDPF_LUMINANCE = 0x20000;
 
 function fourCCToInt32(value) {
   return (
@@ -54,32 +54,32 @@ function int32ToFourCC(value) {
   );
 }
 
-var headerLengthInt = 31; // The header length in 32 bit ints
+const headerLengthInt = 31; // The header length in 32 bit ints
 
-var FOURCC_DXT1 = fourCCToInt32('DXT1');
-var FOURCC_DXT3 = fourCCToInt32('DXT3');
-var FOURCC_DXT5 = fourCCToInt32('DXT5');
+const FOURCC_DXT1 = fourCCToInt32('DXT1');
+const FOURCC_DXT3 = fourCCToInt32('DXT3');
+const FOURCC_DXT5 = fourCCToInt32('DXT5');
 // Offsets into the header array
-var off_magic = 0;
+const off_magic = 0;
 
-var off_size = 1;
-var off_flags = 2;
-var off_height = 3;
-var off_width = 4;
+const off_size = 1;
+const off_flags = 2;
+const off_height = 3;
+const off_width = 4;
 
-var off_mipmapCount = 7;
+const off_mipmapCount = 7;
 
-var off_pfFlags = 20;
-var off_pfFourCC = 21;
+const off_pfFlags = 20;
+const off_pfFourCC = 21;
 
-var off_caps = 27;
-var off_caps2 = 28;
-var off_caps3 = 29;
-var off_caps4 = 30;
+const off_caps = 27;
+const off_caps2 = 28;
+const off_caps3 = 29;
+const off_caps4 = 30;
 
-var ret = {
+const ret = {
   parse: function (arraybuffer, out) {
-    var header = new Int32Array(arraybuffer, 0, headerLengthInt);
+    const header = new Int32Array(arraybuffer, 0, headerLengthInt);
     if (header[off_magic] !== DDS_MAGIC) {
       return null;
     }
@@ -87,12 +87,12 @@ var ret = {
       return null;
     }
 
-    var fourCC = header(off_pfFourCC);
-    var width = header[off_width];
-    var height = header[off_height];
-    var isCubeMap = header[off_caps2] & DDSCAPS2_CUBEMAP;
-    var hasMipmap = header[off_flags] & DDSD_MIPMAPCOUNT;
-    var blockBytes, internalFormat;
+    const fourCC = header(off_pfFourCC);
+    const width = header[off_width];
+    const height = header[off_height];
+    const isCubeMap = header[off_caps2] & DDSCAPS2_CUBEMAP;
+    const hasMipmap = header[off_flags] & DDSD_MIPMAPCOUNT;
+    let blockBytes, internalFormat;
     switch (fourCC) {
       case FOURCC_DXT1:
         blockBytes = 8;
@@ -109,27 +109,27 @@ var ret = {
       default:
         return null;
     }
-    var dataOffset = header[off_size] + 4;
+    let dataOffset = header[off_size] + 4;
     // TODO: Suppose all face are existed
-    var faceNumber = isCubeMap ? 6 : 1;
-    var mipmapCount = 1;
+    const faceNumber = isCubeMap ? 6 : 1;
+    let mipmapCount = 1;
     if (hasMipmap) {
       mipmapCount = Math.max(1, header[off_mipmapCount]);
     }
 
-    var textures = [];
-    for (var f = 0; f < faceNumber; f++) {
-      var _width = width;
-      var _height = height;
+    const textures = [];
+    for (let f = 0; f < faceNumber; f++) {
+      let _width = width;
+      let _height = height;
       textures[f] = new Texture2D({
         width: _width,
         height: _height,
         format: internalFormat
       });
-      var mipmaps = [];
-      for (var i = 0; i < mipmapCount; i++) {
-        var dataLength = (((Math.max(4, _width) / 4) * Math.max(4, _height)) / 4) * blockBytes;
-        var byteArray = new Uint8Array(arraybuffer, dataOffset, dataLength);
+      const mipmaps = [];
+      for (let i = 0; i < mipmapCount; i++) {
+        const dataLength = (((Math.max(4, _width) / 4) * Math.max(4, _height)) / 4) * blockBytes;
+        const byteArray = new Uint8Array(arraybuffer, dataOffset, dataLength);
 
         dataOffset += dataLength;
         _width *= 0.5;

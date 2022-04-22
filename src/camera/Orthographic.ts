@@ -4,7 +4,7 @@ import Camera from '../Camera';
  * @constructor clay.camera.Orthographic
  * @extends clay.Camera
  */
-var Orthographic = Camera.extend(
+const Orthographic = Camera.extend(
   /** @lends clay.camera.Orthographic# */
   {
     /**
@@ -46,7 +46,7 @@ var Orthographic = Camera.extend(
     },
 
     decomposeProjectionMatrix: function () {
-      var m = this.projectionMatrix.array;
+      const m = this.projectionMatrix.array;
       this.left = (-1 - m[12]) / m[0];
       this.right = (1 - m[12]) / m[0];
       this.top = (1 - m[13]) / m[5];
@@ -58,7 +58,7 @@ var Orthographic = Camera.extend(
      * @return {clay.camera.Orthographic}
      */
     clone: function () {
-      var camera = Camera.prototype.clone.call(this);
+      const camera = Camera.prototype.clone.call(this);
       camera.left = this.left;
       camera.right = this.right;
       camera.near = this.near;

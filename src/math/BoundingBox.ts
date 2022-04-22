@@ -2,8 +2,8 @@
 import Vector3 from './Vector3';
 import vec3 from '../glmatrix/vec3';
 
-var vec3Set = vec3.set;
-var vec3Copy = vec3.copy;
+const vec3Set = vec3.set;
+const vec3Copy = vec3.copy;
 
 /**
  * Axis aligned bounding box
@@ -12,7 +12,7 @@ var vec3Copy = vec3.copy;
  * @param {clay.Vector3} [min]
  * @param {clay.Vector3} [max]
  */
-var BoundingBox = function (min, max) {
+const BoundingBox = function (min, max) {
   /**
    * Minimum coords of bounding box
    * @type {clay.Vector3}
@@ -36,14 +36,14 @@ BoundingBox.prototype = {
    */
   updateFromVertices: function (vertices) {
     if (vertices.length > 0) {
-      var min = this.min;
-      var max = this.max;
-      var minArr = min.array;
-      var maxArr = max.array;
+      const min = this.min;
+      const max = this.max;
+      const minArr = min.array;
+      const maxArr = max.array;
       vec3Copy(minArr, vertices[0]);
       vec3Copy(maxArr, vertices[0]);
-      for (var i = 1; i < vertices.length; i++) {
-        var vertex = vertices[i];
+      for (let i = 1; i < vertices.length; i++) {
+        const vertex = vertices[i];
 
         if (vertex[0] < minArr[0]) {
           minArr[0] = vertex[0];
@@ -75,8 +75,8 @@ BoundingBox.prototype = {
    * @param  {clay.BoundingBox} bbox
    */
   union: function (bbox) {
-    var min = this.min;
-    var max = this.max;
+    const min = this.min;
+    const max = this.max;
     vec3.min(min.array, min.array, bbox.min.array);
     vec3.max(max.array, max.array, bbox.max.array);
     min._dirty = true;
@@ -89,8 +89,8 @@ BoundingBox.prototype = {
    * @param  {clay.BoundingBox} bbox
    */
   intersection: function (bbox) {
-    var min = this.min;
-    var max = this.max;
+    const min = this.min;
+    const max = this.max;
     vec3.max(min.array, min.array, bbox.min.array);
     vec3.min(max.array, max.array, bbox.max.array);
     min._dirty = true;
@@ -104,11 +104,11 @@ BoundingBox.prototype = {
    * @return {boolean}
    */
   intersectBoundingBox: function (bbox) {
-    var _min = this.min.array;
-    var _max = this.max.array;
+    const _min = this.min.array;
+    const _max = this.max.array;
 
-    var _min2 = bbox.min.array;
-    var _max2 = bbox.max.array;
+    const _min2 = bbox.min.array;
+    const _max2 = bbox.max.array;
 
     return !(
       _min[0] > _max2[0] ||
@@ -126,11 +126,11 @@ BoundingBox.prototype = {
    * @return {boolean}
    */
   containBoundingBox: function (bbox) {
-    var _min = this.min.array;
-    var _max = this.max.array;
+    const _min = this.min.array;
+    const _max = this.max.array;
 
-    var _min2 = bbox.min.array;
-    var _max2 = bbox.max.array;
+    const _min2 = bbox.min.array;
+    const _max2 = bbox.max.array;
 
     return (
       _min[0] <= _min2[0] &&
@@ -148,10 +148,10 @@ BoundingBox.prototype = {
    * @return {boolean}
    */
   containPoint: function (p) {
-    var _min = this.min.array;
-    var _max = this.max.array;
+    const _min = this.min.array;
+    const _max = this.max.array;
 
-    var _p = p.array;
+    const _p = p.array;
 
     return (
       _min[0] <= _p[0] &&
@@ -167,8 +167,8 @@ BoundingBox.prototype = {
    * If bounding box is finite
    */
   isFinite: function () {
-    var _min = this.min.array;
-    var _max = this.max.array;
+    const _min = this.min.array;
+    const _max = this.max.array;
     return (
       isFinite(_min[0]) &&
       isFinite(_min[1]) &&
@@ -194,18 +194,18 @@ BoundingBox.prototype = {
    */
   transformFrom: (function () {
     // http://dev.theomader.com/transform-bounding-boxes/
-    var xa = vec3.create();
-    var xb = vec3.create();
-    var ya = vec3.create();
-    var yb = vec3.create();
-    var za = vec3.create();
-    var zb = vec3.create();
+    const xa = vec3.create();
+    const xb = vec3.create();
+    const ya = vec3.create();
+    const yb = vec3.create();
+    const za = vec3.create();
+    const zb = vec3.create();
 
     return function (source, matrix) {
-      var min = source.min.array;
-      var max = source.max.array;
+      let min = source.min.array;
+      let max = source.max.array;
 
-      var m = matrix.array;
+      const m = matrix.array;
 
       xa[0] = m[0] * min[0];
       xa[1] = m[1] * min[0];
@@ -250,22 +250,22 @@ BoundingBox.prototype = {
    * @param  {clay.Matrix4} matrix
    */
   applyProjection: function (matrix) {
-    var min = this.min.array;
-    var max = this.max.array;
+    const min = this.min.array;
+    const max = this.max.array;
 
-    var m = matrix.array;
+    const m = matrix.array;
     // min in min z
-    var v10 = min[0];
-    var v11 = min[1];
-    var v12 = min[2];
+    const v10 = min[0];
+    const v11 = min[1];
+    const v12 = min[2];
     // max in min z
-    var v20 = max[0];
-    var v21 = max[1];
-    var v22 = min[2];
+    const v20 = max[0];
+    const v21 = max[1];
+    const v22 = min[2];
     // max in max z
-    var v30 = max[0];
-    var v31 = max[1];
-    var v32 = max[2];
+    const v30 = max[0];
+    const v31 = max[1];
+    const v32 = max[2];
 
     if (m[15] === 1) {
       // Orthographic projection
@@ -277,7 +277,7 @@ BoundingBox.prototype = {
       max[1] = m[5] * v31 + m[13];
       min[2] = m[10] * v32 + m[14];
     } else {
-      var w = -1 / v12;
+      let w = -1 / v12;
       min[0] = m[0] * v10 * w;
       min[1] = m[5] * v11 * w;
       max[2] = (m[10] * v12 + m[14]) * w;
@@ -296,11 +296,11 @@ BoundingBox.prototype = {
   },
 
   updateVertices: function () {
-    var vertices = this.vertices;
+    let vertices = this.vertices;
     if (!vertices) {
       // Cube vertices
       vertices = [];
-      for (var i = 0; i < 8; i++) {
+      for (let i = 0; i < 8; i++) {
         vertices[i] = vec3.fromValues(0, 0, 0);
       }
 
@@ -310,8 +310,8 @@ BoundingBox.prototype = {
        */
       this.vertices = vertices;
     }
-    var min = this.min.array;
-    var max = this.max.array;
+    const min = this.min.array;
+    const max = this.max.array;
     //--- min z
     // min x
     vec3Set(vertices[0], min[0], min[1], min[2]);
@@ -333,8 +333,8 @@ BoundingBox.prototype = {
    * @param  {clay.BoundingBox} bbox
    */
   copy: function (bbox) {
-    var min = this.min;
-    var max = this.max;
+    const min = this.min;
+    const max = this.max;
     vec3Copy(min.array, bbox.min.array);
     vec3Copy(max.array, bbox.max.array);
     min._dirty = true;
@@ -347,7 +347,7 @@ BoundingBox.prototype = {
    * @return {clay.BoundingBox}
    */
   clone: function () {
-    var boundingBox = new BoundingBox();
+    const boundingBox = new BoundingBox();
     boundingBox.copy(this);
     return boundingBox;
   }

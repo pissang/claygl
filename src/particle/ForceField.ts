@@ -7,7 +7,7 @@ import vec3 from '../glmatrix/vec3';
  * @constructor clay.particle.ForceField
  * @extends clay.particle.Field
  */
-var ForceField = Field.extend(
+const ForceField = Field.extend(
   function () {
     return {
       force: new Vector3()

@@ -12,7 +12,7 @@ import Cache from './core/Cache';
  * @alias clay.Texture
  * @extends clay.core.Base
  */
-var Texture = Base.extend(
+const Texture = Base.extend(
   /** @lends clay.Texture# */ {
     /**
      * Texture width, readonly when the texture source is image
@@ -134,8 +134,8 @@ var Texture = Base.extend(
   /** @lends clay.Texture.prototype */
   {
     getWebGLTexture: function (renderer) {
-      var _gl = renderer.gl;
-      var cache = this._cache;
+      const _gl = renderer.gl;
+      const cache = this._cache;
       cache.use(renderer.__uid__);
 
       if (cache.miss('webgl_texture')) {
@@ -168,7 +168,7 @@ var Texture = Base.extend(
 
     // Update the common parameters of texture
     updateCommon: function (renderer) {
-      var _gl = renderer.gl;
+      const _gl = renderer.gl;
       _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
       _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
       _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
@@ -179,7 +179,7 @@ var Texture = Base.extend(
         this.useMipmap = false;
       }
 
-      var sRGBExt = renderer.getGLExtension('EXT_sRGB');
+      const sRGBExt = renderer.getGLExtension('EXT_sRGB');
       // Fallback
       if (this.format === Texture.SRGB && !sRGBExt) {
         this.format = Texture.RGB;
@@ -204,7 +204,7 @@ var Texture = Base.extend(
       return this.wrapT;
     },
     getAvailableMinFilter: function () {
-      var minFilter = this.minFilter;
+      const minFilter = this.minFilter;
       if (this.NPOT || !this.useMipmap) {
         if (
           minFilter === glenum.NEAREST_MIPMAP_NEAREST ||
@@ -229,7 +229,7 @@ var Texture = Base.extend(
 
     nextHighestPowerOfTwo: function (x) {
       --x;
-      for (var i = 1; i < 32; i <<= 1) {
+      for (let i = 1; i < 32; i <<= 1) {
         x = x | (x >> i);
       }
       return x + 1;
@@ -238,11 +238,11 @@ var Texture = Base.extend(
      * @param  {clay.Renderer} renderer
      */
     dispose: function (renderer) {
-      var cache = this._cache;
+      const cache = this._cache;
 
       cache.use(renderer.__uid__);
 
-      var webglTexture = cache.get('webgl_texture');
+      const webglTexture = cache.get('webgl_texture');
       if (webglTexture) {
         renderer.gl.deleteTexture(webglTexture);
       }

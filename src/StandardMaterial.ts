@@ -6,9 +6,9 @@ import standardEssl from './shader/source/standard.glsl.js';
 import util from './core/util';
 
 // Import standard shader
-Shader['import'](standardEssl);
+Shader.import(standardEssl);
 
-var TEXTURE_PROPERTIES = [
+const TEXTURE_PROPERTIES = [
   'diffuseMap',
   'normalMap',
   'roughnessMap',
@@ -19,7 +19,7 @@ var TEXTURE_PROPERTIES = [
   'ssaoMap',
   'aoMap'
 ];
-var SIMPLE_PROPERTIES = [
+const SIMPLE_PROPERTIES = [
   'color',
   'emission',
   'emissionIntensity',
@@ -32,7 +32,7 @@ var SIMPLE_PROPERTIES = [
   'alphaCutoff',
   'normalScale'
 ];
-var PROPERTIES_CHANGE_SHADER = [
+const PROPERTIES_CHANGE_SHADER = [
   'linear',
   'encodeRGBM',
   'decodeRGBM',
@@ -43,11 +43,11 @@ var PROPERTIES_CHANGE_SHADER = [
   'environmentMapPrefiltered'
 ];
 
-var NUM_DEFINE_MAP = {
+const NUM_DEFINE_MAP = {
   roughnessChannel: 'ROUGHNESS_CHANNEL',
   metalnessChannel: 'METALNESS_CHANNEL'
 };
-var BOOL_DEFINE_MAP = {
+const BOOL_DEFINE_MAP = {
   linear: 'SRGB_DECODE',
   encodeRGBM: 'RGBM_ENCODE',
   decodeRGBM: 'RGBM_DECODE',
@@ -56,19 +56,19 @@ var BOOL_DEFINE_MAP = {
   environmentMapPrefiltered: 'ENVIRONMENTMAP_PREFILTER'
 };
 
-var standardShader;
+let standardShader;
 /**
  * Standard material without custom shader.
  * @constructor clay.StandardMaterial
  * @extends clay.Base
  * @example
- * var mat = new clay.StandardMaterial({
+ * const mat = new clay.StandardMaterial({
  *     color: [1, 1, 1],
  *     diffuseMap: diffuseTexture
  * });
  * mat.roughness = 1;
  */
-var StandardMaterial = Material.extend(
+const StandardMaterial = Material.extend(
   function () {
     if (!standardShader) {
       standardShader = new Shader(
@@ -249,7 +249,7 @@ var StandardMaterial = Material.extend(
   },
   {
     clone: function () {
-      var material = new StandardMaterial({
+      const material = new StandardMaterial({
         name: this.name
       });
       TEXTURE_PROPERTIES.forEach(function (propName) {
@@ -288,7 +288,7 @@ TEXTURE_PROPERTIES.forEach(function (propName) {
 });
 
 PROPERTIES_CHANGE_SHADER.forEach(function (propName) {
-  var privateKey = '_' + propName;
+  const privateKey = '_' + propName;
   Object.defineProperty(StandardMaterial.prototype, propName, {
     get: function () {
       return this[privateKey];
@@ -296,10 +296,10 @@ PROPERTIES_CHANGE_SHADER.forEach(function (propName) {
     set: function (value) {
       this[privateKey] = value;
       if (propName in NUM_DEFINE_MAP) {
-        var defineName = NUM_DEFINE_MAP[propName];
+        const defineName = NUM_DEFINE_MAP[propName];
         this.define('fragment', defineName, value);
       } else {
-        var defineName = BOOL_DEFINE_MAP[propName];
+        const defineName = BOOL_DEFINE_MAP[propName];
         value ? this.define('fragment', defineName) : this.undefine('fragment', defineName);
       }
     }
@@ -308,7 +308,7 @@ PROPERTIES_CHANGE_SHADER.forEach(function (propName) {
 
 Object.defineProperty(StandardMaterial.prototype, 'environmentBox', {
   get: function () {
-    var envBox = this._environmentBox;
+    const envBox = this._environmentBox;
     if (envBox) {
       envBox.min.setArray(this.get('environmentBoxMin'));
       envBox.max.setArray(this.get('environmentBoxMax'));
@@ -319,11 +319,11 @@ Object.defineProperty(StandardMaterial.prototype, 'environmentBox', {
   set: function (value) {
     this._environmentBox = value;
 
-    var uniforms = (this.uniforms = this.uniforms || {});
-    uniforms['environmentBoxMin'] = uniforms['environmentBoxMin'] || {
+    const uniforms = (this.uniforms = this.uniforms || {});
+    uniforms.environmentBoxMin = uniforms.environmentBoxMin || {
       value: null
     };
-    uniforms['environmentBoxMax'] = uniforms['environmentBoxMax'] || {
+    uniforms.environmentBoxMax = uniforms.environmentBoxMax || {
       value: null
     };
 

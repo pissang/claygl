@@ -3,19 +3,20 @@ import Texture from './Texture';
 import glenum from './core/glenum';
 import vendor from './core/vendor';
 import mathUtil from './math/util';
-var isPowerOfTwo = mathUtil.isPowerOfTwo;
+const isPowerOfTwo = mathUtil.isPowerOfTwo;
 
 function nearestPowerOfTwo(val) {
   return Math.pow(2, Math.round(Math.log(val) / Math.LN2));
 }
 function convertTextureToPowerOfTwo(texture, canvas) {
-  // var canvas = document.createElement('canvas');
-  var width = nearestPowerOfTwo(texture.width);
-  var height = nearestPowerOfTwo(texture.height);
+  // const canvas = document.createElement('canvas');
+  const width = nearestPowerOfTwo(texture.width);
+  const height = nearestPowerOfTwo(texture.height);
+  /* global document */
   canvas = canvas || document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
-  var ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   ctx.drawImage(texture.image, 0, 0, width, height);
 
   return canvas;
@@ -27,10 +28,10 @@ function convertTextureToPowerOfTwo(texture, canvas) {
  *
  * @example
  *     ...
- *     var mat = new clay.Material({
+ *     const mat = new clay.Material({
  *         shader: clay.shader.library.get('clay.phong', 'diffuseMap')
  *     });
- *     var diffuseMap = new clay.Texture2D();
+ *     const diffuseMap = new clay.Texture2D();
  *     diffuseMap.load('assets/textures/diffuse.jpg');
  *     mat.set('diffuseMap', diffuseMap);
  *     ...
@@ -41,7 +42,7 @@ function convertTextureToPowerOfTwo(texture, canvas) {
  *         });
  *     });
  */
-var Texture2D = Texture.extend(
+const Texture2D = Texture.extend(
   function () {
     return /** @lends clay.Texture2D# */ {
       /**
@@ -78,16 +79,16 @@ var Texture2D = Texture.extend(
     textureType: 'texture2D',
 
     update: function (renderer) {
-      var _gl = renderer.gl;
+      const _gl = renderer.gl;
       _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
 
       this.updateCommon(renderer);
 
-      var glFormat = this.format;
-      var glType = this.type;
+      const glFormat = this.format;
+      let glType = this.type;
 
       // Convert to pot is only available when using image/canvas/video element.
-      var convertToPOT = !!(
+      const convertToPOT = !!(
         this.convertToPOT &&
         !this.mipmaps.length &&
         this.image &&
@@ -117,7 +118,7 @@ var Texture2D = Texture.extend(
         convertToPOT ? this.minFilter : this.getAvailableMinFilter()
       );
 
-      var anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
+      const anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
       if (anisotropicExt && this.anisotropic > 1) {
         _gl.texParameterf(
           _gl.TEXTURE_2D,
@@ -128,17 +129,17 @@ var Texture2D = Texture.extend(
 
       // Fallback to float type if browser don't have half float extension
       if (glType === 36193) {
-        var halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
+        const halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
         if (!halfFloatExt) {
           glType = glenum.FLOAT;
         }
       }
 
       if (this.mipmaps.length) {
-        var width = this.width;
-        var height = this.height;
-        for (var i = 0; i < this.mipmaps.length; i++) {
-          var mipmap = this.mipmaps[i];
+        let width = this.width;
+        let height = this.height;
+        for (let i = 0; i < this.mipmaps.length; i++) {
+          const mipmap = this.mipmaps[i];
           this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType, false);
           width = Math.max(width / 2, 1);
           height = Math.max(height / 2, 1);
@@ -165,7 +166,7 @@ var Texture2D = Texture.extend(
 
     _updateTextureData: function (_gl, data, level, width, height, glFormat, glType, convertToPOT) {
       if (data.image) {
-        var imgData = data.image;
+        let imgData = data.image;
         if (convertToPOT) {
           this._potCanvas = convertTextureToPowerOfTwo(this, this._potCanvas);
           imgData = this._potCanvas;
@@ -210,7 +211,7 @@ var Texture2D = Texture.extend(
      * @memberOf clay.Texture2D.prototype
      */
     generateMipmap: function (renderer) {
-      var _gl = renderer.gl;
+      const _gl = renderer.gl;
       if (this.useMipmap && !this.NPOT) {
         _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
         _gl.generateMipmap(_gl.TEXTURE_2D);
@@ -238,11 +239,11 @@ var Texture2D = Texture.extend(
     },
 
     load: function (src, crossOrigin) {
-      var image = vendor.createImage();
+      const image = vendor.createImage();
       if (crossOrigin) {
         image.crossOrigin = crossOrigin;
       }
-      var self = this;
+      const self = this;
       image.onload = function () {
         self.dirty();
         self.trigger('success', self);

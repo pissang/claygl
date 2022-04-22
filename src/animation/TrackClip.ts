@@ -25,7 +25,7 @@ import vec3 from '../glmatrix/vec3';
  * @param {Function} [opts.onrestart]
  * @param {Array.<clay.animation.SamplerTrack>} [opts.tracks]
  */
-var TrackClip = function (opts) {
+const TrackClip = function (opts) {
   opts = opts || {};
 
   Clip.call(this, opts);
@@ -44,10 +44,10 @@ TrackClip.prototype = Object.create(Clip.prototype);
 TrackClip.prototype.constructor = TrackClip;
 
 TrackClip.prototype.step = function (time, dTime, silent) {
-  var ret = Clip.prototype.step.call(this, time, dTime, true);
+  const ret = Clip.prototype.step.call(this, time, dTime, true);
 
   if (ret !== 'finish') {
-    var time = this.getElapsedTime();
+    let time = this.getElapsedTime();
     // TODO life may be changed.
     if (this._range) {
       time = this._range[0] + time;
@@ -77,14 +77,14 @@ TrackClip.prototype.setRange = function (range) {
 };
 
 TrackClip.prototype.setTime = function (time) {
-  for (var i = 0; i < this.tracks.length; i++) {
+  for (let i = 0; i < this.tracks.length; i++) {
     this.tracks[i].setTime(time);
   }
 };
 
 TrackClip.prototype.calcLifeFromTracks = function () {
   this.life = 0;
-  for (var i = 0; i < this.tracks.length; i++) {
+  for (let i = 0; i < this.tracks.length; i++) {
     this.life = Math.max(this.life, this.tracks[i].getMaxTime());
   }
 };
@@ -101,7 +101,7 @@ TrackClip.prototype.addTrack = function (track) {
  * @param {clay.animation.SamplerTrack} track
  */
 TrackClip.prototype.removeTarck = function (track) {
-  var idx = this.tracks.indexOf(track);
+  const idx = this.tracks.indexOf(track);
   if (idx >= 0) {
     this.tracks.splice(idx, 1);
   }
@@ -114,12 +114,12 @@ TrackClip.prototype.removeTarck = function (track) {
  * @return {clay.animation.TrackClip}
  */
 TrackClip.prototype.getSubClip = function (startTime, endTime, isLoop) {
-  var subClip = new TrackClip({
+  const subClip = new TrackClip({
     name: this.name
   });
 
-  for (var i = 0; i < this.tracks.length; i++) {
-    var subTrack = this.tracks[i].getSubTrack(startTime, endTime);
+  for (let i = 0; i < this.tracks.length; i++) {
+    const subTrack = this.tracks[i].getSubTrack(startTime, endTime);
     subClip.addTrack(subTrack);
   }
 
@@ -139,10 +139,10 @@ TrackClip.prototype.getSubClip = function (startTime, endTime, isLoop) {
  * @param  {number} w
  */
 TrackClip.prototype.blend1D = function (clip1, clip2, w) {
-  for (var i = 0; i < this.tracks.length; i++) {
-    var c1 = clip1.tracks[i];
-    var c2 = clip2.tracks[i];
-    var tClip = this.tracks[i];
+  for (let i = 0; i < this.tracks.length; i++) {
+    const c1 = clip1.tracks[i];
+    const c2 = clip2.tracks[i];
+    const tClip = this.tracks[i];
 
     tClip.blend1D(c1, c2, w);
   }
@@ -154,10 +154,10 @@ TrackClip.prototype.blend1D = function (clip1, clip2, w) {
  * @param  {clay.animation.TrackClip} clip2
  */
 TrackClip.prototype.additiveBlend = function (clip1, clip2) {
-  for (var i = 0; i < this.tracks.length; i++) {
-    var c1 = clip1.tracks[i];
-    var c2 = clip2.tracks[i];
-    var tClip = this.tracks[i];
+  for (let i = 0; i < this.tracks.length; i++) {
+    const c1 = clip1.tracks[i];
+    const c2 = clip2.tracks[i];
+    const tClip = this.tracks[i];
 
     tClip.additiveBlend(c1, c2);
   }
@@ -169,10 +169,10 @@ TrackClip.prototype.additiveBlend = function (clip1, clip2) {
  * @param  {clay.animation.TrackClip} clip2
  */
 TrackClip.prototype.subtractiveBlend = function (clip1, clip2) {
-  for (var i = 0; i < this.tracks.length; i++) {
-    var c1 = clip1.tracks[i];
-    var c2 = clip2.tracks[i];
-    var tClip = this.tracks[i];
+  for (let i = 0; i < this.tracks.length; i++) {
+    const c1 = clip1.tracks[i];
+    const c2 = clip2.tracks[i];
+    const tClip = this.tracks[i];
 
     tClip.subtractiveBlend(c1, c2);
   }
@@ -187,11 +187,11 @@ TrackClip.prototype.subtractiveBlend = function (clip1, clip2) {
  * @param  {number} g
  */
 TrackClip.prototype.blend2D = function (clip1, clip2, clip3, f, g) {
-  for (var i = 0; i < this.tracks.length; i++) {
-    var c1 = clip1.tracks[i];
-    var c2 = clip2.tracks[i];
-    var c3 = clip3.tracks[i];
-    var tClip = this.tracks[i];
+  for (let i = 0; i < this.tracks.length; i++) {
+    const c1 = clip1.tracks[i];
+    const c2 = clip2.tracks[i];
+    const c3 = clip3.tracks[i];
+    const tClip = this.tracks[i];
 
     tClip.blend2D(c1, c2, c3, f, g);
   }
@@ -202,9 +202,9 @@ TrackClip.prototype.blend2D = function (clip1, clip2, clip3, f, g) {
  * @param  {clay.animation.TrackClip} clip
  */
 TrackClip.prototype.copy = function (clip) {
-  for (var i = 0; i < this.tracks.length; i++) {
-    var sTrack = clip.tracks[i];
-    var tTrack = this.tracks[i];
+  for (let i = 0; i < this.tracks.length; i++) {
+    const sTrack = clip.tracks[i];
+    const tTrack = this.tracks[i];
 
     vec3.copy(tTrack.position, sTrack.position);
     vec3.copy(tTrack.scale, sTrack.scale);
@@ -213,8 +213,8 @@ TrackClip.prototype.copy = function (clip) {
 };
 
 TrackClip.prototype.clone = function () {
-  var clip = Clip.prototype.clone.call(this);
-  for (var i = 0; i < this.tracks.length; i++) {
+  const clip = Clip.prototype.clone.call(this);
+  for (let i = 0; i < this.tracks.length; i++) {
     clip.addTrack(this.tracks[i].clone());
   }
   clip.life = this.life;

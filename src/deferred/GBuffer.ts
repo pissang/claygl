@@ -16,9 +16,10 @@ Shader.import(gbufferEssl);
 Shader.import(chunkEssl);
 
 function createFillCanvas(color) {
-  var canvas = document.createElement('canvas');
+  /* global document */
+  const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1;
-  var ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   ctx.fillStyle = color || '#000';
   ctx.fillRect(0, 0, 1, 1);
 
@@ -29,7 +30,7 @@ function createFillCanvas(color) {
 // TODO Performance improvement
 function getGetUniformHook1(defaultNormalMap, defaultRoughnessMap, defaultDiffuseMap) {
   return function (renderable, gBufferMat, symbol) {
-    var standardMaterial = renderable.material;
+    const standardMaterial = renderable.material;
     if (symbol === 'doubleSided') {
       return standardMaterial.isDefined('fragment', 'DOUBLE_SIDED');
     } else if (symbol === 'uvRepeat' || symbol === 'uvOffset' || symbol === 'alpha') {
@@ -41,13 +42,13 @@ function getGetUniformHook1(defaultNormalMap, defaultRoughnessMap, defaultDiffus
     } else if (symbol === 'alphaCutoff') {
       // TODO DIFFUSEMAP_ALPHA_ALPHA
       if (standardMaterial.isDefined('fragment', 'ALPHA_TEST')) {
-        var alphaCutoff = standardMaterial.get('alphaCutoff');
+        const alphaCutoff = standardMaterial.get('alphaCutoff');
         return alphaCutoff || 0;
       }
       return 0;
     } else {
-      var useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
-      var roughGlossMap = useRoughnessWorkflow
+      const useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
+      const roughGlossMap = useRoughnessWorkflow
         ? standardMaterial.get('roughnessMap')
         : standardMaterial.get('glossinessMap');
       switch (symbol) {
@@ -72,7 +73,7 @@ function getGetUniformHook1(defaultNormalMap, defaultRoughnessMap, defaultDiffus
 
 function getGetUniformHook2(defaultDiffuseMap, defaultMetalnessMap) {
   return function (renderable, gBufferMat, symbol) {
-    var standardMaterial = renderable.material;
+    const standardMaterial = renderable.material;
     switch (symbol) {
       case 'color':
       case 'uvRepeat':
@@ -92,7 +93,7 @@ function getGetUniformHook2(defaultDiffuseMap, defaultMetalnessMap) {
       case 'alphaCutoff':
         // TODO DIFFUSEMAP_ALPHA_ALPHA
         if (standardMaterial.isDefined('fragment', 'ALPHA_TEST')) {
-          var alphaCutoff = standardMaterial.get('alphaCutoff');
+          const alphaCutoff = standardMaterial.get('alphaCutoff');
           return alphaCutoff || 0.0;
         }
         return 0.0;
@@ -111,9 +112,9 @@ function getGetUniformHook2(defaultDiffuseMap, defaultMetalnessMap) {
  * @alias clay.deferred.GBuffer
  * @extends clay.core.Base
  */
-var GBuffer = Base.extend(
+const GBuffer = Base.extend(
   function () {
-    var commonTextureOpts = {
+    const commonTextureOpts = {
       minFilter: Texture.NEAREST,
       magFilter: Texture.NEAREST,
       wrapS: Texture.CLAMP_TO_EDGE,
@@ -274,7 +275,7 @@ var GBuffer = Base.extend(
 
     // TODO is dpr needed?
     setViewport: function (x, y, width, height, dpr) {
-      var viewport;
+      let viewport;
       if (typeof x === 'object') {
         viewport = x;
       } else {
@@ -313,25 +314,25 @@ var GBuffer = Base.extend(
     update: function (renderer, scene, camera, opts) {
       opts = opts || {};
 
-      var gl = renderer.gl;
+      const gl = renderer.gl;
 
-      var frameBuffer = this._frameBuffer;
-      var viewport = frameBuffer.viewport;
+      const frameBuffer = this._frameBuffer;
+      const viewport = frameBuffer.viewport;
 
-      var renderList = scene.updateRenderList(camera, true);
+      const renderList = scene.updateRenderList(camera, true);
 
-      var opaqueList = renderList.opaque;
-      var transparentList = renderList.transparent;
+      const opaqueList = renderList.opaque;
+      const transparentList = renderList.transparent;
 
-      var offset = 0;
-      var gBufferRenderList = this._gBufferRenderList;
-      for (var i = 0; i < opaqueList.length; i++) {
+      let offset = 0;
+      const gBufferRenderList = this._gBufferRenderList;
+      for (let i = 0; i < opaqueList.length; i++) {
         if (!opaqueList[i].ignoreGBuffer) {
           gBufferRenderList[offset++] = opaqueList[i];
         }
       }
       if (this.renderTransparent) {
-        for (var i = 0; i < transparentList.length; i++) {
+        for (let i = 0; i < transparentList.length; i++) {
           if (!transparentList[i].ignoreGBuffer) {
             gBufferRenderList[offset++] = transparentList[i];
           }
@@ -344,10 +345,10 @@ var GBuffer = Base.extend(
       gl.colorMask(true, true, true, true);
       gl.disable(gl.BLEND);
 
-      var enableTargetTexture1 = this.enableTargetTexture1;
-      var enableTargetTexture2 = this.enableTargetTexture2;
-      var enableTargetTexture3 = this.enableTargetTexture3;
-      var enableTargetTexture4 = this.enableTargetTexture4;
+      let enableTargetTexture1 = this.enableTargetTexture1;
+      const enableTargetTexture2 = this.enableTargetTexture2;
+      const enableTargetTexture3 = this.enableTargetTexture3;
+      const enableTargetTexture4 = this.enableTargetTexture4;
       if (!enableTargetTexture1 && !enableTargetTexture3 && !enableTargetTexture4) {
         console.warn("Can't disable targetTexture1, targetTexture3, targetTexture4 both");
         enableTargetTexture1 = true;
@@ -362,7 +363,7 @@ var GBuffer = Base.extend(
 
       function clearViewport() {
         if (viewport) {
-          var dpr = viewport.devicePixelRatio;
+          const dpr = viewport.devicePixelRatio;
           // use scissor to make sure only clear the viewport
           gl.enable(gl.SCISSOR_TEST);
           gl.scissor(
@@ -391,8 +392,8 @@ var GBuffer = Base.extend(
 
         clearViewport();
 
-        var gBufferMaterial1 = this._gBufferMaterial1;
-        var passConfig = {
+        const gBufferMaterial1 = this._gBufferMaterial1;
+        const passConfig = {
           getMaterial: function () {
             return gBufferMaterial1;
           },
@@ -414,8 +415,8 @@ var GBuffer = Base.extend(
 
         clearViewport();
 
-        var gBufferMaterial2 = this._gBufferMaterial2;
-        var passConfig = {
+        const gBufferMaterial2 = this._gBufferMaterial2;
+        const passConfig = {
           getMaterial: function () {
             return gBufferMaterial2;
           },
@@ -436,24 +437,24 @@ var GBuffer = Base.extend(
         // PENDING. Better solution?
         camera.update();
 
-        var gBufferMaterial3 = this._gBufferMaterial3;
-        var cameraViewProj = mat4.create();
+        const gBufferMaterial3 = this._gBufferMaterial3;
+        const cameraViewProj = mat4.create();
         mat4.multiply(cameraViewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
-        var passConfig = {
+        const passConfig = {
           getMaterial: function () {
             return gBufferMaterial3;
           },
           afterRender: function (renderer, renderable) {
-            var isSkinnedMesh = renderable.isSkinnedMesh();
+            const isSkinnedMesh = renderable.isSkinnedMesh();
             if (isSkinnedMesh) {
-              var skeleton = renderable.skeleton;
-              var joints = renderable.joints;
+              const skeleton = renderable.skeleton;
+              const joints = renderable.joints;
               if (joints.length > renderer.getMaxJointNumber()) {
-                var skinMatricesTexture = skeleton.getSubSkinMatricesTexture(
+                const skinMatricesTexture = skeleton.getSubSkinMatricesTexture(
                   renderable.__uid__,
                   joints
                 );
-                var prevSkinMatricesTexture = renderable.__prevSkinMatricesTexture;
+                let prevSkinMatricesTexture = renderable.__prevSkinMatricesTexture;
                 if (!prevSkinMatricesTexture) {
                   prevSkinMatricesTexture = renderable.__prevSkinMatricesTexture = new Texture2D({
                     type: Texture.FLOAT,
@@ -469,14 +470,14 @@ var GBuffer = Base.extend(
                 ) {
                   prevSkinMatricesTexture.pixels = new Float32Array(skinMatricesTexture.pixels);
                 } else {
-                  for (var i = 0; i < skinMatricesTexture.pixels.length; i++) {
+                  for (let i = 0; i < skinMatricesTexture.pixels.length; i++) {
                     prevSkinMatricesTexture.pixels[i] = skinMatricesTexture.pixels[i];
                   }
                 }
                 prevSkinMatricesTexture.width = skinMatricesTexture.width;
                 prevSkinMatricesTexture.height = skinMatricesTexture.height;
               } else {
-                var skinMatricesArray = skeleton.getSubSkinMatrices(renderable.__uid__, joints);
+                const skinMatricesArray = skeleton.getSubSkinMatrices(renderable.__uid__, joints);
                 if (
                   !renderable.__prevSkinMatricesArray ||
                   renderable.__prevSkinMatricesArray.length !== skinMatricesArray.length
@@ -542,7 +543,7 @@ var GBuffer = Base.extend(
      * @param {string} [type='normal']
      */
     renderDebug: function (renderer, camera, type, viewport) {
-      var debugTypes = {
+      const debugTypes = {
         normal: 0,
         depth: 1,
         position: 2,
@@ -564,10 +565,10 @@ var GBuffer = Base.extend(
       if (viewport) {
         renderer.setViewport(viewport);
       }
-      var viewProjectionInv = new Matrix4();
+      const viewProjectionInv = new Matrix4();
       Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
 
-      var debugPass = this._debugPass;
+      const debugPass = this._debugPass;
       debugPass.setUniform('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
       debugPass.setUniform('gBufferTexture1', this._gBufferTex1);
       debugPass.setUniform('gBufferTexture2', this._gBufferTex2);

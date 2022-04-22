@@ -7,7 +7,7 @@ import vendor from '../core/vendor';
  * @constructor clay.light.AmbientSH
  * @extends clay.Light
  */
-var AmbientSHLight = Light.extend(
+const AmbientSHLight = Light.extend(
   {
     castShadow: false,
 
@@ -28,8 +28,8 @@ var AmbientSHLight = Light.extend(
       ambientSHLightColor: {
         type: '3f',
         value: function (instance) {
-          var color = instance.color;
-          var intensity = instance.intensity;
+          const color = instance.color;
+          const intensity = instance.intensity;
           return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
         }
       },
@@ -37,8 +37,8 @@ var AmbientSHLight = Light.extend(
       ambientSHLightCoefficients: {
         type: '3f',
         value: function (instance) {
-          var coefficientsTmpArr = instance._coefficientsTmpArr;
-          for (var i = 0; i < instance.coefficients.length; i++) {
+          const coefficientsTmpArr = instance._coefficientsTmpArr;
+          for (let i = 0; i < instance.coefficients.length; i++) {
             coefficientsTmpArr[i] = instance.coefficients[i];
           }
           return coefficientsTmpArr;

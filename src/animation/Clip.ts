@@ -17,7 +17,7 @@ function noop() {}
  * @param {Function} [opts.onfinish]
  * @param {Function} [opts.onrestart]
  */
-var Clip = function (opts) {
+const Clip = function (opts) {
   opts = opts || {};
 
   /**
@@ -135,13 +135,13 @@ Clip.prototype = {
     // PENDIGN Sync ?
     this._elapse(time, deltaTime);
 
-    var percent = Math.min(this._elapsedTime / this.life, 1);
+    const percent = Math.min(this._elapsedTime / this.life, 1);
 
     if (percent < 0) {
       return;
     }
 
-    var schedule;
+    let schedule;
     if (this.easing) {
       schedule = this.easing(percent);
     } else {
@@ -182,7 +182,7 @@ Clip.prototype = {
     // All clips may be expired and all start from the beginning value(position)
     // It is clearly wrong, so we use remainder to add a offset
 
-    var remainder = 0;
+    let remainder = 0;
     // Remainder ignored if restart is invoked manually
     if (time) {
       this._elapse(time);
@@ -211,14 +211,14 @@ Clip.prototype = {
   },
 
   fire: function (eventType, arg) {
-    var eventName = 'on' + eventType;
+    const eventName = 'on' + eventType;
     if (this[eventName]) {
       this[eventName](this.target, arg);
     }
   },
 
   clone: function () {
-    var clip = new this.constructor();
+    const clip = new this.constructor();
     clip.name = this.name;
     clip._loop = this._loop;
     clip._loopRemained = this._loopRemained;

@@ -2,13 +2,13 @@
 // KTX loader
 // Modified from https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/KTXLoader.js
 
-var HEADER_LEN = 12 + 13 * 4; // identifier + header elements (not including key value meta-data pairs)
+const HEADER_LEN = 12 + 13 * 4; // identifier + header elements (not including key value meta-data pairs)
 
 function getUint32(buffer, offset, littleEndian) {
-  var a;
-  var b;
-  var c;
-  var d;
+  let a;
+  let b;
+  let c;
+  let d;
   if (littleEndian) {
     a = buffer[offset];
     b = buffer[offset + 1];
@@ -24,11 +24,11 @@ function getUint32(buffer, offset, littleEndian) {
 }
 
 function parse(arraybuffer, loadMipmaps) {
-  var facesExpected = 1;
+  const facesExpected = 1;
   // Test that it is a ktx formatted file, based on the first 12 bytes, character representation is:
   // '´', 'K', 'T', 'X', ' ', '1', '1', 'ª', '\r', '\n', '\x1A', '\n'
   // 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A
-  var data = new Uint8Array(arraybuffer);
+  const data = new Uint8Array(arraybuffer);
   if (
     data[0] !== 0xab ||
     data[1] !== 0x4b ||
@@ -48,24 +48,24 @@ function parse(arraybuffer, loadMipmaps) {
   }
 
   // load the reset of the header in native 32 bit uint
-  var dataSize = Uint32Array.BYTES_PER_ELEMENT;
-  var offset = 12;
-  // var headerDataView = new DataView( this.arrayBuffer, 12, 13 * dataSize );
-  var endianness = getUint32(data, offset, true);
-  var littleEndian = endianness === 0x04030201;
+  const dataSize = Uint32Array.BYTES_PER_ELEMENT;
+  const offset = 12;
+  // const headerDataView = new DataView( this.arrayBuffer, 12, 13 * dataSize );
+  const endianness = getUint32(data, offset, true);
+  const littleEndian = endianness === 0x04030201;
 
-  var glType = getUint32(data, offset + 1 * dataSize, littleEndian); // must be 0 for compressed textures
-  var glTypeSize = getUint32(data, offset + 2 * dataSize, littleEndian); // must be 1 for compressed textures
-  var glFormat = getUint32(data, offset + 3 * dataSize, littleEndian); // must be 0 for compressed textures
-  var glInternalFormat = getUint32(data, offset + 4 * dataSize, littleEndian); // the value of arg passed to gl.compressedTexImage2D(,,x,,,,)
-  var glBaseInternalFormat = getUint32(data, offset + 5 * dataSize, littleEndian); // specify GL_RGB, GL_RGBA, GL_ALPHA, etc (un-compressed only)
-  var pixelWidth = getUint32(data, offset + 6 * dataSize, littleEndian); // level 0 value of arg passed to gl.compressedTexImage2D(,,,x,,,)
-  var pixelHeight = getUint32(data, offset + 7 * dataSize, littleEndian); // level 0 value of arg passed to gl.compressedTexImage2D(,,,,x,,)
-  var pixelDepth = getUint32(data, offset + 8 * dataSize, littleEndian); // level 0 value of arg passed to gl.compressedTexImage3D(,,,,,x,,)
-  var numberOfArrayElements = getUint32(data, offset + 9 * dataSize, littleEndian); // used for texture arrays
-  var numberOfFaces = getUint32(data, offset + 10 * dataSize, littleEndian); // used for cubemap textures, should either be 1 or 6
-  var numberOfMipmapLevels = getUint32(data, offset + 11 * dataSize, littleEndian); // number of levels; disregard possibility of 0 for compressed textures
-  var bytesOfKeyValueData = getUint32(data, offset + 12 * dataSize, littleEndian); // the amount of space after the header for meta-data
+  const glType = getUint32(data, offset + 1 * dataSize, littleEndian); // must be 0 for compressed textures
+  const glTypeSize = getUint32(data, offset + 2 * dataSize, littleEndian); // must be 1 for compressed textures
+  const glFormat = getUint32(data, offset + 3 * dataSize, littleEndian); // must be 0 for compressed textures
+  const glInternalFormat = getUint32(data, offset + 4 * dataSize, littleEndian); // the value of arg passed to gl.compressedTexImage2D(,,x,,,,)
+  const glBaseInternalFormat = getUint32(data, offset + 5 * dataSize, littleEndian); // specify GL_RGB, GL_RGBA, GL_ALPHA, etc (un-compressed only)
+  const pixelWidth = getUint32(data, offset + 6 * dataSize, littleEndian); // level 0 value of arg passed to gl.compressedTexImage2D(,,,x,,,)
+  const pixelHeight = getUint32(data, offset + 7 * dataSize, littleEndian); // level 0 value of arg passed to gl.compressedTexImage2D(,,,,x,,)
+  const pixelDepth = getUint32(data, offset + 8 * dataSize, littleEndian); // level 0 value of arg passed to gl.compressedTexImage3D(,,,,,x,,)
+  const numberOfArrayElements = getUint32(data, offset + 9 * dataSize, littleEndian); // used for texture arrays
+  const numberOfFaces = getUint32(data, offset + 10 * dataSize, littleEndian); // used for cubemap textures, should either be 1 or 6
+  let numberOfMipmapLevels = getUint32(data, offset + 11 * dataSize, littleEndian); // number of levels; disregard possibility of 0 for compressed textures
+  const bytesOfKeyValueData = getUint32(data, offset + 12 * dataSize, littleEndian); // the amount of space after the header for meta-data
 
   // Make sure we have a compressed type.  Not only reduces work, but probably better to let dev know they are not compressing.
   if (glType !== 0) {
@@ -88,18 +88,18 @@ function parse(arraybuffer, loadMipmaps) {
     return;
   }
 
-  var mipmaps = [];
+  const mipmaps = [];
 
   // initialize width & height for level 1
-  var dataOffset = HEADER_LEN + bytesOfKeyValueData;
-  var width = pixelWidth;
-  var height = pixelHeight;
-  var mipmapCount = loadMipmaps ? numberOfMipmapLevels : 1;
+  let dataOffset = HEADER_LEN + bytesOfKeyValueData;
+  let width = pixelWidth;
+  let height = pixelHeight;
+  const mipmapCount = loadMipmaps ? numberOfMipmapLevels : 1;
 
-  for (var level = 0; level < mipmapCount; level++) {
-    var imageSize = new Int32Array(arraybuffer, dataOffset, 1)[0]; // size per face, since not supporting array cubemaps
-    for (var face = 0; face < numberOfFaces; face++) {
-      var byteArray = new Uint8Array(arraybuffer, dataOffset + 4, imageSize);
+  for (let level = 0; level < mipmapCount; level++) {
+    const imageSize = new Int32Array(arraybuffer, dataOffset, 1)[0]; // size per face, since not supporting array cubemaps
+    for (let face = 0; face < numberOfFaces; face++) {
+      const byteArray = new Uint8Array(arraybuffer, dataOffset + 4, imageSize);
       mipmaps.push({
         pixels: byteArray,
         width: width,
@@ -112,7 +112,7 @@ function parse(arraybuffer, loadMipmaps) {
     width = Math.max(1.0, width * 0.5);
     height = Math.max(1.0, height * 0.5);
   }
-  var res = {
+  const res = {
     width: pixelWidth,
     height: pixelHeight,
     format: glInternalFormat

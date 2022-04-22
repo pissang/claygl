@@ -4,7 +4,7 @@
 
 import Clip from './Clip';
 
-var clipSortFunc = function (a, b) {
+const clipSortFunc = function (a, b) {
   return a.position < b.position;
 };
 
@@ -38,7 +38,7 @@ var clipSortFunc = function (a, b) {
  * @param {number} [opts.position]
  * @param {clay.animation.Clip} [opts.output]
  */
-var Blend1DClip = function (opts) {
+const Blend1DClip = function (opts) {
   opts = opts || {};
 
   Clip.call(this, opts);
@@ -72,7 +72,7 @@ Blend1DClip.prototype.constructor = Blend1DClip;
  * @return {clay.animation.Blend1DClip.IClipInput}
  */
 Blend1DClip.prototype.addInput = function (position, inputClip, offset) {
-  var obj = {
+  const obj = {
     position: position,
     clip: inputClip,
     offset: offset || 0
@@ -83,13 +83,13 @@ Blend1DClip.prototype.addInput = function (position, inputClip, offset) {
     this.inputs.push(obj);
     return obj;
   }
-  var len = this.inputs.length;
+  const len = this.inputs.length;
   if (this.inputs[0].position > position) {
     this.inputs.unshift(obj);
   } else if (this.inputs[len - 1].position <= position) {
     this.inputs.push(obj);
   } else {
-    var key = this._findKey(position);
+    const key = this._findKey(position);
     this.inputs.splice(key, obj);
   }
 
@@ -97,7 +97,7 @@ Blend1DClip.prototype.addInput = function (position, inputClip, offset) {
 };
 
 Blend1DClip.prototype.step = function (time, dTime, silent) {
-  var ret = Clip.prototype.step.call(this, time);
+  const ret = Clip.prototype.step.call(this, time);
 
   if (ret !== 'finish') {
     this.setTime(this.getElapsedTime());
@@ -111,16 +111,16 @@ Blend1DClip.prototype.step = function (time, dTime, silent) {
 };
 
 Blend1DClip.prototype.setTime = function (time) {
-  var position = this.position;
-  var inputs = this.inputs;
-  var len = inputs.length;
-  var min = inputs[0].position;
-  var max = inputs[len - 1].position;
+  const position = this.position;
+  const inputs = this.inputs;
+  const len = inputs.length;
+  const min = inputs[0].position;
+  const max = inputs[len - 1].position;
 
   if (position <= min || position >= max) {
-    var in0 = position <= min ? inputs[0] : inputs[len - 1];
-    var clip = in0.clip;
-    var offset = in0.offset;
+    const in0 = position <= min ? inputs[0] : inputs[len - 1];
+    const clip = in0.clip;
+    const offset = in0.offset;
     clip.setTime((time + offset) % clip.life);
     // Input clip is a blend clip
     // PENDING
@@ -130,19 +130,19 @@ Blend1DClip.prototype.setTime = function (time) {
       this.output.copy(clip);
     }
   } else {
-    var key = this._findKey(position);
-    var in1 = inputs[key];
-    var in2 = inputs[key + 1];
-    var clip1 = in1.clip;
-    var clip2 = in2.clip;
+    const key = this._findKey(position);
+    const in1 = inputs[key];
+    const in2 = inputs[key + 1];
+    const clip1 = in1.clip;
+    const clip2 = in2.clip;
     // Set time on input clips
     clip1.setTime((time + in1.offset) % clip1.life);
     clip2.setTime((time + in2.offset) % clip2.life);
 
-    var w = (this.position - in1.position) / (in2.position - in1.position);
+    const w = (this.position - in1.position) / (in2.position - in1.position);
 
-    var c1 = clip1.output instanceof Clip ? clip1.output : clip1;
-    var c2 = clip2.output instanceof Clip ? clip2.output : clip2;
+    const c1 = clip1.output instanceof Clip ? clip1.output : clip1;
+    const c2 = clip2.output instanceof Clip ? clip2.output : clip2;
     this.output.blend1D(c1, c2, w);
   }
 };
@@ -153,10 +153,10 @@ Blend1DClip.prototype.setTime = function (time) {
  * @return {clay.animation.Blend1DClip}
  */
 Blend1DClip.prototype.clone = function (cloneInputs) {
-  var clip = Clip.prototype.clone.call(this);
+  const clip = Clip.prototype.clone.call(this);
   clip.output = this.output.clone();
-  for (var i = 0; i < this.inputs.length; i++) {
-    var inputClip = cloneInputs ? this.inputs[i].clip.clone(true) : this.inputs[i].clip;
+  for (let i = 0; i < this.inputs.length; i++) {
+    const inputClip = cloneInputs ? this.inputs[i].clip.clone(true) : this.inputs[i].clip;
     clip.addInput(this.inputs[i].position, inputClip, this.inputs[i].offset);
   }
   return clip;
@@ -164,18 +164,18 @@ Blend1DClip.prototype.clone = function (cloneInputs) {
 
 // Find the key where position in range [inputs[key].position, inputs[key+1].position)
 Blend1DClip.prototype._findKey = function (position) {
-  var key = -1;
-  var inputs = this.inputs;
-  var len = inputs.length;
+  let key = -1;
+  const inputs = this.inputs;
+  const len = inputs.length;
   if (this._cachePosition < position) {
-    for (var i = this._cacheKey; i < len - 1; i++) {
+    for (let i = this._cacheKey; i < len - 1; i++) {
       if (position >= inputs[i].position && position < inputs[i + 1].position) {
         key = i;
       }
     }
   } else {
-    var s = Math.min(len - 2, this._cacheKey);
-    for (var i = s; i >= 0; i--) {
+    const s = Math.min(len - 2, this._cacheKey);
+    for (let i = s; i >= 0; i--) {
       if (position >= inputs[i].position && position < inputs[i + 1].position) {
         key = i;
       }

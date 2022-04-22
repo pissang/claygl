@@ -8,26 +8,26 @@ import mat4 from './glmatrix/mat4';
 import LRUCache from './core/LRU';
 import Matrix4 from './math/Matrix4';
 
-var IDENTITY = mat4.create();
-var WORLDVIEW = mat4.create();
+let IDENTITY = mat4.create();
+const WORLDVIEW = mat4.create();
 
-var programKeyCache = {};
+const programKeyCache = {};
 
 function getProgramKey(lightNumbers) {
-  var defineStr = [];
-  var lightTypes = Object.keys(lightNumbers);
+  const defineStr = [];
+  const lightTypes = Object.keys(lightNumbers);
   lightTypes.sort();
-  for (var i = 0; i < lightTypes.length; i++) {
-    var lightType = lightTypes[i];
+  for (let i = 0; i < lightTypes.length; i++) {
+    const lightType = lightTypes[i];
     defineStr.push(lightType + ' ' + lightNumbers[lightType]);
   }
-  var key = defineStr.join('\n');
+  let key = defineStr.join('\n');
 
   if (programKeyCache[key]) {
     return programKeyCache[key];
   }
 
-  var id = util.genGUID();
+  let id = util.genGUID();
   programKeyCache[key] = id;
   return id;
 }
@@ -68,7 +68,7 @@ RenderList.prototype.endCount = function () {
  * @constructor clay.Scene
  * @extends clay.Node
  */
-var Scene = Node.extend(
+const Scene = Node.extend(
   function () {
     return /** @lends clay.Scene# */ {
       /**
@@ -140,7 +140,7 @@ var Scene = Node.extend(
 
     // Remove node from scene
     removeFromScene: function (node) {
-      var idx;
+      let idx;
       if (node instanceof Camera) {
         idx = this._cameraList.indexOf(node);
         if (idx >= 0) {
@@ -172,7 +172,7 @@ var Scene = Node.extend(
      * @param {claygl.Camera} camera
      */
     setMainCamera: function (camera) {
-      var idx = this._cameraList.indexOf(camera);
+      let idx = this._cameraList.indexOf(camera);
       if (idx >= 0) {
         this._cameraList.splice(idx, 1);
       }
@@ -190,16 +190,16 @@ var Scene = Node.extend(
     },
 
     updateLights: function () {
-      var lights = this.lights;
+      const lights = this.lights;
       this._previousLightNumber = this._lightNumber;
 
-      var lightNumber = {};
-      for (var i = 0; i < lights.length; i++) {
-        var light = lights[i];
+      const lightNumber = {};
+      for (let i = 0; i < lights.length; i++) {
+        const light = lights[i];
         if (light.invisible) {
           continue;
         }
-        var group = light.group;
+        const group = light.group;
         if (!lightNumber[group]) {
           lightNumber[group] = {};
         }
@@ -209,7 +209,7 @@ var Scene = Node.extend(
       }
       this._lightNumber = lightNumber;
 
-      for (var groupId in lightNumber) {
+      for (const groupId in lightNumber) {
         this._lightProgramKeys[groupId] = getProgramKey(lightNumber[groupId]);
       }
 
@@ -224,14 +224,14 @@ var Scene = Node.extend(
      * @return {clay.Node}
      */
     cloneNode: function (node) {
-      var newNode = node.clone();
-      var clonedNodesMap = {};
+      const newNode = node.clone();
+      const clonedNodesMap = {};
       function buildNodesMap(sNode, tNode) {
         clonedNodesMap[sNode.__uid__] = tNode;
 
-        for (var i = 0; i < sNode._children.length; i++) {
-          var sChild = sNode._children[i];
-          var tChild = tNode._children[i];
+        for (let i = 0; i < sNode._children.length; i++) {
+          const sChild = sNode._children[i];
+          const tChild = tNode._children[i];
           buildNodesMap(sChild, tChild);
         }
       }
@@ -258,8 +258,8 @@ var Scene = Node.extend(
      * @return {clay.Scene.RenderList}
      */
     updateRenderList: function (camera, updateSceneBoundingBox) {
-      var id = camera.__uid__;
-      var renderList = this._renderLists.get(id);
+      const id = camera.__uid__;
+      let renderList = this._renderLists.get(id);
       if (!renderList) {
         renderList = new RenderList();
         this._renderLists.put(id, renderList);
@@ -271,7 +271,7 @@ var Scene = Node.extend(
         this.viewBoundingBoxLastFrame.max.set(-Infinity, -Infinity, -Infinity);
       }
 
-      var sceneMaterialTransparent = (this.material && this.material.transparent) || false;
+      const sceneMaterialTransparent = (this.material && this.material.transparent) || false;
       this._doUpdateRenderList(
         this,
         camera,
@@ -305,13 +305,13 @@ var Scene = Node.extend(
         return;
       }
       // TODO Optimize
-      for (var i = 0; i < parent._children.length; i++) {
-        var child = parent._children[i];
+      for (let i = 0; i < parent._children.length; i++) {
+        const child = parent._children[i];
 
         if (child.isRenderable()) {
           // Frustum culling
-          var worldM = child.isSkinnedMesh() ? IDENTITY : child.worldTransform.array;
-          var geometry = child.geometry;
+          const worldM = child.isSkinnedMesh() ? IDENTITY : child.worldTransform.array;
+          const geometry = child.geometry;
 
           mat4.multiplyAffine(WORLDVIEW, camera.viewMatrix.array, worldM);
           if (
@@ -346,12 +346,12 @@ var Scene = Node.extend(
     isFrustumCulled: (function () {
       // Frustum culling
       // http://www.cse.chalmers.se/~uffe/vfc_bbox.pdf
-      var cullingBoundingBox = new BoundingBox();
-      var cullingMatrix = new Matrix4();
+      const cullingBoundingBox = new BoundingBox();
+      const cullingMatrix = new Matrix4();
       return function (object, camera, worldViewMat) {
         // Bounding box can be a property of object(like light) or renderable.geometry
         // PENDING
-        var geoBBox = object.boundingBox;
+        let geoBBox = object.boundingBox;
         if (!geoBBox) {
           if (object.skeleton && object.skeleton.boundingBox) {
             geoBBox = object.skeleton.boundingBox;
@@ -389,8 +389,8 @@ var Scene = Node.extend(
 
           cullingBoundingBox.applyProjection(cullingMatrix);
 
-          var min = cullingBoundingBox.min.array;
-          var max = cullingBoundingBox.max.array;
+          const min = cullingBoundingBox.min.array;
+          const max = cullingBoundingBox.max.array;
 
           if (max[0] < -1 || min[0] > 1 || max[1] < -1 || min[1] > 1 || max[2] < -1 || min[2] > 1) {
             return true;
@@ -402,28 +402,28 @@ var Scene = Node.extend(
     })(),
 
     _updateLightUniforms: function () {
-      var lights = this.lights;
+      const lights = this.lights;
       // Put the light cast shadow before the light not cast shadow
       lights.sort(lightSortFunc);
 
-      var lightUniforms = this._lightUniforms;
-      for (var group in lightUniforms) {
-        for (var symbol in lightUniforms[group]) {
+      const lightUniforms = this._lightUniforms;
+      for (const group in lightUniforms) {
+        for (const symbol in lightUniforms[group]) {
           lightUniforms[group][symbol].value.length = 0;
         }
       }
-      for (var i = 0; i < lights.length; i++) {
-        var light = lights[i];
+      for (let i = 0; i < lights.length; i++) {
+        const light = lights[i];
 
         if (light.invisible) {
           continue;
         }
 
-        var group = light.group;
+        const group = light.group;
 
-        for (var symbol in light.uniformTemplates) {
-          var uniformTpl = light.uniformTemplates[symbol];
-          var value = uniformTpl.value(light);
+        for (const symbol in light.uniformTemplates) {
+          const uniformTpl = light.uniformTemplates[symbol];
+          const value = uniformTpl.value(light);
           if (value == null) {
             continue;
           }
@@ -436,7 +436,7 @@ var Scene = Node.extend(
               value: []
             };
           }
-          var lu = lightUniforms[group][symbol];
+          const lu = lightUniforms[group][symbol];
           lu.type = uniformTpl.type + 'v';
           switch (uniformTpl.type) {
             case '1i':
@@ -447,7 +447,7 @@ var Scene = Node.extend(
             case '2f':
             case '3f':
             case '4f':
-              for (var j = 0; j < value.length; j++) {
+              for (let j = 0; j < value.length; j++) {
                 lu.value.push(value[j]);
               }
               break;
@@ -459,16 +459,16 @@ var Scene = Node.extend(
     },
 
     getLightGroups: function () {
-      var lightGroups = [];
-      for (var groupId in this._lightNumber) {
+      const lightGroups = [];
+      for (const groupId in this._lightNumber) {
         lightGroups.push(groupId);
       }
       return lightGroups;
     },
 
     getNumberChangedLightGroups: function () {
-      var lightGroups = [];
-      for (var groupId in this._lightNumber) {
+      const lightGroups = [];
+      for (const groupId in this._lightNumber) {
         if (this.isLightNumberChanged(groupId)) {
           lightGroups.push(groupId);
         }
@@ -479,10 +479,10 @@ var Scene = Node.extend(
     // Determine if light group is different with since last frame
     // Used to determine whether to update shader and scene's uniforms in Renderer.render
     isLightNumberChanged: function (lightGroup) {
-      var prevLightNumber = this._previousLightNumber;
-      var currentLightNumber = this._lightNumber;
+      const prevLightNumber = this._previousLightNumber;
+      const currentLightNumber = this._lightNumber;
       // PENDING Performance
-      for (var type in currentLightNumber[lightGroup]) {
+      for (const type in currentLightNumber[lightGroup]) {
         if (!prevLightNumber[lightGroup]) {
           return true;
         }
@@ -490,7 +490,7 @@ var Scene = Node.extend(
           return true;
         }
       }
-      for (var type in prevLightNumber[lightGroup]) {
+      for (const type in prevLightNumber[lightGroup]) {
         if (!currentLightNumber[lightGroup]) {
           return true;
         }
@@ -511,16 +511,16 @@ var Scene = Node.extend(
 
     setLightUniforms: (function () {
       function setUniforms(uniforms, program, renderer) {
-        for (var symbol in uniforms) {
-          var lu = uniforms[symbol];
+        for (const symbol in uniforms) {
+          const lu = uniforms[symbol];
           if (lu.type === 'tv') {
             if (!program.hasUniform(symbol)) {
               continue;
             }
-            var texSlots = [];
-            for (var i = 0; i < lu.value.length; i++) {
-              var texture = lu.value[i];
-              var slot = program.takeCurrentTextureSlot(renderer, texture);
+            const texSlots = [];
+            for (let i = 0; i < lu.value.length; i++) {
+              const texture = lu.value[i];
+              const slot = program.takeCurrentTextureSlot(renderer, texture);
               texSlots.push(slot);
             }
             program.setUniform(renderer.gl, '1iv', symbol, texSlots);

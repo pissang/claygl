@@ -14,14 +14,14 @@ import ProgramManager from './gpu/ProgramManager';
 import Shader from './Shader';
 
 import prezEssl from './shader/source/prez.glsl.js';
-Shader['import'](prezEssl);
+Shader.import(prezEssl);
 
 import mat4 from './glmatrix/mat4';
 import vec3 from './glmatrix/vec3';
 
-var mat4Create = mat4.create;
+const mat4Create = mat4.create;
 
-var errorShader = {};
+const errorShader = {};
 
 function defaultGetMaterial(renderable) {
   return renderable.material;
@@ -38,7 +38,7 @@ function defaultIfRender(renderable) {
 
 function noop() {}
 
-var attributeBufferTypeMap = {
+const attributeBufferTypeMap = {
   float: glenum.FLOAT,
   byte: glenum.BYTE,
   ubyte: glenum.UNSIGNED_BYTE,
@@ -55,8 +55,8 @@ function VertexArrayObject(availableAttributes, availableAttributeSymbols, indic
 }
 
 function PlaceHolderTexture(renderer) {
-  var blankCanvas;
-  var webglTexture;
+  let blankCanvas;
+  let webglTexture;
   this.bind = function (renderer) {
     if (!blankCanvas) {
       // TODO Environment not support createCanvas.
@@ -65,8 +65,8 @@ function PlaceHolderTexture(renderer) {
       blankCanvas.getContext('2d');
     }
 
-    var gl = renderer.gl;
-    var firstBind = !webglTexture;
+    const gl = renderer.gl;
+    const firstBind = !webglTexture;
     if (firstBind) {
       webglTexture = gl.createTexture();
     }
@@ -87,7 +87,7 @@ function PlaceHolderTexture(renderer) {
  * @constructor clay.Renderer
  * @extends clay.core.Base
  */
-var Renderer = Base.extend(
+const Renderer = Base.extend(
   function () {
     return /** @lends clay.Renderer# */ {
       /**
@@ -205,9 +205,9 @@ var Renderer = Base.extend(
     if (!this.canvas) {
       this.canvas = vendor.createCanvas();
     }
-    var canvas = this.canvas;
+    const canvas = this.canvas;
     try {
-      var opts = {
+      const opts = {
         alpha: this.alpha,
         depth: this.depth,
         stencil: this.stencil,
@@ -247,10 +247,10 @@ var Renderer = Base.extend(
      * @param {number} height
      */
     resize: function (width, height) {
-      var canvas = this.canvas;
+      const canvas = this.canvas;
       // http://www.khronos.org/webgl/wiki/HandlingHighDPI
       // set the display size of the canvas.
-      var dpr = this.devicePixelRatio;
+      const dpr = this.devicePixelRatio;
       if (width != null) {
         if (canvas.style) {
           canvas.style.width = width + 'px';
@@ -291,7 +291,7 @@ var Renderer = Base.extend(
      * @return {number}
      */
     getViewportAspect: function () {
-      var viewport = this.viewport;
+      const viewport = this.viewport;
       return viewport.width / viewport.height;
     },
 
@@ -352,7 +352,7 @@ var Renderer = Base.extend(
      */
     setViewport: function (x, y, width, height, dpr) {
       if (typeof x === 'object') {
-        var obj = x;
+        const obj = x;
 
         x = obj.x;
         y = obj.y;
@@ -404,7 +404,7 @@ var Renderer = Base.extend(
      */
     restoreClear: function () {
       if (this._clearStack.length > 0) {
-        var opt = this._clearStack.pop();
+        const opt = this._clearStack.pop();
         this.clearColor = opt.clearColor;
         this.clearBit = opt.clearBit;
       }
@@ -423,17 +423,17 @@ var Renderer = Base.extend(
      * @return {IRenderInfo}
      */
     render: function (scene, camera, notUpdateScene, preZ) {
-      var _gl = this.gl;
+      const _gl = this.gl;
 
-      var clearColor = this.clearColor;
+      const clearColor = this.clearColor;
 
       if (this.clearBit) {
         // Must set depth and color mask true before clear
         _gl.colorMask(true, true, true, true);
         _gl.depthMask(true);
-        var viewport = this.viewport;
-        var needsScissor = false;
-        var viewportDpr = viewport.devicePixelRatio;
+        const viewport = this.viewport;
+        let needsScissor = false;
+        const viewportDpr = viewport.devicePixelRatio;
         if (
           viewport.width !== this._width ||
           viewport.height !== this._height ||
@@ -472,13 +472,13 @@ var Renderer = Base.extend(
         return;
       }
       camera.update();
-      var renderList = scene.updateRenderList(camera, true);
+      const renderList = scene.updateRenderList(camera, true);
 
       this._sceneRendering = scene;
 
-      var opaqueList = renderList.opaque;
-      var transparentList = renderList.transparent;
-      var sceneMaterial = scene.material;
+      const opaqueList = renderList.opaque;
+      const transparentList = renderList.transparent;
+      const sceneMaterial = scene.material;
 
       scene.trigger('beforerender', this, scene, camera, renderList);
 
@@ -491,10 +491,10 @@ var Renderer = Base.extend(
       }
 
       // Update the depth of transparent list.
-      var worldViewMat = mat4Create();
-      var posViewSpace = vec3.create();
-      for (var i = 0; i < transparentList.length; i++) {
-        var renderable = transparentList[i];
+      const worldViewMat = mat4Create();
+      const posViewSpace = vec3.create();
+      for (let i = 0; i < transparentList.length; i++) {
+        const renderable = transparentList[i];
         mat4.multiplyAffine(worldViewMat, camera.viewMatrix.array, renderable.worldTransform.array);
         vec3.transformMat4(posViewSpace, renderable.position.array, worldViewMat);
         renderable.__depth = posViewSpace[2];
@@ -528,7 +528,7 @@ var Renderer = Base.extend(
 
     validateProgram: function (program) {
       if (program.__error) {
-        var errorMsg = program.__error;
+        const errorMsg = program.__error;
         if (errorShader[program.__uid__]) {
           return;
         }
@@ -543,15 +543,15 @@ var Renderer = Base.extend(
     },
 
     updatePrograms: function (list, scene, passConfig) {
-      var getMaterial = (passConfig && passConfig.getMaterial) || defaultGetMaterial;
+      const getMaterial = (passConfig && passConfig.getMaterial) || defaultGetMaterial;
       scene = scene || null;
-      for (var i = 0; i < list.length; i++) {
-        var renderable = list[i];
-        var renderMaterial = getMaterial.call(this, renderable);
+      for (let i = 0; i < list.length; i++) {
+        const renderable = list[i];
+        const renderMaterial = getMaterial.call(this, renderable);
         if (i > 0) {
-          var prevRenderable = list[i - 1];
-          var prevJointsLen = prevRenderable.joints ? prevRenderable.joints.length : 0;
-          var jointsLen = renderable.joints ? renderable.joints.length : 0;
+          const prevRenderable = list[i - 1];
+          const prevJointsLen = prevRenderable.joints ? prevRenderable.joints.length : 0;
+          const jointsLen = renderable.joints ? renderable.joints.length : 0;
           // Keep program not change if joints, material, lightGroup are same of two renderables.
           if (
             jointsLen === prevJointsLen &&
@@ -563,7 +563,7 @@ var Renderer = Base.extend(
           }
         }
 
-        var program = this._programMgr.getProgram(renderable, renderMaterial, scene, this);
+        const program = this._programMgr.getProgram(renderable, renderMaterial, scene, this);
 
         this.validateProgram(program);
 
@@ -596,7 +596,7 @@ var Renderer = Base.extend(
       passConfig.beforeRender = passConfig.beforeRender || noop;
       passConfig.afterRender = passConfig.afterRender || noop;
 
-      var ifRenderObject = passConfig.ifRender || defaultIfRender;
+      let ifRenderObject = passConfig.ifRender || defaultIfRender;
 
       this.updatePrograms(list, this._sceneRendering, passConfig);
       if (passConfig.sortCompare) {
@@ -604,24 +604,24 @@ var Renderer = Base.extend(
       }
 
       // Some common builtin uniforms
-      var viewport = this.viewport;
-      var vDpr = viewport.devicePixelRatio;
-      var viewportUniform = [
+      const viewport = this.viewport;
+      const vDpr = viewport.devicePixelRatio;
+      const viewportUniform = [
         viewport.x * vDpr,
         viewport.y * vDpr,
         viewport.width * vDpr,
         viewport.height * vDpr
       ];
-      var windowDpr = this.devicePixelRatio;
-      var windowSizeUniform = this.__currentFrameBuffer
+      const windowDpr = this.devicePixelRatio;
+      const windowSizeUniform = this.__currentFrameBuffer
         ? [
             this.__currentFrameBuffer.getTextureWidth(),
             this.__currentFrameBuffer.getTextureHeight()
           ]
         : [this._width * windowDpr, this._height * windowDpr];
       // DEPRECATED
-      var viewportSizeUniform = [viewportUniform[2], viewportUniform[3]];
-      var time = Date.now();
+      const viewportSizeUniform = [viewportUniform[2], viewportUniform[3]];
+      const time = Date.now();
 
       // Calculate view and projection matrix
       if (camera) {
@@ -637,29 +637,29 @@ var Renderer = Base.extend(
       mat4.invert(matrices.PROJECTIONINVERSE, matrices.PROJECTION);
       mat4.invert(matrices.VIEWPROJECTIONINVERSE, matrices.VIEWPROJECTION);
 
-      var _gl = this.gl;
-      var scene = this._sceneRendering;
+      const _gl = this.gl;
+      const scene = this._sceneRendering;
 
-      var prevMaterial;
-      var prevProgram;
-      var prevRenderable;
+      let prevMaterial;
+      let prevProgram;
+      let prevRenderable;
 
       // Status
-      var depthTest, depthMask;
-      var culling, cullFace, frontFace;
-      var transparent;
-      var drawID;
-      var currentVAO;
-      var materialTakesTextureSlot;
+      let depthTest, depthMask;
+      let culling, cullFace, frontFace;
+      let transparent;
+      let drawID;
+      let currentVAO;
+      let materialTakesTextureSlot;
 
-      // var vaoExt = this.getGLExtension('OES_vertex_array_object');
+      // const vaoExt = this.getGLExtension('OES_vertex_array_object');
       // not use vaoExt, some platforms may mess it up.
-      var vaoExt = null;
+      const vaoExt = null;
 
-      for (var i = 0; i < list.length; i++) {
-        var renderable = list[i];
-        var isSceneNode = renderable.worldTransform != null;
-        var worldM;
+      for (let i = 0; i < list.length; i++) {
+        const renderable = list[i];
+        const isSceneNode = renderable.worldTransform != null;
+        let worldM;
 
         if (!ifRenderObject(renderable)) {
           continue;
@@ -675,14 +675,14 @@ var Renderer = Base.extend(
                 : matrices.IDENTITY
               : renderable.worldTransform.array;
         }
-        var geometry = renderable.geometry;
-        var material = passConfig.getMaterial.call(this, renderable);
+        const geometry = renderable.geometry;
+        const material = passConfig.getMaterial.call(this, renderable);
 
-        var program = renderable.__program;
-        var shader = material.shader;
+        let program = renderable.__program;
+        const shader = material.shader;
 
-        var currentDrawID = geometry.__uid__ + '-' + program.__uid__;
-        var drawIDChanged = currentDrawID !== drawID;
+        const currentDrawID = geometry.__uid__ + '-' + program.__uid__;
+        const drawIDChanged = currentDrawID !== drawID;
         drawID = currentDrawID;
         if (drawIDChanged && vaoExt) {
           // TODO Seems need to be bound to null immediately (or before bind another program?) if vao is changed
@@ -713,7 +713,7 @@ var Renderer = Base.extend(
         renderable.beforeRender && renderable.beforeRender(this);
         passConfig.beforeRender.call(this, renderable, material, prevMaterial);
 
-        var programChanged = program !== prevProgram;
+        const programChanged = program !== prevProgram;
         if (programChanged) {
           // Set lights number
           program.bind(this);
@@ -792,15 +792,15 @@ var Renderer = Base.extend(
           prevMaterial = material;
         }
 
-        var matrixSemanticKeys = shader.matrixSemanticKeys;
+        const matrixSemanticKeys = shader.matrixSemanticKeys;
 
         if (isSceneNode) {
-          for (var k = 0; k < matrixSemanticKeys.length; k++) {
-            var semantic = matrixSemanticKeys[k];
-            var semanticInfo = shader.matrixSemantics[semantic];
-            var matrix = matrices[semantic];
+          for (let k = 0; k < matrixSemanticKeys.length; k++) {
+            const semantic = matrixSemanticKeys[k];
+            const semanticInfo = shader.matrixSemantics[semantic];
+            const matrix = matrices[semantic];
             if (semanticInfo.isTranspose) {
-              var matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose];
+              const matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose];
               mat4.transpose(matrix, matrixNoTranspose);
             }
             program.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
@@ -847,14 +847,14 @@ var Renderer = Base.extend(
     },
 
     _updateSkeleton: function (object, program, slot) {
-      var _gl = this.gl;
-      var skeleton = object.skeleton;
+      const _gl = this.gl;
+      const skeleton = object.skeleton;
       // Set pose matrices of skinned mesh
       if (skeleton) {
         // TODO Update before culling.
         skeleton.update();
         if (object.joints.length > this.getMaxJointNumber()) {
-          var skinMatricesTexture = skeleton.getSubSkinMatricesTexture(
+          const skinMatricesTexture = skeleton.getSubSkinMatricesTexture(
             object.__uid__,
             object.joints
           );
@@ -862,23 +862,23 @@ var Renderer = Base.extend(
           program.setUniform(_gl, '1i', 'skinMatricesTexture', slot);
           program.setUniform(_gl, '1f', 'skinMatricesTextureSize', skinMatricesTexture.width);
         } else {
-          var skinMatricesArray = skeleton.getSubSkinMatrices(object.__uid__, object.joints);
+          const skinMatricesArray = skeleton.getSubSkinMatrices(object.__uid__, object.joints);
           program.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
         }
       }
     },
 
     _renderObject: function (renderable, vao, program) {
-      var _gl = this.gl;
-      var geometry = renderable.geometry;
+      const _gl = this.gl;
+      const geometry = renderable.geometry;
 
-      var glDrawMode = renderable.mode;
+      let glDrawMode = renderable.mode;
       if (glDrawMode == null) {
         glDrawMode = 0x0004;
       }
 
-      var ext = null;
-      var isInstanced = renderable.isInstancedMesh && renderable.isInstancedMesh();
+      let ext = null;
+      const isInstanced = renderable.isInstancedMesh && renderable.isInstancedMesh();
       if (isInstanced) {
         ext = this.getGLExtension('ANGLE_instanced_arrays');
         if (!ext) {
@@ -887,15 +887,15 @@ var Renderer = Base.extend(
         }
       }
 
-      var instancedAttrLocations;
+      let instancedAttrLocations;
       if (isInstanced) {
         instancedAttrLocations = this._bindInstancedAttributes(renderable, program, ext);
       }
 
       if (vao.indicesBuffer) {
-        var uintExt = this.getGLExtension('OES_element_index_uint');
-        var useUintExt = uintExt && geometry.indices instanceof Uint32Array;
-        var indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+        const uintExt = this.getGLExtension('OES_element_index_uint');
+        const useUintExt = uintExt && geometry.indices instanceof Uint32Array;
+        const indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
 
         if (isInstanced) {
           ext.drawElementsInstancedANGLE(
@@ -924,7 +924,7 @@ var Renderer = Base.extend(
       }
 
       if (isInstanced) {
-        for (var i = 0; i < instancedAttrLocations.length; i++) {
+        for (let i = 0; i < instancedAttrLocations.length; i++) {
           if (!instancedAttrLocations[i].enabled) {
             _gl.disableVertexAttribArray(instancedAttrLocations[i].location);
           }
@@ -934,19 +934,19 @@ var Renderer = Base.extend(
     },
 
     _bindInstancedAttributes: function (renderable, program, ext) {
-      var _gl = this.gl;
-      var instancedBuffers = renderable.getInstancedAttributesBuffers(this);
-      var locations = [];
+      const _gl = this.gl;
+      let instancedBuffers = renderable.getInstancedAttributesBuffers(this);
+      const locations = [];
 
-      for (var i = 0; i < instancedBuffers.length; i++) {
-        var bufferObj = instancedBuffers[i];
-        var location = program.getAttribLocation(_gl, bufferObj.symbol);
+      for (let i = 0; i < instancedBuffers.length; i++) {
+        const bufferObj = instancedBuffers[i];
+        const location = program.getAttribLocation(_gl, bufferObj.symbol);
         if (location < 0) {
           continue;
         }
 
-        var glType = attributeBufferTypeMap[bufferObj.type] || _gl.FLOAT;
-        var isEnabled = program.isAttribEnabled(this, location);
+        const glType = attributeBufferTypeMap[bufferObj.type] || _gl.FLOAT;
+        let isEnabled = program.isAttribEnabled(this, location);
         if (!program.isAttribEnabled(this, location)) {
           _gl.enableVertexAttribArray(location);
         }
@@ -971,21 +971,21 @@ var Renderer = Base.extend(
       prevProgram,
       getUniformValue
     ) {
-      var _gl = this.gl;
+      const _gl = this.gl;
       // PENDING Same texture in different material take different slot?
 
       // May use shader of other material if shader code are same
-      var sameProgram = prevProgram === program;
+      const sameProgram = prevProgram === program;
 
-      var currentTextureSlot = program.currentTextureSlot();
-      var enabledUniforms = material.getEnabledUniforms();
-      var textureUniforms = material.getTextureUniforms();
-      var placeholderTexture = this._placeholderTexture;
+      const currentTextureSlot = program.currentTextureSlot();
+      const enabledUniforms = material.getEnabledUniforms();
+      const textureUniforms = material.getTextureUniforms();
+      const placeholderTexture = this._placeholderTexture;
 
-      for (var u = 0; u < textureUniforms.length; u++) {
-        var symbol = textureUniforms[u];
-        var uniformValue = getUniformValue(renderable, material, symbol);
-        var uniformType = material.uniforms[symbol].type;
+      for (let u = 0; u < textureUniforms.length; u++) {
+        const symbol = textureUniforms[u];
+        const uniformValue = getUniformValue(renderable, material, symbol);
+        const uniformType = material.uniforms[symbol].type;
         // Not use `instanceof` to determine if a value is texture in Material#bind.
         // Use type instead, in some case texture may be in different namespaces.
         // TODO Duck type validate.
@@ -993,7 +993,7 @@ var Renderer = Base.extend(
           // Reset slot
           uniformValue.__slot = -1;
         } else if (uniformType === 'tv') {
-          for (var i = 0; i < uniformValue.length; i++) {
+          for (let i = 0; i < uniformValue.length; i++) {
             if (uniformValue[i]) {
               uniformValue[i].__slot = -1;
             }
@@ -1004,12 +1004,12 @@ var Renderer = Base.extend(
       placeholderTexture.__slot = -1;
 
       // Set uniforms
-      for (var u = 0; u < enabledUniforms.length; u++) {
-        var symbol = enabledUniforms[u];
-        var uniform = material.uniforms[symbol];
-        var uniformValue = getUniformValue(renderable, material, symbol);
-        var uniformType = uniform.type;
-        var isTexture = uniformType === 't';
+      for (let u = 0; u < enabledUniforms.length; u++) {
+        const symbol = enabledUniforms[u];
+        const uniform = material.uniforms[symbol];
+        let uniformValue = getUniformValue(renderable, material, symbol);
+        const uniformType = uniform.type;
+        const isTexture = uniformType === 't';
 
         if (isTexture) {
           if (!uniformValue || !uniformValue.isRenderable()) {
@@ -1021,7 +1021,7 @@ var Renderer = Base.extend(
         // Many uniforms will be be set twice even if they have the same value
         // So add a evaluation to see if the uniform is really needed to be set
         if (prevMaterial && sameProgram) {
-          var prevUniformValue = getUniformValue(prevRenderable, prevMaterial, symbol);
+          let prevUniformValue = getUniformValue(prevRenderable, prevMaterial, symbol);
           if (isTexture) {
             if (!prevUniformValue || !prevUniformValue.isRenderable()) {
               prevUniformValue = placeholderTexture;
@@ -1033,7 +1033,7 @@ var Renderer = Base.extend(
               // Still take the slot to make sure same texture in different materials have same slot.
               program.takeCurrentTextureSlot(this, null);
             } else if (uniformType === 'tv' && uniformValue) {
-              for (var i = 0; i < uniformValue.length; i++) {
+              for (let i = 0; i < uniformValue.length; i++) {
                 program.takeCurrentTextureSlot(this, null);
               }
             }
@@ -1045,8 +1045,8 @@ var Renderer = Base.extend(
           continue;
         } else if (isTexture) {
           if (uniformValue.__slot < 0) {
-            var slot = program.currentTextureSlot();
-            var res = program.setUniform(_gl, '1i', symbol, slot);
+            const slot = program.currentTextureSlot();
+            const res = program.setUniform(_gl, '1i', symbol, slot);
             if (res) {
               // Texture uniform is enabled
               program.takeCurrentTextureSlot(this, uniformValue);
@@ -1067,12 +1067,12 @@ var Renderer = Base.extend(
               continue;
             }
 
-            var arr = [];
-            for (var i = 0; i < uniformValue.length; i++) {
-              var texture = uniformValue[i];
+            const arr = [];
+            for (let i = 0; i < uniformValue.length; i++) {
+              const texture = uniformValue[i];
 
               if (texture.__slot < 0) {
-                var slot = program.currentTextureSlot();
+                const slot = program.currentTextureSlot();
                 arr.push(slot);
                 program.takeCurrentTextureSlot(this, texture);
                 texture.__slot = slot;
@@ -1089,37 +1089,37 @@ var Renderer = Base.extend(
           program.setUniform(_gl, uniform.type, symbol, uniformValue);
         }
       }
-      var newSlot = program.currentTextureSlot();
+      const newSlot = program.currentTextureSlot();
       // Texture slot maybe used out of material.
       program.resetTextureSlot(currentTextureSlot);
       return newSlot;
     },
 
     _bindVAO: function (vaoExt, shader, geometry, program) {
-      var isStatic = !geometry.dynamic;
-      var _gl = this.gl;
+      const isStatic = !geometry.dynamic;
+      const _gl = this.gl;
 
-      var vaoId = this.__uid__ + '-' + program.__uid__;
-      var vao = geometry.__vaoCache[vaoId];
+      const vaoId = this.__uid__ + '-' + program.__uid__;
+      let vao = geometry.__vaoCache[vaoId];
       if (!vao) {
-        var chunks = geometry.getBufferChunks(this);
+        const chunks = geometry.getBufferChunks(this);
         if (!chunks || !chunks.length) {
           // Empty mesh
           return;
         }
-        var chunk = chunks[0];
-        var attributeBuffers = chunk.attributeBuffers;
-        var indicesBuffer = chunk.indicesBuffer;
+        const chunk = chunks[0];
+        const attributeBuffers = chunk.attributeBuffers;
+        const indicesBuffer = chunk.indicesBuffer;
 
-        var availableAttributes = [];
-        var availableAttributeSymbols = [];
-        for (var a = 0; a < attributeBuffers.length; a++) {
-          var attributeBufferInfo = attributeBuffers[a];
-          var name = attributeBufferInfo.name;
-          var semantic = attributeBufferInfo.semantic;
-          var symbol;
+        const availableAttributes = [];
+        const availableAttributeSymbols = [];
+        for (let a = 0; a < attributeBuffers.length; a++) {
+          const attributeBufferInfo = attributeBuffers[a];
+          const name = attributeBufferInfo.name;
+          const semantic = attributeBufferInfo.semantic;
+          let symbol;
           if (semantic) {
-            var semanticInfo = shader.attributeSemantics[semantic];
+            const semanticInfo = shader.attributeSemantics[semantic];
             symbol = semanticInfo && semanticInfo.symbol;
           } else {
             symbol = name;
@@ -1137,7 +1137,7 @@ var Renderer = Base.extend(
         }
       }
 
-      var needsBindAttributes = true;
+      let needsBindAttributes = true;
 
       // Create vertex object array cost a lot
       // So we don't use it on the dynamic object
@@ -1152,25 +1152,25 @@ var Renderer = Base.extend(
         vaoExt.bindVertexArrayOES(vao.vao);
       }
 
-      var availableAttributes = vao.availableAttributes;
-      var indicesBuffer = vao.indicesBuffer;
+      const availableAttributes = vao.availableAttributes;
+      const indicesBuffer = vao.indicesBuffer;
 
       if (needsBindAttributes) {
-        var locationList = program.enableAttributes(
+        const locationList = program.enableAttributes(
           this,
           vao.availableAttributeSymbols,
           vaoExt && isStatic && vao
         );
         // Setting attributes;
-        for (var a = 0; a < availableAttributes.length; a++) {
-          var location = locationList[a];
+        for (let a = 0; a < availableAttributes.length; a++) {
+          const location = locationList[a];
           if (location === -1) {
             continue;
           }
-          var attributeBufferInfo = availableAttributes[a];
-          var buffer = attributeBufferInfo.buffer;
-          var size = attributeBufferInfo.size;
-          var glType = attributeBufferTypeMap[attributeBufferInfo.type] || _gl.FLOAT;
+          const attributeBufferInfo = availableAttributes[a];
+          const buffer = attributeBufferInfo.buffer;
+          const size = attributeBufferInfo.size;
+          const glType = attributeBufferTypeMap[attributeBufferInfo.type] || _gl.FLOAT;
 
           _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
           _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
@@ -1185,8 +1185,8 @@ var Renderer = Base.extend(
     },
 
     renderPreZ: function (list, scene, camera) {
-      var _gl = this.gl;
-      var preZPassMaterial =
+      const _gl = this.gl;
+      const preZPassMaterial =
         this._prezMaterial ||
         new Material({
           shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
@@ -1208,8 +1208,8 @@ var Renderer = Base.extend(
           return !renderable.ignorePreZ;
         },
         isMaterialChanged: function (renderable, prevRenderable) {
-          var matA = renderable.material;
-          var matB = prevRenderable.material;
+          const matA = renderable.material;
+          const matB = prevRenderable.material;
           return (
             matA.get('diffuseMap') !== matB.get('diffuseMap') ||
             (matA.get('alphaCutoff') || 0) !== (matB.get('alphaCutoff') || 0)
@@ -1223,7 +1223,7 @@ var Renderer = Base.extend(
               renderable.material.isDefined('fragment', 'ALPHA_TEST') &&
               renderable.material.get('diffuseMap')
             ) {
-              var alphaCutoff = renderable.material.get('alphaCutoff');
+              const alphaCutoff = renderable.material.get('alphaCutoff');
               return alphaCutoff || 0;
             }
             return 0;
@@ -1265,25 +1265,25 @@ var Renderer = Base.extend(
       if (root.getParent()) {
         root.getParent().remove(root);
       }
-      var disposedMap = {};
+      const disposedMap = {};
       root.traverse(function (node) {
-        var material = node.material;
+        const material = node.material;
         if (node.geometry && disposeGeometry) {
           node.geometry.dispose(this);
         }
         if (disposeTexture && material && !disposedMap[material.__uid__]) {
-          var textureUniforms = material.getTextureUniforms();
-          for (var u = 0; u < textureUniforms.length; u++) {
-            var uniformName = textureUniforms[u];
-            var val = material.uniforms[uniformName].value;
-            var uniformType = material.uniforms[uniformName].type;
+          const textureUniforms = material.getTextureUniforms();
+          for (let u = 0; u < textureUniforms.length; u++) {
+            const uniformName = textureUniforms[u];
+            const val = material.uniforms[uniformName].value;
+            const uniformType = material.uniforms[uniformName].type;
             if (!val) {
               continue;
             }
             if (uniformType === 't') {
               val.dispose && val.dispose(this);
             } else if (uniformType === 'tv') {
-              for (var k = 0; k < val.length; k++) {
+              for (let k = 0; k < val.length; k++) {
                 if (val[k]) {
                   val[k].dispose && val[k].dispose(this);
                 }
@@ -1345,8 +1345,8 @@ var Renderer = Base.extend(
       // Invert y;
       y = this._height - y;
 
-      var viewport = this.viewport;
-      var arr = out.array;
+      const viewport = this.viewport;
+      const arr = out.array;
       arr[0] = (x - viewport.x) / viewport.width;
       arr[0] = arr[0] * 2 - 1;
       arr[1] = (y - viewport.y) / viewport.height;
@@ -1412,7 +1412,7 @@ Renderer.transparentSortCompare = Renderer.prototype.transparentSortCompare = fu
 };
 
 // Temporary variables
-var matrices = {
+const matrices = {
   IDENTITY: mat4Create(),
 
   WORLD: mat4Create(),

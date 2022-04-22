@@ -11,7 +11,7 @@ import Base from '../core/Base';
  * @extends clay.core.Base
  *
  */
-var CompositorNode = Base.extend(
+const CompositorNode = Base.extend(
   function () {
     return /** @lends clay.compositor.CompositorNode# */ {
       /**
@@ -60,20 +60,20 @@ var CompositorNode = Base.extend(
   {
     // TODO Remove parameter function callback
     updateParameter: function (outputName, renderer) {
-      var outputInfo = this.outputs[outputName];
-      var parameters = outputInfo.parameters;
-      var parametersCopy = outputInfo._parametersCopy;
+      const outputInfo = this.outputs[outputName];
+      const parameters = outputInfo.parameters;
+      let parametersCopy = outputInfo._parametersCopy;
       if (!parametersCopy) {
         parametersCopy = outputInfo._parametersCopy = {};
       }
       if (parameters) {
-        for (var key in parameters) {
+        for (const key in parameters) {
           if (key !== 'width' && key !== 'height') {
             parametersCopy[key] = parameters[key];
           }
         }
       }
-      var width, height;
+      let width, height;
       if (parameters.width instanceof Function) {
         width = parameters.width.call(this, renderer);
       } else {
@@ -112,7 +112,7 @@ var CompositorNode = Base.extend(
      * @param {Object} obj
      */
     setParameters: function (obj) {
-      for (var name in obj) {
+      for (const name in obj) {
         this.setParameter(name, obj[name]);
       }
     },
@@ -125,7 +125,7 @@ var CompositorNode = Base.extend(
         name = renderer;
         return this._outputTextures[name];
       }
-      var outputInfo = this.outputs[name];
+      const outputInfo = this.outputs[name];
       if (!outputInfo) {
         return;
       }
@@ -159,7 +159,7 @@ var CompositorNode = Base.extend(
     removeReference: function (outputName) {
       this._outputReferences[outputName]--;
       if (this._outputReferences[outputName] === 0) {
-        var outputInfo = this.outputs[outputName];
+        const outputInfo = this.outputs[outputName];
         if (outputInfo.keepLastFrame) {
           if (this._prevOutputTextures[outputName]) {
             this._compositor.releaseTexture(this._prevOutputTextures[outputName]);
@@ -199,8 +199,8 @@ var CompositorNode = Base.extend(
     updateReference: function (outputName) {
       if (!this._rendering) {
         this._rendering = true;
-        for (var inputName in this.inputLinks) {
-          var link = this.inputLinks[inputName];
+        for (const inputName in this.inputLinks) {
+          const link = this.inputLinks[inputName];
           link.node.updateReference(link.pin);
         }
         this._rendering = false;
@@ -213,16 +213,16 @@ var CompositorNode = Base.extend(
     beforeFrame: function () {
       this._rendered = false;
 
-      for (var name in this.outputLinks) {
+      for (const name in this.outputLinks) {
         this._outputReferences[name] = 0;
       }
     },
 
     afterFrame: function () {
       // Put back all the textures to pool
-      for (var name in this.outputLinks) {
+      for (const name in this.outputLinks) {
         if (this._outputReferences[name] > 0) {
-          var outputInfo = this.outputs[name];
+          const outputInfo = this.outputs[name];
           if (outputInfo.keepLastFrame) {
             if (this._prevOutputTextures[name]) {
               this._compositor.releaseTexture(this._prevOutputTextures[name]);

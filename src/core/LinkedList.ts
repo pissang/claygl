@@ -4,7 +4,7 @@
  * @constructor
  * @alias clay.core.LinkedList
  */
-var LinkedList = function () {
+const LinkedList = function () {
   /**
    * @type {clay.core.LinkedList.Entry}
    */
@@ -24,7 +24,7 @@ var LinkedList = function () {
  * @return {clay.core.LinkedList.Entry}
  */
 LinkedList.prototype.insert = function (val) {
-  var entry = new LinkedList.Entry(val);
+  const entry = new LinkedList.Entry(val);
   this.insertEntry(entry);
   return entry;
 };
@@ -39,15 +39,15 @@ LinkedList.prototype.insertAt = function (idx, val) {
   if (idx < 0) {
     return;
   }
-  var next = this.head;
-  var cursor = 0;
+  let next = this.head;
+  let cursor = 0;
   while (next && cursor != idx) {
     next = next.next;
     cursor++;
   }
   if (next) {
-    var entry = new LinkedList.Entry(val);
-    var prev = next.prev;
+    const entry = new LinkedList.Entry(val);
+    const prev = next.prev;
     if (!prev) {
       //next is head
       this.head = entry;
@@ -63,8 +63,8 @@ LinkedList.prototype.insertAt = function (idx, val) {
 };
 
 LinkedList.prototype.insertBeforeEntry = function (val, next) {
-  var entry = new LinkedList.Entry(val);
-  var prev = next.prev;
+  const entry = new LinkedList.Entry(val);
+  const prev = next.prev;
   if (!prev) {
     //next is head
     this.head = entry;
@@ -98,8 +98,8 @@ LinkedList.prototype.insertEntry = function (entry) {
  * @param  {clay.core.LinkedList.Entry} entry
  */
 LinkedList.prototype.remove = function (entry) {
-  var prev = entry.prev;
-  var next = entry.next;
+  const prev = entry.prev;
+  const next = entry.next;
   if (prev) {
     prev.next = next;
   } else {
@@ -125,8 +125,8 @@ LinkedList.prototype.removeAt = function (idx) {
   if (idx < 0) {
     return;
   }
-  var curr = this.head;
-  var cursor = 0;
+  let curr = this.head;
+  let cursor = 0;
   while (curr && cursor != idx) {
     curr = curr.next;
     cursor++;
@@ -163,8 +163,8 @@ LinkedList.prototype.getAt = function (idx) {
   if (idx < 0) {
     return;
   }
-  var curr = this.head;
-  var cursor = 0;
+  let curr = this.head;
+  let cursor = 0;
   while (curr && cursor != idx) {
     curr = curr.next;
     cursor++;
@@ -177,8 +177,8 @@ LinkedList.prototype.getAt = function (idx) {
  * @return {number}
  */
 LinkedList.prototype.indexOf = function (value) {
-  var curr = this.head;
-  var cursor = 0;
+  let curr = this.head;
+  let cursor = 0;
   while (curr) {
     if (curr.value === value) {
       return cursor;
@@ -207,9 +207,9 @@ LinkedList.prototype.isEmpty = function () {
  * @param  {} context
  */
 LinkedList.prototype.forEach = function (cb, context) {
-  var curr = this.head;
-  var idx = 0;
-  var haveContext = typeof context != 'undefined';
+  let curr = this.head;
+  let idx = 0;
+  const haveContext = typeof context != 'undefined';
   while (curr) {
     if (haveContext) {
       cb.call(context, curr.value, idx);

@@ -6,7 +6,7 @@ import glenum from './core/glenum';
  * @constructor clay.Mesh
  * @extends clay.Renderable
  */
-var Mesh = Renderable.extend(
+const Mesh = Renderable.extend(
   /** @lends clay.Mesh# */ {
     /**
      * Used when it is a skinned mesh
@@ -40,7 +40,7 @@ var Mesh = Renderable.extend(
     },
 
     clone: function () {
-      var mesh = Renderable.prototype.clone.call(this);
+      const mesh = Renderable.prototype.clone.call(this);
       mesh.skeleton = this.skeleton;
       if (this.joints) {
         mesh.joints = this.joints.slice();

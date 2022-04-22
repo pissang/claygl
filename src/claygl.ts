@@ -133,9 +133,8 @@ import mesh$113 from './util/mesh';
 import sh$114 from './util/sh';
 import texture$115 from './util/texture';
 import transferable$116 from './util/transferable';
-import version$117 from './version';
-import CardboardDistorter$118 from './vr/CardboardDistorter';
-import StereoCamera$119 from './vr/StereoCamera';
+import CardboardDistorter$117 from './vr/CardboardDistorter';
+import StereoCamera$118 from './vr/StereoCamera';
 
 
 const animation = {
@@ -358,11 +357,10 @@ const util = {
 };
 export { util };
 
-export { version$117 as version };
 
 const vr = {
-  CardboardDistorter: CardboardDistorter$118,
-  StereoCamera: StereoCamera$119
+  CardboardDistorter: CardboardDistorter$117,
+  StereoCamera: StereoCamera$118
 };
 export { vr };
 

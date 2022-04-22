@@ -6,9 +6,9 @@ import Material from '../Material';
 import Shader from '../Shader';
 
 import particleEssl from './particle.glsl.js';
-Shader['import'](particleEssl);
+Shader.import(particleEssl);
 
-var particleShader = new Shader(
+const particleShader = new Shader(
   Shader.source('clay.particle.vertex'),
   Shader.source('clay.particle.fragment')
 );
@@ -18,7 +18,7 @@ var particleShader = new Shader(
  * @extends clay.Renderable
  *
  * @example
- *     var particleRenderable = new clay.particle.ParticleRenderable({
+ *     const particleRenderable = new clay.particle.ParticleRenderable({
  *         spriteAnimationTileX: 4,
  *         spriteAnimationTileY: 4,
  *         spriteAnimationRepeat: 1
@@ -26,9 +26,9 @@ var particleShader = new Shader(
  *     scene.add(particleRenderable);
  *     // Enable uv animation in the shader
  *     particleRenderable.material.define('both', 'UV_ANIMATION');
- *     var Emitter = clay.particle.Emitter;
- *     var Vector3 = clay.Vector3;
- *     var emitter = new Emitter({
+ *     const Emitter = clay.particle.Emitter;
+ *     const Vector3 = clay.Vector3;
+ *     const emitter = new Emitter({
  *         max: 2000,
  *         amount: 100,
  *         life: Emitter.random1D(10, 20),
@@ -36,7 +36,7 @@ var particleShader = new Shader(
  *         velocity: Emitter.random3D(new Vector3(-10, 0, -10), new Vector3(10, 0, 10));
  *     });
  *     particleRenderable.addEmitter(emitter);
- *     var gravityField = new clay.particle.ForceField();
+ *     const gravityField = new clay.particle.ForceField();
  *     gravityField.force.y = -10;
  *     particleRenderable.addField(gravityField);
  *     ...
@@ -45,7 +45,7 @@ var particleShader = new Shader(
  *         renderer.render(scene, camera);
  *     });
  */
-var ParticleRenderable = Renderable.extend(
+const ParticleRenderable = Renderable.extend(
   /** @lends clay.particle.ParticleRenderable# */ {
     /**
      * @type {boolean}
@@ -148,8 +148,8 @@ var ParticleRenderable = Renderable.extend(
      */
     reset: function () {
       // Put all the particles back
-      for (var i = 0; i < this._particles.length; i++) {
-        var p = this._particles[i];
+      for (let i = 0; i < this._particles.length; i++) {
+        const p = this._particles[i];
         p.emitter.kill(p);
       }
       this._particles.length = 0;
@@ -165,10 +165,10 @@ var ParticleRenderable = Renderable.extend(
       deltaTime /= 1000;
       this._elapsedTime += deltaTime;
 
-      var particles = this._particles;
+      const particles = this._particles;
 
       if (this._emitting) {
-        for (var i = 0; i < this._emitters.length; i++) {
+        for (let i = 0; i < this._emitters.length; i++) {
           this._emitters[i].emit(particles);
         }
         if (this.oneshot) {
@@ -177,9 +177,9 @@ var ParticleRenderable = Renderable.extend(
       }
 
       // Aging
-      var len = particles.length;
-      for (var i = 0; i < len; ) {
-        var p = particles[i];
+      let len = particles.length;
+      for (let i = 0; i < len; ) {
+        const p = particles[i];
         p.age += deltaTime;
         if (p.age >= p.life) {
           p.emitter.kill(p);
@@ -191,11 +191,11 @@ var ParticleRenderable = Renderable.extend(
         }
       }
 
-      for (var i = 0; i < len; i++) {
+      for (let i = 0; i < len; i++) {
         // Update
-        var p = particles[i];
+        const p = particles[i];
         if (this._fields.length > 0) {
-          for (var j = 0; j < this._fields.length; j++) {
+          for (let j = 0; j < this._fields.length; j++) {
             this._fields[j].applyTo(p.velocity, p.position, p.weight, deltaTime);
           }
         }
@@ -206,20 +206,20 @@ var ParticleRenderable = Renderable.extend(
     },
 
     _updateVertices: function () {
-      var geometry = this.geometry;
+      const geometry = this.geometry;
       // If has uv animation
-      var animTileX = this.spriteAnimationTileX;
-      var animTileY = this.spriteAnimationTileY;
-      var animRepeat = this.spriteAnimationRepeat;
-      var nUvAnimFrame = animTileY * animTileX * animRepeat;
-      var hasUvAnimation = nUvAnimFrame > 1;
-      var positions = geometry.attributes.position.value;
+      const animTileX = this.spriteAnimationTileX;
+      const animTileY = this.spriteAnimationTileY;
+      const animRepeat = this.spriteAnimationRepeat;
+      const nUvAnimFrame = animTileY * animTileX * animRepeat;
+      const hasUvAnimation = nUvAnimFrame > 1;
+      let positions = geometry.attributes.position.value;
       // Put particle status in normal
-      var normals = geometry.attributes.normal.value;
-      var uvs = geometry.attributes.texcoord0.value;
-      var uvs2 = geometry.attributes.texcoord1.value;
+      let normals = geometry.attributes.normal.value;
+      let uvs = geometry.attributes.texcoord0.value;
+      let uvs2 = geometry.attributes.texcoord1.value;
 
-      var len = this._particles.length;
+      const len = this._particles.length;
       if (!positions || positions.length !== len * 3) {
         // TODO Optimize
         positions = geometry.attributes.position.value = new Float32Array(len * 3);
@@ -230,24 +230,24 @@ var ParticleRenderable = Renderable.extend(
         }
       }
 
-      var invAnimTileX = 1 / animTileX;
-      for (var i = 0; i < len; i++) {
-        var particle = this._particles[i];
-        var offset = i * 3;
-        for (var j = 0; j < 3; j++) {
+      const invAnimTileX = 1 / animTileX;
+      for (let i = 0; i < len; i++) {
+        const particle = this._particles[i];
+        const offset = i * 3;
+        for (let j = 0; j < 3; j++) {
           positions[offset + j] = particle.position.array[j];
           normals[offset] = particle.age / particle.life;
           // normals[offset + 1] = particle.rotation;
           normals[offset + 1] = 0;
           normals[offset + 2] = particle.spriteSize;
         }
-        var offset2 = i * 2;
+        const offset2 = i * 2;
         if (hasUvAnimation) {
           // TODO
-          var p = particle.age / particle.life;
-          var stage = Math.round(p * (nUvAnimFrame - 1)) * animRepeat;
-          var v = Math.floor(stage * invAnimTileX);
-          var u = stage - v * animTileX;
+          const p = particle.age / particle.life;
+          const stage = Math.round(p * (nUvAnimFrame - 1)) * animRepeat;
+          const v = Math.floor(stage * invAnimTileX);
+          const u = stage - v * animTileX;
           uvs[offset2] = u / animTileX;
           uvs[offset2 + 1] = 1 - v / animTileY;
           uvs2[offset2] = (u + 1) / animTileX;
@@ -270,8 +270,8 @@ var ParticleRenderable = Renderable.extend(
      */
     dispose: function (renderer) {
       // Put all the particles back
-      for (var i = 0; i < this._particles.length; i++) {
-        var p = this._particles[i];
+      for (let i = 0; i < this._particles.length; i++) {
+        const p = this._particles[i];
         p.emitter.kill(p);
       }
       this.geometry.dispose(renderer);
@@ -282,7 +282,7 @@ var ParticleRenderable = Renderable.extend(
      * @return {clay.particle.ParticleRenderable}
      */
     clone: function () {
-      var particleRenderable = new ParticleRenderable({
+      const particleRenderable = new ParticleRenderable({
         material: this.material
       });
       particleRenderable.loop = this.loop;
@@ -296,7 +296,7 @@ var ParticleRenderable = Renderable.extend(
       particleRenderable.rotation.copy(this.rotation);
       particleRenderable.scale.copy(this.scale);
 
-      for (var i = 0; i < this._children.length; i++) {
+      for (let i = 0; i < this._children.length; i++) {
         particleRenderable.add(this._children[i].clone());
       }
       return particleRenderable;

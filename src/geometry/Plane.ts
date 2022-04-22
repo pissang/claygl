@@ -9,7 +9,7 @@ import BoundingBox from '../math/BoundingBox';
  * @param {number} [opt.widthSegments]
  * @param {number} [opt.heightSegments]
  */
-var Plane = Geometry.extend(
+const Plane = Geometry.extend(
   /** @lends clay.geometry.Plane# */
   {
     dynamic: false,
@@ -31,18 +31,18 @@ var Plane = Geometry.extend(
      * Build plane geometry
      */
     build: function () {
-      var heightSegments = this.heightSegments;
-      var widthSegments = this.widthSegments;
-      var attributes = this.attributes;
-      var positions = [];
-      var texcoords = [];
-      var normals = [];
-      var faces = [];
+      const heightSegments = this.heightSegments;
+      const widthSegments = this.widthSegments;
+      const attributes = this.attributes;
+      const positions = [];
+      const texcoords = [];
+      const normals = [];
+      const faces = [];
 
-      for (var y = 0; y <= heightSegments; y++) {
-        var t = y / heightSegments;
-        for (var x = 0; x <= widthSegments; x++) {
-          var s = x / widthSegments;
+      for (let y = 0; y <= heightSegments; y++) {
+        const t = y / heightSegments;
+        for (let x = 0; x <= widthSegments; x++) {
+          const s = x / widthSegments;
 
           positions.push([2 * s - 1, 2 * t - 1, 0]);
           if (texcoords) {
@@ -52,7 +52,7 @@ var Plane = Geometry.extend(
             normals.push([0, 0, 1]);
           }
           if (x < widthSegments && y < heightSegments) {
-            var i = x + y * (widthSegments + 1);
+            const i = x + y * (widthSegments + 1);
             faces.push([i, i + 1, i + widthSegments + 1]);
             faces.push([i + widthSegments + 1, i + 1, i + widthSegments + 2]);
           }

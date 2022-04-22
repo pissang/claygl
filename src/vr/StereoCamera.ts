@@ -3,9 +3,9 @@ import Base from '../Node';
 import Camera from '../camera/Perspective';
 import Matrix4 from '../math/Matrix4';
 
-var tmpProjectionMatrix = new Matrix4();
+const tmpProjectionMatrix = new Matrix4();
 
-var StereoCamera = Base.extend(
+const StereoCamera = Base.extend(
   function () {
     return {
       aspect: 0.5,
@@ -30,18 +30,18 @@ var StereoCamera = Base.extend(
       zoom = zoom == null ? 1 : zoom;
       eyeSep = eyeSep == null ? 0.064 : eyeSep;
 
-      var fov = camera.fov;
-      var aspect = camera.aspect * this.aspect;
-      var near = camera.near;
+      const fov = camera.fov;
+      const aspect = camera.aspect * this.aspect;
+      const near = camera.near;
 
       // Off-axis stereoscopic effect based on
       // http://paulbourke.net/stereographics/stereorender/
 
       tmpProjectionMatrix.copy(camera.projectionMatrix);
-      var eyeSep = eyeSep / 2;
-      var eyeSepOnProjection = (eyeSep * near) / focus;
-      var ymax = (near * Math.tan((Math.PI / 180) * fov * 0.5)) / zoom;
-      var xmin, xmax;
+      eyeSep = eyeSep / 2;
+      const eyeSepOnProjection = (eyeSep * near) / focus;
+      const ymax = (near * Math.tan((Math.PI / 180) * fov * 0.5)) / zoom;
+      let xmin, xmax;
 
       // translate xOffset
       this._eyeLeft.array[12] = -eyeSep;
@@ -81,10 +81,11 @@ var StereoCamera = Base.extend(
         return;
       }
 
-      var frameData = this._frameData || (this._frameData = new VRFrameData());
+      /* global VRFrameData */
+      const frameData = this._frameData || (this._frameData = new VRFrameData());
       vrDisplay.getFrameData(frameData);
-      var leftCamera = this._leftCamera;
-      var rightCamera = this._rightCamera;
+      const leftCamera = this._leftCamera;
+      const rightCamera = this._rightCamera;
 
       leftCamera.projectionMatrix.setArray(frameData.leftProjectionMatrix);
       leftCamera.decomposeProjectionMatrix();

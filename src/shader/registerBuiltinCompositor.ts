@@ -17,18 +17,18 @@ import fxaaEssl from './source/compositor/fxaa.glsl.js';
 // TODO Must export a module and be used in the other modules. Or it will be tree shaked
 export default function register(Shader) {
   // Some build in shaders
-  Shader['import'](coloradjustEssl);
-  Shader['import'](blurEssl);
-  Shader['import'](lumEssl);
-  Shader['import'](lutEssl);
-  Shader['import'](vigentteEssl);
-  Shader['import'](outputEssl);
-  Shader['import'](brightEssl);
-  Shader['import'](downsampleEssl);
-  Shader['import'](upsampleEssl);
-  Shader['import'](hdrEssl);
-  Shader['import'](lensflareEssl);
-  Shader['import'](blendEssl);
+  Shader.import(coloradjustEssl);
+  Shader.import(blurEssl);
+  Shader.import(lumEssl);
+  Shader.import(lutEssl);
+  Shader.import(vigentteEssl);
+  Shader.import(outputEssl);
+  Shader.import(brightEssl);
+  Shader.import(downsampleEssl);
+  Shader.import(upsampleEssl);
+  Shader.import(hdrEssl);
+  Shader.import(lensflareEssl);
+  Shader.import(blendEssl);
 
-  Shader['import'](fxaaEssl);
+  Shader.import(fxaaEssl);
 }

@@ -12,7 +12,7 @@ import vec3 from '../glmatrix/vec3';
  * @constructor clay.picking.RayPicking
  * @extends clay.core.Base
  */
-var RayPicking = Base.extend(
+const RayPicking = Base.extend(
   /** @lends clay.picking.RayPicking# */ {
     /**
      * Target scene
@@ -44,7 +44,7 @@ var RayPicking = Base.extend(
      * @return {clay.picking.RayPicking~Intersection}
      */
     pick: function (x, y, forcePickAll) {
-      var out = this.pickAll(x, y, [], forcePickAll);
+      const out = this.pickAll(x, y, [], forcePickAll);
       return out[0] || null;
     },
 
@@ -82,20 +82,20 @@ var RayPicking = Base.extend(
           this._intersectRenderable(node, out);
         }
       }
-      for (var i = 0; i < node._children.length; i++) {
+      for (let i = 0; i < node._children.length; i++) {
         this._intersectNode(node._children[i], out, forcePickAll);
       }
     },
 
     _intersectRenderable: (function () {
-      var v1 = new Vector3();
-      var v2 = new Vector3();
-      var v3 = new Vector3();
-      var ray = new Ray();
-      var worldInverse = new Matrix4();
+      const v1 = new Vector3();
+      const v2 = new Vector3();
+      const v3 = new Vector3();
+      const ray = new Ray();
+      const worldInverse = new Matrix4();
 
       return function (renderable, out) {
-        var isSkinnedMesh = renderable.isSkinnedMesh();
+        let isSkinnedMesh = renderable.isSkinnedMesh();
         ray.copy(this._ray);
         Matrix4.invert(worldInverse, renderable.worldTransform);
 
@@ -104,9 +104,9 @@ var RayPicking = Base.extend(
           ray.applyTransform(worldInverse);
         }
 
-        var geometry = renderable.geometry;
+        const geometry = renderable.geometry;
 
-        var bbox = isSkinnedMesh ? renderable.skeleton.boundingBox : geometry.boundingBox;
+        const bbox = isSkinnedMesh ? renderable.skeleton.boundingBox : geometry.boundingBox;
 
         if (bbox && !ray.intersectBoundingBox(bbox)) {
           return;
@@ -122,17 +122,17 @@ var RayPicking = Base.extend(
           return;
         }
 
-        var cullBack =
+        const cullBack =
           (renderable.cullFace === glenum.BACK && renderable.frontFace === glenum.CCW) ||
           (renderable.cullFace === glenum.FRONT && renderable.frontFace === glenum.CW);
 
-        var point;
-        var indices = geometry.indices;
-        var positionAttr = geometry.attributes.position;
-        var weightAttr = geometry.attributes.weight;
-        var jointAttr = geometry.attributes.joint;
-        var skinMatricesArray;
-        var skinMatrices = [];
+        let point;
+        const indices = geometry.indices;
+        const positionAttr = geometry.attributes.position;
+        const weightAttr = geometry.attributes.weight;
+        const jointAttr = geometry.attributes.joint;
+        let skinMatricesArray;
+        const skinMatrices = [];
         // Check if valid.
         if (!positionAttr || !positionAttr.value || !indices) {
           return;
@@ -142,30 +142,30 @@ var RayPicking = Base.extend(
             renderable.__uid__,
             renderable.joints
           );
-          for (var i = 0; i < renderable.joints.length; i++) {
+          for (let i = 0; i < renderable.joints.length; i++) {
             skinMatrices[i] = skinMatrices[i] || [];
-            for (var k = 0; k < 16; k++) {
+            for (let k = 0; k < 16; k++) {
               skinMatrices[i][k] = skinMatricesArray[i * 16 + k];
             }
           }
-          var pos = [];
-          var weight = [];
-          var joint = [];
-          var skinnedPos = [];
-          var tmp = [];
-          var skinnedPositionAttr = geometry.attributes.skinnedPosition;
+          const pos = [];
+          const weight = [];
+          const joint = [];
+          const skinnedPos = [];
+          const tmp = [];
+          let skinnedPositionAttr = geometry.attributes.skinnedPosition;
           if (!skinnedPositionAttr || !skinnedPositionAttr.value) {
             geometry.createAttribute('skinnedPosition', 'f', 3);
             skinnedPositionAttr = geometry.attributes.skinnedPosition;
             skinnedPositionAttr.init(geometry.vertexCount);
           }
-          for (var i = 0; i < geometry.vertexCount; i++) {
+          for (let i = 0; i < geometry.vertexCount; i++) {
             positionAttr.get(i, pos);
             weightAttr.get(i, weight);
             jointAttr.get(i, joint);
             weight[3] = 1 - weight[0] - weight[1] - weight[2];
             vec3.set(skinnedPos, 0, 0, 0);
-            for (var k = 0; k < 4; k++) {
+            for (let k = 0; k < 4; k++) {
               if (joint[k] >= 0 && weight[k] > 1e-4) {
                 vec3.transformMat4(tmp, pos, skinMatrices[joint[k]]);
                 vec3.scaleAndAdd(skinnedPos, skinnedPos, tmp, weight[k]);
@@ -175,11 +175,11 @@ var RayPicking = Base.extend(
           }
         }
 
-        for (var i = 0; i < indices.length; i += 3) {
-          var i1 = indices[i];
-          var i2 = indices[i + 1];
-          var i3 = indices[i + 2];
-          var finalPosAttr = isSkinnedMesh ? geometry.attributes.skinnedPosition : positionAttr;
+        for (let i = 0; i < indices.length; i += 3) {
+          const i1 = indices[i];
+          const i2 = indices[i + 1];
+          const i3 = indices[i + 2];
+          const finalPosAttr = isSkinnedMesh ? geometry.attributes.skinnedPosition : positionAttr;
           finalPosAttr.get(i1, v1.array);
           finalPosAttr.get(i2, v2.array);
           finalPosAttr.get(i3, v3.array);
@@ -190,7 +190,7 @@ var RayPicking = Base.extend(
             point = ray.intersectTriangle(v1, v3, v2, renderable.culling);
           }
           if (point) {
-            var pointW = new Vector3();
+            const pointW = new Vector3();
             if (!isSkinnedMesh) {
               Vector3.transformMat4(pointW, point, renderable.worldTransform);
             } else {

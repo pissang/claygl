@@ -3,20 +3,20 @@ import Mesh from './Mesh';
 import Cache from './core/Cache';
 import BoundingBox from './math/BoundingBox';
 
-var tmpBoundingBox = new BoundingBox();
+const tmpBoundingBox = new BoundingBox();
 
 /**
  * @constructor clay.InstancedMesh
  * @extends clay.Mesh
  */
-var InstancedMesh = Mesh.extend(
+const InstancedMesh = Mesh.extend(
   function () {
     return /** @lends clay.InstancedMesh# */ {
       /**
        * Instances array. Each object in array must have node property
        * @type Array
        * @example
-       *  var node = new clay.Node()
+       *  const node = new clay.Node()
        *  instancedMesh.instances.push({
        *      node: node
        *  });
@@ -45,7 +45,7 @@ var InstancedMesh = Mesh.extend(
     },
 
     removeAttribute: function (symbol) {
-      var idx = this._attributesSymbols.indexOf(symbol);
+      const idx = this._attributesSymbols.indexOf(symbol);
       if (idx >= 0) {
         this._attributesSymbols.splice(idx, 1);
       }
@@ -68,19 +68,19 @@ var InstancedMesh = Mesh.extend(
     },
 
     getInstancedAttributesBuffers: function (renderer) {
-      var cache = this._cache;
+      const cache = this._cache;
 
       cache.use(renderer.__uid__);
 
-      var buffers = cache.get('buffers') || [];
+      const buffers = cache.get('buffers') || [];
 
       if (cache.isDirty('dirty')) {
-        var gl = renderer.gl;
+        const gl = renderer.gl;
 
-        for (var i = 0; i < this._attributesSymbols.length; i++) {
-          var attr = this.instancedAttributes[this._attributesSymbols[i]];
+        for (let i = 0; i < this._attributesSymbols.length; i++) {
+          const attr = this.instancedAttributes[this._attributesSymbols[i]];
 
-          var bufferObj = buffers[i];
+          let bufferObj = buffers[i];
           if (!bufferObj) {
             bufferObj = {
               buffer: gl.createBuffer()
@@ -107,21 +107,21 @@ var InstancedMesh = Mesh.extend(
     update: function (forceUpdateWorld) {
       Mesh.prototype.update.call(this, forceUpdateWorld);
 
-      var arraySize = this.getInstanceCount() * 4;
-      var instancedAttributes = this.instancedAttributes;
+      const arraySize = this.getInstanceCount() * 4;
+      const instancedAttributes = this.instancedAttributes;
 
-      var instanceMat1 = instancedAttributes.instanceMat1.value;
-      var instanceMat2 = instancedAttributes.instanceMat2.value;
-      var instanceMat3 = instancedAttributes.instanceMat3.value;
+      let instanceMat1 = instancedAttributes.instanceMat1.value;
+      let instanceMat2 = instancedAttributes.instanceMat2.value;
+      let instanceMat3 = instancedAttributes.instanceMat3.value;
       if (!instanceMat1 || instanceMat1.length !== arraySize) {
         instanceMat1 = instancedAttributes.instanceMat1.value = new Float32Array(arraySize);
         instanceMat2 = instancedAttributes.instanceMat2.value = new Float32Array(arraySize);
         instanceMat3 = instancedAttributes.instanceMat3.value = new Float32Array(arraySize);
       }
 
-      var sourceBoundingBox =
+      const sourceBoundingBox =
         (this.skeleton && this.skeleton.boundingBox) || this.geometry.boundingBox;
-      var needUpdateBoundingBox =
+      const needUpdateBoundingBox =
         sourceBoundingBox != null && (this.castShadow || this.frustumCulling);
       if (needUpdateBoundingBox && this.instances.length > 0) {
         this.boundingBox = this.boundingBox || new BoundingBox();
@@ -132,15 +132,15 @@ var InstancedMesh = Mesh.extend(
         this.boundingBox = null;
       }
 
-      for (var i = 0; i < this.instances.length; i++) {
-        var instance = this.instances[i];
-        var node = instance.node;
+      for (let i = 0; i < this.instances.length; i++) {
+        const instance = this.instances[i];
+        const node = instance.node;
 
         if (!node) {
           throw new Error('Instance must include node');
         }
-        var transform = node.worldTransform.array;
-        var i4 = i * 4;
+        const transform = node.worldTransform.array;
+        const i4 = i * 4;
         instanceMat1[i4] = transform[0];
         instanceMat1[i4 + 1] = transform[1];
         instanceMat1[i4 + 2] = transform[2];

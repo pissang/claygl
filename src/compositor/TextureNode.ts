@@ -5,7 +5,7 @@ import CompositorNode from './CompositorNode';
  * @constructor clay.compositor.TextureNode
  * @extends clay.compositor.CompositorNode
  */
-var TextureNode = CompositorNode.extend(
+const TextureNode = CompositorNode.extend(
   function () {
     return /** @lends clay.compositor.TextureNode# */ {
       /**

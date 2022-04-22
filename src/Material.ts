@@ -2,18 +2,18 @@
 import Base from './core/Base';
 import util from './core/util';
 import colorUtil from './core/color';
-var parseColor = colorUtil.parseToFloat;
+const parseColor = colorUtil.parseToFloat;
 
-var programKeyCache = {};
+const programKeyCache = {};
 
 function getDefineCode(defines) {
-  var defineKeys = Object.keys(defines);
+  const defineKeys = Object.keys(defines);
   defineKeys.sort();
-  var defineStr = [];
+  const defineStr = [];
   // Custom Defines
-  for (var i = 0; i < defineKeys.length; i++) {
-    var key = defineKeys[i];
-    var value = defines[key];
+  for (let i = 0; i < defineKeys.length; i++) {
+    let key = defineKeys[i];
+    const value = defines[key];
     if (value === null) {
       defineStr.push(key);
     } else {
@@ -25,12 +25,12 @@ function getDefineCode(defines) {
 
 function getProgramKey(vertexDefines, fragmentDefines, enabledTextures) {
   enabledTextures.sort();
-  var defineStr = [];
-  for (var i = 0; i < enabledTextures.length; i++) {
-    var symbol = enabledTextures[i];
+  const defineStr = [];
+  for (let i = 0; i < enabledTextures.length; i++) {
+    const symbol = enabledTextures[i];
     defineStr.push(symbol);
   }
-  var key =
+  let key =
     getDefineCode(vertexDefines) +
     '\n' +
     getDefineCode(fragmentDefines) +
@@ -41,7 +41,7 @@ function getProgramKey(vertexDefines, fragmentDefines, enabledTextures) {
     return programKeyCache[key];
   }
 
-  var id = util.genGUID();
+  let id = util.genGUID();
   programKeyCache[key] = id;
   return id;
 }
@@ -52,7 +52,7 @@ function getProgramKey(vertexDefines, fragmentDefines, enabledTextures) {
  *
  * Here is a basic example to create a standard material
 ```js
-var material = new clay.Material({
+const material = new clay.Material({
     shader: new clay.Shader(
         clay.Shader.source('clay.vertex'),
         clay.Shader.source('clay.fragment')
@@ -62,7 +62,7 @@ var material = new clay.Material({
  * @constructor clay.Material
  * @extends clay.core.Base
  */
-var Material = Base.extend(
+const Material = Base.extend(
   function () {
     return /** @lends clay.Material# */ {
       /**
@@ -151,7 +151,7 @@ var Material = Base.extend(
       if (value === undefined) {
         console.warn('Uniform value "' + symbol + '" is undefined');
       }
-      var uniform = this.uniforms[symbol];
+      const uniform = this.uniforms[symbol];
       if (uniform) {
         if (typeof value === 'string') {
           // Try to parse as a color. Invalid color string will return null.
@@ -174,8 +174,8 @@ var Material = Base.extend(
      * @param {Object} obj
      */
     setUniforms: function (obj) {
-      for (var key in obj) {
-        var val = obj[key];
+      for (let key in obj) {
+        const val = obj[key];
         this.setUniform(key, val);
       }
     },
@@ -202,8 +202,8 @@ var Material = Base.extend(
      */
     set: function (symbol, value) {
       if (typeof symbol === 'object') {
-        for (var key in symbol) {
-          var val = symbol[key];
+        for (let key in symbol) {
+          const val = symbol[key];
           this.setUniform(key, val);
         }
       } else {
@@ -216,7 +216,7 @@ var Material = Base.extend(
      * @return {number|array|clay.Texture|ArrayBufferView}
      */
     get: function (symbol) {
-      var uniform = this.uniforms[symbol];
+      const uniform = this.uniforms[symbol];
       if (uniform) {
         return uniform.value;
       }
@@ -227,29 +227,29 @@ var Material = Base.extend(
      * @param  {boolean} keepStatus If try to keep uniform and texture
      */
     attachShader: function (shader, keepStatus) {
-      var originalUniforms = this.uniforms;
+      const originalUniforms = this.uniforms;
 
       // Ignore if uniform can use in shader.
       this.uniforms = shader.createUniforms();
       this.shader = shader;
 
-      var uniforms = this.uniforms;
+      const uniforms = this.uniforms;
       this._enabledUniforms = Object.keys(uniforms);
       // Make sure uniforms are set in same order to avoid texture slot wrong
       this._enabledUniforms.sort();
       this._textureUniforms = this._enabledUniforms.filter(function (uniformName) {
-        var type = this.uniforms[uniformName].type;
+        const type = this.uniforms[uniformName].type;
         return type === 't' || type === 'tv';
       }, this);
 
-      var originalVertexDefines = this.vertexDefines;
-      var originalFragmentDefines = this.fragmentDefines;
+      const originalVertexDefines = this.vertexDefines;
+      const originalFragmentDefines = this.fragmentDefines;
 
       this.vertexDefines = util.clone(shader.vertexDefines);
       this.fragmentDefines = util.clone(shader.fragmentDefines);
 
       if (keepStatus) {
-        for (var symbol in originalUniforms) {
+        for (const symbol in originalUniforms) {
           if (uniforms[symbol]) {
             uniforms[symbol].value = originalUniforms[symbol].value;
           }
@@ -259,8 +259,8 @@ var Material = Base.extend(
         util.defaults(this.fragmentDefines, originalFragmentDefines);
       }
 
-      var textureStatus = {};
-      for (var key in shader.textures) {
+      const textureStatus = {};
+      for (let key in shader.textures) {
         textureStatus[key] = {
           shaderType: shader.textures[key].shaderType,
           type: shader.textures[key].type,
@@ -278,11 +278,11 @@ var Material = Base.extend(
      * @return {clay.Material}
      */
     clone: function () {
-      var material = new this.constructor({
+      const material = new this.constructor({
         name: this.name,
         shader: this.shader
       });
-      for (var symbol in this.uniforms) {
+      for (const symbol in this.uniforms) {
         material.uniforms[symbol].value = this.uniforms[symbol].value;
       }
       material.depthTest = this.depthTest;
@@ -305,8 +305,8 @@ var Material = Base.extend(
      * @param  {number} [val]
      */
     define: function (shaderType, symbol, val) {
-      var vertexDefines = this.vertexDefines;
-      var fragmentDefines = this.fragmentDefines;
+      const vertexDefines = this.vertexDefines;
+      const fragmentDefines = this.fragmentDefines;
       if (
         shaderType !== 'vertex' &&
         shaderType !== 'fragment' &&
@@ -403,15 +403,15 @@ var Material = Base.extend(
      */
     enableTexture: function (symbol) {
       if (Array.isArray(symbol)) {
-        for (var i = 0; i < symbol.length; i++) {
+        for (let i = 0; i < symbol.length; i++) {
           this.enableTexture(symbol[i]);
         }
         return;
       }
 
-      var status = this._textureStatus[symbol];
+      const status = this._textureStatus[symbol];
       if (status) {
-        var isEnabled = status.enabled;
+        let isEnabled = status.enabled;
         if (!isEnabled) {
           status.enabled = true;
           this._programKey = '';
@@ -422,8 +422,8 @@ var Material = Base.extend(
      * Enable all textures used in the shader
      */
     enableTexturesAll: function () {
-      var textureStatus = this._textureStatus;
-      for (var symbol in textureStatus) {
+      const textureStatus = this._textureStatus;
+      for (const symbol in textureStatus) {
         textureStatus[symbol].enabled = true;
       }
 
@@ -435,15 +435,15 @@ var Material = Base.extend(
      */
     disableTexture: function (symbol) {
       if (Array.isArray(symbol)) {
-        for (var i = 0; i < symbol.length; i++) {
+        for (let i = 0; i < symbol.length; i++) {
           this.disableTexture(symbol[i]);
         }
         return;
       }
 
-      var status = this._textureStatus[symbol];
+      const status = this._textureStatus[symbol];
       if (status) {
-        var isDisabled = !status.enabled;
+        let isDisabled = !status.enabled;
         if (!isDisabled) {
           status.enabled = false;
           this._programKey = '';
@@ -454,8 +454,8 @@ var Material = Base.extend(
      * Disable all textures used in the shader
      */
     disableTexturesAll: function () {
-      var textureStatus = this._textureStatus;
-      for (var symbol in textureStatus) {
+      const textureStatus = this._textureStatus;
+      for (const symbol in textureStatus) {
         textureStatus[symbol].enabled = false;
       }
 
@@ -467,7 +467,7 @@ var Material = Base.extend(
      * @return {boolean}
      */
     isTextureEnabled: function (symbol) {
-      var textureStatus = this._textureStatus;
+      const textureStatus = this._textureStatus;
       return !!textureStatus[symbol] && textureStatus[symbol].enabled;
     },
 
@@ -476,9 +476,9 @@ var Material = Base.extend(
      * @return {string[]}
      */
     getEnabledTextures: function () {
-      var enabledTextures = [];
-      var textureStatus = this._textureStatus;
-      for (var symbol in textureStatus) {
+      const enabledTextures = [];
+      const textureStatus = this._textureStatus;
+      for (const symbol in textureStatus) {
         if (textureStatus[symbol].enabled) {
           enabledTextures.push(symbol);
         }

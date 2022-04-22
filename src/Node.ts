@@ -6,13 +6,13 @@ import Matrix4 from './math/Matrix4';
 import mat4 from './glmatrix/mat4';
 import BoundingBox from './math/BoundingBox';
 
-var nameId = 0;
+let nameId = 0;
 
 /**
  * @constructor clay.Node
  * @extends clay.core.Base
  */
-var Node = Base.extend(
+const Node = Base.extend(
   /** @lends clay.Node# */ {
     /**
      * Scene node name
@@ -137,9 +137,9 @@ var Node = Base.extend(
      * @param {string} name
      */
     setName: function (name) {
-      var scene = this._scene;
+      const scene = this._scene;
       if (scene) {
-        var nodeRepository = scene._nodeRepository;
+        const nodeRepository = scene._nodeRepository;
         delete nodeRepository[this.name];
         nodeRepository[name] = this;
       }
@@ -151,7 +151,7 @@ var Node = Base.extend(
      * @param {clay.Node} node
      */
     add: function (node) {
-      var originalParent = node._parent;
+      const originalParent = node._parent;
       if (originalParent === this) {
         return;
       }
@@ -161,7 +161,7 @@ var Node = Base.extend(
       node._parent = this;
       this._children.push(node);
 
-      var scene = this._scene;
+      const scene = this._scene;
       if (scene && scene !== node.scene) {
         node.traverse(this._addSelfToScene, this);
       }
@@ -175,8 +175,8 @@ var Node = Base.extend(
      * @param {clay.Node} node
      */
     remove: function (node) {
-      var children = this._children;
-      var idx = children.indexOf(node);
+      const children = this._children;
+      let idx = children.indexOf(node);
       if (idx < 0) {
         return;
       }
@@ -193,9 +193,9 @@ var Node = Base.extend(
      * Remove all children
      */
     removeAll: function () {
-      var children = this._children;
+      const children = this._children;
 
-      for (var idx = 0; idx < children.length; idx++) {
+      for (let idx = 0; idx < children.length; idx++) {
         children[idx]._parent = null;
 
         if (this._scene) {
@@ -237,7 +237,7 @@ var Node = Base.extend(
      * @param {clay.Node} node
      */
     isAncestor: function (node) {
-      var parent = node._parent;
+      let parent = node._parent;
       while (parent) {
         if (parent === this) {
           return true;
@@ -270,8 +270,8 @@ var Node = Base.extend(
      * @return {clay.Node}
      */
     getChildByName: function (name) {
-      var children = this._children;
-      for (var i = 0; i < children.length; i++) {
+      const children = this._children;
+      for (let i = 0; i < children.length; i++) {
         if (children[i].name === name) {
           return children[i];
         }
@@ -284,13 +284,13 @@ var Node = Base.extend(
      * @return {clay.Node}
      */
     getDescendantByName: function (name) {
-      var children = this._children;
-      for (var i = 0; i < children.length; i++) {
-        var child = children[i];
+      const children = this._children;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i];
         if (child.name === name) {
           return child;
         } else {
-          var res = child.getDescendantByName(name);
+          const res = child.getDescendantByName(name);
           if (res) {
             return res;
           }
@@ -310,18 +310,18 @@ var Node = Base.extend(
         return;
       }
       // TODO Name have slash ?
-      var pathArr = path.split('/');
-      var current = this;
-      for (var i = 0; i < pathArr.length; i++) {
-        var name = pathArr[i];
+      const pathArr = path.split('/');
+      let current = this;
+      for (let i = 0; i < pathArr.length; i++) {
+        const name = pathArr[i];
         // Skip empty
         if (!name) {
           continue;
         }
-        var found = false;
-        var children = current._children;
-        for (var j = 0; j < children.length; j++) {
-          var child = children[j];
+        let found = false;
+        const children = current._children;
+        for (let j = 0; j < children.length; j++) {
+          const child = children[j];
           if (child.name === name) {
             current = child;
             found = true;
@@ -347,8 +347,8 @@ var Node = Base.extend(
         return '/';
       }
 
-      var current = this._parent;
-      var path = this.name;
+      let current = this._parent;
+      let path = this.name;
       while (current._parent) {
         path = current.name + '/' + path;
         if (current._parent == rootNode) {
@@ -371,8 +371,8 @@ var Node = Base.extend(
      */
     traverse: function (callback, context) {
       callback.call(context, this);
-      var _children = this._children;
-      for (var i = 0, len = _children.length; i < len; i++) {
+      const _children = this._children;
+      for (let i = 0, len = _children.length; i < len; i++) {
         _children[i].traverse(callback, context);
       }
     },
@@ -386,9 +386,9 @@ var Node = Base.extend(
      * @param {Node} [context]
      */
     eachChild: function (callback, context) {
-      var _children = this._children;
-      for (var i = 0, len = _children.length; i < len; i++) {
-        var child = _children[i];
+      const _children = this._children;
+      for (let i = 0, len = _children.length; i < len; i++) {
+        const child = _children[i];
         callback.call(context, child, i);
       }
     },
@@ -406,7 +406,7 @@ var Node = Base.extend(
      * Decompose the local transform to SRT
      */
     decomposeLocalTransform: function (keepScale) {
-      var scale = !keepScale ? this.scale : null;
+      const scale = !keepScale ? this.scale : null;
       this.localTransform.decomposeMatrix(scale, this.rotation, this.position);
     },
 
@@ -424,11 +424,11 @@ var Node = Base.extend(
      * @function
      */
     decomposeWorldTransform: (function () {
-      var tmp = mat4.create();
+      const tmp = mat4.create();
 
       return function (keepScale) {
-        var localTransform = this.localTransform;
-        var worldTransform = this.worldTransform;
+        const localTransform = this.localTransform;
+        const worldTransform = this.worldTransform;
         // Assume world transform is updated
         if (this._parent) {
           mat4.invert(tmp, this._parent.worldTransform.array);
@@ -436,7 +436,7 @@ var Node = Base.extend(
         } else {
           mat4.copy(localTransform.array, worldTransform.array);
         }
-        var scale = !keepScale ? this.scale : null;
+        const scale = !keepScale ? this.scale : null;
         localTransform.decomposeMatrix(scale, this.rotation, this.position);
       };
     })(),
@@ -450,12 +450,12 @@ var Node = Base.extend(
      * Notice that local transform will not be updated if _dirty mark of position, rotation, scale is all false
      */
     updateLocalTransform: function () {
-      var position = this.position;
-      var rotation = this.rotation;
-      var scale = this.scale;
+      const position = this.position;
+      const rotation = this.rotation;
+      const scale = this.scale;
 
       if (this.transformNeedsUpdate()) {
-        var m = this.localTransform.array;
+        const m = this.localTransform.array;
 
         // Transform order, scale->rotation->position
         mat4.fromRotationTranslation(m, rotation.array, position.array);
@@ -475,8 +475,8 @@ var Node = Base.extend(
      * @private
      */
     _updateWorldTransformTopDown: function () {
-      var localTransform = this.localTransform.array;
-      var worldTransform = this.worldTransform.array;
+      const localTransform = this.localTransform.array;
+      const worldTransform = this.worldTransform.array;
       if (this._parent) {
         mat4.multiplyAffine(worldTransform, this._parent.worldTransform.array, localTransform);
       } else {
@@ -489,7 +489,7 @@ var Node = Base.extend(
      */
     updateWorldTransform: function () {
       // Find the root node which transform needs update;
-      var rootNodeIsDirty = this;
+      let rootNodeIsDirty = this;
       while (
         rootNodeIsDirty &&
         rootNodeIsDirty.getParent() &&
@@ -518,8 +518,8 @@ var Node = Base.extend(
         this._needsUpdateWorldTransform = false;
       }
 
-      var children = this._children;
-      for (var i = 0, len = children.length; i < len; i++) {
+      const children = this._children;
+      for (let i = 0, len = children.length; i < len; i++) {
         children[i].update(forceUpdateWorld);
       }
     },
@@ -535,9 +535,9 @@ var Node = Base.extend(
       function defaultFilter(el) {
         return !el.invisible && el.geometry;
       }
-      var tmpBBox = new BoundingBox();
-      var tmpMat4 = new Matrix4();
-      var invWorldTransform = new Matrix4();
+      const tmpBBox = new BoundingBox();
+      const tmpMat4 = new Matrix4();
+      let invWorldTransform = new Matrix4();
       return function (filter, out) {
         out = out || new BoundingBox();
         filter = filter || defaultFilter;
@@ -575,9 +575,9 @@ var Node = Base.extend(
       if (this.transformNeedsUpdate()) {
         this.updateWorldTransform();
       }
-      var m = this.worldTransform.array;
+      const m = this.worldTransform.array;
       if (out) {
-        var arr = out.array;
+        const arr = out.array;
         arr[0] = m[12];
         arr[1] = m[13];
         arr[2] = m[14];
@@ -592,16 +592,16 @@ var Node = Base.extend(
      * @return {Node}
      */
     clone: function () {
-      var node = new this.constructor();
+      const node = new this.constructor();
 
-      var children = this._children;
+      const children = this._children;
 
       node.setName(this.name);
       node.position.copy(this.position);
       node.rotation.copy(this.rotation);
       node.scale.copy(this.scale);
 
-      for (var i = 0; i < children.length; i++) {
+      for (let i = 0; i < children.length; i++) {
         node.add(children[i].clone());
       }
 
@@ -617,14 +617,14 @@ var Node = Base.extend(
      * @function
      */
     rotateAround: (function () {
-      var v = new Vector3();
-      var RTMatrix = new Matrix4();
+      const v = new Vector3();
+      const RTMatrix = new Matrix4();
 
       // TODO improve performance
       return function (point, axis, angle) {
         v.copy(this.position).subtract(point);
 
-        var localTransform = this.localTransform;
+        const localTransform = this.localTransform;
         localTransform.identity();
         // parent node
         localTransform.translate(point);
@@ -646,7 +646,7 @@ var Node = Base.extend(
      * @function
      */
     lookAt: (function () {
-      var m = new Matrix4();
+      const m = new Matrix4();
       return function (target, up) {
         m.lookAt(this.position, target, up || this.localTransform.y).invert();
         this.setLocalTransform(m);

@@ -52,22 +52,22 @@ Shader.import(prezGlsl);
  * @alias clay.deferred.Renderer
  * @extends clay.core.Base
  */
-var DeferredRenderer = Base.extend(
+const DeferredRenderer = Base.extend(
   function () {
-    var fullQuadVertex = Shader.source('clay.compositor.vertex');
-    var lightVolumeVertex = Shader.source('clay.deferred.light_volume.vertex');
+    const fullQuadVertex = Shader.source('clay.compositor.vertex');
+    const lightVolumeVertex = Shader.source('clay.deferred.light_volume.vertex');
 
-    var directionalLightShader = new Shader(
+    const directionalLightShader = new Shader(
       fullQuadVertex,
       Shader.source('clay.deferred.directional_light')
     );
 
-    var lightAccumulateBlendFunc = function (gl) {
+    const lightAccumulateBlendFunc = function (gl) {
       gl.blendEquation(gl.FUNC_ADD);
       gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
     };
 
-    var createLightPassMat = function (shader) {
+    const createLightPassMat = function (shader) {
       return new Material({
         shader: shader,
         blend: lightAccumulateBlendFunc,
@@ -76,22 +76,22 @@ var DeferredRenderer = Base.extend(
       });
     };
 
-    var createVolumeShader = function (name) {
+    const createVolumeShader = function (name) {
       return new Shader(lightVolumeVertex, Shader.source('clay.deferred.' + name));
     };
 
     // Rotate and positioning to fit the spot light
     // Which the cusp of cone pointing to the positive z
     // and positioned on the origin
-    var coneGeo = new ConeGeo({
+    const coneGeo = new ConeGeo({
       capSegments: 10
     });
-    var mat = new Matrix4();
+    const mat = new Matrix4();
     mat.rotateX(Math.PI / 2).translate(new Vector3(0, -1, 0));
 
     coneGeo.applyTransform(mat);
 
-    var cylinderGeo = new CylinderGeo({
+    const cylinderGeo = new CylinderGeo({
       capSegments: 10
     });
     // Align with x axis
@@ -185,7 +185,7 @@ var DeferredRenderer = Base.extend(
       camera.update(true);
 
       // PENDING For stereo rendering
-      var dpr = renderer.getDevicePixelRatio();
+      const dpr = renderer.getDevicePixelRatio();
       if (
         this.autoResize &&
         (renderer.getWidth() * dpr !== this._lightAccumTex.width ||
@@ -252,20 +252,20 @@ var DeferredRenderer = Base.extend(
     },
 
     _accumulateLightBuffer: function (renderer, scene, camera, updateShadow) {
-      var gl = renderer.gl;
-      var lightAccumTex = this._lightAccumTex;
-      var lightAccumFrameBuffer = this._lightAccumFrameBuffer;
+      const gl = renderer.gl;
+      const lightAccumTex = this._lightAccumTex;
+      const lightAccumFrameBuffer = this._lightAccumFrameBuffer;
 
-      var eyePosition = camera.getWorldPosition().array;
+      const eyePosition = camera.getWorldPosition().array;
 
       // Update volume meshes
-      for (var i = 0; i < scene.lights.length; i++) {
+      for (let i = 0; i < scene.lights.length; i++) {
         if (!scene.lights[i].invisible) {
           this._updateLightProxy(scene.lights[i]);
         }
       }
 
-      var shadowMapPass = this.shadowMapPass;
+      const shadowMapPass = this.shadowMapPass;
       if (shadowMapPass && updateShadow) {
         gl.clearColor(1, 1, 1, 1);
         this._prepareLightShadow(renderer, scene, camera);
@@ -275,11 +275,11 @@ var DeferredRenderer = Base.extend(
 
       lightAccumFrameBuffer.attach(lightAccumTex);
       lightAccumFrameBuffer.bind(renderer);
-      var clearColor = renderer.clearColor;
+      const clearColor = renderer.clearColor;
 
-      var viewport = lightAccumFrameBuffer.viewport;
+      const viewport = lightAccumFrameBuffer.viewport;
       if (viewport) {
-        var dpr = viewport.devicePixelRatio;
+        const dpr = viewport.devicePixelRatio;
         // use scissor to make sure only clear the viewport
         gl.enable(gl.SCISSOR_TEST);
         gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
@@ -293,28 +293,28 @@ var DeferredRenderer = Base.extend(
 
       this.trigger('startlightaccumulate', renderer, scene, camera);
 
-      var viewProjectionInv = new Matrix4();
+      const viewProjectionInv = new Matrix4();
       Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
 
-      var volumeMeshList = [];
+      const volumeMeshList = [];
 
-      for (var i = 0; i < scene.lights.length; i++) {
-        var light = scene.lights[i];
+      for (let i = 0; i < scene.lights.length; i++) {
+        const light = scene.lights[i];
         if (light.invisible) {
           continue;
         }
 
-        var uTpl = light.uniformTemplates;
+        const uTpl = light.uniformTemplates;
 
-        var volumeMesh = light.volumeMesh || light.__volumeMesh;
+        const volumeMesh = light.volumeMesh || light.__volumeMesh;
 
         if (volumeMesh) {
-          var material = volumeMesh.material;
+          const material = volumeMesh.material;
           // Volume mesh will affect the scene bounding box when rendering
           // if castShadow is true
           volumeMesh.castShadow = false;
 
-          var unknownLightType = false;
+          let unknownLightType = false;
           switch (light.type) {
             case 'POINT_LIGHT':
               material.setUniform('lightColor', uTpl.pointLightColor.value(light));
@@ -361,8 +361,9 @@ var DeferredRenderer = Base.extend(
 
           volumeMeshList.push(volumeMesh);
         } else {
-          var pass = this._fullQuadPass;
-          var unknownLightType = false;
+          const pass = this._fullQuadPass;
+          let unknownLightType = false;
+          let hasShadow;
           // Full quad light
           switch (light.type) {
             case 'AMBIENT_LIGHT':
@@ -390,7 +391,7 @@ var DeferredRenderer = Base.extend(
               );
               break;
             case 'DIRECTIONAL_LIGHT':
-              var hasShadow = shadowMapPass && light.castShadow;
+              hasShadow = shadowMapPass && light.castShadow;
               pass.material = this._directionalLightMat;
               pass.material[hasShadow ? 'define' : 'undefine']('fragment', 'SHADOWMAP_ENABLED');
               if (hasShadow) {
@@ -410,7 +411,7 @@ var DeferredRenderer = Base.extend(
             continue;
           }
 
-          var passMaterial = pass.material;
+          const passMaterial = pass.material;
           passMaterial.setUniform('eyePosition', eyePosition);
           passMaterial.setUniform('viewProjectionInv', viewProjectionInv.array);
           passMaterial.setUniform('gBufferTexture1', this._gBuffer.getTargetTexture1());
@@ -441,11 +442,11 @@ var DeferredRenderer = Base.extend(
     },
 
     _prepareLightShadow: (function () {
-      var worldView = new Matrix4();
+      const worldView = new Matrix4();
       return function (renderer, scene, camera) {
-        for (var i = 0; i < scene.lights.length; i++) {
-          var light = scene.lights[i];
-          var volumeMesh = light.volumeMesh || light.__volumeMesh;
+        for (let i = 0; i < scene.lights.length; i++) {
+          const light = scene.lights[i];
+          const volumeMesh = light.volumeMesh || light.__volumeMesh;
           if (!light.castShadow || light.invisible) {
             continue;
           }
@@ -469,16 +470,17 @@ var DeferredRenderer = Base.extend(
     })(),
 
     _prepareSingleLightShadow: function (renderer, scene, camera, light, material) {
+      let shadowMaps, lightMatrices, cascadeClips, cascadeClipsNear, cascadeClipsFar;
       switch (light.type) {
         case 'POINT_LIGHT':
-          var shadowMaps = [];
+          shadowMaps = [];
           this.shadowMapPass.renderPointLightShadow(renderer, scene, light, shadowMaps);
           material.setUniform('lightShadowMap', shadowMaps[0]);
           material.setUniform('lightShadowMapSize', light.shadowResolution);
           break;
         case 'SPOT_LIGHT':
-          var shadowMaps = [];
-          var lightMatrices = [];
+          shadowMaps = [];
+          lightMatrices = [];
           this.shadowMapPass.renderSpotLightShadow(
             renderer,
             scene,
@@ -491,9 +493,9 @@ var DeferredRenderer = Base.extend(
           material.setUniform('lightShadowMapSize', light.shadowResolution);
           break;
         case 'DIRECTIONAL_LIGHT':
-          var shadowMaps = [];
-          var lightMatrices = [];
-          var cascadeClips = [];
+          shadowMaps = [];
+          lightMatrices = [];
+          cascadeClips = [];
           this.shadowMapPass.renderDirectionalLightShadow(
             renderer,
             scene,
@@ -503,8 +505,8 @@ var DeferredRenderer = Base.extend(
             lightMatrices,
             shadowMaps
           );
-          var cascadeClipsNear = cascadeClips.slice();
-          var cascadeClipsFar = cascadeClips.slice();
+          cascadeClipsNear = cascadeClips.slice();
+          cascadeClipsFar = cascadeClips.slice();
           cascadeClipsNear.pop();
           cascadeClipsFar.shift();
 
@@ -528,7 +530,11 @@ var DeferredRenderer = Base.extend(
     //
     // See "Deferred Shading Optimizations" in GDC2011
     _updateLightProxy: function (light) {
-      var volumeMesh;
+      let volumeMesh;
+      let shader;
+      let r;
+      let aspect;
+      let range;
       if (light.volumeMesh) {
         volumeMesh = light.volumeMesh;
       } else {
@@ -537,7 +543,7 @@ var DeferredRenderer = Base.extend(
           // Directional and ambient light renders in full quad
           case 'POINT_LIGHT':
           case 'SPHERE_LIGHT':
-            var shader =
+            shader =
               light.type === 'SPHERE_LIGHT' ? this._sphereLightShader : this._pointLightShader;
             // Volume mesh created automatically
             if (!light.__volumeMesh) {
@@ -551,7 +557,7 @@ var DeferredRenderer = Base.extend(
               });
             }
             volumeMesh = light.__volumeMesh;
-            var r = light.range + (light.radius || 0);
+            r = light.range + (light.radius || 0);
             volumeMesh.scale.set(r, r, r);
             break;
           case 'SPOT_LIGHT':
@@ -563,8 +569,8 @@ var DeferredRenderer = Base.extend(
                 culling: false
               });
             volumeMesh = light.__volumeMesh;
-            var aspect = Math.tan((light.penumbraAngle * Math.PI) / 180);
-            var range = light.range;
+            aspect = Math.tan((light.penumbraAngle * Math.PI) / 180);
+            range = light.range;
             volumeMesh.scale.set(aspect * range, aspect * range, range / 2);
             break;
           case 'TUBE_LIGHT':
@@ -576,7 +582,7 @@ var DeferredRenderer = Base.extend(
                 culling: false
               });
             volumeMesh = light.__volumeMesh;
-            var range = light.range;
+            range = light.range;
             volumeMesh.scale.set(light.length / 2 + range, range, range);
             break;
         }
@@ -589,26 +595,26 @@ var DeferredRenderer = Base.extend(
           light.worldTransform,
           volumeMesh.worldTransform
         );
-        var hasShadow = this.shadowMapPass && light.castShadow;
+        const hasShadow = this.shadowMapPass && light.castShadow;
         volumeMesh.material[hasShadow ? 'define' : 'undefine']('fragment', 'SHADOWMAP_ENABLED');
       }
     },
 
     _renderVolumeMeshList: (function () {
-      var worldView = new Matrix4();
-      var preZMaterial = new Material({
+      const worldView = new Matrix4();
+      const preZMaterial = new Material({
         shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
       });
       function getPreZMaterial() {
         return preZMaterial;
       }
       return function (renderer, scene, camera, volumeMeshList) {
-        var gl = renderer.gl;
+        const gl = renderer.gl;
 
         gl.depthFunc(gl.LEQUAL);
 
-        for (var i = 0; i < volumeMeshList.length; i++) {
-          var volumeMesh = volumeMeshList[i];
+        for (let i = 0; i < volumeMeshList.length; i++) {
+          const volumeMesh = volumeMeshList[i];
 
           // Frustum culling
           Matrix4.multiply(worldView, camera.viewMatrix, volumeMesh.worldTransform);

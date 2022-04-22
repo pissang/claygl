@@ -5,11 +5,11 @@ import mat4 from './glmatrix/mat4';
 import BoundingBox from './math/BoundingBox';
 import GeometryBase from './GeometryBase';
 
-var vec3Create = vec3.create;
-var vec3Add = vec3.add;
-var vec3Set = vec3.set;
+const vec3Create = vec3.create;
+const vec3Add = vec3.add;
+const vec3Set = vec3.set;
 
-var Attribute = GeometryBase.Attribute;
+const Attribute = GeometryBase.Attribute;
 
 /**
  * Geometry in ClayGL contains vertex attributes of mesh. These vertex attributes will be finally provided to the {@link clay.Shader}.
@@ -37,7 +37,7 @@ var Attribute = GeometryBase.Attribute;
  * It's simple to create a basic geometry with these classes.
  *
 ```js
-var sphere = new clay.geometry.Sphere({
+const sphere = new clay.geometry.Sphere({
     radius: 2
 });
 ```
@@ -47,12 +47,12 @@ var sphere = new clay.geometry.Sphere({
  * Usually the vertex attributes data are created by the {@link clay.loader.GLTF} or procedural geometries like {@link clay.geometry.Sphere}.
  * Besides these, you can create the data manually. Here is a simple example to create a triangle.
 ```js
-var TRIANGLE_POSITIONS = [
+const TRIANGLE_POSITIONS = [
     [-0.5, -0.5, 0],
     [0.5, -0.5, 0],
     [0, 0.5, 0]
 ];
-var geometry = new clay.StaticGeometryBase();
+const geometry = new clay.StaticGeometryBase();
 // Add triangle vertices to position attribute.
 geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 ```
@@ -80,7 +80,7 @@ attribute vec3 normal : NORMAL;
  * @constructor clay.Geometry
  * @extends clay.GeometryBase
  */
-var Geometry = GeometryBase.extend(
+const Geometry = GeometryBase.extend(
   function () {
     return /** @lends clay.Geometry# */ {
       /**
@@ -129,22 +129,22 @@ var Geometry = GeometryBase.extend(
      * Update boundingBox of Geometry
      */
     updateBoundingBox: function () {
-      var bbox = this.boundingBox;
+      let bbox = this.boundingBox;
       if (!bbox) {
         bbox = this.boundingBox = new BoundingBox();
       }
-      var posArr = this.attributes.position.value;
+      const posArr = this.attributes.position.value;
       if (posArr && posArr.length) {
-        var min = bbox.min;
-        var max = bbox.max;
-        var minArr = min.array;
-        var maxArr = max.array;
+        const min = bbox.min;
+        const max = bbox.max;
+        const minArr = min.array;
+        const maxArr = max.array;
         vec3.set(minArr, posArr[0], posArr[1], posArr[2]);
         vec3.set(maxArr, posArr[0], posArr[1], posArr[2]);
-        for (var i = 3; i < posArr.length; ) {
-          var x = posArr[i++];
-          var y = posArr[i++];
-          var z = posArr[i++];
+        for (let i = 3; i < posArr.length; ) {
+          const x = posArr[i++];
+          const y = posArr[i++];
+          const z = posArr[i++];
           if (x < minArr[0]) {
             minArr[0] = x;
           }
@@ -178,32 +178,32 @@ var Geometry = GeometryBase.extend(
         return;
       }
 
-      var indices = this.indices;
-      var attributes = this.attributes;
-      var positions = attributes.position.value;
-      var normals = attributes.normal.value;
+      const indices = this.indices;
+      const attributes = this.attributes;
+      const positions = attributes.position.value;
+      let normals = attributes.normal.value;
 
       if (!normals || normals.length !== positions.length) {
         normals = attributes.normal.value = new vendor.Float32Array(positions.length);
       } else {
         // Reset
-        for (var i = 0; i < normals.length; i++) {
+        for (let i = 0; i < normals.length; i++) {
           normals[i] = 0;
         }
       }
 
-      var p1 = vec3Create();
-      var p2 = vec3Create();
-      var p3 = vec3Create();
+      const p1 = vec3Create();
+      const p2 = vec3Create();
+      const p3 = vec3Create();
 
-      var v21 = vec3Create();
-      var v32 = vec3Create();
+      const v21 = vec3Create();
+      const v32 = vec3Create();
 
-      var n = vec3Create();
+      const n = vec3Create();
 
-      var len = indices ? indices.length : this.vertexCount;
-      var i1, i2, i3;
-      for (var f = 0; f < len; ) {
+      const len = indices ? indices.length : this.vertexCount;
+      let i1, i2, i3;
+      for (let f = 0; f < len; ) {
         if (indices) {
           i1 = indices[f++];
           i2 = indices[f++];
@@ -222,14 +222,14 @@ var Geometry = GeometryBase.extend(
         vec3.sub(v32, p2, p3);
         vec3.cross(n, v21, v32);
         // Already be weighted by the triangle area
-        for (var i = 0; i < 3; i++) {
+        for (let i = 0; i < 3; i++) {
           normals[i1 * 3 + i] = normals[i1 * 3 + i] + n[i];
           normals[i2 * 3 + i] = normals[i2 * 3 + i] + n[i];
           normals[i3 * 3 + i] = normals[i3 * 3 + i] + n[i];
         }
       }
 
-      for (var i = 0; i < normals.length; ) {
+      for (let i = 0; i < normals.length; ) {
         vec3Set(n, normals[i], normals[i + 1], normals[i + 2]);
         vec3.normalize(n, n);
         normals[i++] = n[0];
@@ -251,25 +251,25 @@ var Geometry = GeometryBase.extend(
         this.generateUniqueVertex();
       }
 
-      var indices = this.indices;
-      var attributes = this.attributes;
-      var positions = attributes.position.value;
-      var normals = attributes.normal.value;
+      const indices = this.indices;
+      const attributes = this.attributes;
+      const positions = attributes.position.value;
+      let normals = attributes.normal.value;
 
-      var p1 = vec3Create();
-      var p2 = vec3Create();
-      var p3 = vec3Create();
+      const p1 = vec3Create();
+      const p2 = vec3Create();
+      const p3 = vec3Create();
 
-      var v21 = vec3Create();
-      var v32 = vec3Create();
-      var n = vec3Create();
+      const v21 = vec3Create();
+      const v32 = vec3Create();
+      const n = vec3Create();
 
       if (!normals) {
         normals = attributes.normal.value = new Float32Array(positions.length);
       }
-      var len = indices ? indices.length : this.vertexCount;
-      var i1, i2, i3;
-      for (var f = 0; f < len; ) {
+      const len = indices ? indices.length : this.vertexCount;
+      let i1, i2, i3;
+      for (let f = 0; f < len; ) {
         if (indices) {
           i1 = indices[f++];
           i2 = indices[f++];
@@ -290,7 +290,7 @@ var Geometry = GeometryBase.extend(
 
         vec3.normalize(n, n);
 
-        for (var i = 0; i < 3; i++) {
+        for (let i = 0; i < 3; i++) {
           normals[i1 * 3 + i] = n[i];
           normals[i2 * 3 + i] = n[i];
           normals[i3 * 3 + i] = n[i];
@@ -307,35 +307,35 @@ var Geometry = GeometryBase.extend(
         return;
       }
 
-      var nVertex = this.vertexCount;
-      var attributes = this.attributes;
+      const nVertex = this.vertexCount;
+      const attributes = this.attributes;
       if (!attributes.tangent.value) {
         attributes.tangent.value = new Float32Array(nVertex * 4);
       }
-      var texcoords = attributes.texcoord0.value;
-      var positions = attributes.position.value;
-      var tangents = attributes.tangent.value;
-      var normals = attributes.normal.value;
+      const texcoords = attributes.texcoord0.value;
+      const positions = attributes.position.value;
+      const tangents = attributes.tangent.value;
+      const normals = attributes.normal.value;
 
       if (!texcoords) {
         console.warn("Geometry without texcoords can't generate tangents.");
         return;
       }
 
-      var tan1 = [];
-      var tan2 = [];
-      for (var i = 0; i < nVertex; i++) {
+      const tan1 = [];
+      const tan2 = [];
+      for (let i = 0; i < nVertex; i++) {
         tan1[i] = [0.0, 0.0, 0.0];
         tan2[i] = [0.0, 0.0, 0.0];
       }
 
-      var sdir = [0.0, 0.0, 0.0];
-      var tdir = [0.0, 0.0, 0.0];
-      var indices = this.indices;
+      const sdir = [0.0, 0.0, 0.0];
+      const tdir = [0.0, 0.0, 0.0];
+      const indices = this.indices;
 
-      var len = indices ? indices.length : this.vertexCount;
-      var i1, i2, i3;
-      for (var i = 0; i < len; ) {
+      const len = indices ? indices.length : this.vertexCount;
+      let i1, i2, i3;
+      for (let i = 0; i < len; ) {
         if (indices) {
           i1 = indices[i++];
           i2 = indices[i++];
@@ -346,7 +346,7 @@ var Geometry = GeometryBase.extend(
           i3 = i++;
         }
 
-        var st1s = texcoords[i1 * 2],
+        const st1s = texcoords[i1 * 2],
           st2s = texcoords[i2 * 2],
           st3s = texcoords[i3 * 2],
           st1t = texcoords[i1 * 2 + 1],
@@ -362,19 +362,19 @@ var Geometry = GeometryBase.extend(
           p2z = positions[i2 * 3 + 2],
           p3z = positions[i3 * 3 + 2];
 
-        var x1 = p2x - p1x,
+        const x1 = p2x - p1x,
           x2 = p3x - p1x,
           y1 = p2y - p1y,
           y2 = p3y - p1y,
           z1 = p2z - p1z,
           z2 = p3z - p1z;
 
-        var s1 = st2s - st1s,
+        const s1 = st2s - st1s,
           s2 = st3s - st1s,
           t1 = st2t - st1t,
           t2 = st3t - st1t;
 
-        var r = 1.0 / (s1 * t2 - t1 * s2);
+        const r = 1.0 / (s1 * t2 - t1 * s2);
         sdir[0] = (t2 * x1 - t1 * x2) * r;
         sdir[1] = (t2 * y1 - t1 * y2) * r;
         sdir[2] = (t2 * z1 - t1 * z2) * r;
@@ -390,14 +390,14 @@ var Geometry = GeometryBase.extend(
         vec3Add(tan2[i2], tan2[i2], tdir);
         vec3Add(tan2[i3], tan2[i3], tdir);
       }
-      var tmp = vec3Create();
-      var nCrossT = vec3Create();
-      var n = vec3Create();
-      for (var i = 0; i < nVertex; i++) {
+      const tmp = vec3Create();
+      const nCrossT = vec3Create();
+      const n = vec3Create();
+      for (let i = 0; i < nVertex; i++) {
         n[0] = normals[i * 3];
         n[1] = normals[i * 3 + 1];
         n[2] = normals[i * 3 + 2];
-        var t = tan1[i];
+        const t = tan1[i];
 
         // Gram-Schmidt orthogonalize
         vec3.scale(tmp, n, vec3.dot(n, t));
@@ -436,27 +436,27 @@ var Geometry = GeometryBase.extend(
         this.indices = new vendor.Uint32Array(this.indices);
       }
 
-      var attributes = this.attributes;
-      var indices = this.indices;
+      const attributes = this.attributes;
+      const indices = this.indices;
 
-      var attributeNameList = this.getEnabledAttributes();
+      const attributeNameList = this.getEnabledAttributes();
 
-      var oldAttrValues = {};
-      for (var a = 0; a < attributeNameList.length; a++) {
-        var name = attributeNameList[a];
+      const oldAttrValues = {};
+      for (let a = 0; a < attributeNameList.length; a++) {
+        const name = attributeNameList[a];
         oldAttrValues[name] = attributes[name].value;
         attributes[name].init(this.indices.length);
       }
 
-      var cursor = 0;
-      for (var i = 0; i < indices.length; i++) {
-        var ii = indices[i];
-        for (var a = 0; a < attributeNameList.length; a++) {
-          var name = attributeNameList[a];
-          var array = attributes[name].value;
-          var size = attributes[name].size;
+      let cursor = 0;
+      for (let i = 0; i < indices.length; i++) {
+        const ii = indices[i];
+        for (let a = 0; a < attributeNameList.length; a++) {
+          const name = attributeNameList[a];
+          const array = attributes[name].value;
+          const size = attributes[name].size;
 
-          for (var k = 0; k < size; k++) {
+          for (let k = 0; k < size; k++) {
             array[cursor * size + k] = oldAttrValues[name][ii * size + k];
           }
         }
@@ -479,18 +479,18 @@ var Geometry = GeometryBase.extend(
         this.generateUniqueVertex();
       }
 
-      var attributes = this.attributes;
-      var array = attributes.barycentric.value;
-      var indices = this.indices;
+      const attributes = this.attributes;
+      let array = attributes.barycentric.value;
+      const indices = this.indices;
       // Already existed;
       if (array && array.length === indices.length * 3) {
         return;
       }
       array = attributes.barycentric.value = new Float32Array(indices.length * 3);
 
-      for (var i = 0; i < (indices ? indices.length : this.vertexCount / 3); ) {
-        for (var j = 0; j < 3; j++) {
-          var ii = indices ? indices[i++] : i * 3 + j;
+      for (let i = 0; i < (indices ? indices.length : this.vertexCount / 3); ) {
+        for (let j = 0; j < 3; j++) {
+          const ii = indices ? indices[i++] : i * 3 + j;
           array[ii * 3 + j] = 1;
         }
       }
@@ -502,19 +502,19 @@ var Geometry = GeometryBase.extend(
      * @param {clay.Matrix4} matrix
      */
     applyTransform: function (matrix) {
-      var attributes = this.attributes;
-      var positions = attributes.position.value;
-      var normals = attributes.normal.value;
-      var tangents = attributes.tangent.value;
+      const attributes = this.attributes;
+      const positions = attributes.position.value;
+      const normals = attributes.normal.value;
+      const tangents = attributes.tangent.value;
 
       matrix = matrix.array;
       // Normal Matrix
-      var inverseTransposeMatrix = mat4.create();
+      const inverseTransposeMatrix = mat4.create();
       mat4.invert(inverseTransposeMatrix, matrix);
       mat4.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
 
-      var vec3TransformMat4 = vec3.transformMat4;
-      var vec3ForEach = vec3.forEach;
+      const vec3TransformMat4 = vec3.transformMat4;
+      const vec3ForEach = vec3.forEach;
       vec3ForEach(positions, 3, 0, null, vec3TransformMat4, matrix);
       if (normals) {
         vec3ForEach(normals, 3, 0, null, vec3TransformMat4, inverseTransposeMatrix);
@@ -532,16 +532,16 @@ var Geometry = GeometryBase.extend(
      * @param {clay.Renderer} renderer
      */
     dispose: function (renderer) {
-      var cache = this._cache;
+      const cache = this._cache;
 
       cache.use(renderer.__uid__);
-      var chunks = cache.get('chunks');
+      const chunks = cache.get('chunks');
       if (chunks) {
-        for (var c = 0; c < chunks.length; c++) {
-          var chunk = chunks[c];
+        for (let c = 0; c < chunks.length; c++) {
+          const chunk = chunks[c];
 
-          for (var k = 0; k < chunk.attributeBuffers.length; k++) {
-            var attribs = chunk.attributeBuffers[k];
+          for (let k = 0; k < chunk.attributeBuffers.length; k++) {
+            const attribs = chunk.attributeBuffers[k];
             renderer.gl.deleteBuffer(attribs.buffer);
           }
 
@@ -551,9 +551,9 @@ var Geometry = GeometryBase.extend(
         }
       }
       if (this.__vaoCache) {
-        var vaoExt = renderer.getGLExtension('OES_vertex_array_object');
-        for (var id in this.__vaoCache) {
-          var vao = this.__vaoCache[id].vao;
+        const vaoExt = renderer.getGLExtension('OES_vertex_array_object');
+        for (const id in this.__vaoCache) {
+          const vao = this.__vaoCache[id].vao;
           if (vao) {
             vaoExt.deleteVertexArrayOES(vao);
           }

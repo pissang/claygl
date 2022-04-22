@@ -513,7 +513,7 @@ vec4.forEach = (function () {
   var vec = vec4.create();
 
   return function (a, stride, offset, count, fn, arg) {
-    var i, l;
+    let i, l;
     if (!stride) {
       stride = 4;
     }

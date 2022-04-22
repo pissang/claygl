@@ -2,7 +2,7 @@
 import Vector3 from './Vector3';
 import vec3 from '../glmatrix/vec3';
 
-var EPSILON = 1e-5;
+const EPSILON = 1e-5;
 
 /**
  * @constructor
@@ -10,7 +10,7 @@ var EPSILON = 1e-5;
  * @param {clay.Vector3} [origin]
  * @param {clay.Vector3} [direction]
  */
-var Ray = function (origin, direction) {
+const Ray = function (origin, direction) {
   /**
    * @type {clay.Vector3}
    */
@@ -32,12 +32,12 @@ Ray.prototype = {
    * @return {clay.Vector3}
    */
   intersectPlane: function (plane, out) {
-    var pn = plane.normal.array;
-    var d = plane.distance;
-    var ro = this.origin.array;
-    var rd = this.direction.array;
+    const pn = plane.normal.array;
+    const d = plane.distance;
+    const ro = this.origin.array;
+    const rd = this.direction.array;
 
-    var divider = vec3.dot(pn, rd);
+    const divider = vec3.dot(pn, rd);
     // ray is parallel to the plane
     if (divider === 0) {
       return null;
@@ -45,7 +45,7 @@ Ray.prototype = {
     if (!out) {
       out = new Vector3();
     }
-    var t = (vec3.dot(pn, ro) - d) / divider;
+    const t = (vec3.dot(pn, ro) - d) / divider;
     vec3.scaleAndAdd(out.array, ro, rd, -t);
     out._dirty = true;
     return out;
@@ -57,22 +57,22 @@ Ray.prototype = {
    */
   mirrorAgainstPlane: function (plane) {
     // Distance to plane
-    var d = vec3.dot(plane.normal.array, this.direction.array);
+    const d = vec3.dot(plane.normal.array, this.direction.array);
     vec3.scaleAndAdd(this.direction.array, this.direction.array, plane.normal.array, -d * 2);
     this.direction._dirty = true;
   },
 
   distanceToPoint: (function () {
-    var v = vec3.create();
+    const v = vec3.create();
     return function (point) {
       vec3.sub(v, point, this.origin.array);
       // Distance from projection point to origin
-      var b = vec3.dot(v, this.direction.array);
+      const b = vec3.dot(v, this.direction.array);
       if (b < 0) {
         return vec3.distance(this.origin.array, point);
       }
       // Squared distance from center to origin
-      var c2 = vec3.lenSquared(v);
+      const c2 = vec3.lenSquared(v);
       // Squared distance from center to projection point
       return Math.sqrt(c2 - b * b);
     };
@@ -86,30 +86,30 @@ Ray.prototype = {
    * @return {clay.Vector3}
    */
   intersectSphere: (function () {
-    var v = vec3.create();
+    const v = vec3.create();
     return function (center, radius, out) {
-      var origin = this.origin.array;
-      var direction = this.direction.array;
+      const origin = this.origin.array;
+      const direction = this.direction.array;
       center = center.array;
       vec3.sub(v, center, origin);
       // Distance from projection point to origin
-      var b = vec3.dot(v, direction);
+      const b = vec3.dot(v, direction);
       // Squared distance from center to origin
-      var c2 = vec3.squaredLength(v);
+      const c2 = vec3.squaredLength(v);
       // Squared distance from center to projection point
-      var d2 = c2 - b * b;
+      const d2 = c2 - b * b;
 
-      var r2 = radius * radius;
+      const r2 = radius * radius;
       // No intersection
       if (d2 > r2) {
         return;
       }
 
-      var a = Math.sqrt(r2 - d2);
+      const a = Math.sqrt(r2 - d2);
       // First intersect point
-      var t0 = b - a;
+      const t0 = b - a;
       // Second intersect point
-      var t1 = b + a;
+      const t1 = b + a;
 
       if (!out) {
         out = new Vector3();
@@ -136,16 +136,16 @@ Ray.prototype = {
    * @return {clay.Vector3}
    */
   intersectBoundingBox: function (bbox, out) {
-    var dir = this.direction.array;
-    var origin = this.origin.array;
-    var min = bbox.min.array;
-    var max = bbox.max.array;
+    const dir = this.direction.array;
+    const origin = this.origin.array;
+    const min = bbox.min.array;
+    const max = bbox.max.array;
 
-    var invdirx = 1 / dir[0];
-    var invdiry = 1 / dir[1];
-    var invdirz = 1 / dir[2];
+    const invdirx = 1 / dir[0];
+    const invdiry = 1 / dir[1];
+    const invdirz = 1 / dir[2];
 
-    var tmin, tmax, tymin, tymax, tzmin, tzmax;
+    let tmin, tmax, tymin, tymax, tzmin, tzmax;
     if (invdirx >= 0) {
       tmin = (min[0] - origin[0]) * invdirx;
       tmax = (max[0] - origin[0]) * invdirx;
@@ -194,7 +194,7 @@ Ray.prototype = {
       return null;
     }
 
-    var t = tmin >= 0 ? tmin : tmax;
+    const t = tmin >= 0 ? tmin : tmax;
 
     if (!out) {
       out = new Vector3();
@@ -215,14 +215,14 @@ Ray.prototype = {
    * @return {clay.Vector3}
    */
   intersectTriangle: (function () {
-    var eBA = vec3.create();
-    var eCA = vec3.create();
-    var AO = vec3.create();
-    var vCross = vec3.create();
+    const eBA = vec3.create();
+    const eCA = vec3.create();
+    const AO = vec3.create();
+    const vCross = vec3.create();
 
     return function (a, b, c, singleSided, out, barycenteric) {
-      var dir = this.direction.array;
-      var origin = this.origin.array;
+      const dir = this.direction.array;
+      const origin = this.origin.array;
       a = a.array;
       b = b.array;
       c = c.array;
@@ -232,7 +232,7 @@ Ray.prototype = {
 
       vec3.cross(vCross, eCA, dir);
 
-      var det = vec3.dot(eBA, vCross);
+      const det = vec3.dot(eBA, vCross);
 
       if (singleSided) {
         if (det > -EPSILON) {
@@ -245,20 +245,20 @@ Ray.prototype = {
       }
 
       vec3.sub(AO, origin, a);
-      var u = vec3.dot(vCross, AO) / det;
+      const u = vec3.dot(vCross, AO) / det;
       if (u < 0 || u > 1) {
         return null;
       }
 
       vec3.cross(vCross, eBA, AO);
-      var v = vec3.dot(dir, vCross) / det;
+      const v = vec3.dot(dir, vCross) / det;
 
       if (v < 0 || v > 1 || u + v > 1) {
         return null;
       }
 
       vec3.cross(vCross, eBA, eCA);
-      var t = -vec3.dot(AO, vCross) / det;
+      const t = -vec3.dot(AO, vCross) / det;
 
       if (t < 0) {
         return null;
@@ -303,7 +303,7 @@ Ray.prototype = {
    * @return {clay.Ray}
    */
   clone: function () {
-    var ray = new Ray();
+    const ray = new Ray();
     ray.copy(this);
     return ray;
   }

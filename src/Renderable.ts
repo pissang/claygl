@@ -7,7 +7,7 @@ import glenum from './core/glenum';
  * @alias clay.Renderable
  * @extends clay.Node
  */
-var Renderable = Node.extend(
+const Renderable = Node.extend(
   /** @lends clay.Renderable# */ {
     /**
      * @type {clay.Material}
@@ -139,7 +139,7 @@ var Renderable = Node.extend(
      * @return {clay.Renderable}
      */
     clone: (function () {
-      var properties = [
+      const properties = [
         'castShadow',
         'receiveShadow',
         'mode',
@@ -154,13 +154,13 @@ var Renderable = Node.extend(
         'ignoreGBuffer'
       ];
       return function () {
-        var renderable = Node.prototype.clone.call(this);
+        const renderable = Node.prototype.clone.call(this);
 
         renderable.geometry = this.geometry;
         renderable.material = this.material;
 
-        for (var i = 0; i < properties.length; i++) {
-          var name = properties[i];
+        for (let i = 0; i < properties.length; i++) {
+          const name = properties[i];
           // Try not to overwrite the prototype property
           if (renderable[name] !== this[name]) {
             renderable[name] = this[name];

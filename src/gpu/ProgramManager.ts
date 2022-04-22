@@ -1,8 +1,8 @@
 // @ts-nocheck
 import GLProgram from './GLProgram';
 
-var loopRegex =
-  /for\s*?\(int\s*?_idx_\s*\=\s*([\w-]+)\;\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
+const loopRegex =
+  /for\s*?\(int\s*?_idx_\s*=\s*([\w-]+);\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
 
 function unrollLoop(shaderStr, defines, lightsNumbers) {
   // Loop unroll from three.js, https://github.com/mrdoob/three.js/blob/master/src/renderers/webgl/WebGLProgram.js#L175
@@ -15,7 +15,7 @@ function unrollLoop(shaderStr, defines, lightsNumbers) {
   //     vec3 color = texture2D(textures[_idx_], uv).rgb;
   // }}
   function replace(match, start, end, snippet) {
-    var unroll = '';
+    let unroll = '';
     // Try to treat as define
     if (isNaN(start)) {
       if (start in defines) {
@@ -33,7 +33,7 @@ function unrollLoop(shaderStr, defines, lightsNumbers) {
     }
     // TODO Error checking
 
-    for (var idx = parseInt(start); idx < parseInt(end); idx++) {
+    for (let idx = parseInt(start); idx < parseInt(end); idx++) {
       // PENDING Add scope?
       unroll +=
         '{' +
@@ -44,32 +44,32 @@ function unrollLoop(shaderStr, defines, lightsNumbers) {
     return unroll;
   }
 
-  var lightNumberDefines = {};
-  for (var lightType in lightsNumbers) {
+  const lightNumberDefines = {};
+  for (const lightType in lightsNumbers) {
     lightNumberDefines[lightType + '_COUNT'] = lightsNumbers[lightType];
   }
   return shaderStr.replace(loopRegex, replace);
 }
 
 function getDefineCode(defines, lightsNumbers, enabledTextures) {
-  var defineStr = [];
+  const defineStr = [];
   if (lightsNumbers) {
-    for (var lightType in lightsNumbers) {
-      var count = lightsNumbers[lightType];
+    for (const lightType in lightsNumbers) {
+      const count = lightsNumbers[lightType];
       if (count > 0) {
         defineStr.push('#define ' + lightType.toUpperCase() + '_COUNT ' + count);
       }
     }
   }
   if (enabledTextures) {
-    for (var i = 0; i < enabledTextures.length; i++) {
-      var symbol = enabledTextures[i];
+    for (let i = 0; i < enabledTextures.length; i++) {
+      const symbol = enabledTextures[i];
       defineStr.push('#define ' + symbol.toUpperCase() + '_ENABLED');
     }
   }
   // Custom Defines
-  for (var symbol in defines) {
-    var value = defines[symbol];
+  for (const symbol in defines) {
+    const value = defines[symbol];
     if (value === null) {
       defineStr.push('#define ' + symbol);
     } else {
@@ -82,8 +82,8 @@ function getDefineCode(defines, lightsNumbers, enabledTextures) {
 function getExtensionCode(exts) {
   // Extension declaration must before all non-preprocessor codes
   // TODO vertex ? extension enum ?
-  var extensionStr = [];
-  for (var i = 0; i < exts.length; i++) {
+  const extensionStr = [];
+  for (let i = 0; i < exts.length; i++) {
     extensionStr.push('#extension GL_' + exts[i][0] + ' : enable');
   }
   return extensionStr.join('\n');
@@ -107,11 +107,11 @@ function ProgramManager(renderer) {
 }
 
 ProgramManager.prototype.getProgram = function (renderable, material, scene, renderer) {
-  var cache = this._cache;
+  const cache = this._cache;
 
-  var isSkinnedMesh = renderable.isSkinnedMesh && renderable.isSkinnedMesh();
-  var isInstancedMesh = renderable.isInstancedMesh && renderable.isInstancedMesh();
-  var key = 's' + material.shader.shaderID + 'm' + material.getProgramKey();
+  const isSkinnedMesh = renderable.isSkinnedMesh && renderable.isSkinnedMesh();
+  const isInstancedMesh = renderable.isInstancedMesh && renderable.isInstancedMesh();
+  let key = 's' + material.shader.shaderID + 'm' + material.getProgramKey();
   if (scene) {
     key += 'se' + scene.getProgramKey(renderable.lightGroup);
   }
@@ -124,19 +124,18 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene, ren
   if (renderer.logDepthBuffer) {
     key += ',ld';
   }
-  var program = cache[key];
+  let program = cache[key];
 
   if (program) {
     return program;
   }
 
-  var lightsNumbers = scene ? scene.getLightsNumbers(renderable.lightGroup) : {};
-  var renderer = this._renderer;
-  var _gl = renderer.gl;
-  var enabledTextures = material.getEnabledTextures();
-  var extraDefineCode = '';
+  const lightsNumbers = scene ? scene.getLightsNumbers(renderable.lightGroup) : {};
+  const _gl = renderer.gl;
+  const enabledTextures = material.getEnabledTextures();
+  let extraDefineCode = '';
   if (isSkinnedMesh) {
-    var skinDefines = {
+    const skinDefines = {
       SKINNING: null,
       JOINT_COUNT: renderable.joints.length
     };
@@ -154,13 +153,13 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene, ren
   }
   // TODO Optimize key generation
   // VERTEX
-  var vertexDefineStr =
+  let vertexDefineStr =
     extraDefineCode + getDefineCode(material.vertexDefines, lightsNumbers, enabledTextures);
   // FRAGMENT
-  var fragmentDefineStr =
+  let fragmentDefineStr =
     extraDefineCode + getDefineCode(material.fragmentDefines, lightsNumbers, enabledTextures);
 
-  var extensions = [
+  const extensions = [
     ['OES_standard_derivatives', 'STANDARD_DERIVATIVES'],
     ['EXT_shader_texture_lod', 'TEXTURE_LOD'],
     ['EXT_frag_depth', 'FRAG_DEPTH']
@@ -168,15 +167,15 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene, ren
     return renderer.getGLExtension(ext[0]) != null;
   });
 
-  for (var i = 0; i < extensions.length; i++) {
-    var extDefineCode = '\n#define SUPPORT_' + extensions[i][1];
+  for (let i = 0; i < extensions.length; i++) {
+    const extDefineCode = '\n#define SUPPORT_' + extensions[i][1];
     fragmentDefineStr += extDefineCode;
     vertexDefineStr += extDefineCode;
   }
 
-  var vertexCode = vertexDefineStr + '\n' + material.shader.vertex;
+  const vertexCode = vertexDefineStr + '\n' + material.shader.vertex;
 
-  var fragmentCode =
+  const fragmentCode =
     getExtensionCode(extensions) +
     '\n' +
     getPrecisionCode(material.precision) +
@@ -185,13 +184,13 @@ ProgramManager.prototype.getProgram = function (renderable, material, scene, ren
     '\n' +
     material.shader.fragment;
 
-  var finalVertexCode = unrollLoop(vertexCode, material.vertexDefines, lightsNumbers);
-  var finalFragmentCode = unrollLoop(fragmentCode, material.fragmentDefines, lightsNumbers);
+  const finalVertexCode = unrollLoop(vertexCode, material.vertexDefines, lightsNumbers);
+  const finalFragmentCode = unrollLoop(fragmentCode, material.fragmentDefines, lightsNumbers);
 
-  var program = new GLProgram();
+  program = new GLProgram();
   program.uniformSemantics = material.shader.uniformSemantics;
   program.attributes = material.shader.attributes;
-  var errorMsg = program.buildProgram(_gl, material.shader, finalVertexCode, finalFragmentCode);
+  const errorMsg = program.buildProgram(_gl, material.shader, finalVertexCode, finalFragmentCode);
   program.__error = errorMsg;
 
   cache[key] = program;

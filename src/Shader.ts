@@ -9,13 +9,13 @@
 import util from './core/util';
 import vendor from './core/vendor';
 
-var uniformRegex =
+const uniformRegex =
   /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+([\s\S]*?);/g;
-var attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+([\s\S]*?);/g;
+const attributeRegex = /attribute\s+(float|int|vec2|vec3|vec4)\s+([\s\S]*?);/g;
 // Only parse number define.
-var defineRegex = /#define\s+(\w+)?(\s+[\d-.]+)?\s*;?\s*\n/g;
+const defineRegex = /#define\s+(\w+)?(\s+[\d-.]+)?\s*;?\s*\n/g;
 
-var uniformTypeMap = {
+const uniformTypeMap = {
   bool: '1i',
   int: '1i',
   sampler2D: 't',
@@ -33,14 +33,14 @@ var uniformTypeMap = {
 };
 
 function createZeroArray(len) {
-  var arr = [];
-  for (var i = 0; i < len; i++) {
+  const arr = [];
+  for (let i = 0; i < len; i++) {
     arr[i] = 0;
   }
   return arr;
 }
 
-var uniformValueConstructor = {
+const uniformValueConstructor = {
   bool: function () {
     return true;
   },
@@ -92,7 +92,7 @@ var uniformValueConstructor = {
   }
 };
 
-var attributeSemantics = [
+const attributeSemantics = [
   'POSITION',
   'NORMAL',
   'BINORMAL',
@@ -106,7 +106,7 @@ var attributeSemantics = [
   'JOINT',
   'WEIGHT'
 ];
-var uniformSemantics = [
+const uniformSemantics = [
   'SKIN_MATRIX',
   // Information about viewport
   'VIEWPORT_SIZE',
@@ -123,7 +123,7 @@ var uniformSemantics = [
   // Log depth buffer
   'LOG_DEPTH_BUFFER_FC'
 ];
-var matrixSemantics = [
+const matrixSemantics = [
   'WORLD',
   'VIEW',
   'PROJECTION',
@@ -150,7 +150,7 @@ var matrixSemantics = [
   'WORLDVIEWPROJECTIONINVERSETRANSPOSE'
 ];
 
-var attributeSizeMap = {
+const attributeSizeMap = {
   // WebGL does not support integer attributes
   vec4: 4,
   vec3: 3,
@@ -158,15 +158,15 @@ var attributeSizeMap = {
   float: 1
 };
 
-var shaderIDCache = {};
-var shaderCodeCache = {};
+const shaderIDCache = {};
+const shaderCodeCache = {};
 
 function getShaderID(vertex, fragment) {
-  var key = 'vertex:' + vertex + 'fragment:' + fragment;
+  const key = 'vertex:' + vertex + 'fragment:' + fragment;
   if (shaderIDCache[key]) {
     return shaderIDCache[key];
   }
-  var id = util.genGUID();
+  const id = util.genGUID();
   shaderIDCache[key] = id;
 
   shaderCodeCache[id] = {
@@ -188,15 +188,15 @@ function logSyntaxError() {
 }
 
 function parseDeclarations(type, line) {
-  var speratorsRegexp = /[,=\(\):]/;
-  var tokens = line
+  const speratorsRegexp = /[,=():]/;
+  let tokens = line
     // Convert `symbol: [1,2,3]` to `symbol: vec3(1,2,3)`
     .replace(/:\s*\[\s*(.*)\s*\]/g, '=' + type + '($1)')
     .replace(/\s+/g, '')
-    .split(/(?=[,=\(\):])/g);
+    .split(/(?=[,=():])/g);
 
-  var newTokens = [];
-  for (var i = 0; i < tokens.length; i++) {
+  const newTokens = [];
+  for (let i = 0; i < tokens.length; i++) {
     if (tokens[i].match(speratorsRegexp)) {
       newTokens.push(tokens[i].charAt(0), tokens[i].slice(1));
     } else {
@@ -205,17 +205,17 @@ function parseDeclarations(type, line) {
   }
   tokens = newTokens;
 
-  var TYPE_SYMBOL = 0;
-  var TYPE_ASSIGN = 1;
-  var TYPE_VEC = 2;
-  var TYPE_ARR = 3;
-  var TYPE_SEMANTIC = 4;
-  var TYPE_NORMAL = 5;
+  const TYPE_SYMBOL = 0;
+  const TYPE_ASSIGN = 1;
+  const TYPE_VEC = 2;
+  const TYPE_ARR = 3;
+  const TYPE_SEMANTIC = 4;
+  const TYPE_NORMAL = 5;
 
-  var opType = TYPE_SYMBOL;
-  var declarations = {};
-  var declarationValue = null;
-  var currentDeclaration;
+  let opType = TYPE_SYMBOL;
+  const declarations = {};
+  let declarationValue = null;
+  let currentDeclaration;
 
   addSymbol(tokens[0]);
 
@@ -223,7 +223,7 @@ function parseDeclarations(type, line) {
     if (!symbol) {
       logSyntaxError();
     }
-    var arrResult = symbol.match(/\[(.*?)\]/);
+    const arrResult = symbol.match(/\[(.*?)\]/);
     currentDeclaration = symbol.replace(/\[(.*?)\]/, '');
     declarations[currentDeclaration] = {};
     if (arrResult) {
@@ -232,8 +232,8 @@ function parseDeclarations(type, line) {
     }
   }
 
-  for (var i = 1; i < tokens.length; i++) {
-    var token = tokens[i];
+  for (let i = 1; i < tokens.length; i++) {
+    const token = tokens[i];
     if (!token) {
       // Empty token;
       continue;
@@ -299,7 +299,7 @@ function parseDeclarations(type, line) {
       declarationValue = null;
       continue;
     } else if (opType === TYPE_SEMANTIC) {
-      var semantic = token;
+      const semantic = token;
       if (
         attributeSemantics.indexOf(semantic) >= 0 ||
         uniformSemantics.indexOf(semantic) >= 0 ||
@@ -335,7 +335,7 @@ function parseDeclarations(type, line) {
  * @param {string} fragment
  * @example
  * // Create a phong shader
- * var shader = new clay.Shader(
+ * const shader = new clay.Shader(
  *      clay.Shader.source('clay.standard.vertex'),
  *      clay.Shader.source('clay.standard.fragment')
  * );
@@ -402,10 +402,10 @@ Shader.prototype = {
 
   // Create a new uniform instance for material
   createUniforms: function () {
-    var uniforms = {};
+    const uniforms = {};
 
-    for (var symbol in this.uniformTemplates) {
-      var uniformTpl = this.uniformTemplates[symbol];
+    for (const symbol in this.uniformTemplates) {
+      const uniformTpl = this.uniformTemplates[symbol];
       uniforms[symbol] = {
         type: uniformTpl.type,
         value: uniformTpl.value()
@@ -429,8 +429,8 @@ Shader.prototype = {
         type: uniformType
       };
     } else if (matrixSemantics.indexOf(semantic) >= 0) {
-      var isTranspose = false;
-      var semanticNoTranspose = semantic;
+      let isTranspose = false;
+      let semanticNoTranspose = semantic;
       if (semantic.match(/TRANSPOSE$/)) {
         isTranspose = true;
         semanticNoTranspose = semantic.slice(0, -9);
@@ -460,16 +460,16 @@ Shader.prototype = {
     materialUniforms[symbol] = {
       type: uniformType,
       value: isArray
-        ? uniformValueConstructor['array']
+        ? uniformValueConstructor.array
         : defaultValueFunc || uniformValueConstructor[type],
       semantic: null
     };
   },
 
   _parseUniforms: function () {
-    var uniforms = {};
-    var self = this;
-    var shaderType = 'vertex';
+    const uniforms = {};
+    const self = this;
+    let shaderType = 'vertex';
     this._uniformList = [];
 
     this._vertexCode = this._vertexCode.replace(uniformRegex, _uniformParser);
@@ -487,14 +487,14 @@ Shader.prototype = {
     }
 
     function _uniformParser(str, type, content) {
-      var declaredUniforms = parseDeclarations(type, content);
-      var uniformMainStr = [];
-      for (var symbol in declaredUniforms) {
-        var uniformInfo = declaredUniforms[symbol];
-        var semantic = uniformInfo.semantic;
-        var tmpStr = symbol;
-        var uniformType = uniformTypeMap[type];
-        var defaultValueFunc = makeDefaultValueFunc(declaredUniforms[symbol].value);
+      const declaredUniforms = parseDeclarations(type, content);
+      const uniformMainStr = [];
+      for (const symbol in declaredUniforms) {
+        const uniformInfo = declaredUniforms[symbol];
+        const semantic = uniformInfo.semantic;
+        let tmpStr = symbol;
+        let uniformType = uniformTypeMap[type];
+        const defaultValueFunc = makeDefaultValueFunc(declaredUniforms[symbol].value);
         if (declaredUniforms[symbol].isArray) {
           tmpStr += '[' + declaredUniforms[symbol].arraySize + ']';
           uniformType += 'v';
@@ -537,17 +537,17 @@ Shader.prototype = {
   },
 
   _parseAttributes: function () {
-    var attributes = {};
-    var self = this;
+    const attributes = {};
+    const self = this;
     this._vertexCode = this._vertexCode.replace(attributeRegex, _attributeParser);
 
     function _attributeParser(str, type, content) {
-      var declaredAttributes = parseDeclarations(type, content);
+      const declaredAttributes = parseDeclarations(type, content);
 
-      var size = attributeSizeMap[type] || 1;
-      var attributeMainStr = [];
-      for (var symbol in declaredAttributes) {
-        var semantic = declaredAttributes[symbol].semantic;
+      const size = attributeSizeMap[type] || 1;
+      const attributeMainStr = [];
+      for (const symbol in declaredAttributes) {
+        const semantic = declaredAttributes[symbol].semantic;
         attributes[symbol] = {
           // TODO Can only be float
           type: 'float',
@@ -575,14 +575,14 @@ Shader.prototype = {
   },
 
   _parseDefines: function () {
-    var self = this;
-    var shaderType = 'vertex';
+    const self = this;
+    let shaderType = 'vertex';
     this._vertexCode = this._vertexCode.replace(defineRegex, _defineParser);
     shaderType = 'fragment';
     this._fragmentCode = this._fragmentCode.replace(defineRegex, _defineParser);
 
     function _defineParser(str, symbol, value) {
-      var defines = shaderType === 'vertex' ? self.vertexDefines : self.fragmentDefines;
+      const defines = shaderType === 'vertex' ? self.vertexDefines : self.fragmentDefines;
       if (!defines[symbol]) {
         // Haven't been defined by user
         if (value === 'false') {
@@ -607,8 +607,8 @@ Shader.prototype = {
    * @return {clay.Shader}
    */
   clone: function () {
-    var code = shaderCodeCache[this._shaderID];
-    var shader = new Shader(code.vertex, code.fragment);
+    const code = shaderCodeCache[this._shaderID];
+    const shader = new Shader(code.vertex, code.fragment);
     return shader;
   }
 };
@@ -636,10 +636,10 @@ if (Object.defineProperty) {
   });
 }
 
-var importRegex = /(@import)\s*([0-9a-zA-Z_\-\.]*)/g;
+const importRegex = /(@import)\s*([0-9a-zA-Z_\-.]*)/g;
 Shader.parseImport = function (shaderStr) {
   shaderStr = shaderStr.replace(importRegex, function (str, importSymbol, importName) {
-    var str = Shader.source(importName);
+    str = Shader.source(importName);
     if (str) {
       // Recursively parse
       return Shader.parseImport(str);
@@ -651,21 +651,21 @@ Shader.parseImport = function (shaderStr) {
   return shaderStr;
 };
 
-var exportRegex = /(@export)\s*([0-9a-zA-Z_\-\.]*)\s*\n([\s\S]*?)@end/g;
+const exportRegex = /(@export)\s*([0-9a-zA-Z_\-.]*)\s*\n([\s\S]*?)@end/g;
 
 /**
  * Import shader source
  * @param  {string} shaderStr
  * @memberOf clay.Shader
  */
-Shader['import'] = function (shaderStr) {
+Shader.import = function (shaderStr) {
   shaderStr.replace(exportRegex, function (str, exportSymbol, exportName, code) {
-    var code = code.replace(/(^[\s\t\xa0\u3000]+)|([\u3000\xa0\s\t]+\x24)/g, '');
+    code = code.replace(/(^[\s\t\xa0\u3000]+)|([\u3000\xa0\s\t]+\x24)/g, '');
     if (code) {
-      var parts = exportName.split('.');
-      var obj = Shader.codes;
-      var i = 0;
-      var key;
+      const parts = exportName.split('.');
+      let obj = Shader.codes;
+      let i = 0;
+      let key;
       while (i < parts.length - 1) {
         key = parts[i++];
         if (!obj[key]) {
@@ -694,11 +694,11 @@ Shader.codes = {};
  * @return {string}
  */
 Shader.source = function (name) {
-  var parts = name.split('.');
-  var obj = Shader.codes;
-  var i = 0;
+  const parts = name.split('.');
+  let obj = Shader.codes;
+  let i = 0;
   while (obj && i < parts.length) {
-    var key = parts[i++];
+    const key = parts[i++];
     obj = obj[key];
   }
   if (typeof obj !== 'string') {

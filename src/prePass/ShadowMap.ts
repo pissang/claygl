@@ -20,10 +20,10 @@ import TexturePool from '../compositor/TexturePool';
 
 import mat4 from '../glmatrix/mat4';
 
-var targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
+const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
 
 import shadowmapEssl from '../shader/source/shadowmap.glsl.js';
-Shader['import'](shadowmapEssl);
+Shader.import(shadowmapEssl);
 
 function getDepthMaterialUniform(renderable, depthMaterial, symbol) {
   if (symbol === 'alphaMap') {
@@ -33,7 +33,7 @@ function getDepthMaterialUniform(renderable, depthMaterial, symbol) {
       renderable.material.isDefined('fragment', 'ALPHA_TEST') &&
       renderable.material.get('diffuseMap')
     ) {
-      var alphaCutoff = renderable.material.get('alphaCutoff');
+      const alphaCutoff = renderable.material.get('alphaCutoff');
       return alphaCutoff || 0;
     }
     return 0;
@@ -47,8 +47,8 @@ function getDepthMaterialUniform(renderable, depthMaterial, symbol) {
 }
 
 function isDepthMaterialChanged(renderable, prevRenderable) {
-  var matA = renderable.material;
-  var matB = prevRenderable.material;
+  const matA = renderable.material;
+  const matB = prevRenderable.material;
   return (
     matA.get('diffuseMap') !== matB.get('diffuseMap') ||
     (matA.get('alphaCutoff') || 0) !== (matB.get('alphaCutoff') || 0)
@@ -61,7 +61,7 @@ function isDepthMaterialChanged(renderable, prevRenderable) {
  * @constructor clay.prePass.ShadowMap
  * @extends clay.core.Base
  * @example
- *     var shadowMapPass = new clay.prePass.ShadowMap({
+ *     const shadowMapPass = new clay.prePass.ShadowMap({
  *         softShadow: clay.prePass.ShadowMap.VSM
  *     });
  *     ...
@@ -70,7 +70,7 @@ function isDepthMaterialChanged(renderable, prevRenderable) {
  *         renderer.render(scene, camera);
  *     });
  */
-var ShadowMapPass = Base.extend(
+const ShadowMapPass = Base.extend(
   function () {
     return /** @lends clay.prePass.ShadowMap# */ {
       /**
@@ -158,18 +158,18 @@ var ShadowMapPass = Base.extend(
      */
     renderDebug: function (renderer, size) {
       renderer.saveClear();
-      var viewport = renderer.viewport;
-      var x = 0,
+      const viewport = renderer.viewport;
+      let x = 0,
         y = 0;
-      var width = size || viewport.width / 4;
-      var height = width;
+      const width = size || viewport.width / 4;
+      const height = width;
       if (this.softShadow === ShadowMapPass.VSM) {
         this._outputDepthPass.material.define('fragment', 'USE_VSM');
       } else {
         this._outputDepthPass.material.undefine('fragment', 'USE_VSM');
       }
-      for (var name in this._textures) {
-        var texture = this._textures[name];
+      for (const name in this._textures) {
+        const texture = this._textures[name];
         renderer.setViewport(x, y, (width * texture.width) / texture.height, height);
         this._outputDepthPass.setUniform('depthMap', texture);
         this._outputDepthPass.render(renderer);
@@ -194,7 +194,7 @@ var ShadowMapPass = Base.extend(
         mesh.material.undefine('fragment', 'PCF_KERNEL_SIZE');
       } else {
         mesh.material.undefine('fragment', 'USE_VSM');
-        var kernelPCF = this.kernelPCF;
+        let kernelPCF = this.kernelPCF;
         if (kernelPCF && kernelPCF.length) {
           mesh.material.define('fragment', 'PCF_KERNEL_SIZE', kernelPCF.length / 2);
         } else {
@@ -204,15 +204,15 @@ var ShadowMapPass = Base.extend(
     },
 
     _update: function (renderer, scene) {
-      var self = this;
+      const self = this;
       scene.traverse(function (renderable) {
         if (renderable.isRenderable()) {
           self._updateReceivers(renderer, renderable);
         }
       });
 
-      for (var i = 0; i < scene.lights.length; i++) {
-        var light = scene.lights[i];
+      for (let i = 0; i < scene.lights.length; i++) {
+        const light = scene.lights[i];
         if (light.castShadow && !light.invisible) {
           this._lightsCastShadow.push(light);
         }
@@ -221,13 +221,13 @@ var ShadowMapPass = Base.extend(
 
     _renderShadowPass: function (renderer, scene, sceneCamera, notUpdateScene) {
       // reset
-      for (var name in this._shadowMapNumber) {
+      for (const name in this._shadowMapNumber) {
         this._shadowMapNumber[name] = 0;
       }
       this._lightsCastShadow.length = 0;
       this._receivers.length = 0;
 
-      var _gl = renderer.gl;
+      const _gl = renderer.gl;
 
       if (!notUpdateScene) {
         scene.update();
@@ -256,17 +256,17 @@ var ShadowMapPass = Base.extend(
       _gl.clearColor(1.0, 1.0, 1.0, 1.0);
 
       // Shadow uniforms
-      var spotLightShadowMaps = [];
-      var spotLightMatrices = [];
-      var directionalLightShadowMaps = [];
-      var directionalLightMatrices = [];
-      var shadowCascadeClips = [];
-      var pointLightShadowMaps = [];
+      const spotLightShadowMaps = [];
+      const spotLightMatrices = [];
+      const directionalLightShadowMaps = [];
+      const directionalLightMatrices = [];
+      const shadowCascadeClips = [];
+      const pointLightShadowMaps = [];
 
-      var dirLightHasCascade;
+      let dirLightHasCascade;
       // Create textures for shadow map
-      for (var i = 0; i < this._lightsCastShadow.length; i++) {
-        var light = this._lightsCastShadow[i];
+      for (let i = 0; i < this._lightsCastShadow.length; i++) {
+        const light = this._lightsCastShadow[i];
         if (light.type === 'DIRECTIONAL_LIGHT') {
           if (dirLightHasCascade) {
             console.warn('Only one direectional light supported with shadow cascade');
@@ -304,12 +304,12 @@ var ShadowMapPass = Base.extend(
         this._shadowMapNumber[light.type]++;
       }
 
-      for (var lightType in this._shadowMapNumber) {
-        var number = this._shadowMapNumber[lightType];
-        var key = lightType + '_SHADOWMAP_COUNT';
-        for (var i = 0; i < this._receivers.length; i++) {
-          var mesh = this._receivers[i];
-          var material = mesh.material;
+      for (const lightType in this._shadowMapNumber) {
+        const number = this._shadowMapNumber[lightType];
+        let key = lightType + '_SHADOWMAP_COUNT';
+        for (let i = 0; i < this._receivers.length; i++) {
+          const mesh = this._receivers[i];
+          const material = mesh.material;
           if (material.fragmentDefines[key] !== number) {
             if (number > 0) {
               material.define('fragment', key, number);
@@ -319,9 +319,9 @@ var ShadowMapPass = Base.extend(
           }
         }
       }
-      for (var i = 0; i < this._receivers.length; i++) {
-        var mesh = this._receivers[i];
-        var material = mesh.material;
+      for (let i = 0; i < this._receivers.length; i++) {
+        const mesh = this._receivers[i];
+        const material = mesh.material;
         if (dirLightHasCascade) {
           material.define('fragment', 'SHADOW_CASCADE', dirLightHasCascade.shadowCascade);
         } else {
@@ -329,13 +329,13 @@ var ShadowMapPass = Base.extend(
         }
       }
 
-      var shadowUniforms = scene.shadowUniforms;
+      const shadowUniforms = scene.shadowUniforms;
 
       function getSize(texture) {
         return texture.height;
       }
       if (directionalLightShadowMaps.length > 0) {
-        var directionalLightShadowMapSizes = directionalLightShadowMaps.map(getSize);
+        const directionalLightShadowMapSizes = directionalLightShadowMaps.map(getSize);
         shadowUniforms.directionalLightShadowMaps = {
           value: directionalLightShadowMaps,
           type: 'tv'
@@ -346,8 +346,8 @@ var ShadowMapPass = Base.extend(
           type: '1fv'
         };
         if (dirLightHasCascade) {
-          var shadowCascadeClipsNear = shadowCascadeClips.slice();
-          var shadowCascadeClipsFar = shadowCascadeClips.slice();
+          const shadowCascadeClipsNear = shadowCascadeClips.slice();
+          const shadowCascadeClipsFar = shadowCascadeClips.slice();
           shadowCascadeClipsNear.pop();
           shadowCascadeClipsFar.shift();
 
@@ -362,8 +362,8 @@ var ShadowMapPass = Base.extend(
       }
 
       if (spotLightShadowMaps.length > 0) {
-        var spotLightShadowMapSizes = spotLightShadowMaps.map(getSize);
-        var shadowUniforms = scene.shadowUniforms;
+        const spotLightShadowMapSizes = spotLightShadowMaps.map(getSize);
+        const shadowUniforms = scene.shadowUniforms;
         shadowUniforms.spotLightShadowMaps = { value: spotLightShadowMaps, type: 'tv' };
         shadowUniforms.spotLightMatrices = { value: spotLightMatrices, type: 'm4v' };
         shadowUniforms.spotLightShadowMapSizes = { value: spotLightShadowMapSizes, type: '1fv' };
@@ -375,13 +375,13 @@ var ShadowMapPass = Base.extend(
     },
 
     renderDirectionalLightShadow: (function () {
-      var splitFrustum = new Frustum();
-      var splitProjMatrix = new Matrix4();
-      var cropBBox = new BoundingBox();
-      var cropMatrix = new Matrix4();
-      var lightViewMatrix = new Matrix4();
-      var lightViewProjMatrix = new Matrix4();
-      var lightProjMatrix = new Matrix4();
+      const splitFrustum = new Frustum();
+      const splitProjMatrix = new Matrix4();
+      const cropBBox = new BoundingBox();
+      const cropMatrix = new Matrix4();
+      const lightViewMatrix = new Matrix4();
+      const lightViewProjMatrix = new Matrix4();
+      const lightProjMatrix = new Matrix4();
 
       return function (
         renderer,
@@ -392,8 +392,8 @@ var ShadowMapPass = Base.extend(
         directionalLightMatrices,
         directionalLightShadowMaps
       ) {
-        var defaultShadowMaterial = this._getDepthMaterial(light);
-        var passConfig = {
+        const defaultShadowMaterial = this._getDepthMaterial(light);
+        const passConfig = {
           getMaterial: function (renderable) {
             return renderable.shadowDepthMaterial || defaultShadowMaterial;
           },
@@ -407,17 +407,17 @@ var ShadowMapPass = Base.extend(
 
         // First frame
         if (!scene.viewBoundingBoxLastFrame.isFinite()) {
-          var boundingBox = scene.getBoundingBox();
+          const boundingBox = scene.getBoundingBox();
           scene.viewBoundingBoxLastFrame.copy(boundingBox).applyTransform(sceneCamera.viewMatrix);
         }
         // Considering moving speed since the bounding box is from last frame
         // TODO: add a bias
-        var clippedFar = Math.min(-scene.viewBoundingBoxLastFrame.min.z, sceneCamera.far);
-        var clippedNear = Math.max(-scene.viewBoundingBoxLastFrame.max.z, sceneCamera.near);
+        const clippedFar = Math.min(-scene.viewBoundingBoxLastFrame.min.z, sceneCamera.far);
+        const clippedNear = Math.max(-scene.viewBoundingBoxLastFrame.max.z, sceneCamera.near);
 
-        var lightCamera = this._getDirectionalLightCamera(light, scene, sceneCamera);
+        const lightCamera = this._getDirectionalLightCamera(light, scene, sceneCamera);
 
-        var lvpMat4Arr = lightViewProjMatrix.array;
+        const lvpMat4Arr = lightViewProjMatrix.array;
         lightProjMatrix.copy(lightCamera.projectionMatrix);
         mat4.invert(lightViewMatrix.array, lightCamera.worldTransform.array);
         mat4.multiply(
@@ -427,33 +427,33 @@ var ShadowMapPass = Base.extend(
         );
         mat4.multiply(lvpMat4Arr, lightProjMatrix.array, lightViewMatrix.array);
 
-        var clipPlanes = [];
-        var isPerspective = sceneCamera instanceof PerspectiveCamera;
+        const clipPlanes = [];
+        let isPerspective = sceneCamera instanceof PerspectiveCamera;
 
-        var scaleZ = (sceneCamera.near + sceneCamera.far) / (sceneCamera.near - sceneCamera.far);
-        var offsetZ =
+        const scaleZ = (sceneCamera.near + sceneCamera.far) / (sceneCamera.near - sceneCamera.far);
+        const offsetZ =
           (2 * sceneCamera.near * sceneCamera.far) / (sceneCamera.near - sceneCamera.far);
-        for (var i = 0; i <= light.shadowCascade; i++) {
-          var clog = clippedNear * Math.pow(clippedFar / clippedNear, i / light.shadowCascade);
-          var cuni = clippedNear + ((clippedFar - clippedNear) * i) / light.shadowCascade;
-          var c = clog * light.cascadeSplitLogFactor + cuni * (1 - light.cascadeSplitLogFactor);
+        for (let i = 0; i <= light.shadowCascade; i++) {
+          const clog = clippedNear * Math.pow(clippedFar / clippedNear, i / light.shadowCascade);
+          const cuni = clippedNear + ((clippedFar - clippedNear) * i) / light.shadowCascade;
+          const c = clog * light.cascadeSplitLogFactor + cuni * (1 - light.cascadeSplitLogFactor);
           clipPlanes.push(c);
           shadowCascadeClips.push(-(-c * scaleZ + offsetZ) / -c);
         }
-        var texture = this._getTexture(light, light.shadowCascade);
+        const texture = this._getTexture(light, light.shadowCascade);
         directionalLightShadowMaps.push(texture);
 
-        var viewport = renderer.viewport;
+        const viewport = renderer.viewport;
 
-        var _gl = renderer.gl;
+        const _gl = renderer.gl;
         this._frameBuffer.attach(texture);
         this._frameBuffer.bind(renderer);
         _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-        for (var i = 0; i < light.shadowCascade; i++) {
+        for (let i = 0; i < light.shadowCascade; i++) {
           // Get the splitted frustum
-          var nearPlane = clipPlanes[i];
-          var farPlane = clipPlanes[i + 1];
+          const nearPlane = clipPlanes[i];
+          const farPlane = clipPlanes[i + 1];
           if (isPerspective) {
             mat4.perspective(
               splitProjMatrix.array,
@@ -476,8 +476,8 @@ var ShadowMapPass = Base.extend(
           splitFrustum.setFromProjection(splitProjMatrix);
           splitFrustum.getTransformedBoundingBox(cropBBox, lightViewMatrix);
           cropBBox.applyProjection(lightProjMatrix);
-          var _min = cropBBox.min.array;
-          var _max = cropBBox.max.array;
+          const _min = cropBBox.min.array;
+          const _max = cropBBox.max.array;
           _min[0] = Math.max(_min[0], -1);
           _min[1] = Math.max(_min[1], -1);
           _max[0] = Math.min(_max[0], 1);
@@ -485,7 +485,7 @@ var ShadowMapPass = Base.extend(
           cropMatrix.ortho(_min[0], _max[0], _min[1], _max[1], 1, -1);
           lightCamera.projectionMatrix.multiplyLeft(cropMatrix);
 
-          var shadowSize = light.shadowResolution || 512;
+          const shadowSize = light.shadowResolution || 512;
 
           // Reversed, left to right => far to near
           renderer.setViewport(
@@ -496,7 +496,7 @@ var ShadowMapPass = Base.extend(
             1
           );
 
-          var renderList = scene.updateRenderList(lightCamera);
+          const renderList = scene.updateRenderList(lightCamera);
           renderer.renderPass(renderList.opaque, lightCamera, passConfig);
 
           // Filter for VSM
@@ -504,7 +504,7 @@ var ShadowMapPass = Base.extend(
             this._gaussianFilter(renderer, texture, texture.width);
           }
 
-          var matrix = new Matrix4();
+          const matrix = new Matrix4();
           matrix.copy(lightCamera.viewMatrix).multiplyLeft(lightCamera.projectionMatrix);
 
           directionalLightMatrices.push(matrix.array);
@@ -525,17 +525,17 @@ var ShadowMapPass = Base.extend(
       spotLightMatrices,
       spotLightShadowMaps
     ) {
-      var texture = this._getTexture(light);
-      var lightCamera = this._getSpotLightCamera(light);
-      var _gl = renderer.gl;
+      const texture = this._getTexture(light);
+      const lightCamera = this._getSpotLightCamera(light);
+      const _gl = renderer.gl;
 
       this._frameBuffer.attach(texture);
       this._frameBuffer.bind(renderer);
 
       _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
 
-      var defaultShadowMaterial = this._getDepthMaterial(light);
-      var passConfig = {
+      const defaultShadowMaterial = this._getDepthMaterial(light);
+      const passConfig = {
         getMaterial: function (renderable) {
           return renderable.shadowDepthMaterial || defaultShadowMaterial;
         },
@@ -547,7 +547,7 @@ var ShadowMapPass = Base.extend(
         sortCompare: Renderer.opaqueSortCompare
       };
 
-      var renderList = scene.updateRenderList(lightCamera);
+      const renderList = scene.updateRenderList(lightCamera);
       renderer.renderPass(renderList.opaque, lightCamera, passConfig);
 
       this._frameBuffer.unbind(renderer);
@@ -557,7 +557,7 @@ var ShadowMapPass = Base.extend(
         this._gaussianFilter(renderer, texture, texture.width);
       }
 
-      var matrix = new Matrix4();
+      const matrix = new Matrix4();
       matrix.copy(lightCamera.worldTransform).invert().multiplyLeft(lightCamera.projectionMatrix);
 
       spotLightShadowMaps.push(texture);
@@ -565,12 +565,12 @@ var ShadowMapPass = Base.extend(
     },
 
     renderPointLightShadow: function (renderer, scene, light, pointLightShadowMaps) {
-      var texture = this._getTexture(light);
-      var _gl = renderer.gl;
+      const texture = this._getTexture(light);
+      const _gl = renderer.gl;
       pointLightShadowMaps.push(texture);
 
-      var defaultShadowMaterial = this._getDepthMaterial(light);
-      var passConfig = {
+      const defaultShadowMaterial = this._getDepthMaterial(light);
+      const passConfig = {
         getMaterial: function (renderable) {
           return renderable.shadowDepthMaterial || defaultShadowMaterial;
         },
@@ -578,7 +578,7 @@ var ShadowMapPass = Base.extend(
         sortCompare: Renderer.opaqueSortCompare
       };
 
-      var renderListEachSide = {
+      const renderListEachSide = {
         px: [],
         py: [],
         pz: [],
@@ -586,22 +586,29 @@ var ShadowMapPass = Base.extend(
         ny: [],
         nz: []
       };
-      var bbox = new BoundingBox();
-      var lightWorldPosition = light.getWorldPosition().array;
-      var lightBBox = new BoundingBox();
-      var range = light.range;
+      const bbox = new BoundingBox();
+      const lightWorldPosition = light.getWorldPosition().array;
+      const lightBBox = new BoundingBox();
+      const range = light.range;
       lightBBox.min.setArray(lightWorldPosition);
       lightBBox.max.setArray(lightWorldPosition);
-      var extent = new Vector3(range, range, range);
+      const extent = new Vector3(range, range, range);
       lightBBox.max.add(extent);
       lightBBox.min.sub(extent);
 
-      var targetsNeedRender = { px: false, py: false, pz: false, nx: false, ny: false, nz: false };
+      const targetsNeedRender = {
+        px: false,
+        py: false,
+        pz: false,
+        nx: false,
+        ny: false,
+        nz: false
+      };
       scene.traverse(function (renderable) {
         if (renderable.isRenderable() && renderable.castShadow) {
-          var geometry = renderable.geometry;
+          const geometry = renderable.geometry;
           if (!geometry.boundingBox) {
-            for (var i = 0; i < targets.length; i++) {
+            for (let i = 0; i < targets.length; i++) {
               renderListEachSide[targets[i]].push(renderable);
             }
             return;
@@ -612,17 +619,17 @@ var ShadowMapPass = Base.extend(
           }
 
           bbox.updateVertices();
-          for (var i = 0; i < targets.length; i++) {
+          for (let i = 0; i < targets.length; i++) {
             targetsNeedRender[targets[i]] = false;
           }
-          for (var i = 0; i < 8; i++) {
-            var vtx = bbox.vertices[i];
-            var x = vtx[0] - lightWorldPosition[0];
-            var y = vtx[1] - lightWorldPosition[1];
-            var z = vtx[2] - lightWorldPosition[2];
-            var absx = Math.abs(x);
-            var absy = Math.abs(y);
-            var absz = Math.abs(z);
+          for (let i = 0; i < 8; i++) {
+            const vtx = bbox.vertices[i];
+            const x = vtx[0] - lightWorldPosition[0];
+            const y = vtx[1] - lightWorldPosition[1];
+            const z = vtx[2] - lightWorldPosition[2];
+            const absx = Math.abs(x);
+            const absy = Math.abs(y);
+            const absz = Math.abs(z);
             if (absx > absy) {
               if (absx > absz) {
                 targetsNeedRender[x > 0 ? 'px' : 'nx'] = true;
@@ -637,7 +644,7 @@ var ShadowMapPass = Base.extend(
               }
             }
           }
-          for (var i = 0; i < targets.length; i++) {
+          for (let i = 0; i < targets.length; i++) {
             if (targetsNeedRender[targets[i]]) {
               renderListEachSide[targets[i]].push(renderable);
             }
@@ -645,9 +652,9 @@ var ShadowMapPass = Base.extend(
         }
       });
 
-      for (var i = 0; i < 6; i++) {
-        var target = targets[i];
-        var camera = this._getPointLightCamera(light, target);
+      for (let i = 0; i < 6; i++) {
+        const target = targets[i];
+        const camera = this._getPointLightCamera(light, target);
 
         this._frameBuffer.attach(
           texture,
@@ -664,10 +671,10 @@ var ShadowMapPass = Base.extend(
     },
 
     _getDepthMaterial: function (light) {
-      var shadowMaterial = this._lightMaterials[light.__uid__];
-      var isPointLight = light.type === 'POINT_LIGHT';
+      let shadowMaterial = this._lightMaterials[light.__uid__];
+      const isPointLight = light.type === 'POINT_LIGHT';
       if (!shadowMaterial) {
-        var shaderPrefix = isPointLight ? 'clay.sm.distance.' : 'clay.sm.depth.';
+        const shaderPrefix = isPointLight ? 'clay.sm.distance.' : 'clay.sm.depth.';
         shadowMaterial = new Material({
           precision: this.precision,
           shader: new Shader(
@@ -699,12 +706,12 @@ var ShadowMapPass = Base.extend(
     },
 
     _gaussianFilter: function (renderer, texture, size) {
-      var parameter = {
+      const parameter = {
         width: size,
         height: size,
         type: Texture.FLOAT
       };
-      var tmpTexture = this._texturePool.get(parameter);
+      const tmpTexture = this._texturePool.get(parameter);
 
       this._frameBuffer.attach(tmpTexture);
       this._frameBuffer.bind(renderer);
@@ -722,9 +729,9 @@ var ShadowMapPass = Base.extend(
     },
 
     _getTexture: function (light, cascade) {
-      var key = light.__uid__;
-      var texture = this._textures[key];
-      var resolution = light.shadowResolution || 512;
+      const key = light.__uid__;
+      let texture = this._textures[key];
+      const resolution = light.shadowResolution || 512;
       cascade = cascade || 1;
       if (!texture) {
         if (light.type === 'POINT_LIGHT') {
@@ -761,7 +768,7 @@ var ShadowMapPass = Base.extend(
           nz: new PerspectiveCamera()
         };
       }
-      var camera = this._lightCameras.point[target];
+      const camera = this._lightCameras.point[target];
 
       camera.far = light.range;
       camera.fov = 90;
@@ -793,16 +800,16 @@ var ShadowMapPass = Base.extend(
     },
 
     _getDirectionalLightCamera: (function () {
-      var lightViewMatrix = new Matrix4();
-      var sceneViewBoundingBox = new BoundingBox();
-      var lightViewBBox = new BoundingBox();
+      const lightViewMatrix = new Matrix4();
+      const sceneViewBoundingBox = new BoundingBox();
+      const lightViewBBox = new BoundingBox();
       // Camera of directional light will be adjusted
       // to contain the view frustum and scene bounding box as tightly as possible
       return function (light, scene, sceneCamera) {
         if (!this._lightCameras.directional) {
           this._lightCameras.directional = new OrthoCamera();
         }
-        var camera = this._lightCameras.directional;
+        const camera = this._lightCameras.directional;
 
         sceneViewBoundingBox.copy(scene.viewBoundingBoxLastFrame);
         sceneViewBoundingBox.intersection(sceneCamera.frustum.boundingBox);
@@ -822,8 +829,8 @@ var ShadowMapPass = Base.extend(
 
         lightViewBBox.copy(sceneViewBoundingBox).applyTransform(lightViewMatrix);
 
-        var min = lightViewBBox.min.array;
-        var max = lightViewBBox.max.array;
+        const min = lightViewBBox.min.array;
+        const max = lightViewBBox.max.array;
 
         // Move camera to adjust the near to 0
         camera.position
@@ -851,7 +858,7 @@ var ShadowMapPass = Base.extend(
       if (!this._lightCameras.spot) {
         this._lightCameras.spot = new PerspectiveCamera();
       }
-      var camera = this._lightCameras.spot;
+      const camera = this._lightCameras.spot;
       // Update properties
       camera.fov = light.penumbraAngle * 2;
       camera.far = light.range;
@@ -868,13 +875,13 @@ var ShadowMapPass = Base.extend(
      */
     // PENDING Renderer or WebGLRenderingContext
     dispose: function (renderer) {
-      var _gl = renderer.gl || renderer;
+      const _gl = renderer.gl || renderer;
 
       if (this._frameBuffer) {
         this._frameBuffer.dispose(_gl);
       }
 
-      for (var name in this._textures) {
+      for (const name in this._textures) {
         this._textures[name].dispose(_gl);
       }
 
@@ -891,11 +898,11 @@ var ShadowMapPass = Base.extend(
       };
       this._meshMaterials = {};
 
-      for (var i = 0; i < this._receivers.length; i++) {
-        var mesh = this._receivers[i];
+      for (let i = 0; i < this._receivers.length; i++) {
+        const mesh = this._receivers[i];
         // Mesh may be disposed
         if (mesh.material) {
-          var material = mesh.material;
+          const material = mesh.material;
           material.undefine('fragment', 'POINT_LIGHT_SHADOW_COUNT');
           material.undefine('fragment', 'DIRECTIONAL_LIGHT_SHADOW_COUNT');
           material.undefine('fragment', 'AMBIENT_LIGHT_SHADOW_COUNT');

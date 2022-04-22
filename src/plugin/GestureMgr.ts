@@ -1,5 +1,7 @@
 // @ts-nocheck
-var GestureMgr = function () {
+import util from '../core/util';
+
+const GestureMgr = function () {
   this._track = [];
 };
 
@@ -17,21 +19,21 @@ GestureMgr.prototype = {
   },
 
   _doTrack: function (event, target, root) {
-    var touches = event.targetTouches;
+    const touches = event.targetTouches;
 
     if (!touches) {
       return;
     }
 
-    var trackItem = {
+    const trackItem = {
       points: [],
       touches: [],
       target: target,
       event: event
     };
 
-    for (var i = 0, len = touches.length; i < len; i++) {
-      var touch = touches[i];
+    for (let i = 0, len = touches.length; i < len; i++) {
+      const touch = touches[i];
       trackItem.points.push([touch.clientX, touch.clientY]);
       trackItem.touches.push(touch);
     }
@@ -40,9 +42,9 @@ GestureMgr.prototype = {
   },
 
   _recognize: function (event) {
-    for (var eventName in recognizers) {
-      if (recognizers.hasOwnProperty(eventName)) {
-        var gestureInfo = recognizers[eventName](this._track, event);
+    for (const eventName in recognizers) {
+      if (util.hasOwn(recognizers, eventName)) {
+        const gestureInfo = recognizers[eventName](this._track, event);
         if (gestureInfo) {
           return gestureInfo;
         }
@@ -52,8 +54,8 @@ GestureMgr.prototype = {
 };
 
 function dist(pointPair) {
-  var dx = pointPair[1][0] - pointPair[0][0];
-  var dy = pointPair[1][1] - pointPair[0][1];
+  const dx = pointPair[1][0] - pointPair[0][0];
+  const dy = pointPair[1][1] - pointPair[0][1];
 
   return Math.sqrt(dx * dx + dy * dy);
 }
@@ -62,24 +64,24 @@ function center(pointPair) {
   return [(pointPair[0][0] + pointPair[1][0]) / 2, (pointPair[0][1] + pointPair[1][1]) / 2];
 }
 
-var recognizers = {
+const recognizers = {
   pinch: function (track, event) {
-    var trackLen = track.length;
+    const trackLen = track.length;
 
     if (!trackLen) {
       return;
     }
 
-    var pinchEnd = (track[trackLen - 1] || {}).points;
-    var pinchPre = (track[trackLen - 2] || {}).points || pinchEnd;
+    const pinchEnd = (track[trackLen - 1] || {}).points;
+    const pinchPre = (track[trackLen - 2] || {}).points || pinchEnd;
 
     if (pinchPre && pinchPre.length > 1 && pinchEnd && pinchEnd.length > 1) {
-      var pinchScale = dist(pinchEnd) / dist(pinchPre);
+      let pinchScale = dist(pinchEnd) / dist(pinchPre);
       !isFinite(pinchScale) && (pinchScale = 1);
 
       event.pinchScale = pinchScale;
 
-      var pinchCenter = center(pinchEnd);
+      const pinchCenter = center(pinchEnd);
       event.pinchX = pinchCenter[0];
       event.pinchY = pinchCenter[1];
 

@@ -21,7 +21,7 @@ function lerp(a, b, t) {
   return a * (1 - t) + b * t;
 }
 
-var CardboardDistorter = Base.extend(
+const CardboardDistorter = Base.extend(
   function () {
     return {
       clearColor: [0, 0, 0, 1],
@@ -46,8 +46,8 @@ var CardboardDistorter = Base.extend(
   },
   {
     render: function (renderer, sourceTexture) {
-      var clearColor = this.clearColor;
-      var gl = renderer.gl;
+      const clearColor = this.clearColor;
+      const gl = renderer.gl;
       gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
       gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -76,41 +76,38 @@ var CardboardDistorter = Base.extend(
     },
 
     _updateMesh: function (width, height, deviceInfo) {
-      var positionAttr = this._mesh.geometry.attributes.position;
-      var texcoordAttr = this._mesh.geometry.attributes.texcoord0;
+      const positionAttr = this._mesh.geometry.attributes.position;
+      const texcoordAttr = this._mesh.geometry.attributes.texcoord0;
       positionAttr.init(2 * width * height);
       texcoordAttr.init(2 * width * height);
 
-      var lensFrustum = deviceInfo.getLeftEyeVisibleTanAngles();
-      var noLensFrustum = deviceInfo.getLeftEyeNoLensTanAngles();
-      var viewport = deviceInfo.getLeftEyeVisibleScreenRect(noLensFrustum);
-      var vidx = 0;
+      const lensFrustum = deviceInfo.getLeftEyeVisibleTanAngles();
+      const noLensFrustum = deviceInfo.getLeftEyeNoLensTanAngles();
+      const viewport = deviceInfo.getLeftEyeVisibleScreenRect(noLensFrustum);
 
-      var pos = [];
-      var uv = [];
+      const pos = [];
+      const uv = [];
+      let vidx = 0;
 
       // Vertices
-      for (var e = 0; e < 2; e++) {
-        for (var j = 0; j < height; j++) {
-          for (var i = 0; i < width; i++, vidx++) {
-            var u = i / (width - 1);
-            var v = j / (height - 1);
+      for (let e = 0; e < 2; e++) {
+        for (let j = 0; j < height; j++) {
+          for (let i = 0; i < width; i++, vidx++) {
+            let u = i / (width - 1);
+            let v = j / (height - 1);
 
             // Grid points regularly spaced in StreoScreen, and barrel distorted in
             // the mesh.
-            var s = u;
-            var t = v;
-            var x = lerp(lensFrustum[0], lensFrustum[2], u);
-            var y = lerp(lensFrustum[3], lensFrustum[1], v);
-            var d = Math.sqrt(x * x + y * y);
-            var r = deviceInfo.distortion.distortInverse(d);
-            var p = (x * r) / d;
-            var q = (y * r) / d;
+            const s = u;
+            const t = v;
+            const x = lerp(lensFrustum[0], lensFrustum[2], u);
+            const y = lerp(lensFrustum[3], lensFrustum[1], v);
+            const d = Math.sqrt(x * x + y * y);
+            const r = deviceInfo.distortion.distortInverse(d);
+            const p = (x * r) / d;
+            const q = (y * r) / d;
             u = (p - noLensFrustum[0]) / (noLensFrustum[2] - noLensFrustum[0]);
             v = (q - noLensFrustum[3]) / (noLensFrustum[1] - noLensFrustum[3]);
-
-            // Convert u,v to mesh screen coordinates.
-            var aspect = deviceInfo.device.widthMeters / deviceInfo.device.heightMeters;
 
             // FIXME: The original Unity plugin multiplied U by the aspect ratio
             // and didn't multiply either value by 2, but that seems to get it
@@ -132,7 +129,7 @@ var CardboardDistorter = Base.extend(
           }
         }
 
-        var w = lensFrustum[2] - lensFrustum[0];
+        let w = lensFrustum[2] - lensFrustum[0];
         lensFrustum[0] = -(w + lensFrustum[0]);
         lensFrustum[2] = w - lensFrustum[2];
         w = noLensFrustum[2] - noLensFrustum[0];
@@ -142,14 +139,14 @@ var CardboardDistorter = Base.extend(
       }
 
       // Indices
-      var indices = new Uint16Array(2 * (width - 1) * (height - 1) * 6);
-      var halfwidth = width / 2;
-      var halfheight = height / 2;
-      var vidx = 0;
-      var iidx = 0;
-      for (var e = 0; e < 2; e++) {
-        for (var j = 0; j < height; j++) {
-          for (var i = 0; i < width; i++, vidx++) {
+      const indices = new Uint16Array(2 * (width - 1) * (height - 1) * 6);
+      const halfwidth = width / 2;
+      const halfheight = height / 2;
+      vidx = 0;
+      let iidx = 0;
+      for (let e = 0; e < 2; e++) {
+        for (let j = 0; j < height; j++) {
+          for (let i = 0; i < width; i++, vidx++) {
             if (i === 0 || j === 0) {
               continue;
             }

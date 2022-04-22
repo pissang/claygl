@@ -1,14 +1,14 @@
 // @ts-nocheck
 // Delaunay Triangulation
 // Modified from https://github.com/ironwallaby/delaunay
-var EPSILON = 1.0 / 1048576.0;
+const EPSILON = 1.0 / 1048576.0;
 
 function supertriangle(vertices) {
-  var xmin = Number.POSITIVE_INFINITY;
-  var ymin = Number.POSITIVE_INFINITY;
-  var xmax = Number.NEGATIVE_INFINITY;
-  var ymax = Number.NEGATIVE_INFINITY;
-  var i, dx, dy, dmax, xmid, ymid;
+  let xmin = Number.POSITIVE_INFINITY;
+  let ymin = Number.POSITIVE_INFINITY;
+  let xmax = Number.NEGATIVE_INFINITY;
+  let ymax = Number.NEGATIVE_INFINITY;
+  let i, dx, dy, dmax, xmid, ymid;
 
   for (i = vertices.length; i--; ) {
     if (vertices[i][0] < xmin) {
@@ -39,24 +39,15 @@ function supertriangle(vertices) {
 }
 
 function circumcircle(vertices, i, j, k) {
-  var x1 = vertices[i][0],
+  const x1 = vertices[i][0],
     y1 = vertices[i][1],
     x2 = vertices[j][0],
     y2 = vertices[j][1],
     x3 = vertices[k][0],
     y3 = vertices[k][1],
     fabsy1y2 = Math.abs(y1 - y2),
-    fabsy2y3 = Math.abs(y2 - y3),
-    xc,
-    yc,
-    m1,
-    m2,
-    mx1,
-    mx2,
-    my1,
-    my2,
-    dx,
-    dy;
+    fabsy2y3 = Math.abs(y2 - y3);
+  let xc, yc, m1, m2, mx1, mx2, my1, my2;
 
   /* Check for coincident points */
   if (fabsy1y2 < EPSILON && fabsy2y3 < EPSILON) {
@@ -86,13 +77,13 @@ function circumcircle(vertices, i, j, k) {
     yc = fabsy1y2 > fabsy2y3 ? m1 * (xc - mx1) + my1 : m2 * (xc - mx2) + my2;
   }
 
-  dx = x2 - xc;
-  dy = y2 - yc;
+  const dx = x2 - xc;
+  const dy = y2 - yc;
   return { i: i, j: j, k: k, x: xc, y: yc, r: dx * dx + dy * dy };
 }
 
 function dedup(edges) {
-  var i, j, a, b, m, n;
+  let i, j, a, b, m, n;
 
   for (j = edges.length; j; ) {
     b = edges[--j];
@@ -111,10 +102,10 @@ function dedup(edges) {
   }
 }
 
-var delaunay = {
+const delaunay = {
   triangulate: function (vertices, key) {
-    var n = vertices.length;
-    var i, j, indices, st, open, closed, edges, dx, dy, a, b, c;
+    const n = vertices.length;
+    let i, j, indices, st, open, closed, edges, dx, dy, a, b, c;
 
     /* Bail if there aren't enough vertices to form any triangles. */
     if (n < 3) {
@@ -142,7 +133,7 @@ var delaunay = {
     }
 
     indices.sort(function (i, j) {
-      var diff = vertices[j][0] - vertices[i][0];
+      const diff = vertices[j][0] - vertices[i][0];
       return diff !== 0 ? diff : i - j;
     });
 
@@ -227,18 +218,18 @@ var delaunay = {
       return null;
     }
 
-    var a = tri[1][0] - tri[0][0];
-    var b = tri[2][0] - tri[0][0];
-    var c = tri[1][1] - tri[0][1];
-    var d = tri[2][1] - tri[0][1];
-    var i = a * d - b * c;
+    const a = tri[1][0] - tri[0][0];
+    const b = tri[2][0] - tri[0][0];
+    const c = tri[1][1] - tri[0][1];
+    const d = tri[2][1] - tri[0][1];
+    let i = a * d - b * c;
 
     /* Degenerate tri. */
     if (i === 0.0) {
       return null;
     }
 
-    var u = (d * (p[0] - tri[0][0]) - b * (p[1] - tri[0][1])) / i,
+    const u = (d * (p[0] - tri[0][0]) - b * (p[1] - tri[0][1])) / i,
       v = (a * (p[1] - tri[0][1]) - c * (p[0] - tri[0][0])) / i;
 
     /* If we're outside the tri, fail. */

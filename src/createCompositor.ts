@@ -13,7 +13,7 @@ import registerBuiltinCompositor from './shader/registerBuiltinCompositor';
 
 registerBuiltinCompositor(Shader);
 
-var shaderSourceReg = /^#source\((.*?)\)/;
+const shaderSourceReg = /^#source\((.*?)\)/;
 
 /**
  * @name clay.createCompositor
@@ -23,25 +23,25 @@ var shaderSourceReg = /^#source\((.*?)\)/;
  * @return {clay.compositor.Compositor}
  */
 function createCompositor(json, opts) {
-  var compositor = new Compositor();
+  const compositor = new Compositor();
   opts = opts || {};
 
-  var lib = {
+  const lib = {
     textures: {},
     parameters: {}
   };
-  var afterLoad = function (shaderLib, textureLib) {
-    for (var i = 0; i < json.nodes.length; i++) {
-      var nodeInfo = json.nodes[i];
-      var node = createNode(nodeInfo, lib, opts);
+  const afterLoad = function () {
+    for (let i = 0; i < json.nodes.length; i++) {
+      const nodeInfo = json.nodes[i];
+      const node = createNode(nodeInfo, lib, opts);
       if (node) {
         compositor.addNode(node);
       }
     }
   };
 
-  for (var name in json.parameters) {
-    var paramInfo = json.parameters[name];
+  for (const name in json.parameters) {
+    const paramInfo = json.parameters[name];
     lib.parameters[name] = convertParameter(paramInfo);
   }
   // TODO load texture asynchronous
@@ -54,14 +54,14 @@ function createCompositor(json, opts) {
 }
 
 function createNode(nodeInfo, lib, opts) {
-  var type = nodeInfo.type || 'filter';
-  var shaderSource;
-  var inputs;
-  var outputs;
+  const type = nodeInfo.type || 'filter';
+  let shaderSource;
+  let inputs;
+  let outputs;
 
   if (type === 'filter') {
-    var shaderExp = nodeInfo.shader.trim();
-    var res = shaderSourceReg.exec(shaderExp);
+    const shaderExp = nodeInfo.shader.trim();
+    const res = shaderSourceReg.exec(shaderExp);
     if (res) {
       shaderSource = Shader.source(res[1].trim());
     } else if (shaderExp.charAt(0) === '#') {
@@ -77,7 +77,7 @@ function createNode(nodeInfo, lib, opts) {
 
   if (nodeInfo.inputs) {
     inputs = {};
-    for (var name in nodeInfo.inputs) {
+    for (const name in nodeInfo.inputs) {
       if (typeof nodeInfo.inputs[name] === 'string') {
         inputs[name] = nodeInfo.inputs[name];
       } else {
@@ -90,8 +90,8 @@ function createNode(nodeInfo, lib, opts) {
   }
   if (nodeInfo.outputs) {
     outputs = {};
-    for (var name in nodeInfo.outputs) {
-      var outputInfo = nodeInfo.outputs[name];
+    for (const name in nodeInfo.outputs) {
+      const outputInfo = nodeInfo.outputs[name];
       outputs[name] = {};
       if (outputInfo.attachment != null) {
         outputs[name].attachment = outputInfo.attachment;
@@ -107,7 +107,7 @@ function createNode(nodeInfo, lib, opts) {
       }
     }
   }
-  var node;
+  let node;
   if (type === 'scene') {
     node = new CompoSceneNode({
       name: nodeInfo.name,
@@ -132,8 +132,8 @@ function createNode(nodeInfo, lib, opts) {
   }
   if (node) {
     if (nodeInfo.parameters) {
-      for (var name in nodeInfo.parameters) {
-        var val = nodeInfo.parameters[name];
+      for (const name in nodeInfo.parameters) {
+        let val = nodeInfo.parameters[name];
         if (typeof val === 'string') {
           val = val.trim();
           if (val.charAt(0) === '#') {
@@ -148,8 +148,8 @@ function createNode(nodeInfo, lib, opts) {
       }
     }
     if (nodeInfo.defines && node.pass) {
-      for (var name in nodeInfo.defines) {
-        var val = nodeInfo.defines[name];
+      for (const name in nodeInfo.defines) {
+        const val = nodeInfo.defines[name];
         node.pass.material.define('fragment', name, val);
       }
     }
@@ -157,7 +157,7 @@ function createNode(nodeInfo, lib, opts) {
   return node;
 }
 
-function defaultWidthFunc(width, height) {
+function defaultWidthFunc(width) {
   return width;
 }
 function defaultHeightFunc(width, height) {
@@ -165,14 +165,14 @@ function defaultHeightFunc(width, height) {
 }
 
 function convertParameter(paramInfo) {
-  var param = {};
+  const param = {};
   if (!paramInfo) {
     return param;
   }
   ['type', 'minFilter', 'magFilter', 'wrapS', 'wrapT', 'flipY', 'useMipmap'].forEach(function (
     name
   ) {
-    var val = paramInfo[name];
+    let val = paramInfo[name];
     if (val != null) {
       // Convert string to enum
       if (typeof val === 'string') {
@@ -182,10 +182,10 @@ function convertParameter(paramInfo) {
     }
   });
 
-  var sizeScale = paramInfo.scale || 1;
+  const sizeScale = paramInfo.scale || 1;
   ['width', 'height'].forEach(function (name) {
     if (paramInfo[name] != null) {
-      var val = paramInfo[name];
+      let val = paramInfo[name];
       if (typeof val === 'string') {
         val = val.trim();
         param[name] = createSizeParser(name, tryConvertExpr(val), sizeScale);
@@ -212,15 +212,14 @@ function loadTextures(json, lib, opts, callback) {
     callback({});
     return;
   }
-  var textures = {};
-  var loading = 0;
-
-  var cbd = false;
-  var textureRootPath = opts.textureRootPath;
+  const textures = {};
+  const textureRootPath = opts.textureRootPath;
+  let loading = 0;
+  let cbd = false;
   util.each(json.textures, function (textureInfo, name) {
-    var texture;
-    var path = textureInfo.path;
-    var parameters = convertParameter(textureInfo.parameters);
+    let texture;
+    let path = textureInfo.path;
+    const parameters = convertParameter(textureInfo.parameters);
     if (Array.isArray(path) && path.length === 6) {
       if (textureRootPath) {
         path = path.map(function (item) {
@@ -257,11 +256,11 @@ function loadTextures(json, lib, opts, callback) {
 function createSizeSetHandler(name, exprFunc) {
   return function (renderer) {
     // PENDING viewport size or window size
-    var dpr = renderer.getDevicePixelRatio();
+    const dpr = renderer.getDevicePixelRatio();
     // PENDING If multiply dpr ?
-    var width = renderer.getWidth();
-    var height = renderer.getHeight();
-    var result = exprFunc(width, height, dpr);
+    const width = renderer.getWidth();
+    const height = renderer.getHeight();
+    const result = exprFunc(width, height, dpr);
     this.setParameter(name, result);
   };
 }
@@ -269,19 +268,19 @@ function createSizeSetHandler(name, exprFunc) {
 function createSizeParser(name, exprFunc, scale) {
   scale = scale || 1;
   return function (renderer) {
-    var dpr = renderer.getDevicePixelRatio();
-    var width = renderer.getWidth() * scale;
-    var height = renderer.getHeight() * scale;
+    const dpr = renderer.getDevicePixelRatio();
+    const width = renderer.getWidth() * scale;
+    const height = renderer.getHeight() * scale;
     return exprFunc(width, height, dpr);
   };
 }
 
 function tryConvertExpr(string) {
   // PENDING
-  var exprRes = /^expr\((.*)\)$/.exec(string);
+  const exprRes = /^expr\((.*)\)$/.exec(string);
   if (exprRes) {
     try {
-      var func = new Function('width', 'height', 'dpr', 'return ' + exprRes[1]);
+      const func = new Function('width', 'height', 'dpr', 'return ' + exprRes[1]);
       // Try run t
       func(1, 1);
 

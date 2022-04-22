@@ -848,7 +848,7 @@ mat4.rotateZ = function (out, a, rad) {
  *
  *     mat4.identity(dest);
  *     mat4.translate(dest, vec);
- *     var quatMat = mat4.create();
+ *     var  quatMat = mat4.create();
  *     quat4.toMat4(quat, quatMat);
  *     mat4.multiply(dest, quatMat);
  *
