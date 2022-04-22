@@ -18,11 +18,11 @@
   "scripts": {
     "build": "npm run glsl2js && npm run gen:entry && npx rollup -c && npx terser dist/claygl.js -c -m > dist/claygl.min.js",
     "build:lib": "npx tsc",
+    "prepublishOnly": "npm run build && npm run build:lib",
     "dev": "rollup --sourcemap inline -c -w",
     "glsl2js": "node build/glsl2js.js",
     "gen:entry": "node build/genentry.js",
     "gen:fixture": "npm run pretest && electron-mocha --require-main \"./test/genfixture-env.js\" --renderer \"./test/integration/**/*.spec.js\"",
-    "prepublishOnly": "npm run build",
     "debug": "npm run pretest && electron-mocha --debug-brk --renderer \"./test/**/*.spec.js\"",
     "instrument": "istanbul instrument ./dist/claygl.src.js --output ./dist/claygl.js --no-compact --complete-copy --es-modules",
     "pretest": "npm run build:sourcemap",
@@ -37,6 +37,7 @@
     "url": "https://github.com/pissang/claygl.git"
   },
   "devDependencies": {
+    "@typescript-eslint/parser": "^5.20.0",
     "electron": "1.7.9",
     "electron-mocha": "^4.0.3",
     "eslint": "^8.13.0",
