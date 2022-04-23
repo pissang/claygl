@@ -1,4 +1,3 @@
-// @ts-nocheck
 import vec2 from '../glmatrix/vec2';
 
 /**
@@ -7,42 +6,40 @@ import vec2 from '../glmatrix/vec2';
  * @param {number} x
  * @param {number} y
  */
-const Vector2 = function (x, y) {
-  x = x || 0;
-  y = y || 0;
+class Vector2 {
+  constructor(x, y) {
+    x = x || 0;
+    y = y || 0;
 
-  /**
-   * Storage of Vector2, read and write of x, y will change the values in array
-   * All methods also operate on the array instead of x, y components
-   * @name array
-   * @type {Float32Array}
-   * @memberOf clay.Vector2#
-   */
-  this.array = vec2.fromValues(x, y);
+    /**
+     * Storage of Vector2, read and write of x, y will change the values in array
+     * All methods also operate on the array instead of x, y components
+     * @name array
+     * @type {Float32Array}
+     * @memberOf clay.Vector2#
+     */
+    this.array = vec2.fromValues(x, y);
 
-  /**
-   * Dirty flag is used by the Node to determine
-   * if the matrix is updated to latest
-   * @name _dirty
-   * @type {boolean}
-   * @memberOf clay.Vector2#
-   */
-  this._dirty = true;
-};
-
-Vector2.prototype = {
-  constructor: Vector2,
+    /**
+     * Dirty flag is used by the Node to determine
+     * if the matrix is updated to latest
+     * @name _dirty
+     * @type {boolean}
+     * @memberOf clay.Vector2#
+     */
+    this._dirty = true;
+  }
 
   /**
    * Add b to self
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  add: function (b) {
+  add(b) {
     vec2.add(this.array, this.array, b.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Set x and y components
@@ -50,44 +47,44 @@ Vector2.prototype = {
    * @param  {number}  y
    * @return {clay.Vector2}
    */
-  set: function (x, y) {
+  set(x, y) {
     this.array[0] = x;
     this.array[1] = y;
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Set x and y components from array
    * @param  {Float32Array|number[]} arr
    * @return {clay.Vector2}
    */
-  setArray: function (arr) {
+  setArray(arr) {
     this.array[0] = arr[0];
     this.array[1] = arr[1];
 
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Clone a new Vector2
    * @return {clay.Vector2}
    */
-  clone: function () {
+  clone() {
     return new Vector2(this.x, this.y);
-  },
+  }
 
   /**
    * Copy x, y from b
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  copy: function (b) {
+  copy(b) {
     vec2.copy(this.array, b.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Cross product of self and b, written to a Vector3 out
@@ -95,76 +92,76 @@ Vector2.prototype = {
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  cross: function (out, b) {
+  cross(out, b) {
     vec2.cross(out.array, this.array, b.array);
     out._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Alias for distance
    * @param  {clay.Vector2} b
    * @return {number}
    */
-  dist: function (b) {
+  dist(b) {
     return vec2.dist(this.array, b.array);
-  },
+  }
 
   /**
    * Distance between self and b
    * @param  {clay.Vector2} b
    * @return {number}
    */
-  distance: function (b) {
+  distance(b) {
     return vec2.distance(this.array, b.array);
-  },
+  }
 
   /**
    * Alias for divide
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  div: function (b) {
+  div(b) {
     vec2.div(this.array, this.array, b.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Divide self by b
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  divide: function (b) {
+  divide(b) {
     vec2.divide(this.array, this.array, b.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Dot product of self and b
    * @param  {clay.Vector2} b
    * @return {number}
    */
-  dot: function (b) {
+  dot(b) {
     return vec2.dot(this.array, b.array);
-  },
+  }
 
   /**
    * Alias of length
    * @return {number}
    */
-  len: function () {
+  len() {
     return vec2.len(this.array);
-  },
+  }
 
   /**
    * Calculate the length
    * @return {number}
    */
-  length: function () {
+  length() {
     return vec2.length(this.array);
-  },
+  }
 
   /**
    * Linear interpolation between a and b
@@ -173,97 +170,97 @@ Vector2.prototype = {
    * @param  {number}  t
    * @return {clay.Vector2}
    */
-  lerp: function (a, b, t) {
+  lerp(a, b, t) {
     vec2.lerp(this.array, a.array, b.array, t);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Minimum of self and b
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  min: function (b) {
+  min(b) {
     vec2.min(this.array, this.array, b.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Maximum of self and b
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  max: function (b) {
+  max(b) {
     vec2.max(this.array, this.array, b.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Alias for multiply
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  mul: function (b) {
+  mul(b) {
     vec2.mul(this.array, this.array, b.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Mutiply self and b
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  multiply: function (b) {
+  multiply(b) {
     vec2.multiply(this.array, this.array, b.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Negate self
    * @return {clay.Vector2}
    */
-  negate: function () {
+  negate() {
     vec2.negate(this.array, this.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Normalize self
    * @return {clay.Vector2}
    */
-  normalize: function () {
+  normalize() {
     vec2.normalize(this.array, this.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Generate random x, y components with a given scale
    * @param  {number} scale
    * @return {clay.Vector2}
    */
-  random: function (scale) {
+  random(scale) {
     vec2.random(this.array, scale);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Scale self
    * @param  {number}  scale
    * @return {clay.Vector2}
    */
-  scale: function (s) {
+  scale(s) {
     vec2.scale(this.array, this.array, s);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Scale b and add to self
@@ -271,120 +268,120 @@ Vector2.prototype = {
    * @param  {number}  scale
    * @return {clay.Vector2}
    */
-  scaleAndAdd: function (b, s) {
+  scaleAndAdd(b, s) {
     vec2.scaleAndAdd(this.array, this.array, b.array, s);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Alias for squaredDistance
    * @param  {clay.Vector2} b
    * @return {number}
    */
-  sqrDist: function (b) {
+  sqrDist(b) {
     return vec2.sqrDist(this.array, b.array);
-  },
+  }
 
   /**
    * Squared distance between self and b
    * @param  {clay.Vector2} b
    * @return {number}
    */
-  squaredDistance: function (b) {
+  squaredDistance(b) {
     return vec2.squaredDistance(this.array, b.array);
-  },
+  }
 
   /**
    * Alias for squaredLength
    * @return {number}
    */
-  sqrLen: function () {
+  sqrLen() {
     return vec2.sqrLen(this.array);
-  },
+  }
 
   /**
    * Squared length of self
    * @return {number}
    */
-  squaredLength: function () {
+  squaredLength() {
     return vec2.squaredLength(this.array);
-  },
+  }
 
   /**
    * Alias for subtract
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  sub: function (b) {
+  sub(b) {
     vec2.sub(this.array, this.array, b.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Subtract b from self
    * @param  {clay.Vector2} b
    * @return {clay.Vector2}
    */
-  subtract: function (b) {
+  subtract(b) {
     vec2.subtract(this.array, this.array, b.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Transform self with a Matrix2 m
    * @param  {clay.Matrix2} m
    * @return {clay.Vector2}
    */
-  transformMat2: function (m) {
+  transformMat2(m) {
     vec2.transformMat2(this.array, this.array, m.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Transform self with a Matrix2d m
    * @param  {clay.Matrix2d} m
    * @return {clay.Vector2}
    */
-  transformMat2d: function (m) {
+  transformMat2d(m) {
     vec2.transformMat2d(this.array, this.array, m.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Transform self with a Matrix3 m
    * @param  {clay.Matrix3} m
    * @return {clay.Vector2}
    */
-  transformMat3: function (m) {
+  transformMat3(m) {
     vec2.transformMat3(this.array, this.array, m.array);
     this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Transform self with a Matrix4 m
    * @param  {clay.Matrix4} m
    * @return {clay.Vector2}
    */
-  transformMat4: function (m) {
+  transformMat4(m) {
     vec2.transformMat4(this.array, this.array, m.array);
     this._dirty = true;
     return this;
-  },
+  }
 
-  toString: function () {
+  toString() {
     return '[' + Array.prototype.join.call(this.array, ',') + ']';
-  },
+  }
 
-  toArray: function () {
+  toArray() {
     return Array.prototype.slice.call(this.array);
   }
-};
+}
 
 // Getter and Setter
 if (Object.defineProperty) {

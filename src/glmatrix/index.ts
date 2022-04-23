@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @fileoverview gl-matrix - High performance matrix and vector operations
  * @author Brandon Jones
@@ -32,22 +31,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import mat2 from './mat2';
-import mat2d from './mat2d';
-import mat3 from './mat3';
-import mat4 from './mat4';
-import quat from './quat';
-import vec2 from './vec2';
-import vec3 from './vec3';
-import vec4 from './vec4';
-
-export default {
-  vec2: vec2,
-  vec3: vec3,
-  vec4: vec4,
-  mat2: mat2,
-  mat2d: mat2d,
-  mat3: mat3,
-  mat4: mat4,
-  quat: quat
-};
+export * as mat2 from './mat2';
+export * as mat2d from './mat2d';
+export * as mat3 from './mat3';
+export * as mat4 from './mat4';
+export * as quat from './quat';
+export * as vec2 from './vec2';
+export * as vec3 from './vec3';
+export * as vec4 from './vec4';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @license
  * Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
@@ -28,19 +27,12 @@
 import { GLMAT_EPSILON, GLMAT_ARRAY_TYPE } from './common';
 
 /**
- * @class 4x4 Matrix
- * @name mat4
- */
-
-var mat4 = {};
-
-/**
  * Creates a new identity mat4
  *
- * @returns {mat4} a new 4x4 matrix
+ * @returns a new 4x4 matrix
  */
-mat4.create = function () {
-  var out = new GLMAT_ARRAY_TYPE(16);
+export function create() {
+  const out = new GLMAT_ARRAY_TYPE(16);
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -58,16 +50,16 @@ mat4.create = function () {
   out[14] = 0;
   out[15] = 1;
   return out;
-};
+}
 
 /**
  * Creates a new mat4 initialized with values from an existing matrix
  *
- * @param {mat4} a matrix to clone
- * @returns {mat4} a new 4x4 matrix
+ * @param a matrix to clone
+ * @returns a new 4x4 matrix
  */
-mat4.clone = function (a) {
-  var out = new GLMAT_ARRAY_TYPE(16);
+export function clone(a: number[]) {
+  const out = new GLMAT_ARRAY_TYPE(16);
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -85,16 +77,16 @@ mat4.clone = function (a) {
   out[14] = a[14];
   out[15] = a[15];
   return out;
-};
+}
 
 /**
  * Copy the values from one mat4 to another
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the source matrix
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the source matrix
+ * @returns out
  */
-mat4.copy = function (out, a) {
+export function copy(out: number[], a: number[]) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -112,15 +104,15 @@ mat4.copy = function (out, a) {
   out[14] = a[14];
   out[15] = a[15];
   return out;
-};
+}
 
 /**
  * Set a mat4 to the identity matrix
  *
- * @param {mat4} out the receiving matrix
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @returns out
  */
-mat4.identity = function (out) {
+export function identity(out: number[]) {
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -138,19 +130,19 @@ mat4.identity = function (out) {
   out[14] = 0;
   out[15] = 1;
   return out;
-};
+}
 
 /**
  * Transpose the values of a mat4
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the source matrix
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the source matrix
+ * @returns out
  */
-mat4.transpose = function (out, a) {
+export function transpose(out: number[], a: number[]) {
   // If we are transposing ourselves we can skip a few steps but have to cache some values
   if (out === a) {
-    var a01 = a[1],
+    const a01 = a[1],
       a02 = a[2],
       a03 = a[3],
       a12 = a[6],
@@ -189,17 +181,17 @@ mat4.transpose = function (out, a) {
   }
 
   return out;
-};
+}
 
 /**
  * Inverts a mat4
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the source matrix
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the source matrix
+ * @returns out
  */
-mat4.invert = function (out, a) {
-  var a00 = a[0],
+export function invert(out: number[], a: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a03 = a[3],
@@ -226,9 +218,9 @@ mat4.invert = function (out, a) {
     b08 = a20 * a33 - a23 * a30,
     b09 = a21 * a32 - a22 * a31,
     b10 = a21 * a33 - a23 * a31,
-    b11 = a22 * a33 - a23 * a32,
-    // Calculate the determinant
-    det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+    b11 = a22 * a33 - a23 * a32;
+  // Calculate the determinant
+  let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
 
   if (!det) {
     return null;
@@ -253,17 +245,17 @@ mat4.invert = function (out, a) {
   out[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
 
   return out;
-};
+}
 
 /**
  * Calculates the adjugate of a mat4
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the source matrix
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the source matrix
+ * @returns out
  */
-mat4.adjoint = function (out, a) {
-  var a00 = a[0],
+export function adjoint(out: number[], a: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a03 = a[3],
@@ -337,16 +329,16 @@ mat4.adjoint = function (out, a) {
   out[15] =
     a00 * (a11 * a22 - a12 * a21) - a10 * (a01 * a22 - a02 * a21) + a20 * (a01 * a12 - a02 * a11);
   return out;
-};
+}
 
 /**
  * Calculates the determinant of a mat4
  *
- * @param {mat4} a the source matrix
- * @returns {Number} determinant of a
+ * @param a the source matrix
+ * @returns determinant of a
  */
-mat4.determinant = function (a) {
-  var a00 = a[0],
+export function determinant(a: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a03 = a[3],
@@ -377,18 +369,18 @@ mat4.determinant = function (a) {
 
   // Calculate the determinant
   return b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
-};
+}
 
 /**
  * Multiplies two mat4's
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the first operand
- * @param {mat4} b the second operand
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the first operand
+ * @param b the second operand
+ * @returns out
  */
-mat4.multiply = function (out, a, b) {
-  var a00 = a[0],
+export function multiply(out: number[], a: number[], b: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a03 = a[3],
@@ -406,7 +398,7 @@ mat4.multiply = function (out, a, b) {
     a33 = a[15];
 
   // Cache only the current line of the second matrix
-  var b0 = b[0],
+  let b0 = b[0],
     b1 = b[1],
     b2 = b[2],
     b3 = b[3];
@@ -442,18 +434,18 @@ mat4.multiply = function (out, a, b) {
   out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
   out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
   return out;
-};
+}
 
 /**
  * Multiplies two affine mat4's
  * Add by https://github.com/pissang
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the first operand
- * @param {mat4} b the second operand
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the first operand
+ * @param b the second operand
+ * @returns out
  */
-mat4.multiplyAffine = function (out, a, b) {
-  var a00 = a[0],
+export function multiplyAffine(out: number[], a: number[], b: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a10 = a[4],
@@ -467,7 +459,7 @@ mat4.multiplyAffine = function (out, a, b) {
     a32 = a[14];
 
   // Cache only the current line of the second matrix
-  var b0 = b[0],
+  let b0 = b[0],
     b1 = b[1],
     b2 = b[2];
   out[0] = b0 * a00 + b1 * a10 + b2 * a20;
@@ -499,43 +491,31 @@ mat4.multiplyAffine = function (out, a, b) {
   out[14] = b0 * a02 + b1 * a12 + b2 * a22 + a32;
   // out[15] = 1;
   return out;
-};
+}
 
 /**
  * Alias for {@link mat4.multiply}
- * @function
  */
-mat4.mul = mat4.multiply;
+export const mul = multiply;
 
 /**
  * Alias for {@link mat4.multiplyAffine}
  * @function
  */
-mat4.mulAffine = mat4.multiplyAffine;
+export const mulAffine = multiplyAffine;
 /**
  * Translate a mat4 by the given vector
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the matrix to translate
- * @param {vec3} v vector to translate by
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the matrix to translate
+ * @param v vector to translate by
+ * @returns out
  */
-mat4.translate = function (out, a, v) {
-  var x = v[0],
+export function translate(out: number[], a: number[], v: number[]) {
+  const x = v[0],
     y = v[1],
-    z = v[2],
-    a00,
-    a01,
-    a02,
-    a03,
-    a10,
-    a11,
-    a12,
-    a13,
-    a20,
-    a21,
-    a22,
-    a23;
+    z = v[2];
+  let a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23;
 
   if (a === out) {
     out[12] = a[0] * x + a[4] * y + a[8] * z + a[12];
@@ -576,18 +556,18 @@ mat4.translate = function (out, a, v) {
   }
 
   return out;
-};
+}
 
 /**
  * Scales the mat4 by the dimensions in the given vec3
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the matrix to scale
- * @param {vec3} v the vec3 to scale the matrix by
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the matrix to scale
+ * @param v the vec3 to scale the matrix by
+ * @returns out
  **/
-mat4.scale = function (out, a, v) {
-  var x = v[0],
+export function scale(out: number[], a: number[], v: number[]) {
+  const x = v[0],
     y = v[1],
     z = v[2];
 
@@ -608,46 +588,22 @@ mat4.scale = function (out, a, v) {
   out[14] = a[14];
   out[15] = a[15];
   return out;
-};
+}
 
 /**
  * Rotates a mat4 by the given angle
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the matrix to rotate
- * @param {Number} rad the angle to rotate the matrix by
- * @param {vec3} axis the axis to rotate around
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the matrix to rotate
+ * @param rad the angle to rotate the matrix by
+ * @param axis the axis to rotate around
+ * @returns out
  */
-mat4.rotate = function (out, a, rad, axis) {
-  var x = axis[0],
+export function rotate(out: number[], a: number[], rad: number, axis: number[]) {
+  let x = axis[0],
     y = axis[1],
     z = axis[2],
-    len = Math.sqrt(x * x + y * y + z * z),
-    s,
-    c,
-    t,
-    a00,
-    a01,
-    a02,
-    a03,
-    a10,
-    a11,
-    a12,
-    a13,
-    a20,
-    a21,
-    a22,
-    a23,
-    b00,
-    b01,
-    b02,
-    b10,
-    b11,
-    b12,
-    b20,
-    b21,
-    b22;
+    len = Math.sqrt(x * x + y * y + z * z);
 
   if (Math.abs(len) < GLMAT_EPSILON) {
     return null;
@@ -658,33 +614,33 @@ mat4.rotate = function (out, a, rad, axis) {
   y *= len;
   z *= len;
 
-  s = Math.sin(rad);
-  c = Math.cos(rad);
-  t = 1 - c;
+  const s = Math.sin(rad);
+  const c = Math.cos(rad);
+  const t = 1 - c;
 
-  a00 = a[0];
-  a01 = a[1];
-  a02 = a[2];
-  a03 = a[3];
-  a10 = a[4];
-  a11 = a[5];
-  a12 = a[6];
-  a13 = a[7];
-  a20 = a[8];
-  a21 = a[9];
-  a22 = a[10];
-  a23 = a[11];
+  const a00 = a[0];
+  const a01 = a[1];
+  const a02 = a[2];
+  const a03 = a[3];
+  const a10 = a[4];
+  const a11 = a[5];
+  const a12 = a[6];
+  const a13 = a[7];
+  const a20 = a[8];
+  const a21 = a[9];
+  const a22 = a[10];
+  const a23 = a[11];
 
   // Construct the elements of the rotation matrix
-  b00 = x * x * t + c;
-  b01 = y * x * t + z * s;
-  b02 = z * x * t - y * s;
-  b10 = x * y * t - z * s;
-  b11 = y * y * t + c;
-  b12 = z * y * t + x * s;
-  b20 = x * z * t + y * s;
-  b21 = y * z * t - x * s;
-  b22 = z * z * t + c;
+  const b00 = x * x * t + c;
+  const b01 = y * x * t + z * s;
+  const b02 = z * x * t - y * s;
+  const b10 = x * y * t - z * s;
+  const b11 = y * y * t + c;
+  const b12 = z * y * t + x * s;
+  const b20 = x * z * t + y * s;
+  const b21 = y * z * t - x * s;
+  const b22 = z * z * t + c;
 
   // Perform rotation-specific matrix multiplication
   out[0] = a00 * b00 + a10 * b01 + a20 * b02;
@@ -708,18 +664,18 @@ mat4.rotate = function (out, a, rad, axis) {
     out[15] = a[15];
   }
   return out;
-};
+}
 
 /**
  * Rotates a matrix by the given angle around the X axis
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the matrix to rotate
- * @param {Number} rad the angle to rotate the matrix by
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the matrix to rotate
+ * @param rad the angle to rotate the matrix by
+ * @returns out
  */
-mat4.rotateX = function (out, a, rad) {
-  var s = Math.sin(rad),
+export function rotateX(out: number[], a: number[], rad: number) {
+  const s = Math.sin(rad),
     c = Math.cos(rad),
     a10 = a[4],
     a11 = a[5],
@@ -752,18 +708,18 @@ mat4.rotateX = function (out, a, rad) {
   out[10] = a22 * c - a12 * s;
   out[11] = a23 * c - a13 * s;
   return out;
-};
+}
 
 /**
  * Rotates a matrix by the given angle around the Y axis
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the matrix to rotate
- * @param {Number} rad the angle to rotate the matrix by
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the matrix to rotate
+ * @param rad the angle to rotate the matrix by
+ * @returns out
  */
-mat4.rotateY = function (out, a, rad) {
-  var s = Math.sin(rad),
+export function rotateY(out: number[], a: number[], rad: number) {
+  const s = Math.sin(rad),
     c = Math.cos(rad),
     a00 = a[0],
     a01 = a[1],
@@ -796,18 +752,18 @@ mat4.rotateY = function (out, a, rad) {
   out[10] = a02 * s + a22 * c;
   out[11] = a03 * s + a23 * c;
   return out;
-};
+}
 
 /**
  * Rotates a matrix by the given angle around the Z axis
  *
- * @param {mat4} out the receiving matrix
- * @param {mat4} a the matrix to rotate
- * @param {Number} rad the angle to rotate the matrix by
- * @returns {mat4} out
+ * @param out the receiving matrix
+ * @param a the matrix to rotate
+ * @param rad the angle to rotate the matrix by
+ * @returns out
  */
-mat4.rotateZ = function (out, a, rad) {
-  var s = Math.sin(rad),
+export function rotateZ(out: number[], a: number[], rad: number) {
+  const s = Math.sin(rad),
     c = Math.cos(rad),
     a00 = a[0],
     a01 = a[1],
@@ -840,7 +796,7 @@ mat4.rotateZ = function (out, a, rad) {
   out[6] = a12 * c - a02 * s;
   out[7] = a13 * c - a03 * s;
   return out;
-};
+}
 
 /**
  * Creates a matrix from a quaternion rotation and vector translation
@@ -848,18 +804,18 @@ mat4.rotateZ = function (out, a, rad) {
  *
  *     mat4.identity(dest);
  *     mat4.translate(dest, vec);
- *     var  quatMat = mat4.create();
+ *     const  quatMat = mat4.create();
  *     quat4.toMat4(quat, quatMat);
  *     mat4.multiply(dest, quatMat);
  *
- * @param {mat4} out mat4 receiving operation result
+ * @param out mat4 receiving operation result
  * @param {quat4} q Rotation quaternion
- * @param {vec3} v Translation vector
- * @returns {mat4} out
+ * @param v Translation vector
+ * @returns out
  */
-mat4.fromRotationTranslation = function (out, q, v) {
+export function fromRotationTranslation(out: number[], q: number[], v: number[]) {
   // Quaternion math
-  var x = q[0],
+  const x = q[0],
     y = q[1],
     z = q[2],
     w = q[3],
@@ -894,10 +850,10 @@ mat4.fromRotationTranslation = function (out, q, v) {
   out[15] = 1;
 
   return out;
-};
+}
 
-mat4.fromQuat = function (out, q) {
-  var x = q[0],
+export function fromQuat(out: number[], q: number[]) {
+  const x = q[0],
     y = q[1],
     z = q[2],
     w = q[3],
@@ -935,22 +891,30 @@ mat4.fromQuat = function (out, q) {
   out[15] = 1;
 
   return out;
-};
+}
 
 /**
  * Generates a frustum matrix with the given bounds
  *
- * @param {mat4} out mat4 frustum matrix will be written into
- * @param {Number} left Left bound of the frustum
- * @param {Number} right Right bound of the frustum
- * @param {Number} bottom Bottom bound of the frustum
- * @param {Number} top Top bound of the frustum
- * @param {Number} near Near bound of the frustum
- * @param {Number} far Far bound of the frustum
- * @returns {mat4} out
+ * @param out mat4 frustum matrix will be written into
+ * @param left Left bound of the frustum
+ * @param right Right bound of the frustum
+ * @param bottom Bottom bound of the frustum
+ * @param top Top bound of the frustum
+ * @param near Near bound of the frustum
+ * @param far Far bound of the frustum
+ * @returns out
  */
-mat4.frustum = function (out, left, right, bottom, top, near, far) {
-  var rl = 1 / (right - left),
+export function frustum(
+  out: number[],
+  left: number,
+  right: number,
+  bottom: number,
+  top: number,
+  near: number,
+  far: number
+) {
+  const rl = 1 / (right - left),
     tb = 1 / (top - bottom),
     nf = 1 / (near - far);
   out[0] = near * 2 * rl;
@@ -970,20 +934,26 @@ mat4.frustum = function (out, left, right, bottom, top, near, far) {
   out[14] = far * near * 2 * nf;
   out[15] = 0;
   return out;
-};
+}
 
 /**
  * Generates a perspective projection matrix with the given bounds
  *
- * @param {mat4} out mat4 frustum matrix will be written into
- * @param {number} fovy Vertical field of view in radians
- * @param {number} aspect Aspect ratio. typically viewport width/height
- * @param {number} near Near bound of the frustum
- * @param {number} far Far bound of the frustum
- * @returns {mat4} out
+ * @param out mat4 frustum matrix will be written into
+ * @param fovy Vertical field of view in radians
+ * @param aspect Aspect ratio. typically viewport width/height
+ * @param near Near bound of the frustum
+ * @param far Far bound of the frustum
+ * @returns out
  */
-mat4.perspective = function (out, fovy, aspect, near, far) {
-  var f = 1.0 / Math.tan(fovy / 2),
+export function perspective(
+  out: number[],
+  fovy: number,
+  aspect: number,
+  near: number,
+  far: number
+) {
+  const f = 1.0 / Math.tan(fovy / 2),
     nf = 1 / (near - far);
   out[0] = f / aspect;
   out[1] = 0;
@@ -1002,22 +972,30 @@ mat4.perspective = function (out, fovy, aspect, near, far) {
   out[14] = 2 * far * near * nf;
   out[15] = 0;
   return out;
-};
+}
 
 /**
  * Generates a orthogonal projection matrix with the given bounds
  *
- * @param {mat4} out mat4 frustum matrix will be written into
- * @param {number} left Left bound of the frustum
- * @param {number} right Right bound of the frustum
- * @param {number} bottom Bottom bound of the frustum
- * @param {number} top Top bound of the frustum
- * @param {number} near Near bound of the frustum
- * @param {number} far Far bound of the frustum
- * @returns {mat4} out
+ * @param out mat4 frustum matrix will be written into
+ * @param left Left bound of the frustum
+ * @param right Right bound of the frustum
+ * @param bottom Bottom bound of the frustum
+ * @param top Top bound of the frustum
+ * @param near Near bound of the frustum
+ * @param far Far bound of the frustum
+ * @returns out
  */
-mat4.ortho = function (out, left, right, bottom, top, near, far) {
-  var lr = 1 / (left - right),
+export function ortho(
+  out: number[],
+  left: number,
+  right: number,
+  bottom: number,
+  top: number,
+  near: number,
+  far: number
+) {
+  const lr = 1 / (left - right),
     bt = 1 / (bottom - top),
     nf = 1 / (near - far);
   out[0] = -2 * lr;
@@ -1037,29 +1015,20 @@ mat4.ortho = function (out, left, right, bottom, top, near, far) {
   out[14] = (far + near) * nf;
   out[15] = 1;
   return out;
-};
+}
 
 /**
  * Generates a look-at matrix with the given eye position, focal point, and up axis
  *
- * @param {mat4} out mat4 frustum matrix will be written into
- * @param {vec3} eye Position of the viewer
- * @param {vec3} center Point the viewer is looking at
- * @param {vec3} up vec3 pointing up
- * @returns {mat4} out
+ * @param out mat4 frustum matrix will be written into
+ * @param eye Position of the viewer
+ * @param center Point the viewer is looking at
+ * @param up vec3 pointing up
+ * @returns out
  */
-mat4.lookAt = function (out, eye, center, up) {
-  var x0,
-    x1,
-    x2,
-    y0,
-    y1,
-    y2,
-    z0,
-    z1,
-    z2,
-    len,
-    eyex = eye[0],
+export function lookAt(out: number[], eye: number[], center: number[], up: number[]) {
+  let x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
+  const eyex = eye[0],
     eyey = eye[1],
     eyez = eye[2],
     upx = up[0],
@@ -1074,7 +1043,7 @@ mat4.lookAt = function (out, eye, center, up) {
     Math.abs(eyey - centery) < GLMAT_EPSILON &&
     Math.abs(eyez - centerz) < GLMAT_EPSILON
   ) {
-    return mat4.identity(out);
+    return identity(out);
   }
 
   z0 = eyex - centerx;
@@ -1135,15 +1104,15 @@ mat4.lookAt = function (out, eye, center, up) {
   out[15] = 1;
 
   return out;
-};
+}
 
 /**
  * Returns Frobenius norm of a mat4
  *
- * @param {mat4} a the matrix to calculate Frobenius norm of
- * @returns {Number} Frobenius norm
+ * @param a the matrix to calculate Frobenius norm of
+ * @returns Frobenius norm
  */
-mat4.frob = function (a) {
+export function frob(a: number[]) {
   return Math.sqrt(
     Math.pow(a[0], 2) +
       Math.pow(a[1], 2) +
@@ -1162,6 +1131,4 @@ mat4.frob = function (a) {
       Math.pow(a[14], 2) +
       Math.pow(a[15], 2)
   );
-};
-
-export default mat4;
+}

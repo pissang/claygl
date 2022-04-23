@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @license
  * Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
@@ -46,15 +45,13 @@ import { GLMAT_ARRAY_TYPE } from './common';
  * The last row is ignored so the array is shorter and operations are faster.
  */
 
-var mat2d = {};
-
 /**
  * Creates a new identity mat2d
  *
- * @returns {mat2d} a new 2x3 matrix
+ * @returns a new 2x3 matrix
  */
-mat2d.create = function () {
-  var out = new GLMAT_ARRAY_TYPE(6);
+export function create() {
+  const out = new GLMAT_ARRAY_TYPE(6);
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -62,16 +59,16 @@ mat2d.create = function () {
   out[4] = 0;
   out[5] = 0;
   return out;
-};
+}
 
 /**
  * Creates a new mat2d initialized with values from an existing matrix
  *
- * @param {mat2d} a matrix to clone
- * @returns {mat2d} a new 2x3 matrix
+ * @param a matrix to clone
+ * @returns a new 2x3 matrix
  */
-mat2d.clone = function (a) {
-  var out = new GLMAT_ARRAY_TYPE(6);
+export function clone(a: number[]) {
+  const out = new GLMAT_ARRAY_TYPE(6);
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -79,16 +76,16 @@ mat2d.clone = function (a) {
   out[4] = a[4];
   out[5] = a[5];
   return out;
-};
+}
 
 /**
  * Copy the values from one mat2d to another
  *
- * @param {mat2d} out the receiving matrix
- * @param {mat2d} a the source matrix
- * @returns {mat2d} out
+ * @param out the receiving matrix
+ * @param a the source matrix
+ * @returns out
  */
-mat2d.copy = function (out, a) {
+export function copy(out: number[], a: number[]) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -96,15 +93,15 @@ mat2d.copy = function (out, a) {
   out[4] = a[4];
   out[5] = a[5];
   return out;
-};
+}
 
 /**
  * Set a mat2d to the identity matrix
  *
- * @param {mat2d} out the receiving matrix
- * @returns {mat2d} out
+ * @param out the receiving matrix
+ * @returns out
  */
-mat2d.identity = function (out) {
+export function identity(out: number[]) {
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -112,24 +109,24 @@ mat2d.identity = function (out) {
   out[4] = 0;
   out[5] = 0;
   return out;
-};
+}
 
 /**
  * Inverts a mat2d
  *
- * @param {mat2d} out the receiving matrix
- * @param {mat2d} a the source matrix
- * @returns {mat2d} out
+ * @param out the receiving matrix
+ * @param a the source matrix
+ * @returns out
  */
-mat2d.invert = function (out, a) {
-  var aa = a[0],
+export function invert(out: number[], a: number[]) {
+  const aa = a[0],
     ab = a[1],
     ac = a[2],
     ad = a[3],
     atx = a[4],
     aty = a[5];
 
-  var det = aa * ad - ab * ac;
+  let det = aa * ad - ab * ac;
   if (!det) {
     return null;
   }
@@ -142,28 +139,28 @@ mat2d.invert = function (out, a) {
   out[4] = (ac * aty - ad * atx) * det;
   out[5] = (ab * atx - aa * aty) * det;
   return out;
-};
+}
 
 /**
  * Calculates the determinant of a mat2d
  *
- * @param {mat2d} a the source matrix
- * @returns {Number} determinant of a
+ * @param a the source matrix
+ * @returns determinant of a
  */
-mat2d.determinant = function (a) {
+export function determinant(a: number[]) {
   return a[0] * a[3] - a[1] * a[2];
-};
+}
 
 /**
  * Multiplies two mat2d's
  *
- * @param {mat2d} out the receiving matrix
- * @param {mat2d} a the first operand
- * @param {mat2d} b the second operand
- * @returns {mat2d} out
+ * @param out the receiving matrix
+ * @param a the first operand
+ * @param b the second operand
+ * @returns out
  */
-mat2d.multiply = function (out, a, b) {
-  var a0 = a[0],
+export function multiply(out: number[], a: number[], b: number[]) {
+  const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
     a3 = a[3],
@@ -182,24 +179,22 @@ mat2d.multiply = function (out, a, b) {
   out[4] = a0 * b4 + a2 * b5 + a4;
   out[5] = a1 * b4 + a3 * b5 + a5;
   return out;
-};
+}
 
 /**
- * Alias for {@link mat2d.multiply}
- * @function
+ * Alias for {@link export function multiply@function
  */
-mat2d.mul = mat2d.multiply;
+export const mul = multiply;
 
 /**
  * Rotates a mat2d by the given angle
- *
- * @param {mat2d} out the receiving matrix
- * @param {mat2d} a the matrix to rotate
- * @param {Number} rad the angle to rotate the matrix by
- * @returns {mat2d} out
+ * @param out the receiving matrix
+ * @param a the matrix to rotate
+ * @param rad the angle to rotate the matrix by
+ * @returns out
  */
-mat2d.rotate = function (out, a, rad) {
-  var a0 = a[0],
+export function rotate(out: number[], a: number[], rad: number) {
+  const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
     a3 = a[3],
@@ -214,18 +209,18 @@ mat2d.rotate = function (out, a, rad) {
   out[4] = a4;
   out[5] = a5;
   return out;
-};
+}
 
 /**
  * Scales the mat2d by the dimensions in the given vec2
  *
- * @param {mat2d} out the receiving matrix
- * @param {mat2d} a the matrix to translate
- * @param {vec2} v the vec2 to scale the matrix by
- * @returns {mat2d} out
+ * @param out the receiving matrix
+ * @param a the matrix to translate
+ * @param v the vec2 to scale the matrix by
+ * @returns out
  **/
-mat2d.scale = function (out, a, v) {
-  var a0 = a[0],
+export function scale(out: number[], a: number[], v: number[]) {
+  const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
     a3 = a[3],
@@ -240,18 +235,18 @@ mat2d.scale = function (out, a, v) {
   out[4] = a4;
   out[5] = a5;
   return out;
-};
+}
 
 /**
  * Translates the mat2d by the dimensions in the given vec2
  *
- * @param {mat2d} out the receiving matrix
- * @param {mat2d} a the matrix to translate
- * @param {vec2} v the vec2 to translate the matrix by
- * @returns {mat2d} out
+ * @param out the receiving matrix
+ * @param a the matrix to translate
+ * @param v the vec2 to translate the matrix by
+ * @returns out
  **/
-mat2d.translate = function (out, a, v) {
-  var a0 = a[0],
+export function translate(out: number[], a: number[], v: number[]) {
+  const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
     a3 = a[3],
@@ -266,15 +261,15 @@ mat2d.translate = function (out, a, v) {
   out[4] = a0 * v0 + a2 * v1 + a4;
   out[5] = a1 * v0 + a3 * v1 + a5;
   return out;
-};
+}
 
 /**
  * Returns Frobenius norm of a mat2d
  *
- * @param {mat2d} a the matrix to calculate Frobenius norm of
- * @returns {Number} Frobenius norm
+ * @param a the matrix to calculate Frobenius norm of
+ * @returns Frobenius norm
  */
-mat2d.frob = function (a) {
+export function frob(a: number[]) {
   return Math.sqrt(
     Math.pow(a[0], 2) +
       Math.pow(a[1], 2) +
@@ -284,6 +279,4 @@ mat2d.frob = function (a) {
       Math.pow(a[5], 2) +
       1
   );
-};
-
-export default mat2d;
+}

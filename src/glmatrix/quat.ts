@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @license
  * Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
@@ -26,30 +25,23 @@
  */
 
 import { GLMAT_ARRAY_TYPE } from './common';
-import vec3 from './vec3';
-import vec4 from './vec4';
-import mat3 from './mat3';
-
-/**
- * @class Quaternion
- * @name quat
- */
-
-var quat = {};
+import * as vec3 from './vec3';
+import * as vec4 from './vec4';
+import * as mat3 from './mat3';
 
 /**
  * Creates a new identity quat
  *
- * @returns {quat} a new quaternion
+ * @returns a new quaternion
  */
-quat.create = function () {
-  var out = new GLMAT_ARRAY_TYPE(4);
+export function create() {
+  const out = new GLMAT_ARRAY_TYPE(4);
   out[0] = 0;
   out[1] = 0;
   out[2] = 0;
   out[3] = 1;
   return out;
-};
+}
 
 /**
  * Sets a quaternion to represent the shortest rotation from one
@@ -57,23 +49,23 @@ quat.create = function () {
  *
  * Both vectors are assumed to be unit length.
  *
- * @param {quat} out the receiving quaternion.
- * @param {vec3} a the initial vector
- * @param {vec3} b the destination vector
- * @returns {quat} out
+ * @param out the receiving quaternion.
+ * @param a the initial vector
+ * @param b the destination vector
+ * @returns out
  */
-quat.rotationTo = (function () {
-  var tmpvec3 = vec3.create();
-  var xUnitVec3 = vec3.fromValues(1, 0, 0);
-  var yUnitVec3 = vec3.fromValues(0, 1, 0);
+export const rotationTo = (function () {
+  const tmpvec3 = vec3.create();
+  const xUnitVec3 = vec3.fromValues(1, 0, 0);
+  const yUnitVec3 = vec3.fromValues(0, 1, 0);
 
-  return function (out, a, b) {
-    var dot = vec3.dot(a, b);
+  return function (out: number[], a: number[], b: number[]) {
+    const dot = vec3.dot(a, b);
     if (dot < -0.999999) {
       vec3.cross(tmpvec3, xUnitVec3, a);
       if (vec3.length(tmpvec3) < 0.000001) vec3.cross(tmpvec3, yUnitVec3, a);
       vec3.normalize(tmpvec3, tmpvec3);
-      quat.setAxisAngle(out, tmpvec3, Math.PI);
+      setAxisAngle(out, tmpvec3, Math.PI);
       return out;
     } else if (dot > 0.999999) {
       out[0] = 0;
@@ -87,7 +79,7 @@ quat.rotationTo = (function () {
       out[1] = tmpvec3[1];
       out[2] = tmpvec3[2];
       out[3] = 1 + dot;
-      return quat.normalize(out, out);
+      return normalize(out, out);
     }
   };
 })();
@@ -97,15 +89,15 @@ quat.rotationTo = (function () {
  * axes. Each axis is a vec3 and is expected to be unit length and
  * perpendicular to all other specified axes.
  *
- * @param {vec3} view  the vector representing the viewing direction
- * @param {vec3} right the vector representing the local "right" direction
- * @param {vec3} up    the vector representing the local "up" direction
- * @returns {quat} out
+ * @param view  the vector representing the viewing direction
+ * @param right the vector representing the local "right" direction
+ * @param up    the vector representing the local "up" direction
+ * @returns out
  */
-quat.setAxes = (function () {
-  var matr = mat3.create();
+export const setAxes = (function () {
+  const matr = mat3.create();
 
-  return function (out, view, right, up) {
+  return function (out: number[], view: number[], right: number[], up: number[]) {
     matr[0] = right[0];
     matr[3] = right[1];
     matr[6] = right[2];
@@ -118,108 +110,108 @@ quat.setAxes = (function () {
     matr[5] = -view[1];
     matr[8] = -view[2];
 
-    return quat.normalize(out, quat.fromMat3(out, matr));
+    return normalize(out, fromMat3(out, matr));
   };
 })();
 
 /**
  * Creates a new quat initialized with values from an existing quaternion
  *
- * @param {quat} a quaternion to clone
- * @returns {quat} a new quaternion
+ * @param a quaternion to clone
+ * @returns a new quaternion
  * @function
  */
-quat.clone = vec4.clone;
+export const clone = vec4.clone;
 
 /**
  * Creates a new quat initialized with the given values
  *
- * @param {Number} x X component
- * @param {Number} y Y component
- * @param {Number} z Z component
- * @param {Number} w W component
- * @returns {quat} a new quaternion
+ * @param x X component
+ * @param y Y component
+ * @param z Z component
+ * @param w W component
+ * @returns a new quaternion
  * @function
  */
-quat.fromValues = vec4.fromValues;
+export const fromValues = vec4.fromValues;
 
 /**
  * Copy the values from one quat to another
  *
- * @param {quat} out the receiving quaternion
- * @param {quat} a the source quaternion
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param a the source quaternion
+ * @returns out
  * @function
  */
-quat.copy = vec4.copy;
+export const copy = vec4.copy;
 
 /**
  * Set the components of a quat to the given values
  *
- * @param {quat} out the receiving quaternion
- * @param {Number} x X component
- * @param {Number} y Y component
- * @param {Number} z Z component
- * @param {Number} w W component
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param x X component
+ * @param y Y component
+ * @param z Z component
+ * @param w W component
+ * @returns out
  * @function
  */
-quat.set = vec4.set;
+export const set = vec4.set;
 
 /**
  * Set a quat to the identity quaternion
  *
- * @param {quat} out the receiving quaternion
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @returns out
  */
-quat.identity = function (out) {
+export function identity(out: number[]) {
   out[0] = 0;
   out[1] = 0;
   out[2] = 0;
   out[3] = 1;
   return out;
-};
+}
 
 /**
  * Sets a quat from the given angle and rotation axis,
  * then returns it.
  *
- * @param {quat} out the receiving quaternion
- * @param {vec3} axis the axis around which to rotate
- * @param {Number} rad the angle in radians
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param axis the axis around which to rotate
+ * @param rad the angle in radians
+ * @returns out
  **/
-quat.setAxisAngle = function (out, axis, rad) {
+export function setAxisAngle(out: number[], axis: number[], rad: number) {
   rad = rad * 0.5;
-  var s = Math.sin(rad);
+  const s = Math.sin(rad);
   out[0] = s * axis[0];
   out[1] = s * axis[1];
   out[2] = s * axis[2];
   out[3] = Math.cos(rad);
   return out;
-};
+}
 
 /**
  * Adds two quat's
  *
- * @param {quat} out the receiving quaternion
- * @param {quat} a the first operand
- * @param {quat} b the second operand
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param a the first operand
+ * @param b the second operand
+ * @returns out
  * @function
  */
-quat.add = vec4.add;
+export const add = vec4.add;
 
 /**
  * Multiplies two quat's
  *
- * @param {quat} out the receiving quaternion
- * @param {quat} a the first operand
- * @param {quat} b the second operand
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param a the first operand
+ * @param b the second operand
+ * @returns out
  */
-quat.multiply = function (out, a, b) {
-  var ax = a[0],
+export function multiply(out: number[], a: number[], b: number[]) {
+  const ax = a[0],
     ay = a[1],
     az = a[2],
     aw = a[3],
@@ -233,37 +225,37 @@ quat.multiply = function (out, a, b) {
   out[2] = az * bw + aw * bz + ax * by - ay * bx;
   out[3] = aw * bw - ax * bx - ay * by - az * bz;
   return out;
-};
+}
 
 /**
  * Alias for {@link quat.multiply}
  * @function
  */
-quat.mul = quat.multiply;
+export const mul = multiply;
 
 /**
  * Scales a quat by a scalar number
  *
- * @param {quat} out the receiving vector
- * @param {quat} a the vector to scale
- * @param {Number} b amount to scale the vector by
- * @returns {quat} out
+ * @param out the receiving vector
+ * @param a the vector to scale
+ * @param b amount to scale the vector by
+ * @returns out
  * @function
  */
-quat.scale = vec4.scale;
+export const scale = vec4.scale;
 
 /**
  * Rotates a quaternion by the given angle about the X axis
  *
- * @param {quat} out quat receiving operation result
- * @param {quat} a quat to rotate
- * @param {number} rad angle (in radians) to rotate
- * @returns {quat} out
+ * @param out quat receiving operation result
+ * @param a quat to rotate
+ * @param rad angle (in radians) to rotate
+ * @returns out
  */
-quat.rotateX = function (out, a, rad) {
+export function rotateX(out: number[], a: number[], rad: number) {
   rad *= 0.5;
 
-  var ax = a[0],
+  const ax = a[0],
     ay = a[1],
     az = a[2],
     aw = a[3],
@@ -275,20 +267,20 @@ quat.rotateX = function (out, a, rad) {
   out[2] = az * bw - ay * bx;
   out[3] = aw * bw - ax * bx;
   return out;
-};
+}
 
 /**
  * Rotates a quaternion by the given angle about the Y axis
  *
- * @param {quat} out quat receiving operation result
- * @param {quat} a quat to rotate
- * @param {number} rad angle (in radians) to rotate
- * @returns {quat} out
+ * @param out quat receiving operation result
+ * @param a quat to rotate
+ * @param rad angle (in radians) to rotate
+ * @returns out
  */
-quat.rotateY = function (out, a, rad) {
+export function rotateY(out: number[], a: number[], rad: number) {
   rad *= 0.5;
 
-  var ax = a[0],
+  const ax = a[0],
     ay = a[1],
     az = a[2],
     aw = a[3],
@@ -300,20 +292,20 @@ quat.rotateY = function (out, a, rad) {
   out[2] = az * bw + ax * by;
   out[3] = aw * bw - ay * by;
   return out;
-};
+}
 
 /**
  * Rotates a quaternion by the given angle about the Z axis
  *
- * @param {quat} out quat receiving operation result
- * @param {quat} a quat to rotate
- * @param {number} rad angle (in radians) to rotate
- * @returns {quat} out
+ * @param out quat receiving operation result
+ * @param a quat to rotate
+ * @param rad angle (in radians) to rotate
+ * @returns out
  */
-quat.rotateZ = function (out, a, rad) {
+export function rotateZ(out: number[], a: number[], rad: number) {
   rad *= 0.5;
 
-  var ax = a[0],
+  const ax = a[0],
     ay = a[1],
     az = a[2],
     aw = a[3],
@@ -325,19 +317,19 @@ quat.rotateZ = function (out, a, rad) {
   out[2] = az * bw + aw * bz;
   out[3] = aw * bw - az * bz;
   return out;
-};
+}
 
 /**
  * Calculates the W component of a quat from the X, Y, and Z components.
  * Assumes that quaternion is 1 unit in length.
  * Any existing W component will be ignored.
  *
- * @param {quat} out the receiving quaternion
- * @param {quat} a quat to calculate W component of
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param a quat to calculate W component of
+ * @returns out
  */
-quat.calculateW = function (out, a) {
-  var x = a[0],
+export function calculateW(out: number[], a: number[]) {
+  const x = a[0],
     y = a[1],
     z = a[2];
 
@@ -346,53 +338,53 @@ quat.calculateW = function (out, a) {
   out[2] = z;
   out[3] = Math.sqrt(Math.abs(1.0 - x * x - y * y - z * z));
   return out;
-};
+}
 
 /**
  * Calculates the dot product of two quat's
  *
- * @param {quat} a the first operand
- * @param {quat} b the second operand
- * @returns {Number} dot product of a and b
+ * @param a the first operand
+ * @param b the second operand
+ * @returns dot product of a and b
  * @function
  */
-quat.dot = vec4.dot;
+export const dot = vec4.dot;
 
 /**
  * Performs a linear interpolation between two quat's
  *
- * @param {quat} out the receiving quaternion
- * @param {quat} a the first operand
- * @param {quat} b the second operand
- * @param {Number} t interpolation amount between the two inputs
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param a the first operand
+ * @param b the second operand
+ * @param t interpolation amount between the two inputs
+ * @returns out
  * @function
  */
-quat.lerp = vec4.lerp;
+export const lerp = vec4.lerp;
 
 /**
  * Performs a spherical linear interpolation between two quat
  *
- * @param {quat} out the receiving quaternion
- * @param {quat} a the first operand
- * @param {quat} b the second operand
- * @param {Number} t interpolation amount between the two inputs
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param a the first operand
+ * @param b the second operand
+ * @param t interpolation amount between the two inputs
+ * @returns out
  */
-quat.slerp = function (out, a, b, t) {
+export function slerp(out: number[], a: number[], b: number[], t: number) {
   // benchmarks:
   //    http://jsperf.com/quaternion-slerp-implementations
 
-  var ax = a[0],
+  const ax = a[0],
     ay = a[1],
     az = a[2],
-    aw = a[3],
-    bx = b[0],
+    aw = a[3];
+  let bx = b[0],
     by = b[1],
     bz = b[2],
     bw = b[3];
 
-  var omega, cosom, sinom, scale0, scale1;
+  let omega, cosom, sinom, scale0, scale1;
 
   // calc cosine
   cosom = ax * bx + ay * by + az * bz + aw * bw;
@@ -424,17 +416,17 @@ quat.slerp = function (out, a, b, t) {
   out[3] = scale0 * aw + scale1 * bw;
 
   return out;
-};
+}
 
 /**
  * Calculates the inverse of a quat
  *
- * @param {quat} out the receiving quaternion
- * @param {quat} a quat to calculate inverse of
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param a quat to calculate inverse of
+ * @returns out
  */
-quat.invert = function (out, a) {
-  var a0 = a[0],
+export function invert(out: number[], a: number[]) {
+  const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
     a3 = a[3],
@@ -448,63 +440,63 @@ quat.invert = function (out, a) {
   out[2] = -a2 * invDot;
   out[3] = a3 * invDot;
   return out;
-};
+}
 
 /**
  * Calculates the conjugate of a quat
  * If the quaternion is normalized, this function is faster than quat.inverse and produces the same result.
  *
- * @param {quat} out the receiving quaternion
- * @param {quat} a quat to calculate conjugate of
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param a quat to calculate conjugate of
+ * @returns out
  */
-quat.conjugate = function (out, a) {
+export function conjugate(out: number[], a: number[]) {
   out[0] = -a[0];
   out[1] = -a[1];
   out[2] = -a[2];
   out[3] = a[3];
   return out;
-};
+}
 
 /**
  * Calculates the length of a quat
  *
- * @param {quat} a vector to calculate length of
- * @returns {Number} length of a
+ * @param a vector to calculate length of
+ * @returns length of a
  * @function
  */
-quat.length = vec4.length;
+export const length = vec4.length;
 
 /**
  * Alias for {@link quat.length}
  * @function
  */
-quat.len = quat.length;
+export const len = length;
 
 /**
  * Calculates the squared length of a quat
  *
- * @param {quat} a vector to calculate squared length of
- * @returns {Number} squared length of a
+ * @param a vector to calculate squared length of
+ * @returns squared length of a
  * @function
  */
-quat.squaredLength = vec4.squaredLength;
+export const squaredLength = vec4.squaredLength;
 
 /**
  * Alias for {@link quat.squaredLength}
  * @function
  */
-quat.sqrLen = quat.squaredLength;
+export const sqrLen = squaredLength;
 
 /**
  * Normalize a quat
  *
- * @param {quat} out the receiving quaternion
- * @param {quat} a quaternion to normalize
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param a quaternion to normalize
+ * @returns out
  * @function
  */
-quat.normalize = vec4.normalize;
+export const normalize = vec4.normalize;
 
 /**
  * Creates a quaternion from the given 3x3 rotation matrix.
@@ -512,16 +504,16 @@ quat.normalize = vec4.normalize;
  * NOTE: The resultant quaternion is not normalized, so you should be sure
  * to renormalize the quaternion yourself where necessary.
  *
- * @param {quat} out the receiving quaternion
- * @param {mat3} m rotation matrix
- * @returns {quat} out
+ * @param out the receiving quaternion
+ * @param m rotation matrix
+ * @returns out
  * @function
  */
-quat.fromMat3 = function (out, m) {
+export function fromMat3(out: number[], m: number[]) {
   // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
   // article "Quaternion Calculus and Fast Animation".
-  var fTrace = m[0] + m[4] + m[8];
-  var fRoot;
+  const fTrace = m[0] + m[4] + m[8];
+  let fRoot;
 
   if (fTrace > 0.0) {
     // |w| > 1/2, may as well choose w > 1/2
@@ -548,6 +540,4 @@ quat.fromMat3 = function (out, m) {
   }
 
   return out;
-};
-
-export default quat;
+}

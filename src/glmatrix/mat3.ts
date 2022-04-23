@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @license
  * Copyright (c) 2013, Brandon Jones, Colin MacKenzie IV. All rights reserved.
@@ -32,15 +31,13 @@ import { GLMAT_ARRAY_TYPE } from './common';
  * @name mat3
  */
 
-var mat3 = {};
-
 /**
  * Creates a new identity mat3
  *
- * @returns {mat3} a new 3x3 matrix
+ * @returns a new 3x3 matrix
  */
-mat3.create = function () {
-  var out = new GLMAT_ARRAY_TYPE(9);
+export function create() {
+  const out = new GLMAT_ARRAY_TYPE(9);
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -51,16 +48,16 @@ mat3.create = function () {
   out[7] = 0;
   out[8] = 1;
   return out;
-};
+}
 
 /**
  * Copies the upper-left 3x3 values into the given mat3.
  *
- * @param {mat3} out the receiving 3x3 matrix
+ * @param out the receiving 3x3 matrix
  * @param {mat4} a   the source 4x4 matrix
- * @returns {mat3} out
+ * @returns out
  */
-mat3.fromMat4 = function (out, a) {
+export function fromMat4(out: number[], a: number[]) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -71,16 +68,16 @@ mat3.fromMat4 = function (out, a) {
   out[7] = a[9];
   out[8] = a[10];
   return out;
-};
+}
 
 /**
  * Creates a new mat3 initialized with values from an existing matrix
  *
- * @param {mat3} a matrix to clone
- * @returns {mat3} a new 3x3 matrix
+ * @param a matrix to clone
+ * @returns a new 3x3 matrix
  */
-mat3.clone = function (a) {
-  var out = new GLMAT_ARRAY_TYPE(9);
+export function clone(a: number[]) {
+  const out = new GLMAT_ARRAY_TYPE(9);
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -91,16 +88,16 @@ mat3.clone = function (a) {
   out[7] = a[7];
   out[8] = a[8];
   return out;
-};
+}
 
 /**
  * Copy the values from one mat3 to another
  *
- * @param {mat3} out the receiving matrix
- * @param {mat3} a the source matrix
- * @returns {mat3} out
+ * @param out the receiving matrix
+ * @param a the source matrix
+ * @returns out
  */
-mat3.copy = function (out, a) {
+export function copy(out: number[], a: number[]) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -111,15 +108,15 @@ mat3.copy = function (out, a) {
   out[7] = a[7];
   out[8] = a[8];
   return out;
-};
+}
 
 /**
  * Set a mat3 to the identity matrix
  *
- * @param {mat3} out the receiving matrix
- * @returns {mat3} out
+ * @param out the receiving matrix
+ * @returns out
  */
-mat3.identity = function (out) {
+export function identity(out: number[]) {
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -130,19 +127,19 @@ mat3.identity = function (out) {
   out[7] = 0;
   out[8] = 1;
   return out;
-};
+}
 
 /**
  * Transpose the values of a mat3
  *
- * @param {mat3} out the receiving matrix
- * @param {mat3} a the source matrix
- * @returns {mat3} out
+ * @param out the receiving matrix
+ * @param a the source matrix
+ * @returns out
  */
-mat3.transpose = function (out, a) {
+export function transpose(out: number[], a: number[]) {
   // If we are transposing ourselves we can skip a few steps but have to cache some values
   if (out === a) {
-    var a01 = a[1],
+    const a01 = a[1],
       a02 = a[2],
       a12 = a[5];
     out[1] = a[3];
@@ -164,17 +161,17 @@ mat3.transpose = function (out, a) {
   }
 
   return out;
-};
+}
 
 /**
  * Inverts a mat3
  *
- * @param {mat3} out the receiving matrix
- * @param {mat3} a the source matrix
- * @returns {mat3} out
+ * @param out the receiving matrix
+ * @param a the source matrix
+ * @returns out
  */
-mat3.invert = function (out, a) {
-  var a00 = a[0],
+export function invert(out: number[], a: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a10 = a[3],
@@ -185,9 +182,9 @@ mat3.invert = function (out, a) {
     a22 = a[8],
     b01 = a22 * a11 - a12 * a21,
     b11 = -a22 * a10 + a12 * a20,
-    b21 = a21 * a10 - a11 * a20,
-    // Calculate the determinant
-    det = a00 * b01 + a01 * b11 + a02 * b21;
+    b21 = a21 * a10 - a11 * a20;
+  // Calculate the determinant
+  let det = a00 * b01 + a01 * b11 + a02 * b21;
 
   if (!det) {
     return null;
@@ -204,17 +201,17 @@ mat3.invert = function (out, a) {
   out[7] = (-a21 * a00 + a01 * a20) * det;
   out[8] = (a11 * a00 - a01 * a10) * det;
   return out;
-};
+}
 
 /**
  * Calculates the adjugate of a mat3
  *
- * @param {mat3} out the receiving matrix
- * @param {mat3} a the source matrix
- * @returns {mat3} out
+ * @param out the receiving matrix
+ * @param a the source matrix
+ * @returns out
  */
-mat3.adjoint = function (out, a) {
-  var a00 = a[0],
+export function adjoint(out: number[], a: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a10 = a[3],
@@ -234,16 +231,16 @@ mat3.adjoint = function (out, a) {
   out[7] = a01 * a20 - a00 * a21;
   out[8] = a00 * a11 - a01 * a10;
   return out;
-};
+}
 
 /**
  * Calculates the determinant of a mat3
  *
- * @param {mat3} a the source matrix
- * @returns {Number} determinant of a
+ * @param a the source matrix
+ * @returns determinant of a
  */
-mat3.determinant = function (a) {
-  var a00 = a[0],
+export function determinant(a: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a10 = a[3],
@@ -256,18 +253,18 @@ mat3.determinant = function (a) {
   return (
     a00 * (a22 * a11 - a12 * a21) + a01 * (-a22 * a10 + a12 * a20) + a02 * (a21 * a10 - a11 * a20)
   );
-};
+}
 
 /**
  * Multiplies two mat3's
  *
- * @param {mat3} out the receiving matrix
- * @param {mat3} a the first operand
- * @param {mat3} b the second operand
- * @returns {mat3} out
+ * @param out the receiving matrix
+ * @param a the first operand
+ * @param b the second operand
+ * @returns out
  */
-mat3.multiply = function (out, a, b) {
-  var a00 = a[0],
+export function multiply(out: number[], a: number[], b: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a10 = a[3],
@@ -298,24 +295,24 @@ mat3.multiply = function (out, a, b) {
   out[7] = b20 * a01 + b21 * a11 + b22 * a21;
   out[8] = b20 * a02 + b21 * a12 + b22 * a22;
   return out;
-};
+}
 
 /**
  * Alias for {@link mat3.multiply}
  * @function
  */
-mat3.mul = mat3.multiply;
+export const mul = multiply;
 
 /**
  * Translate a mat3 by the given vector
  *
- * @param {mat3} out the receiving matrix
- * @param {mat3} a the matrix to translate
- * @param {vec2} v vector to translate by
- * @returns {mat3} out
+ * @param out the receiving matrix
+ * @param a the matrix to translate
+ * @param v vector to translate by
+ * @returns out
  */
-mat3.translate = function (out, a, v) {
-  var a00 = a[0],
+export function translate(out: number[], a: number[], v: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a10 = a[3],
@@ -339,18 +336,18 @@ mat3.translate = function (out, a, v) {
   out[7] = x * a01 + y * a11 + a21;
   out[8] = x * a02 + y * a12 + a22;
   return out;
-};
+}
 
 /**
  * Rotates a mat3 by the given angle
  *
- * @param {mat3} out the receiving matrix
- * @param {mat3} a the matrix to rotate
- * @param {Number} rad the angle to rotate the matrix by
- * @returns {mat3} out
+ * @param out the receiving matrix
+ * @param a the matrix to rotate
+ * @param rad the angle to rotate the matrix by
+ * @returns out
  */
-mat3.rotate = function (out, a, rad) {
-  var a00 = a[0],
+export function rotate(out: number[], a: number[], rad: number) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a10 = a[3],
@@ -374,18 +371,18 @@ mat3.rotate = function (out, a, rad) {
   out[7] = a21;
   out[8] = a22;
   return out;
-};
+}
 
 /**
  * Scales the mat3 by the dimensions in the given vec2
  *
- * @param {mat3} out the receiving matrix
- * @param {mat3} a the matrix to rotate
- * @param {vec2} v the vec2 to scale the matrix by
- * @returns {mat3} out
+ * @param out the receiving matrix
+ * @param a the matrix to rotate
+ * @param v the vec2 to scale the matrix by
+ * @returns out
  **/
-mat3.scale = function (out, a, v) {
-  var x = v[0],
+export function scale(out: number[], a: number[], v: number[]) {
+  const x = v[0],
     y = v[1];
 
   out[0] = x * a[0];
@@ -400,16 +397,16 @@ mat3.scale = function (out, a, v) {
   out[7] = a[7];
   out[8] = a[8];
   return out;
-};
+}
 
 /**
  * Copies the values from a mat2d into a mat3
  *
- * @param {mat3} out the receiving matrix
- * @param {mat2d} a the matrix to copy
- * @returns {mat3} out
+ * @param out the receiving matrix
+ * @param a the matrix to copy
+ * @returns out
  **/
-mat3.fromMat2d = function (out, a) {
+export function fromMat2d(out: number[], a: number[]) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = 0;
@@ -422,18 +419,18 @@ mat3.fromMat2d = function (out, a) {
   out[7] = a[5];
   out[8] = 1;
   return out;
-};
+}
 
 /**
  * Calculates a 3x3 matrix from the given quaternion
  *
- * @param {mat3} out mat3 receiving operation result
- * @param {quat} q Quaternion to create matrix from
+ * @param out mat3 receiving operation result
+ * @param q Quaternion to create matrix from
  *
- * @returns {mat3} out
+ * @returns out
  */
-mat3.fromQuat = function (out, q) {
-  var x = q[0],
+export function fromQuat(out: number[], q: number[]) {
+  const x = q[0],
     y = q[1],
     z = q[2],
     w = q[3],
@@ -463,18 +460,18 @@ mat3.fromQuat = function (out, q) {
   out[8] = 1 - xx - yy;
 
   return out;
-};
+}
 
 /**
  * Calculates a 3x3 normal matrix (transpose inverse) from the 4x4 matrix
  *
- * @param {mat3} out mat3 receiving operation result
+ * @param out mat3 receiving operation result
  * @param {mat4} a Mat4 to derive the normal matrix from
  *
- * @returns {mat3} out
+ * @returns out
  */
-mat3.normalFromMat4 = function (out, a) {
-  var a00 = a[0],
+export function normalFromMat4(out: number[], a: number[]) {
+  const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
     a03 = a[3],
@@ -501,9 +498,9 @@ mat3.normalFromMat4 = function (out, a) {
     b08 = a20 * a33 - a23 * a30,
     b09 = a21 * a32 - a22 * a31,
     b10 = a21 * a33 - a23 * a31,
-    b11 = a22 * a33 - a23 * a32,
-    // Calculate the determinant
-    det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+    b11 = a22 * a33 - a23 * a32;
+  // Calculate the determinant
+  let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
 
   if (!det) {
     return null;
@@ -523,15 +520,15 @@ mat3.normalFromMat4 = function (out, a) {
   out[8] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
 
   return out;
-};
+}
 
 /**
  * Returns Frobenius norm of a mat3
  *
- * @param {mat3} a the matrix to calculate Frobenius norm of
- * @returns {Number} Frobenius norm
+ * @param a the matrix to calculate Frobenius norm of
+ * @returns Frobenius norm
  */
-mat3.frob = function (a) {
+export function frob(a: number[]) {
   return Math.sqrt(
     Math.pow(a[0], 2) +
       Math.pow(a[1], 2) +
@@ -543,6 +540,4 @@ mat3.frob = function (a) {
       Math.pow(a[7], 2) +
       Math.pow(a[8], 2)
   );
-};
-
-export default mat3;
+}
