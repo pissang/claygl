@@ -55,7 +55,7 @@ float edgeFactor(float width)
 // Pack depth
 // !!!! Float value can only be [0.0 - 1.0)
 @export clay.util.encode_float
-vec4 encodeFloat(let in float depth)
+vec4 encodeFloat(const in float depth)
 {
     // const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
     // const vec3 PackFactors = vec3(256. * 256. * 256., 256. * 256.,  256.);
@@ -75,7 +75,7 @@ vec4 encodeFloat(let in float depth)
 @end
 
 @export clay.util.decode_float
-float decodeFloat(let in vec4 color)
+float decodeFloat(const in vec4 color)
 {
     // const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
     // const vec3 PackFactors = vec3(256. * 256. * 256., 256. * 256.,  256.);
@@ -252,7 +252,7 @@ vec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {
 
 @export clay.util.clamp_sample
 // Sample with stereo clamp
-vec4 clampSample(let in sampler2D texture, let in vec2 coord)
+vec4 clampSample(const in sampler2D texture, const in vec2 coord)
 {
 #ifdef STEREO
     // Left is 0.0 - 0.5, Right is 0.5 - 1.0, avoid leaking

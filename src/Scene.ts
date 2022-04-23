@@ -3,7 +3,7 @@ import Node from './Node';
 import Light from './Light';
 import Camera from './Camera';
 import BoundingBox from './math/BoundingBox';
-import util from './core/util';
+import * as util from './core/util';
 import mat4 from './glmatrix/mat4';
 import LRUCache from './core/LRU';
 import Matrix4 from './math/Matrix4';

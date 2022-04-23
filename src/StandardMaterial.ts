@@ -3,7 +3,7 @@ import Material from './Material';
 
 import Shader from './Shader';
 import standardEssl from './shader/source/standard.glsl.js';
-import util from './core/util';
+import * as util from './core/util';
 
 // Import standard shader
 Shader.import(standardEssl);
@@ -82,7 +82,7 @@ const StandardMaterial = Material.extend(
   },
   function (option) {
     // PENDING
-    util.extend(this, option);
+    Object.assign(this, option);
     // Extend after shader is created.
     util.defaults(
       this,

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import util from '../core/util';
+import * as util from '../core/util';
 import Geometry from '../Geometry';
 import BoundingBox from '../math/BoundingBox';
 import Vector3 from '../math/Vector3';
@@ -25,7 +25,7 @@ const transferableUtil = {
       return null;
     }
     const data = {
-      metadata: util.extend({}, META)
+      metadata: Object.assign({}, META)
     };
     //transferable buffers
     const buffers = [];

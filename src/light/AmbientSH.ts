@@ -1,6 +1,5 @@
 // @ts-nocheck
 import Light from '../Light';
-import vendor from '../core/vendor';
 
 /**
  * Spherical Harmonic Ambient Light
@@ -19,7 +18,7 @@ const AmbientSHLight = Light.extend(
     coefficients: []
   },
   function () {
-    this._coefficientsTmpArr = new vendor.Float32Array(9 * 3);
+    this._coefficientsTmpArr = new Float32Array(9 * 3);
   },
   {
     type: 'AMBIENT_SH_LIGHT',

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import Texture from './Texture';
 import glenum from './core/glenum';
-import util from './core/util';
+import * as util from './core/util';
 import mathUtil from './math/util';
 import vendor from './core/vendor';
 const isPowerOfTwo = mathUtil.isPowerOfTwo;

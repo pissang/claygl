@@ -1,52 +1,70 @@
-// @ts-nocheck
 /**
  * Simple double linked list. Compared with array, it has O(1) remove operation.
  * @constructor
  * @alias clay.core.LinkedList
  */
-const LinkedList = function () {
-  /**
-   * @type {clay.core.LinkedList.Entry}
-   */
-  this.head = null;
 
-  /**
-   * @type {clay.core.LinkedList.Entry}
-   */
-  this.tail = null;
-
-  this._length = 0;
-};
-
-/**
- * Insert a new value at the tail
- * @param  {} val
- * @return {clay.core.LinkedList.Entry}
- */
-LinkedList.prototype.insert = function (val) {
-  const entry = new LinkedList.Entry(val);
-  this.insertEntry(entry);
-  return entry;
-};
-
-/**
- * Insert a new value at idx
- * @param {number} idx
- * @param  {} val
- * @return {clay.core.LinkedList.Entry}
- */
-LinkedList.prototype.insertAt = function (idx, val) {
-  if (idx < 0) {
-    return;
+export class Entry<T> {
+  value: T;
+  next?: Entry<T>;
+  prev?: Entry<T>;
+  constructor(val: T) {
+    /**
+     * @type {}
+     */
+    this.value = val;
   }
-  let next = this.head;
-  let cursor = 0;
-  while (next && cursor != idx) {
-    next = next.next;
-    cursor++;
+}
+class LinkedList<T> {
+  head?: Entry<T>;
+  tail?: Entry<T>;
+
+  private _length = 0;
+  constructor() {}
+
+  /**
+   * Insert a new value at the tail
+   */
+  insert(val: T) {
+    const entry = new Entry(val);
+    this.insertEntry(entry);
+    return entry;
   }
-  if (next) {
-    const entry = new LinkedList.Entry(val);
+
+  /**
+   * Insert a new value at idx
+   * @param idx
+   * @param val
+   */
+  insertAt(idx: number, val: T) {
+    if (idx < 0) {
+      return;
+    }
+    let next = this.head;
+    let cursor = 0;
+    while (next && cursor != idx) {
+      next = next.next;
+      cursor++;
+    }
+    if (next) {
+      const entry = new Entry(val);
+      const prev = next.prev;
+      if (!prev) {
+        //next is head
+        this.head = entry;
+      } else {
+        prev.next = entry;
+        entry.prev = prev;
+      }
+      entry.next = next;
+      next.prev = entry;
+    } else {
+      this.insert(val);
+    }
+  }
+
+  insertBeforeEntry(val: T, next: Entry<T>) {
+    const entry = new Entry(val);
     const prev = next.prev;
     if (!prev) {
       //next is head
@@ -57,197 +75,155 @@ LinkedList.prototype.insertAt = function (idx, val) {
     }
     entry.next = next;
     next.prev = entry;
-  } else {
-    this.insert(val);
-  }
-};
 
-LinkedList.prototype.insertBeforeEntry = function (val, next) {
-  const entry = new LinkedList.Entry(val);
-  const prev = next.prev;
-  if (!prev) {
-    //next is head
-    this.head = entry;
-  } else {
-    prev.next = entry;
-    entry.prev = prev;
+    this._length++;
   }
-  entry.next = next;
-  next.prev = entry;
 
-  this._length++;
-};
-
-/**
- * Insert an entry at the tail
- * @param  {clay.core.LinkedList.Entry} entry
- */
-LinkedList.prototype.insertEntry = function (entry) {
-  if (!this.head) {
-    this.head = this.tail = entry;
-  } else {
-    this.tail.next = entry;
-    entry.prev = this.tail;
-    this.tail = entry;
-  }
-  this._length++;
-};
-
-/**
- * Remove entry.
- * @param  {clay.core.LinkedList.Entry} entry
- */
-LinkedList.prototype.remove = function (entry) {
-  const prev = entry.prev;
-  const next = entry.next;
-  if (prev) {
-    prev.next = next;
-  } else {
-    // Is head
-    this.head = next;
-  }
-  if (next) {
-    next.prev = prev;
-  } else {
-    // Is tail
-    this.tail = prev;
-  }
-  entry.next = entry.prev = null;
-  this._length--;
-};
-
-/**
- * Remove entry at index.
- * @param  {number} idx
- * @return {}
- */
-LinkedList.prototype.removeAt = function (idx) {
-  if (idx < 0) {
-    return;
-  }
-  let curr = this.head;
-  let cursor = 0;
-  while (curr && cursor != idx) {
-    curr = curr.next;
-    cursor++;
-  }
-  if (curr) {
-    this.remove(curr);
-    return curr.value;
-  }
-};
-/**
- * Get head value
- * @return {}
- */
-LinkedList.prototype.getHead = function () {
-  if (this.head) {
-    return this.head.value;
-  }
-};
-/**
- * Get tail value
- * @return {}
- */
-LinkedList.prototype.getTail = function () {
-  if (this.tail) {
-    return this.tail.value;
-  }
-};
-/**
- * Get value at idx
- * @param {number} idx
- * @return {}
- */
-LinkedList.prototype.getAt = function (idx) {
-  if (idx < 0) {
-    return;
-  }
-  let curr = this.head;
-  let cursor = 0;
-  while (curr && cursor != idx) {
-    curr = curr.next;
-    cursor++;
-  }
-  return curr.value;
-};
-
-/**
- * @param  {} value
- * @return {number}
- */
-LinkedList.prototype.indexOf = function (value) {
-  let curr = this.head;
-  let cursor = 0;
-  while (curr) {
-    if (curr.value === value) {
-      return cursor;
-    }
-    curr = curr.next;
-    cursor++;
-  }
-};
-
-/**
- * @return {number}
- */
-LinkedList.prototype.length = function () {
-  return this._length;
-};
-
-/**
- * If list is empty
- */
-LinkedList.prototype.isEmpty = function () {
-  return this._length === 0;
-};
-
-/**
- * @param  {Function} cb
- * @param  {} context
- */
-LinkedList.prototype.forEach = function (cb, context) {
-  let curr = this.head;
-  let idx = 0;
-  const haveContext = typeof context != 'undefined';
-  while (curr) {
-    if (haveContext) {
-      cb.call(context, curr.value, idx);
+  /**
+   * Insert an entry at the tail
+   * @param  entry
+   */
+  insertEntry(entry: Entry<T>) {
+    if (!this.head) {
+      this.head = this.tail = entry;
     } else {
-      cb(curr.value, idx);
+      this.tail!.next = entry;
+      entry.prev = this.tail;
+      this.tail = entry;
     }
-    curr = curr.next;
-    idx++;
+    this._length++;
   }
-};
-
-/**
- * Clear the list
- */
-LinkedList.prototype.clear = function () {
-  this.tail = this.head = null;
-  this._length = 0;
-};
-
-/**
- * @constructor
- * @param {} val
- */
-LinkedList.Entry = function (val) {
-  /**
-   * @type {}
-   */
-  this.value = val;
 
   /**
-   * @type {clay.core.LinkedList.Entry}
+   * Remove entry.
+   * @param  entry
    */
-  this.next = null;
+  remove(entry: Entry<T>) {
+    const prev = entry.prev;
+    const next = entry.next;
+    if (prev) {
+      prev.next = next;
+    } else {
+      // Is head
+      this.head = next;
+    }
+    if (next) {
+      next.prev = prev;
+    } else {
+      // Is tail
+      this.tail = prev;
+    }
+    entry.next = entry.prev = undefined;
+    this._length--;
+  }
 
   /**
-   * @type {clay.core.LinkedList.Entry}
+   * Remove entry at index.
+   * @param  idx
+   * @return
    */
-  this.prev = null;
-};
+  removeAt(idx: number) {
+    if (idx < 0) {
+      return;
+    }
+    let curr = this.head;
+    let cursor = 0;
+    while (curr && cursor != idx) {
+      curr = curr.next;
+      cursor++;
+    }
+    if (curr) {
+      this.remove(curr);
+      return curr.value;
+    }
+  }
+  /**
+   * Get head value
+   * @return {}
+   */
+  getHead() {
+    if (this.head) {
+      return this.head.value;
+    }
+  }
+  /**
+   * Get tail value
+   * @return {}
+   */
+  getTail() {
+    if (this.tail) {
+      return this.tail.value;
+    }
+  }
+  /**
+   * Get value at idx
+   * @param idx
+   * @return
+   */
+  getAt(idx: number): T | undefined {
+    if (idx < 0) {
+      return;
+    }
+    let curr = this.head;
+    let cursor = 0;
+    while (curr && cursor != idx) {
+      curr = curr.next;
+      cursor++;
+    }
+    return curr && curr.value;
+  }
+
+  /**
+   * @param  value
+   */
+  indexOf(value: T): number {
+    let curr = this.head;
+    let cursor = 0;
+    while (curr) {
+      if (curr.value === value) {
+        return cursor;
+      }
+      curr = curr.next;
+      cursor++;
+    }
+    return -1;
+  }
+
+  /**
+   * Length of list
+   */
+  length(): number {
+    return this._length;
+  }
+
+  /**
+   * If list is empty
+   */
+  isEmpty() {
+    return this._length === 0;
+  }
+
+  /**
+   * @param  cb
+   * @param  context
+   */
+  forEach(cb: (value: T, idx: number) => void) {
+    let curr = this.head;
+    let idx = 0;
+    while (curr) {
+      cb(curr.value, idx);
+      curr = curr.next;
+      idx++;
+    }
+  }
+
+  /**
+   * Clear the list
+   */
+  clear() {
+    this.tail = this.head = undefined;
+    this._length = 0;
+  }
+}
 
 export default LinkedList;

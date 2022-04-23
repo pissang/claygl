@@ -6,7 +6,7 @@
  * TODO Morph targets
  */
 import Base from '../core/Base';
-import util from '../core/util';
+import * as util from '../core/util';
 import vendor from '../core/vendor';
 
 import Scene from '../Scene';
@@ -45,12 +45,12 @@ const semanticAttributeMap = {
 };
 
 const ARRAY_CTOR_MAP = {
-  5120: vendor.Int8Array,
-  5121: vendor.Uint8Array,
-  5122: vendor.Int16Array,
-  5123: vendor.Uint16Array,
-  5125: vendor.Uint32Array,
-  5126: vendor.Float32Array
+  5120: Int8Array,
+  5121: Uint8Array,
+  5122: Int16Array,
+  5123: Uint16Array,
+  5125: Uint32Array,
+  5126: Float32Array
 };
 const SIZE_MAP = {
   SCALAR: 1,
@@ -67,7 +67,7 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
 
   const buffer = lib.bufferViews[accessorInfo.bufferView];
   const byteOffset = accessorInfo.byteOffset || 0;
-  const ArrayCtor = ARRAY_CTOR_MAP[accessorInfo.componentType] || vendor.Float32Array;
+  const ArrayCtor = ARRAY_CTOR_MAP[accessorInfo.componentType] || Float32Array;
 
   let size = SIZE_MAP[accessorInfo.type];
   if (size == null && isIndices) {
@@ -79,7 +79,7 @@ function getAccessorData(json, lib, accessorIdx, isIndices) {
     // eslint-disable-next-line
     accessorInfo.extensions && accessorInfo.extensions['WEB3D_quantized_attributes'];
   if (quantizeExtension) {
-    const decodedArr = new vendor.Float32Array(size * accessorInfo.count);
+    const decodedArr = new Float32Array(size * accessorInfo.count);
     const decodeMatrix = quantizeExtension.decodeMatrix;
     const decodeOffset = [];
     const decodeScale = [];
@@ -540,7 +540,7 @@ const GLTFLoader = Base.extend(
             const offset = IBMInfo.byteOffset || 0;
             const size = IBMInfo.count * 16;
 
-            const array = new vendor.Float32Array(buffer, offset, size);
+            const array = new Float32Array(buffer, offset, size);
 
             skeleton.setJointMatricesArray(array);
           } else {
@@ -812,7 +812,7 @@ const GLTFLoader = Base.extend(
       }
       if (isStandardMaterial) {
         material = new StandardMaterial(
-          util.extend(
+          Object.assign(
             {
               name: materialInfo.name,
               alphaTest: alphaTest,
@@ -1000,7 +1000,7 @@ const GLTFLoader = Base.extend(
               let attributeArray = getAccessorData(json, lib, accessorIdx);
               // WebGL attribute buffer not support uint32.
               // Direct use Float32Array may also have issue.
-              if (attributeArray instanceof vendor.Uint32Array) {
+              if (attributeArray instanceof Uint32Array) {
                 attributeArray = new Float32Array(attributeArray);
               }
               if (semantic === 'WEIGHTS_0' && size === 4) {
@@ -1035,13 +1035,13 @@ const GLTFLoader = Base.extend(
               }
 
               let attributeType = 'float';
-              if (attributeArray instanceof vendor.Uint16Array) {
+              if (attributeArray instanceof Uint16Array) {
                 attributeType = 'ushort';
-              } else if (attributeArray instanceof vendor.Int16Array) {
+              } else if (attributeArray instanceof Int16Array) {
                 attributeType = 'short';
-              } else if (attributeArray instanceof vendor.Uint8Array) {
+              } else if (attributeArray instanceof Uint8Array) {
                 attributeType = 'ubyte';
-              } else if (attributeArray instanceof vendor.Int8Array) {
+              } else if (attributeArray instanceof Int8Array) {
                 attributeType = 'byte';
               }
               geometry.attributes[attributeName].type = attributeType;
@@ -1062,14 +1062,11 @@ const GLTFLoader = Base.extend(
             // Parse indices
             if (primitiveInfo.indices != null) {
               geometry.indices = getAccessorData(json, lib, primitiveInfo.indices, true);
-              if (
-                geometry.vertexCount <= 0xffff &&
-                geometry.indices instanceof vendor.Uint32Array
-              ) {
-                geometry.indices = new vendor.Uint16Array(geometry.indices);
+              if (geometry.vertexCount <= 0xffff && geometry.indices instanceof Uint32Array) {
+                geometry.indices = new Uint16Array(geometry.indices);
               }
-              if (geometry.indices instanceof vendor.Uint8Array) {
-                geometry.indices = new vendor.Uint16Array(geometry.indices);
+              if (geometry.indices instanceof Uint8Array) {
+                geometry.indices = new Uint16Array(geometry.indices);
               }
             }
 

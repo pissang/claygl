@@ -1,5 +1,10 @@
-// @ts-nocheck
-function get(options) {
+function get(options: {
+  url: string;
+  responseType?: XMLHttpRequest['responseType'];
+  onprogress?: (percent: number, loaded: number, total: number) => void;
+  onload?: (data: any) => void;
+  onerror?: () => void;
+}) {
   /* global XMLHttpRequest */
   const xhr = new XMLHttpRequest();
 
@@ -10,18 +15,19 @@ function get(options) {
   // arraybuffer, blob, document, json, text
   xhr.responseType = options.responseType || 'text';
 
-  if (options.onprogress) {
+  const onprogress = options.onprogress;
+  if (onprogress) {
     //https://developer.mozilla.org/en-US/docs/DOM/XMLHttpRequest/Using_XMLHttpRequest
     xhr.onprogress = function (e) {
       if (e.lengthComputable) {
         const percent = e.loaded / e.total;
-        options.onprogress(percent, e.loaded, e.total);
+        onprogress(percent, e.loaded, e.total);
       } else {
-        options.onprogress(null);
+        onprogress(0, 0, 0);
       }
     };
   }
-  xhr.onload = function (e) {
+  xhr.onload = function () {
     if (xhr.status >= 400) {
       options.onerror && options.onerror();
     } else {
@@ -34,6 +40,4 @@ function get(options) {
   xhr.send(null);
 }
 
-export default {
-  get: get
-};
+export { get };

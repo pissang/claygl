@@ -7,11 +7,11 @@ import vendor from './core/vendor';
 function getArrayCtorByType(type) {
   return (
     {
-      byte: vendor.Int8Array,
-      ubyte: vendor.Uint8Array,
-      short: vendor.Int16Array,
-      ushort: vendor.Uint16Array
-    }[type] || vendor.Float32Array
+      byte: Int8Array,
+      ubyte: Uint8Array,
+      short: Int16Array,
+      ushort: Uint16Array
+    }[type] || Float32Array
   );
 }
 
@@ -393,7 +393,7 @@ const GeometryBase = Base.extend(
      */
     initIndicesFromArray: function (array) {
       let value;
-      const ArrayConstructor = this.vertexCount > 0xffff ? vendor.Uint32Array : vendor.Uint16Array;
+      const ArrayConstructor = this.vertexCount > 0xffff ? Uint32Array : Uint16Array;
       // Convert 2d array to flat
       if (array[0] && array[0].length) {
         let n = 0;

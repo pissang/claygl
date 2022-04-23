@@ -1,7 +1,7 @@
 // @ts-nocheck
-import notifier from '../core/mixin/notifier';
+import notifier from '../core/otifierr
 import vendor from '../core/vendor';
-import util from '../core/util';
+import * as util from '../core/util';
 
 /**
  * @constructor
@@ -52,7 +52,7 @@ Task.prototype.isSettled = function () {
   return this._fullfilled || this._rejected;
 };
 
-util.extend(Task.prototype, notifier);
+Object.assign(Task.prototype, notifier);
 
 function makeRequestTask(url, responseType) {
   const task = new Task();
@@ -116,6 +116,6 @@ Task.makeTask = function () {
   return new Task();
 };
 
-util.extend(Task.prototype, notifier);
+Object.assign(Task.prototype, notifier);
 
 export default Task;

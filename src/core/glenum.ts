@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * @namespace clay.core.glenum
  * @see http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14
@@ -418,4 +417,4 @@ export default {
   CONTEXT_LOST_WEBGL: 0x9242,
   UNPACK_COLORSPACE_CONVERSION_WEBGL: 0x9243,
   BROWSER_DEFAULT_WEBGL: 0x9244
-};
+} as const;

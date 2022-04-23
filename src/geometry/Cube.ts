@@ -66,7 +66,7 @@ const Cube = Geometry.extend(
       for (let k = 0; k < attrList.length; k++) {
         this.attributes[attrList[k]].init(vertexNumber);
       }
-      this.indices = new vendor.Uint16Array(faceNumber);
+      this.indices = new Uint16Array(faceNumber);
       let faceOffset = 0;
       let vertexOffset = 0;
       for (const pos in planes) {

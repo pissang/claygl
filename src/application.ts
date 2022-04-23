@@ -35,12 +35,12 @@ import AmbientSHLight from './light/AmbientSH';
 import ShadowMapPass from './prePass/ShadowMap';
 import RayPicking from './picking/RayPicking';
 import LRUCache from './core/LRU';
-import util from './core/util';
+import * as util from './core/util';
 import shUtil from './util/sh';
 import textureUtil from './util/texture';
 import vendor from './core/vendor';
 
-import colorUtil from './core/color';
+import * as colorUtil from './core/color';
 const parseColor = colorUtil.parseToFloat;
 
 import shaderLibrary from './shader/builtin';

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import util from './core/util';
+import * as util from './core/util';
 import Compositor from './compositor/Compositor';
 import CompoSceneNode from './compositor/SceneNode';
 import CompoTextureNode from './compositor/TextureNode';

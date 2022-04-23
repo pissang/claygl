@@ -1,28 +1,29 @@
-// @ts-nocheck
-import util from '../util';
+import * as util from './util';
 
-function Handler(action, context) {
-  this.action = action;
-  this.context = context;
+class Handler {
+  action: Function;
+  context: any;
+  constructor(action: Function, context: any) {
+    this.action = action;
+    this.context = context;
+  }
 }
 /**
  * @mixin
  * @alias clay.core.mixin.notifier
  */
-const notifier = {
+class Notifier {
+  private _handlers?: Record<string, Handler[]>;
   /**
    * Trigger event
    * @param  {string} name
    */
-  trigger: function (name) {
-    if (!this.__handlers__) {
-      return;
-    }
-    if (!util.hasOwn(this.__handlers__, name)) {
+  trigger(name: string) {
+    if (!util.hasOwn(this._handlers, name)) {
       return;
     }
 
-    const hdls = this.__handlers__[name];
+    const hdls = this._handlers![name];
     const l = hdls.length;
     const args = arguments;
     let i = -1;
@@ -59,7 +60,7 @@ const notifier = {
         }
         return;
     }
-  },
+  }
   /**
    * Register event handler
    * @param  {string} name
@@ -67,11 +68,11 @@ const notifier = {
    * @param  {Object} [context]
    * @chainable
    */
-  on: function (name, action, context) {
+  on(name: string, action: Function, context: any) {
     if (!name || !action) {
       return;
     }
-    const handlers = this.__handlers__ || (this.__handlers__ = {});
+    const handlers = this._handlers || (this._handlers = {});
     if (!handlers[name]) {
       handlers[name] = [];
     } else {
@@ -83,7 +84,7 @@ const notifier = {
     handlers[name].push(handler);
 
     return this;
-  },
+  }
 
   /**
    * Register event, event will only be triggered once and then removed
@@ -92,17 +93,17 @@ const notifier = {
    * @param  {Object} [context]
    * @chainable
    */
-  once: function (name, action, context) {
+  once(name: string, action: Function, context: any) {
     if (!name || !action) {
       return;
     }
     const self = this;
     function wrapper() {
       self.off(name, wrapper);
-      action.apply(this, arguments);
+      action.apply(self, arguments);
     }
     return this.on(name, wrapper, context);
-  },
+  }
 
   /**
    * Alias of once('before' + name)
@@ -111,13 +112,13 @@ const notifier = {
    * @param  {Object} [context]
    * @chainable
    */
-  before: function (name, action, context) {
+  before(name: string, action: Function, context: any) {
     if (!name || !action) {
       return;
     }
     name = 'before' + name;
     return this.on(name, action, context);
-  },
+  }
 
   /**
    * Alias of once('after' + name)
@@ -126,13 +127,13 @@ const notifier = {
    * @param  {Object} [context]
    * @chainable
    */
-  after: function (name, action, context) {
+  after(name: string, action: Function, context: any) {
     if (!name || !action) {
       return;
     }
     name = 'after' + name;
     return this.on(name, action, context);
-  },
+  }
 
   /**
    * Alias of on('success')
@@ -140,9 +141,9 @@ const notifier = {
    * @param  {Object} [context]
    * @chainable
    */
-  success: function (action, context) {
+  success(action: Function, context: any) {
     return this.once('success', action, context);
-  },
+  }
 
   /**
    * Alias of on('error')
@@ -150,9 +151,9 @@ const notifier = {
    * @param  {Object} [context]
    * @chainable
    */
-  error: function (action, context) {
+  error(action: Function, context: any) {
     return this.once('error', action, context);
-  },
+  }
 
   /**
    * Remove event listener
@@ -160,8 +161,8 @@ const notifier = {
    * @param  {Object} [context]
    * @chainable
    */
-  off: function (name, action) {
-    const handlers = this.__handlers__ || (this.__handlers__ = {});
+  off(name: string, action: Function) {
+    const handlers = this._handlers || (this._handlers = {});
 
     if (!action) {
       handlers[name] = [];
@@ -179,7 +180,7 @@ const notifier = {
     }
 
     return this;
-  },
+  }
 
   /**
    * If registered the event handler
@@ -187,8 +188,8 @@ const notifier = {
    * @param  {Function}  action
    * @return {boolean}
    */
-  has: function (name, action) {
-    const handlers = this.__handlers__;
+  has(name: string, action: Function) {
+    const handlers = this._handlers;
 
     if (!handlers || !handlers[name]) {
       return false;
@@ -200,6 +201,6 @@ const notifier = {
       }
     }
   }
-};
+}
 
-export default notifier;
+export default Notifier;

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import util from '../core/util';
+import * as util from '../core/util';
 import Task from './Task';
 
 /**

@@ -35,10 +35,10 @@ function projectEnvironmentMapGPU(renderer, envMap) {
 
   framebuffer.bind(renderer);
   // TODO Only chrome and firefox support Float32Array
-  const pixels = new vendor.Float32Array(9 * 4);
+  const pixels = new Float32Array(9 * 4);
   renderer.gl.readPixels(0, 0, 9, 1, Texture.RGBA, Texture.FLOAT, pixels);
 
-  const coeff = new vendor.Float32Array(9 * 3);
+  const coeff = new Float32Array(9 * 3);
   for (let i = 0; i < 9; i++) {
     coeff[i * 3] = pixels[i * 4];
     coeff[i * 3 + 1] = pixels[i * 4 + 1];
@@ -88,7 +88,7 @@ const normalTransform = {
 
 // Project on cpu.
 function projectEnvironmentMapCPU(renderer, cubePixels, width, height) {
-  const coeff = new vendor.Float32Array(9 * 3);
+  const coeff = new Float32Array(9 * 3);
   const normal = vec3.create();
   const texel = vec3.create();
   const fetchNormal = vec3.create();

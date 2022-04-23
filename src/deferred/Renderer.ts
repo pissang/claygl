@@ -17,7 +17,7 @@ import Vector3 from '../math/Vector3';
 import GBuffer from './GBuffer';
 
 import prezGlsl from '../shader/source/prez.glsl.js';
-import utilGlsl from '../shader/source/util.glsl.js';
+import * as utilGlsl from '../shader/source/util.glsl.js';
 
 import lightvolumeGlsl from '../shader/source/deferred/lightvolume.glsl.js';
 // Light shaders

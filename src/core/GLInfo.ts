@@ -1,4 +1,3 @@
-// @ts-nocheck
 const EXTENSION_LIST = [
   'OES_texture_float',
   'OES_texture_half_float',
@@ -20,46 +19,52 @@ const EXTENSION_LIST = [
   'EXT_frag_depth',
   'EXT_sRGB',
   'ANGLE_instanced_arrays'
-];
+] as const;
 
 const PARAMETER_NAMES = ['MAX_TEXTURE_SIZE', 'MAX_CUBE_MAP_TEXTURE_SIZE'];
 
-function GLInfo(_gl) {
-  const extensions = {};
-  const parameters = {};
+/* global WebGLRenderingContext */
+class GLInfo {
+  private _extensions: Record<string, any> = {};
+  private _parameters: Record<string, any> = {};
+  gl: WebGLRenderingContext;
 
-  // Get webgl extension
-  for (let i = 0; i < EXTENSION_LIST.length; i++) {
-    const extName = EXTENSION_LIST[i];
-    createExtension(extName);
-  }
-  // Get parameters
-  for (let i = 0; i < PARAMETER_NAMES.length; i++) {
-    const name = PARAMETER_NAMES[i];
-    parameters[name] = _gl.getParameter(_gl[name]);
-  }
-
-  this.getExtension = function (name) {
-    if (!(name in extensions)) {
-      createExtension(name);
+  constructor(gl: WebGLRenderingContext) {
+    this.gl = gl;
+    // Get webgl extension
+    for (let i = 0; i < EXTENSION_LIST.length; i++) {
+      const extName = EXTENSION_LIST[i];
+      this._createExtension(extName);
     }
-    return extensions[name];
-  };
+    // Get parameters
+    for (let i = 0; i < PARAMETER_NAMES.length; i++) {
+      const name = PARAMETER_NAMES[i];
+      this._parameters[name] = gl.getParameter((gl as any)[name]);
+    }
+  }
 
-  this.getParameter = function (name) {
-    return parameters[name];
-  };
+  getExtension(name: string) {
+    if (!(name in this._extensions)) {
+      this._createExtension(name);
+    }
+    return this._extensions[name];
+  }
 
-  function createExtension(name) {
-    if (_gl.getExtension) {
-      let ext = _gl.getExtension(name);
+  getParameter(name: string) {
+    return this._parameters[name];
+  }
+
+  private _createExtension(name: string) {
+    const gl = this.gl;
+    if (gl.getExtension) {
+      let ext = gl.getExtension(name);
       if (!ext) {
-        ext = _gl.getExtension('MOZ_' + name);
+        ext = gl.getExtension('MOZ_' + name);
       }
       if (!ext) {
-        ext = _gl.getExtension('WEBKIT_' + name);
+        ext = gl.getExtension('WEBKIT_' + name);
       }
-      extensions[name] = ext;
+      this._extensions[name] = ext;
     }
   }
 }

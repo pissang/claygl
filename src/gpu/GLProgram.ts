@@ -29,7 +29,7 @@ function checkShaderErrorMsg(_gl, shader, shaderString) {
   }
 }
 
-const tmpFloat32Array16 = new vendor.Float32Array(16);
+const tmpFloat32Array16 = new Float32Array(16);
 
 const GLProgram = Base.extend(
   {
@@ -163,7 +163,7 @@ const GLProgram = Base.extend(
         case 'm4v':
           // Raw value
           if (Array.isArray(value) && Array.isArray(value[0])) {
-            const array = new vendor.Float32Array(value.length * 16);
+            const array = new Float32Array(value.length * 16);
             let cursor = 0;
             for (let i = 0; i < value.length; i++) {
               const item = value[i];

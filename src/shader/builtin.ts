@@ -1,6 +1,6 @@
 // @ts-nocheck
 import lightEssl from './source/header/light';
-import utilEssl from './source/util.glsl.js';
+import * as utilEssl from './source/util.glsl.js';
 
 import basicEssl from './source/basic.glsl.js';
 import lambertEssl from './source/lambert.glsl.js';

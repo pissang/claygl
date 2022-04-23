@@ -11,8 +11,9 @@ module.exports = {
     'no-array-constructor': 2,
     'no-label-var': 2,
     'no-undef-init': 2,
-    'no-unused-vars': 0,
-    '@typescript-eslint/no-unused-vars': [1, { vars: 'local', args: 'none' }]
+    'no-dupe-class-members': 0,
+    '@typescript-eslint/no-unused-vars': [1, { vars: 'local', args: 'none' }],
+    '@typescript-eslint/no-dupe-class-members': 2
   },
   globals: {
     console: true,

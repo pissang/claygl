@@ -1,7 +1,7 @@
 // @ts-nocheck
 import Base from './core/Base';
-import util from './core/util';
-import colorUtil from './core/color';
+import * as util from './core/util';
+import * as colorUtil from './core/color';
 const parseColor = colorUtil.parseToFloat;
 
 const programKeyCache = {};

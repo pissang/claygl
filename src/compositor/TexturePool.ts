@@ -1,7 +1,7 @@
 // @ts-nocheck
 import Texture2D from '../Texture2D';
 import glenum from '../core/glenum';
-import util from '../core/util';
+import * as util from '../core/util';
 
 const TexturePool = function () {
   this._pool = {};

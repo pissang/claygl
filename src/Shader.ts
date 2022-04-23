@@ -6,7 +6,7 @@
  * http://www.nvidia.com/object/using_sas.html
  * https://github.com/KhronosGroup/collada2json/issues/45
  */
-import util from './core/util';
+import * as util from './core/util';
 import vendor from './core/vendor';
 
 const uniformRegex =
@@ -263,7 +263,7 @@ function parseDeclarations(type, line) {
 
       continue;
     } else if (token === ')') {
-      declarations[currentDeclaration].value = new vendor.Float32Array(declarationValue);
+      declarations[currentDeclaration].value = new Float32Array(declarationValue);
       declarationValue = null;
       opType = TYPE_NORMAL;
       continue;

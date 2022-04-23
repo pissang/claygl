@@ -184,7 +184,7 @@ const Geometry = GeometryBase.extend(
       let normals = attributes.normal.value;
 
       if (!normals || normals.length !== positions.length) {
-        normals = attributes.normal.value = new vendor.Float32Array(positions.length);
+        normals = attributes.normal.value = new Float32Array(positions.length);
       } else {
         // Reset
         for (let i = 0; i < normals.length; i++) {
@@ -433,7 +433,7 @@ const Geometry = GeometryBase.extend(
       }
 
       if (this.indices.length > 0xffff) {
-        this.indices = new vendor.Uint32Array(this.indices);
+        this.indices = new Uint32Array(this.indices);
       }
 
       const attributes = this.attributes;

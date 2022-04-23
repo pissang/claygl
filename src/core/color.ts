@@ -1,12 +1,9 @@
-// @ts-nocheck
 /**
  * @namespace clay.core.color
  */
 import LRU from '../core/LRU';
 
-const colorUtil = {};
-
-const kCSSColorTable = {
+const kCSSColorTable: Record<string, number[]> = {
   transparent: [0, 0, 0, 0],
   aliceblue: [240, 248, 255, 1],
   antiquewhite: [250, 235, 215, 1],
@@ -157,24 +154,24 @@ const kCSSColorTable = {
   yellowgreen: [154, 205, 50, 1]
 };
 
-function clampCssByte(i) {
+function clampCssByte(i: number) {
   // Clamp to integer 0 .. 255.
   i = Math.round(i); // Seems to be what Chrome does (vs truncation).
   return i < 0 ? 0 : i > 255 ? 255 : i;
 }
 
-function clampCssAngle(i) {
+function clampCssAngle(i: number) {
   // Clamp to integer 0 .. 360.
   i = Math.round(i); // Seems to be what Chrome does (vs truncation).
   return i < 0 ? 0 : i > 360 ? 360 : i;
 }
 
-function clampCssFloat(f) {
+function clampCssFloat(f: number) {
   // Clamp to float 0.0 .. 1.0.
   return f < 0 ? 0 : f > 1 ? 1 : f;
 }
 
-function parseCssInt(str) {
+function parseCssInt(str: string) {
   // int or percentage.
   if (str.length && str.charAt(str.length - 1) === '%') {
     return clampCssByte((parseFloat(str) / 100) * 255);
@@ -182,15 +179,15 @@ function parseCssInt(str) {
   return clampCssByte(parseInt(str, 10));
 }
 
-function parseCssFloat(str) {
+function parseCssFloat(str: string | number) {
   // float or percentage.
-  if (str.length && str.charAt(str.length - 1) === '%') {
-    return clampCssFloat(parseFloat(str) / 100);
+  if ((str as string).length && (str as string).charAt((str as string).length - 1) === '%') {
+    return clampCssFloat(parseFloat(str as string) / 100);
   }
-  return clampCssFloat(parseFloat(str));
+  return clampCssFloat(parseFloat(str as string));
 }
 
-function cssHueToRgb(m1, m2, h) {
+function cssHueToRgb(m1: number, m2: number, h: number) {
   if (h < 0) {
     h += 1;
   } else if (h > 1) {
@@ -209,18 +206,18 @@ function cssHueToRgb(m1, m2, h) {
   return m1;
 }
 
-function lerpNumber(a, b, p) {
+function lerpNumber(a: number, b: number, p: number) {
   return a + (b - a) * p;
 }
 
-function setRgba(out, r, g, b, a) {
+function setRgba(out: number[], r: number, g: number, b: number, a: number) {
   out[0] = r;
   out[1] = g;
   out[2] = b;
   out[3] = a;
   return out;
 }
-function copyRgba(out, a) {
+function copyRgba(out: number[], a: number[]) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -228,10 +225,10 @@ function copyRgba(out, a) {
   return out;
 }
 
-const colorCache = new LRU(20);
-let lastRemovedArr = null;
+const colorCache = new LRU<number[]>(20);
+let lastRemovedArr: number[] | undefined;
 
-function putToCache(colorStr, rgbaArr) {
+function putToCache(colorStr: string, rgbaArr: number[]) {
   // Reuse removed array
   if (lastRemovedArr) {
     copyRgba(lastRemovedArr, rgbaArr);
@@ -240,12 +237,11 @@ function putToCache(colorStr, rgbaArr) {
 }
 
 /**
- * @name clay.core.color.parse
- * @param {string} colorStr
- * @param {Array.<number>} out
- * @return {Array.<number>}
+ * @param colorStr
+ * @param out
+ * @return
  */
-colorUtil.parse = function (colorStr, rgbaArr) {
+export function parse(colorStr: string, rgbaArr?: number[]) {
   if (!colorStr) {
     return;
   }
@@ -301,8 +297,8 @@ colorUtil.parse = function (colorStr, rgbaArr) {
   const op = str.indexOf('('),
     ep = str.indexOf(')');
   if (op !== -1 && ep + 1 === str.length) {
-    const fname = str.substr(0, op);
-    const params = str.substr(op + 1, ep - (op + 1)).split(',');
+    const fname = str.slice(0, op);
+    const params = str.slice(op + 1, ep - (op + 1)).split(',');
     let alpha = 1; // To allow case fallthrough.
     switch (fname) {
       case 'rgba':
@@ -310,7 +306,7 @@ colorUtil.parse = function (colorStr, rgbaArr) {
           setRgba(rgbaArr, 0, 0, 0, 1);
           return;
         }
-        alpha = parseCssFloat(params.pop()); // jshint ignore:line
+        alpha = parseCssFloat(params.pop()!); // jshint ignore:line
       // Fall through.
       case 'rgb':
         if (params.length !== 3) {
@@ -331,7 +327,7 @@ colorUtil.parse = function (colorStr, rgbaArr) {
           setRgba(rgbaArr, 0, 0, 0, 1);
           return;
         }
-        params[3] = parseCssFloat(params[3]);
+        params[3] = parseCssFloat(params[3]) as any;
         hsla2rgba(params, rgbaArr);
         putToCache(colorStr, rgbaArr);
         return rgbaArr;
@@ -350,10 +346,10 @@ colorUtil.parse = function (colorStr, rgbaArr) {
 
   setRgba(rgbaArr, 0, 0, 0, 1);
   return;
-};
+}
 
-colorUtil.parseToFloat = function (colorStr, rgbaArr) {
-  rgbaArr = colorUtil.parse(colorStr, rgbaArr);
+export function parseToFloat(colorStr: string, rgbaArr?: number[]) {
+  rgbaArr = parse(colorStr, rgbaArr);
   if (!rgbaArr) {
     return;
   }
@@ -361,20 +357,19 @@ colorUtil.parseToFloat = function (colorStr, rgbaArr) {
   rgbaArr[1] /= 255;
   rgbaArr[2] /= 255;
   return rgbaArr;
-};
+}
 
 /**
- * @name clay.core.color.hsla2rgba
- * @param {Array.<number>} hsla
- * @param {Array.<number>} rgba
- * @return {Array.<number>} rgba
+ * @param hsla
+ * @param rgba
+ * @return rgba
  */
-function hsla2rgba(hsla, rgba) {
-  const h = (((parseFloat(hsla[0]) % 360) + 360) % 360) / 360; // 0 .. 1
+export function hsla2rgba(hsla: (number | string)[], rgba?: number[]) {
+  const h = (((parseFloat(hsla[0] as any) % 360) + 360) % 360) / 360; // 0 .. 1
   // NOTE(deanm): According to the CSS spec s/l should only be
   // percentages, but we don't bother and let float or percentage.
-  const s = parseCssFloat(hsla[1]);
-  const l = parseCssFloat(hsla[2]);
+  const s = parseCssFloat(hsla[1] as any);
+  const l = parseCssFloat(hsla[2] as any);
   const m2 = l <= 0.5 ? l * (s + 1) : l + s - l * s;
   const m1 = l * 2 - m2;
 
@@ -388,18 +383,17 @@ function hsla2rgba(hsla, rgba) {
   );
 
   if (hsla.length === 4) {
-    rgba[3] = hsla[3];
+    rgba[3] = +hsla[3];
   }
 
   return rgba;
 }
 
 /**
- * @name clay.core.color.rgba2hsla
- * @param {Array.<number>} rgba
- * @return {Array.<number>} hsla
+ * @param rgba
+ * @return hsla
  */
-function rgba2hsla(rgba) {
+export function rgba2hsla(rgba: number[]) {
   if (!rgba) {
     return;
   }
@@ -439,16 +433,16 @@ function rgba2hsla(rgba) {
       H = 2 / 3 + deltaG - deltaR;
     }
 
-    if (H < 0) {
+    if (H && H < 0) {
       H += 1;
     }
 
-    if (H > 1) {
+    if (H && H > 1) {
       H -= 1;
     }
   }
 
-  const hsla = [H * 360, S, L];
+  const hsla = [(H as number) * 360, S, L];
 
   if (rgba[3] != null) {
     hsla.push(rgba[3]);
@@ -458,13 +452,12 @@ function rgba2hsla(rgba) {
 }
 
 /**
- * @name clay.core.color.lift
- * @param {string} color
- * @param {number} level
- * @return {string}
+ * @param color
+ * @param level
+ * @return
  */
-colorUtil.lift = function (color, level) {
-  const colorArr = colorUtil.parse(color);
+export function lift(color: string, level: number): string | undefined {
+  const colorArr = parse(color);
   if (colorArr) {
     for (let i = 0; i < 3; i++) {
       if (level < 0) {
@@ -473,33 +466,31 @@ colorUtil.lift = function (color, level) {
         colorArr[i] = ((255 - colorArr[i]) * level + colorArr[i]) | 0;
       }
     }
-    return colorUtil.stringify(colorArr, colorArr.length === 4 ? 'rgba' : 'rgb');
+    return stringify(colorArr, colorArr.length === 4 ? 'rgba' : 'rgb');
   }
-};
+}
 
 /**
- * @name clay.core.color.toHex
- * @param {string} color
- * @return {string}
+ * @param color
+ * @return
  */
-colorUtil.toHex = function (color) {
-  const colorArr = colorUtil.parse(color);
+export function toHex(color: string): string | undefined {
+  const colorArr = parse(color);
   if (colorArr) {
     return ((1 << 24) + (colorArr[0] << 16) + (colorArr[1] << 8) + +colorArr[2])
       .toString(16)
       .slice(1);
   }
-};
+}
 
 /**
  * Map value to color. Faster than lerp methods because color is represented by rgba array.
- * @name clay.core.color
- * @param {number} normalizedValue A float between 0 and 1.
- * @param {Array.<Array.<number>>} colors List of rgba color array
- * @param {Array.<number>} [out] Mapped gba color array
- * @return {Array.<number>} will be null/undefined if input illegal.
+ * @param normalizedValue A float between 0 and 1.
+ * @param colors List of rgba color array
+ * @param out Mapped gba color array
+ * @return will be null/undefined if input illegal.
  */
-colorUtil.fastLerp = function (normalizedValue, colors, out) {
+export function fastLerp(normalizedValue: number, colors: number[][], out?: number[]) {
   if (!(colors && colors.length) || !(normalizedValue >= 0 && normalizedValue <= 1)) {
     return;
   }
@@ -518,9 +509,7 @@ colorUtil.fastLerp = function (normalizedValue, colors, out) {
   out[3] = clampCssFloat(lerpNumber(leftColor[3], rightColor[3], dv));
 
   return out;
-};
-
-colorUtil.fastMapToColor = colorUtil.fastLerp;
+}
 
 /**
  * @param {number} normalizedValue A float between 0 and 1.
@@ -529,7 +518,7 @@ colorUtil.fastMapToColor = colorUtil.fastLerp;
  * @return {(string|Object)} Result color. If fullOutput,
  *                           return {color: ..., leftIndex: ..., rightIndex: ..., value: ...},
  */
-colorUtil.lerp = function (normalizedValue, colors, fullOutput) {
+export function lerp(normalizedValue: number, colors: string[]) {
   if (!(colors && colors.length) || !(normalizedValue >= 0 && normalizedValue <= 1)) {
     return;
   }
@@ -537,11 +526,14 @@ colorUtil.lerp = function (normalizedValue, colors, fullOutput) {
   const value = normalizedValue * (colors.length - 1);
   const leftIndex = Math.floor(value);
   const rightIndex = Math.ceil(value);
-  const leftColor = colorUtil.parse(colors[leftIndex]);
-  const rightColor = colorUtil.parse(colors[rightIndex]);
+  const leftColor = parse(colors[leftIndex]);
+  const rightColor = parse(colors[rightIndex]);
+  if (!leftColor || !rightColor) {
+    return;
+  }
   const dv = value - leftIndex;
 
-  const color = colorUtil.stringify(
+  return stringify(
     [
       clampCssByte(lerpNumber(leftColor[0], rightColor[0], dv)),
       clampCssByte(lerpNumber(leftColor[1], rightColor[1], dv)),
@@ -550,71 +542,55 @@ colorUtil.lerp = function (normalizedValue, colors, fullOutput) {
     ],
     'rgba'
   );
-
-  return fullOutput
-    ? {
-        color: color,
-        leftIndex: leftIndex,
-        rightIndex: rightIndex,
-        value: value
-      }
-    : color;
-};
-
-/**
- * @deprecated
- */
-colorUtil.mapToColor = colorUtil.lerp;
+}
 
 /**
  * @name clay.core.color
- * @param {string} color
- * @param {number=} h 0 ~ 360, ignore when null.
- * @param {number=} s 0 ~ 1, ignore when null.
- * @param {number=} l 0 ~ 1, ignore when null.
- * @return {string} Color string in rgba format.
+ * @param color
+ * @param h 0 ~ 360, ignore when null.
+ * @param s 0 ~ 1, ignore when null.
+ * @param l 0 ~ 1, ignore when null.
+ * @return Color string in rgba format.
  */
-colorUtil.modifyHSL = function (color, h, s, l) {
-  color = colorUtil.parse(color);
+export function modifyHSL(color: string, h: number, s: number, l: number): string | undefined {
+  let colorArr = parse(color);
 
-  if (color) {
-    color = rgba2hsla(color);
-    h != null && (color[0] = clampCssAngle(h));
-    s != null && (color[1] = parseCssFloat(s));
-    l != null && (color[2] = parseCssFloat(l));
+  if (colorArr) {
+    colorArr = rgba2hsla(colorArr)!;
+    h != null && (colorArr[0] = clampCssAngle(h));
+    s != null && (colorArr[1] = parseCssFloat(s));
+    l != null && (colorArr[2] = parseCssFloat(l));
 
-    return colorUtil.stringify(hsla2rgba(color), 'rgba');
+    return stringify(hsla2rgba(colorArr), 'rgba');
   }
-};
+}
 
 /**
  * @param {string} color
  * @param {number=} alpha 0 ~ 1
  * @return {string} Color string in rgba format.
  */
-colorUtil.modifyAlpha = function (color, alpha) {
-  color = colorUtil.parse(color);
+export function modifyAlpha(color: string, alpha: number) {
+  const colorArr = parse(color);
 
-  if (color && alpha != null) {
-    color[3] = clampCssFloat(alpha);
-    return colorUtil.stringify(color, 'rgba');
+  if (colorArr && alpha != null) {
+    colorArr[3] = clampCssFloat(alpha);
+    return stringify(colorArr, 'rgba');
   }
-};
+}
 
 /**
- * @param {Array.<number>} arrColor like [12,33,44,0.4]
- * @param {string} type 'rgba', 'hsva', ...
- * @return {string} Result color. (If input illegal, return undefined).
+ * @param colorArr like [12,33,44,0.4]
+ * @param type 'rgba', 'hsva', ...
+ * @return Result color. (If input illegal, return undefined).
  */
-colorUtil.stringify = function (arrColor, type) {
-  if (!arrColor || !arrColor.length) {
+export function stringify(colorArr: number[], type: 'rgba' | 'hsva' | 'hsla' | 'rgb') {
+  if (!colorArr || !colorArr.length) {
     return;
   }
-  let colorStr = arrColor[0] + ',' + arrColor[1] + ',' + arrColor[2];
+  let colorStr = colorArr[0] + ',' + colorArr[1] + ',' + colorArr[2];
   if (type === 'rgba' || type === 'hsva' || type === 'hsla') {
-    colorStr += ',' + arrColor[3];
+    colorStr += ',' + colorArr[3];
   }
   return type + '(' + colorStr + ')';
-};
-
-export default colorUtil;
+}

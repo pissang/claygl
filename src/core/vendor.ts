@@ -1,9 +1,20 @@
-// @ts-nocheck
-import request from './request';
+import { get } from './request';
 
-let supportWebGL;
+let supportWebGL: boolean;
 
-const vendor = {};
+interface Vendor {
+  supportWebGL: () => boolean;
+  requestAnimationFrame: (cb: () => void) => void;
+  /* global HTMLCanvasElement HTMLImageElement */
+  createCanvas: () => HTMLCanvasElement;
+  createImage: () => HTMLImageElement;
+  request: {
+    get: typeof get;
+  };
+  addEventListener: (dom: any, type: string, func: Function, useCapture?: boolean) => void;
+  removeEventListener: (dom: any, type: string, func: Function) => void;
+}
+const vendor = {} as Vendor;
 
 /**
  * If support WebGL
@@ -25,21 +36,7 @@ vendor.supportWebGL = function () {
   return supportWebGL;
 };
 
-vendor.Int8Array = typeof Int8Array === 'undefined' ? Array : Int8Array;
-
-vendor.Uint8Array = typeof Uint8Array === 'undefined' ? Array : Uint8Array;
-
-vendor.Uint16Array = typeof Uint16Array === 'undefined' ? Array : Uint16Array;
-
-vendor.Uint32Array = typeof Uint32Array === 'undefined' ? Array : Uint32Array;
-
-vendor.Int16Array = typeof Int16Array === 'undefined' ? Array : Int16Array;
-
-vendor.Float32Array = typeof Float32Array === 'undefined' ? Array : Float32Array;
-
-vendor.Float64Array = typeof Float64Array === 'undefined' ? Array : Float64Array;
-
-let g = {};
+let g: any;
 if (typeof window !== 'undefined') {
   g = window;
 } else if (typeof global !== 'undefined') {
@@ -49,10 +46,7 @@ if (typeof window !== 'undefined') {
 
 vendor.requestAnimationFrame =
   g.requestAnimationFrame ||
-  g.msRequestAnimationFrame ||
-  g.mozRequestAnimationFrame ||
-  g.webkitRequestAnimationFrame ||
-  function (func) {
+  function (func: () => void) {
     setTimeout(func, 16);
   };
 
@@ -65,7 +59,7 @@ vendor.createImage = function () {
 };
 
 vendor.request = {
-  get: request.get
+  get
 };
 
 vendor.addEventListener = function (dom, type, func, useCapture) {
