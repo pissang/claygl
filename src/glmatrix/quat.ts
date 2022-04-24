@@ -24,23 +24,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { GLMAT_ARRAY_TYPE } from './common';
+import { Mat3Array, QuatArray, Vec3Array } from './common';
 import * as vec3 from './vec3';
 import * as vec4 from './vec4';
 import * as mat3 from './mat3';
-
+export type { QuatArray };
 /**
  * Creates a new identity quat
  *
  * @returns a new quaternion
  */
-export function create() {
-  const out = new GLMAT_ARRAY_TYPE(4);
-  out[0] = 0;
-  out[1] = 0;
-  out[2] = 0;
-  out[3] = 1;
-  return out;
+export function create(): QuatArray {
+  return [0, 0, 0, 1];
 }
 
 /**
@@ -59,7 +54,7 @@ export const rotationTo = (function () {
   const xUnitVec3 = vec3.fromValues(1, 0, 0);
   const yUnitVec3 = vec3.fromValues(0, 1, 0);
 
-  return function (out: number[], a: number[], b: number[]) {
+  return function (out: QuatArray, a: Vec3Array, b: Vec3Array) {
     const dot = vec3.dot(a, b);
     if (dot < -0.999999) {
       vec3.cross(tmpvec3, xUnitVec3, a);
@@ -97,7 +92,7 @@ export const rotationTo = (function () {
 export const setAxes = (function () {
   const matr = mat3.create();
 
-  return function (out: number[], view: number[], right: number[], up: number[]) {
+  return function (out: QuatArray, view: Vec3Array, right: Vec3Array, up: Vec3Array) {
     matr[0] = right[0];
     matr[3] = right[1];
     matr[6] = right[2];
@@ -181,7 +176,7 @@ export function identity(out: number[]) {
  * @param rad the angle in radians
  * @returns out
  **/
-export function setAxisAngle(out: number[], axis: number[], rad: number) {
+export function setAxisAngle(out: QuatArray, axis: Vec3Array, rad: number) {
   rad = rad * 0.5;
   const s = Math.sin(rad);
   out[0] = s * axis[0];
@@ -210,7 +205,7 @@ export const add = vec4.add;
  * @param b the second operand
  * @returns out
  */
-export function multiply(out: number[], a: number[], b: number[]) {
+export function multiply(out: QuatArray, a: QuatArray, b: QuatArray) {
   const ax = a[0],
     ay = a[1],
     az = a[2],
@@ -252,7 +247,7 @@ export const scale = vec4.scale;
  * @param rad angle (in radians) to rotate
  * @returns out
  */
-export function rotateX(out: number[], a: number[], rad: number) {
+export function rotateX(out: QuatArray, a: QuatArray, rad: number) {
   rad *= 0.5;
 
   const ax = a[0],
@@ -277,7 +272,7 @@ export function rotateX(out: number[], a: number[], rad: number) {
  * @param rad angle (in radians) to rotate
  * @returns out
  */
-export function rotateY(out: number[], a: number[], rad: number) {
+export function rotateY(out: QuatArray, a: QuatArray, rad: number) {
   rad *= 0.5;
 
   const ax = a[0],
@@ -302,7 +297,7 @@ export function rotateY(out: number[], a: number[], rad: number) {
  * @param rad angle (in radians) to rotate
  * @returns out
  */
-export function rotateZ(out: number[], a: number[], rad: number) {
+export function rotateZ(out: QuatArray, a: QuatArray, rad: number) {
   rad *= 0.5;
 
   const ax = a[0],
@@ -328,7 +323,7 @@ export function rotateZ(out: number[], a: number[], rad: number) {
  * @param a quat to calculate W component of
  * @returns out
  */
-export function calculateW(out: number[], a: number[]) {
+export function calculateW(out: QuatArray, a: QuatArray) {
   const x = a[0],
     y = a[1],
     z = a[2];
@@ -371,7 +366,7 @@ export const lerp = vec4.lerp;
  * @param t interpolation amount between the two inputs
  * @returns out
  */
-export function slerp(out: number[], a: number[], b: number[], t: number) {
+export function slerp(out: QuatArray, a: QuatArray, b: QuatArray, t: number) {
   // benchmarks:
   //    http://jsperf.com/quaternion-slerp-implementations
 
@@ -425,7 +420,7 @@ export function slerp(out: number[], a: number[], b: number[], t: number) {
  * @param a quat to calculate inverse of
  * @returns out
  */
-export function invert(out: number[], a: number[]) {
+export function invert(out: QuatArray, a: QuatArray) {
   const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
@@ -450,7 +445,7 @@ export function invert(out: number[], a: number[]) {
  * @param a quat to calculate conjugate of
  * @returns out
  */
-export function conjugate(out: number[], a: number[]) {
+export function conjugate(out: QuatArray, a: QuatArray) {
   out[0] = -a[0];
   out[1] = -a[1];
   out[2] = -a[2];
@@ -509,7 +504,7 @@ export const normalize = vec4.normalize;
  * @returns out
  * @function
  */
-export function fromMat3(out: number[], m: number[]) {
+export function fromMat3(out: QuatArray, m: Mat3Array) {
   // Algorithm in Ken Shoemake's article in 1987 SIGGRAPH course notes
   // article "Quaternion Calculus and Fast Animation".
   const fTrace = m[0] + m[4] + m[8];
@@ -528,8 +523,8 @@ export function fromMat3(out: number[], m: number[]) {
     let i = 0;
     if (m[4] > m[0]) i = 1;
     if (m[8] > m[i * 3 + i]) i = 2;
-    let j = (i + 1) % 3;
-    let k = (i + 2) % 3;
+    const j = (i + 1) % 3;
+    const k = (i + 2) % 3;
 
     fRoot = Math.sqrt(m[i * 3 + i] - m[j * 3 + j] - m[k * 3 + k] + 1.0);
     out[i] = 0.5 * fRoot;

@@ -7,3 +7,31 @@ export const GLMAT_ARRAY_TYPE = Array;
 // }
 
 export const GLMAT_RANDOM = Math.random;
+
+export type Vec2Array = [number, number];
+export type Vec3Array = [number, number, number];
+export type Vec4Array = [number, number, number, number];
+export type QuatArray = [number, number, number, number];
+// prettier-ignore
+export type Mat2Array = [
+  number, number,
+  number, number
+];
+// prettier-ignore
+export type Mat2dArray = [
+  number, number, number,
+  number, number, number
+];
+// prettier-ignore
+export type Mat3Array = [
+  number, number, number,
+  number, number, number,
+  number, number, number
+];
+// prettier-ignore
+export type Mat4Array = [
+  number, number, number, number,
+  number, number, number, number,
+  number, number, number, number,
+  number, number, number, number
+];

@@ -24,8 +24,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { GLMAT_ARRAY_TYPE } from './common';
+import { Mat2dArray, Vec2Array } from './common';
 
+export type { Mat2dArray };
 /**
  * @class 2x3 Matrix
  * @name mat2d
@@ -50,15 +51,8 @@ import { GLMAT_ARRAY_TYPE } from './common';
  *
  * @returns a new 2x3 matrix
  */
-export function create() {
-  const out = new GLMAT_ARRAY_TYPE(6);
-  out[0] = 1;
-  out[1] = 0;
-  out[2] = 0;
-  out[3] = 1;
-  out[4] = 0;
-  out[5] = 0;
-  return out;
+export function create(): Mat2dArray {
+  return [1, 0, 0, 1, 0, 0];
 }
 
 /**
@@ -67,15 +61,8 @@ export function create() {
  * @param a matrix to clone
  * @returns a new 2x3 matrix
  */
-export function clone(a: number[]) {
-  const out = new GLMAT_ARRAY_TYPE(6);
-  out[0] = a[0];
-  out[1] = a[1];
-  out[2] = a[2];
-  out[3] = a[3];
-  out[4] = a[4];
-  out[5] = a[5];
-  return out;
+export function clone(a: Mat2dArray): Mat2dArray {
+  return [a[0], a[1], a[2], a[3], a[4], a[5]];
 }
 
 /**
@@ -85,7 +72,7 @@ export function clone(a: number[]) {
  * @param a the source matrix
  * @returns out
  */
-export function copy(out: number[], a: number[]) {
+export function copy(out: Mat2dArray, a: Mat2dArray) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -101,7 +88,7 @@ export function copy(out: number[], a: number[]) {
  * @param out the receiving matrix
  * @returns out
  */
-export function identity(out: number[]) {
+export function identity(out: Mat2dArray) {
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -118,7 +105,7 @@ export function identity(out: number[]) {
  * @param a the source matrix
  * @returns out
  */
-export function invert(out: number[], a: number[]) {
+export function invert(out: Mat2dArray, a: Mat2dArray) {
   const aa = a[0],
     ab = a[1],
     ac = a[2],
@@ -147,7 +134,7 @@ export function invert(out: number[], a: number[]) {
  * @param a the source matrix
  * @returns determinant of a
  */
-export function determinant(a: number[]) {
+export function determinant(a: Mat2dArray) {
   return a[0] * a[3] - a[1] * a[2];
 }
 
@@ -159,7 +146,7 @@ export function determinant(a: number[]) {
  * @param b the second operand
  * @returns out
  */
-export function multiply(out: number[], a: number[], b: number[]) {
+export function multiply(out: Mat2dArray, a: Mat2dArray, b: Mat2dArray) {
   const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
@@ -193,7 +180,7 @@ export const mul = multiply;
  * @param rad the angle to rotate the matrix by
  * @returns out
  */
-export function rotate(out: number[], a: number[], rad: number) {
+export function rotate(out: Mat2dArray, a: Mat2dArray, rad: number) {
   const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
@@ -219,7 +206,7 @@ export function rotate(out: number[], a: number[], rad: number) {
  * @param v the vec2 to scale the matrix by
  * @returns out
  **/
-export function scale(out: number[], a: number[], v: number[]) {
+export function scale(out: Mat2dArray, a: Mat2dArray, v: Vec2Array) {
   const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
@@ -245,7 +232,7 @@ export function scale(out: number[], a: number[], v: number[]) {
  * @param v the vec2 to translate the matrix by
  * @returns out
  **/
-export function translate(out: number[], a: number[], v: number[]) {
+export function translate(out: Mat2dArray, a: Mat2dArray, v: Vec2Array) {
   const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
@@ -269,7 +256,7 @@ export function translate(out: number[], a: number[], v: number[]) {
  * @param a the matrix to calculate Frobenius norm of
  * @returns Frobenius norm
  */
-export function frob(a: number[]) {
+export function frob(a: Mat2dArray) {
   return Math.sqrt(
     Math.pow(a[0], 2) +
       Math.pow(a[1], 2) +

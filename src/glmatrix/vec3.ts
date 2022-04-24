@@ -24,19 +24,15 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { GLMAT_RANDOM, GLMAT_ARRAY_TYPE } from './common';
-
+import { GLMAT_RANDOM, Vec3Array, Mat4Array, Mat3Array, QuatArray } from './common';
+export type { Vec3Array };
 /**
  * Creates a new, empty vec3
  *
  * @returns a new 3D vector
  */
-export function create() {
-  const out = new GLMAT_ARRAY_TYPE(3);
-  out[0] = 0;
-  out[1] = 0;
-  out[2] = 0;
-  return out;
+export function create(): Vec3Array {
+  return [0, 0, 0];
 }
 
 /**
@@ -45,12 +41,8 @@ export function create() {
  * @param a vector to clone
  * @returns a new 3D vector
  */
-export function clone(a: number[]) {
-  const out = new GLMAT_ARRAY_TYPE(3);
-  out[0] = a[0];
-  out[1] = a[1];
-  out[2] = a[2];
-  return out;
+export function clone(a: number[]): Vec3Array {
+  return [a[0], a[1], a[2]];
 }
 
 /**
@@ -61,12 +53,8 @@ export function clone(a: number[]) {
  * @param z Z component
  * @returns a new 3D vector
  */
-export function fromValues(x: number, y: number, z: number) {
-  const out = new GLMAT_ARRAY_TYPE(3);
-  out[0] = x;
-  out[1] = y;
-  out[2] = z;
-  return out;
+export function fromValues(x: number, y: number, z: number): Vec3Array {
+  return [x, y, z];
 }
 
 /**
@@ -76,7 +64,7 @@ export function fromValues(x: number, y: number, z: number) {
  * @param a the source vector
  * @returns out
  */
-export function copy(out: number[], a: number[]) {
+export function copy(out: Vec3Array, a: Vec3Array) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -92,7 +80,7 @@ export function copy(out: number[], a: number[]) {
  * @param z Z component
  * @returns out
  */
-export function set(out: number[], x: number, y: number, z: number) {
+export function set(out: Vec3Array, x: number, y: number, z: number) {
   out[0] = x;
   out[1] = y;
   out[2] = z;
@@ -107,7 +95,7 @@ export function set(out: number[], x: number, y: number, z: number) {
  * @param b the second operand
  * @returns out
  */
-export function add(out: number[], a: number[], b: number[]) {
+export function add(out: Vec3Array, a: Vec3Array, b: Vec3Array) {
   out[0] = a[0] + b[0];
   out[1] = a[1] + b[1];
   out[2] = a[2] + b[2];
@@ -122,7 +110,7 @@ export function add(out: number[], a: number[], b: number[]) {
  * @param b the second operand
  * @returns out
  */
-export function subtract(out: number[], a: number[], b: number[]) {
+export function subtract(out: Vec3Array, a: Vec3Array, b: Vec3Array) {
   out[0] = a[0] - b[0];
   out[1] = a[1] - b[1];
   out[2] = a[2] - b[2];
@@ -143,7 +131,7 @@ export const sub = subtract;
  * @param b the second operand
  * @returns out
  */
-export function multiply(out: number[], a: number[], b: number[]) {
+export function multiply(out: Vec3Array, a: Vec3Array, b: Vec3Array) {
   out[0] = a[0] * b[0];
   out[1] = a[1] * b[1];
   out[2] = a[2] * b[2];
@@ -164,7 +152,7 @@ export const mul = multiply;
  * @param b the second operand
  * @returns out
  */
-export function divide(out: number[], a: number[], b: number[]) {
+export function divide(out: Vec3Array, a: Vec3Array, b: Vec3Array) {
   out[0] = a[0] / b[0];
   out[1] = a[1] / b[1];
   out[2] = a[2] / b[2];
@@ -185,7 +173,7 @@ export const div = divide;
  * @param b the second operand
  * @returns out
  */
-export function min(out: number[], a: number[], b: number[]) {
+export function min(out: Vec3Array, a: Vec3Array, b: Vec3Array) {
   out[0] = Math.min(a[0], b[0]);
   out[1] = Math.min(a[1], b[1]);
   out[2] = Math.min(a[2], b[2]);
@@ -200,7 +188,7 @@ export function min(out: number[], a: number[], b: number[]) {
  * @param b the second operand
  * @returns out
  */
-export function max(out: number[], a: number[], b: number[]) {
+export function max(out: Vec3Array, a: Vec3Array, b: Vec3Array) {
   out[0] = Math.max(a[0], b[0]);
   out[1] = Math.max(a[1], b[1]);
   out[2] = Math.max(a[2], b[2]);
@@ -215,7 +203,7 @@ export function max(out: number[], a: number[], b: number[]) {
  * @param b amount to scale the vector by
  * @returns out
  */
-export function scale(out: number[], a: number[], b: number) {
+export function scale(out: Vec3Array, a: Vec3Array, b: number) {
   out[0] = a[0] * b;
   out[1] = a[1] * b;
   out[2] = a[2] * b;
@@ -231,7 +219,7 @@ export function scale(out: number[], a: number[], b: number) {
  * @param scale the amount to scale b by before adding
  * @returns out
  */
-export function scaleAndAdd(out: number[], a: number[], b: number[], scale: number) {
+export function scaleAndAdd(out: Vec3Array, a: Vec3Array, b: Vec3Array, scale: number) {
   out[0] = a[0] + b[0] * scale;
   out[1] = a[1] + b[1] * scale;
   out[2] = a[2] + b[2] * scale;
@@ -245,7 +233,7 @@ export function scaleAndAdd(out: number[], a: number[], b: number[], scale: numb
  * @param b the second operand
  * @returns distance between a and b
  */
-export function distance(a: number[], b: number[]) {
+export function distance(a: Vec3Array, b: Vec3Array) {
   const x = b[0] - a[0],
     y = b[1] - a[1],
     z = b[2] - a[2];
@@ -265,7 +253,7 @@ export const dist = distance;
  * @param b the second operand
  * @returns squared distance between a and b
  */
-export function squaredDistance(a: number[], b: number[]) {
+export function squaredDistance(a: Vec3Array, b: Vec3Array) {
   const x = b[0] - a[0],
     y = b[1] - a[1],
     z = b[2] - a[2];
@@ -284,7 +272,7 @@ export const sqrDist = squaredDistance;
  * @param a vector to calculate length of
  * @returns length of a
  */
-export function length(a: number[]) {
+export function length(a: Vec3Array) {
   const x = a[0],
     y = a[1],
     z = a[2];
@@ -303,7 +291,7 @@ export const len = length;
  * @param a vector to calculate squared length of
  * @returns squared length of a
  */
-export function squaredLength(a: number[]) {
+export function squaredLength(a: Vec3Array) {
   const x = a[0],
     y = a[1],
     z = a[2];
@@ -323,7 +311,7 @@ export const sqrLen = squaredLength;
  * @param a vector to negate
  * @returns out
  */
-export function negate(out: number[], a: number[]) {
+export function negate(out: Vec3Array, a: Vec3Array) {
   out[0] = -a[0];
   out[1] = -a[1];
   out[2] = -a[2];
@@ -337,7 +325,7 @@ export function negate(out: number[], a: number[]) {
  * @param a vector to invert
  * @returns out
  */
-export function inverse(out: number[], a: number[]) {
+export function inverse(out: Vec3Array, a: Vec3Array) {
   out[0] = 1.0 / a[0];
   out[1] = 1.0 / a[1];
   out[2] = 1.0 / a[2];
@@ -351,7 +339,7 @@ export function inverse(out: number[], a: number[]) {
  * @param a vector to normalize
  * @returns out
  */
-export function normalize(out: number[], a: number[]) {
+export function normalize(out: Vec3Array, a: Vec3Array) {
   const x = a[0],
     y = a[1],
     z = a[2];
@@ -373,7 +361,7 @@ export function normalize(out: number[], a: number[]) {
  * @param b the second operand
  * @returns dot product of a and b
  */
-export function dot(a: number[], b: number[]) {
+export function dot(a: Vec3Array, b: Vec3Array) {
   return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 }
 
@@ -385,7 +373,7 @@ export function dot(a: number[], b: number[]) {
  * @param b the second operand
  * @returns out
  */
-export function cross(out: number[], a: number[], b: number[]) {
+export function cross(out: Vec3Array, a: Vec3Array, b: Vec3Array) {
   const ax = a[0],
     ay = a[1],
     az = a[2],
@@ -408,7 +396,7 @@ export function cross(out: number[], a: number[], b: number[]) {
  * @param t interpolation amount between the two inputs
  * @returns out
  */
-export function lerp(out: number[], a: number[], b: number[], t: number) {
+export function lerp(out: Vec3Array, a: Vec3Array, b: Vec3Array, t: number) {
   const ax = a[0],
     ay = a[1],
     az = a[2];
@@ -425,7 +413,7 @@ export function lerp(out: number[], a: number[], b: number[], t: number) {
  * @param [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
  * @returns out
  */
-export function random(out: number[], scale: number) {
+export function random(out: Vec3Array, scale: number) {
   scale = scale || 1.0;
 
   const r = GLMAT_RANDOM() * 2.0 * Math.PI;
@@ -447,7 +435,7 @@ export function random(out: number[], scale: number) {
  * @param m matrix to transform with
  * @returns out
  */
-export function transformMat4(out: number[], a: number[], m: number[]) {
+export function transformMat4(out: Vec3Array, a: Vec3Array, m: Mat4Array) {
   const x = a[0],
     y = a[1],
     z = a[2];
@@ -467,7 +455,7 @@ export function transformMat4(out: number[], a: number[], m: number[]) {
  * @param m the 3x3 matrix to transform with
  * @returns out
  */
-export function transformMat3(out: number[], a: number[], m: number[]) {
+export function transformMat3(out: Vec3Array, a: Vec3Array, m: Mat3Array) {
   const x = a[0],
     y = a[1],
     z = a[2];
@@ -485,7 +473,7 @@ export function transformMat3(out: number[], a: number[], m: number[]) {
  * @param q quaternion to transform with
  * @returns out
  */
-export function transformQuat(out: number[], a: number[], q: number[]) {
+export function transformQuat(out: Vec3Array, a: Vec3Array, q: QuatArray) {
   // benchmarks: http://jsperf.com/quaternion-transform-vec3-implementations
 
   const x = a[0],
@@ -516,7 +504,7 @@ export function transformQuat(out: number[], a: number[], q: number[]) {
  * @param c The angle of rotation
  * @returns out
  */
-export function rotateX(out: number[], a: number[], b: number[], c: number) {
+export function rotateX(out: Vec3Array, a: Vec3Array, b: Vec3Array, c: number) {
   const p = [],
     r = [];
   //Translate point to the origin
@@ -545,7 +533,7 @@ export function rotateX(out: number[], a: number[], b: number[], c: number) {
  * @param c The angle of rotation
  * @returns out
  */
-export function rotateY(out: number[], a: number[], b: number[], c: number) {
+export function rotateY(out: Vec3Array, a: Vec3Array, b: Vec3Array, c: number) {
   const p = [],
     r = [];
   //Translate point to the origin
@@ -574,7 +562,7 @@ export function rotateY(out: number[], a: number[], b: number[], c: number) {
  * @param c The angle of rotation
  * @returns out
  */
-export function rotateZ(out: number[], a: number[], b: number[], c: number) {
+export function rotateZ(out: Vec3Array, a: Vec3Array, b: Vec3Array, c: number) {
   const p = [],
     r = [];
   //Translate point to the origin
@@ -611,11 +599,11 @@ export const forEach = (function () {
   const vec = create();
 
   return function <T>(
-    a: number[],
+    a: { readonly length: number; [n: number]: number },
     stride: number,
     offset: number,
     count: number,
-    fn: (a: number[], b: number[], arg?: T) => void,
+    fn: (a: Vec3Array, b: Vec3Array, arg?: T) => void,
     arg?: T
   ) {
     let i, l;
@@ -653,7 +641,7 @@ export const forEach = (function () {
  * @param b The second operand
  * @returns The angle in radians
  */
-export function angle(a: number[], b: number[]) {
+export function angle(a: Vec3Array, b: Vec3Array) {
   const tempA = fromValues(a[0], a[1], a[2]);
   const tempB = fromValues(b[0], b[1], b[2]);
 

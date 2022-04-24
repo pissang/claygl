@@ -24,8 +24,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { GLMAT_ARRAY_TYPE } from './common';
-
+import { Mat2dArray, Mat3Array, Mat4Array, QuatArray, Vec2Array } from './common';
+export type { Mat3Array };
 /**
  * @class 3x3 Matrix
  * @name mat3
@@ -36,18 +36,8 @@ import { GLMAT_ARRAY_TYPE } from './common';
  *
  * @returns a new 3x3 matrix
  */
-export function create() {
-  const out = new GLMAT_ARRAY_TYPE(9);
-  out[0] = 1;
-  out[1] = 0;
-  out[2] = 0;
-  out[3] = 0;
-  out[4] = 1;
-  out[5] = 0;
-  out[6] = 0;
-  out[7] = 0;
-  out[8] = 1;
-  return out;
+export function create(): Mat3Array {
+  return [1, 0, 0, 0, 1, 0, 0, 0, 1];
 }
 
 /**
@@ -57,7 +47,7 @@ export function create() {
  * @param {mat4} a   the source 4x4 matrix
  * @returns out
  */
-export function fromMat4(out: number[], a: number[]) {
+export function fromMat4(out: Mat3Array, a: Mat4Array) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -76,18 +66,8 @@ export function fromMat4(out: number[], a: number[]) {
  * @param a matrix to clone
  * @returns a new 3x3 matrix
  */
-export function clone(a: number[]) {
-  const out = new GLMAT_ARRAY_TYPE(9);
-  out[0] = a[0];
-  out[1] = a[1];
-  out[2] = a[2];
-  out[3] = a[3];
-  out[4] = a[4];
-  out[5] = a[5];
-  out[6] = a[6];
-  out[7] = a[7];
-  out[8] = a[8];
-  return out;
+export function clone(a: Mat3Array): Mat3Array {
+  return [a[0], a[1], a[2], a[3], a[4], a[5], a[6], a[7], a[8]];
 }
 
 /**
@@ -97,7 +77,7 @@ export function clone(a: number[]) {
  * @param a the source matrix
  * @returns out
  */
-export function copy(out: number[], a: number[]) {
+export function copy(out: Mat3Array, a: Mat3Array) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -116,7 +96,7 @@ export function copy(out: number[], a: number[]) {
  * @param out the receiving matrix
  * @returns out
  */
-export function identity(out: number[]) {
+export function identity(out: Mat3Array) {
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -136,7 +116,7 @@ export function identity(out: number[]) {
  * @param a the source matrix
  * @returns out
  */
-export function transpose(out: number[], a: number[]) {
+export function transpose(out: Mat3Array, a: Mat3Array) {
   // If we are transposing ourselves we can skip a few steps but have to cache some values
   if (out === a) {
     const a01 = a[1],
@@ -170,7 +150,7 @@ export function transpose(out: number[], a: number[]) {
  * @param a the source matrix
  * @returns out
  */
-export function invert(out: number[], a: number[]) {
+export function invert(out: Mat3Array, a: Mat3Array) {
   const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
@@ -210,7 +190,7 @@ export function invert(out: number[], a: number[]) {
  * @param a the source matrix
  * @returns out
  */
-export function adjoint(out: number[], a: number[]) {
+export function adjoint(out: Mat3Array, a: Mat3Array) {
   const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
@@ -239,7 +219,7 @@ export function adjoint(out: number[], a: number[]) {
  * @param a the source matrix
  * @returns determinant of a
  */
-export function determinant(a: number[]) {
+export function determinant(a: Mat3Array) {
   const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
@@ -263,7 +243,7 @@ export function determinant(a: number[]) {
  * @param b the second operand
  * @returns out
  */
-export function multiply(out: number[], a: number[], b: number[]) {
+export function multiply(out: Mat3Array, a: Mat3Array, b: Mat3Array) {
   const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
@@ -311,7 +291,7 @@ export const mul = multiply;
  * @param v vector to translate by
  * @returns out
  */
-export function translate(out: number[], a: number[], v: number[]) {
+export function translate(out: Mat3Array, a: Mat3Array, v: Vec2Array) {
   const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
@@ -346,7 +326,7 @@ export function translate(out: number[], a: number[], v: number[]) {
  * @param rad the angle to rotate the matrix by
  * @returns out
  */
-export function rotate(out: number[], a: number[], rad: number) {
+export function rotate(out: Mat3Array, a: Mat3Array, rad: number) {
   const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
@@ -381,7 +361,7 @@ export function rotate(out: number[], a: number[], rad: number) {
  * @param v the vec2 to scale the matrix by
  * @returns out
  **/
-export function scale(out: number[], a: number[], v: number[]) {
+export function scale(out: Mat3Array, a: Mat3Array, v: Vec2Array) {
   const x = v[0],
     y = v[1];
 
@@ -406,7 +386,7 @@ export function scale(out: number[], a: number[], v: number[]) {
  * @param a the matrix to copy
  * @returns out
  **/
-export function fromMat2d(out: number[], a: number[]) {
+export function fromMat2d(out: Mat3Array, a: Mat2dArray) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = 0;
@@ -429,7 +409,7 @@ export function fromMat2d(out: number[], a: number[]) {
  *
  * @returns out
  */
-export function fromQuat(out: number[], q: number[]) {
+export function fromQuat(out: Mat3Array, q: QuatArray) {
   const x = q[0],
     y = q[1],
     z = q[2],
@@ -470,7 +450,7 @@ export function fromQuat(out: number[], q: number[]) {
  *
  * @returns out
  */
-export function normalFromMat4(out: number[], a: number[]) {
+export function normalFromMat4(out: Mat3Array, a: Mat4Array) {
   const a00 = a[0],
     a01 = a[1],
     a02 = a[2],
@@ -528,7 +508,7 @@ export function normalFromMat4(out: number[], a: number[]) {
  * @param a the matrix to calculate Frobenius norm of
  * @returns Frobenius norm
  */
-export function frob(a: number[]) {
+export function frob(a: Mat3Array) {
   return Math.sqrt(
     Math.pow(a[0], 2) +
       Math.pow(a[1], 2) +

@@ -24,20 +24,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { GLMAT_ARRAY_TYPE } from './common';
+import { Mat2Array, Vec2Array } from './common';
 
+export type { Vec2Array };
 /**
  * Creates a new identity mat2
  *
  * @returns a new 2x2 matrix
  */
-export function create() {
-  const out = new GLMAT_ARRAY_TYPE(4);
-  out[0] = 1;
-  out[1] = 0;
-  out[2] = 0;
-  out[3] = 1;
-  return out;
+export function create(): Mat2Array {
+  return [1, 0, 0, 1];
 }
 
 /**
@@ -46,13 +42,8 @@ export function create() {
  * @param a matrix to clone
  * @returns a new 2x2 matrix
  */
-export function clone(a: number[]) {
-  const out = new GLMAT_ARRAY_TYPE(4);
-  out[0] = a[0];
-  out[1] = a[1];
-  out[2] = a[2];
-  out[3] = a[3];
-  return out;
+export function clone(a: Mat2Array): Mat2Array {
+  return [a[0], a[1], a[2], a[3]];
 }
 
 /**
@@ -62,7 +53,7 @@ export function clone(a: number[]) {
  * @param a the source matrix
  * @returns out
  */
-export function copy(out: number[], a: number[]) {
+export function copy(out: Mat2Array, a: Mat2Array) {
   out[0] = a[0];
   out[1] = a[1];
   out[2] = a[2];
@@ -76,7 +67,7 @@ export function copy(out: number[], a: number[]) {
  * @param out the receiving matrix
  * @returns out
  */
-export function identity(out: number[]) {
+export function identity(out: Mat2Array) {
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -91,7 +82,7 @@ export function identity(out: number[]) {
  * @param a the source matrix
  * @returns out
  */
-export function transpose(out: number[], a: number[]) {
+export function transpose(out: Mat2Array, a: Mat2Array) {
   // If we are transposing ourselves we can skip a few steps but have to cache some values
   if (out === a) {
     const a1 = a[1];
@@ -114,13 +105,13 @@ export function transpose(out: number[], a: number[]) {
  * @param a the source matrix
  * @returns out
  */
-export function invert(out: number[], a: number[]) {
+export function invert(out: Mat2Array, a: Mat2Array) {
   const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
-    a3 = a[3],
-    // Calculate the determinant
-    det = a0 * a3 - a2 * a1;
+    a3 = a[3];
+  // Calculate the determinant
+  let det = a0 * a3 - a2 * a1;
 
   if (!det) {
     return null;
@@ -142,7 +133,7 @@ export function invert(out: number[], a: number[]) {
  * @param a the source matrix
  * @returns out
  */
-export function adjoint(out: number[], a: number[]) {
+export function adjoint(out: Mat2Array, a: Mat2Array) {
   // Caching this value is nessecary if out == a
   const a0 = a[0];
   out[0] = a[3];
@@ -159,7 +150,7 @@ export function adjoint(out: number[], a: number[]) {
  * @param a the source matrix
  * @returns determinant of a
  */
-export function determinant(a: number[]) {
+export function determinant(a: Mat2Array) {
   return a[0] * a[3] - a[2] * a[1];
 }
 
@@ -171,7 +162,7 @@ export function determinant(a: number[]) {
  * @param b the second operand
  * @returns out
  */
-export function multiply(out: number[], a: number[], b: number[]) {
+export function multiply(out: Mat2Array, a: Mat2Array, b: Mat2Array) {
   const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
@@ -201,7 +192,7 @@ export const mul = multiply;
  * @param rad the angle to rotate the matrix by
  * @returns out
  */
-export function rotate(out: number[], a: number[], rad: number) {
+export function rotate(out: Mat2Array, a: Mat2Array, rad: number) {
   const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
@@ -223,7 +214,7 @@ export function rotate(out: number[], a: number[], rad: number) {
  * @param {vec2} v the vec2 to scale the matrix by
  * @returns out
  **/
-export function scale(out: number[], a: number[], v: number[]) {
+export function scale(out: Mat2Array, a: Mat2Array, v: Vec2Array) {
   const a0 = a[0],
     a1 = a[1],
     a2 = a[2],
@@ -243,7 +234,7 @@ export function scale(out: number[], a: number[], v: number[]) {
  * @param a the matrix to calculate Frobenius norm of
  * @returns Frobenius norm
  */
-export function frob(a: number[]): number {
+export function frob(a: Mat2Array): number {
   return Math.sqrt(Math.pow(a[0], 2) + Math.pow(a[1], 2) + Math.pow(a[2], 2) + Math.pow(a[3], 2));
 }
 
@@ -255,7 +246,7 @@ export function frob(a: number[]): number {
  * @param a the input matrix to factorize
  */
 
-export function LDU(L: number[], D: number[], U: number[], a: number[]) {
+export function LDU(L: Mat2Array, D: Mat2Array, U: Mat2Array, a: Mat2Array) {
   L[2] = a[2] / a[0];
   U[0] = a[0];
   U[1] = a[1];

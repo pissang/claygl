@@ -24,8 +24,16 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-import { GLMAT_ARRAY_TYPE, GLMAT_RANDOM } from './common';
-
+import {
+  GLMAT_RANDOM,
+  Mat2Array,
+  Mat2dArray,
+  Mat3Array,
+  Mat4Array,
+  Vec2Array,
+  Vec3Array
+} from './common';
+export type { Vec2Array };
 /**
  * @class 2 Dimensional Vector
  * @name vec2
@@ -36,11 +44,8 @@ import { GLMAT_ARRAY_TYPE, GLMAT_RANDOM } from './common';
  *
  * @returns a new 2D vector
  */
-export function create() {
-  const out = new GLMAT_ARRAY_TYPE(2);
-  out[0] = 0;
-  out[1] = 0;
-  return out;
+export function create(): Vec2Array {
+  return [0, 0];
 }
 
 /**
@@ -49,11 +54,8 @@ export function create() {
  * @param a vector to clone
  * @returns a new 2D vector
  */
-export function clone(a: number[]) {
-  const out = new GLMAT_ARRAY_TYPE(2);
-  out[0] = a[0];
-  out[1] = a[1];
-  return out;
+export function clone(a: Vec2Array): Vec2Array {
+  return [a[0], a[1]];
 }
 
 /**
@@ -64,10 +66,7 @@ export function clone(a: number[]) {
  * @returns a new 2D vector
  */
 export function fromValues(x: number, y: number) {
-  const out = new GLMAT_ARRAY_TYPE(2);
-  out[0] = x;
-  out[1] = y;
-  return out;
+  return [x, y] as Vec2Array;
 }
 
 /**
@@ -77,7 +76,7 @@ export function fromValues(x: number, y: number) {
  * @param a the source vector
  * @returns out
  */
-export function copy(out: number[], a: number[]) {
+export function copy(out: Vec2Array, a: Vec2Array) {
   out[0] = a[0];
   out[1] = a[1];
   return out;
@@ -91,7 +90,7 @@ export function copy(out: number[], a: number[]) {
  * @param y Y component
  * @returns out
  */
-export function set(out: number[], x: number, y: number) {
+export function set(out: Vec2Array, x: number, y: number) {
   out[0] = x;
   out[1] = y;
   return out;
@@ -105,7 +104,7 @@ export function set(out: number[], x: number, y: number) {
  * @param b the second operand
  * @returns out
  */
-export function add(out: number[], a: number[], b: number[]) {
+export function add(out: Vec2Array, a: Vec2Array, b: Vec2Array) {
   out[0] = a[0] + b[0];
   out[1] = a[1] + b[1];
   return out;
@@ -119,7 +118,7 @@ export function add(out: number[], a: number[], b: number[]) {
  * @param b the second operand
  * @returns out
  */
-export function subtract(out: number[], a: number[], b: number[]) {
+export function subtract(out: Vec2Array, a: Vec2Array, b: Vec2Array) {
   out[0] = a[0] - b[0];
   out[1] = a[1] - b[1];
   return out;
@@ -137,7 +136,7 @@ export const sub = subtract;
  * @param b the second operand
  * @returns out
  */
-export function multiply(out: number[], a: number[], b: number[]) {
+export function multiply(out: Vec2Array, a: Vec2Array, b: Vec2Array) {
   out[0] = a[0] * b[0];
   out[1] = a[1] * b[1];
   return out;
@@ -155,7 +154,7 @@ export const mul = multiply;
  * @param b the second operand
  * @returns out
  */
-export function divide(out: number[], a: number[], b: number[]) {
+export function divide(out: Vec2Array, a: Vec2Array, b: Vec2Array) {
   out[0] = a[0] / b[0];
   out[1] = a[1] / b[1];
   return out;
@@ -173,7 +172,7 @@ export const div = divide;
  * @param b the second operand
  * @returns out
  */
-export function min(out: number[], a: number[], b: number[]) {
+export function min(out: Vec2Array, a: Vec2Array, b: Vec2Array) {
   out[0] = Math.min(a[0], b[0]);
   out[1] = Math.min(a[1], b[1]);
   return out;
@@ -187,7 +186,7 @@ export function min(out: number[], a: number[], b: number[]) {
  * @param b the second operand
  * @returns out
  */
-export function max(out: number[], a: number[], b: number[]) {
+export function max(out: Vec2Array, a: Vec2Array, b: Vec2Array) {
   out[0] = Math.max(a[0], b[0]);
   out[1] = Math.max(a[1], b[1]);
   return out;
@@ -201,7 +200,7 @@ export function max(out: number[], a: number[], b: number[]) {
  * @param b amount to scale the vector by
  * @returns out
  */
-export function scale(out: number[], a: number[], b: number) {
+export function scale(out: Vec2Array, a: Vec2Array, b: number) {
   out[0] = a[0] * b;
   out[1] = a[1] * b;
   return out;
@@ -216,7 +215,7 @@ export function scale(out: number[], a: number[], b: number) {
  * @param scale the amount to scale b by before adding
  * @returns out
  */
-export function scaleAndAdd(out: number[], a: number[], b: number[], scale: number) {
+export function scaleAndAdd(out: Vec2Array, a: Vec2Array, b: Vec2Array, scale: number) {
   out[0] = a[0] + b[0] * scale;
   out[1] = a[1] + b[1] * scale;
   return out;
@@ -229,7 +228,7 @@ export function scaleAndAdd(out: number[], a: number[], b: number[], scale: numb
  * @param b the second operand
  * @returns distance between a and b
  */
-export function distance(a: number[], b: number[]) {
+export function distance(a: Vec2Array, b: Vec2Array) {
   const x = b[0] - a[0],
     y = b[1] - a[1];
   return Math.sqrt(x * x + y * y);
@@ -246,7 +245,7 @@ export const dist = distance;
  * @param b the second operand
  * @returns squared distance between a and b
  */
-export function squaredDistance(a: number[], b: number[]) {
+export function squaredDistance(a: Vec2Array, b: Vec2Array) {
   const x = b[0] - a[0],
     y = b[1] - a[1];
   return x * x + y * y;
@@ -262,7 +261,7 @@ export const sqrDist = squaredDistance;
  * @param a vector to calculate length of
  * @returns length of a
  */
-export function length(a: number[]) {
+export function length(a: Vec2Array) {
   const x = a[0],
     y = a[1];
   return Math.sqrt(x * x + y * y);
@@ -278,7 +277,7 @@ export const len = length;
  * @param a vector to calculate squared length of
  * @returns squared length of a
  */
-export function squaredLength(a: number[]) {
+export function squaredLength(a: Vec2Array) {
   const x = a[0],
     y = a[1];
   return x * x + y * y;
@@ -295,7 +294,7 @@ export const sqrLen = squaredLength;
  * @param a vector to negate
  * @returns out
  */
-export function negate(out: number[], a: number[]) {
+export function negate(out: Vec2Array, a: Vec2Array) {
   out[0] = -a[0];
   out[1] = -a[1];
   return out;
@@ -308,7 +307,7 @@ export function negate(out: number[], a: number[]) {
  * @param a vector to invert
  * @returns out
  */
-export function inverse(out: number[], a: number[]) {
+export function inverse(out: Vec2Array, a: Vec2Array) {
   out[0] = 1.0 / a[0];
   out[1] = 1.0 / a[1];
   return out;
@@ -321,7 +320,7 @@ export function inverse(out: number[], a: number[]) {
  * @param a vector to normalize
  * @returns out
  */
-export function normalize(out: number[], a: number[]) {
+export function normalize(out: Vec2Array, a: Vec2Array) {
   const x = a[0],
     y = a[1];
   let len = x * x + y * y;
@@ -341,7 +340,7 @@ export function normalize(out: number[], a: number[]) {
  * @param b the second operand
  * @returns dot product of a and b
  */
-export function dot(a: number[], b: number[]) {
+export function dot(a: Vec2Array, b: Vec2Array) {
   return a[0] * b[0] + a[1] * b[1];
 }
 
@@ -349,12 +348,12 @@ export function dot(a: number[], b: number[]) {
  * Computes the cross product of two vec2's
  * Note that the cross product must by definition produce a 3D vector
  *
- * @param {vec3} out the receiving vector
+ * @param out the receiving vector
  * @param a the first operand
  * @param b the second operand
- * @returns {vec3} out
+ * @returns out
  */
-export function cross(out: number[], a: number[], b: number[]) {
+export function cross(out: Vec3Array, a: Vec2Array, b: Vec2Array) {
   const z = a[0] * b[1] - a[1] * b[0];
   out[0] = out[1] = 0;
   out[2] = z;
@@ -370,7 +369,7 @@ export function cross(out: number[], a: number[], b: number[]) {
  * @param t interpolation amount between the two inputs
  * @returns out
  */
-export function lerp(out: number[], a: number[], b: number[], t: number) {
+export function lerp(out: Vec2Array, a: Vec2Array, b: Vec2Array, t: number) {
   const ax = a[0],
     ay = a[1];
   out[0] = ax + t * (b[0] - ax);
@@ -385,7 +384,7 @@ export function lerp(out: number[], a: number[], b: number[], t: number) {
  * @param [scale] Length of the resulting vector. If ommitted, a unit vector will be returned
  * @returns out
  */
-export function random(out: number[], scale: number) {
+export function random(out: Vec2Array, scale: number) {
   scale = scale || 1.0;
   const r = GLMAT_RANDOM() * 2.0 * Math.PI;
   out[0] = Math.cos(r) * scale;
@@ -401,7 +400,7 @@ export function random(out: number[], scale: number) {
  * @param {mat2} m matrix to transform with
  * @returns out
  */
-export function transformMat2(out: number[], a: number[], m: number[]) {
+export function transformMat2(out: Vec2Array, a: Vec2Array, m: Mat2Array) {
   const x = a[0],
     y = a[1];
   out[0] = m[0] * x + m[2] * y;
@@ -417,7 +416,7 @@ export function transformMat2(out: number[], a: number[], m: number[]) {
  * @param m matrix to transform with
  * @returns out
  */
-export function transformMat2d(out: number[], a: number[], m: number[]) {
+export function transformMat2d(out: Vec2Array, a: Vec2Array, m: Mat2dArray) {
   const x = a[0],
     y = a[1];
   out[0] = m[0] * x + m[2] * y + m[4];
@@ -434,7 +433,7 @@ export function transformMat2d(out: number[], a: number[], m: number[]) {
  * @param m matrix to transform with
  * @returns out
  */
-export function transformMat3(out: number[], a: number[], m: number[]) {
+export function transformMat3(out: Vec2Array, a: Vec2Array, m: Mat3Array) {
   const x = a[0],
     y = a[1];
   out[0] = m[0] * x + m[3] * y + m[6];
@@ -452,7 +451,7 @@ export function transformMat3(out: number[], a: number[], m: number[]) {
  * @param {mat4} m matrix to transform with
  * @returns out
  */
-export function transformMat4(out: number[], a: number[], m: number[]) {
+export function transformMat4(out: Vec2Array, a: Vec2Array, m: Mat4Array) {
   const x = a[0],
     y = a[1];
   out[0] = m[0] * x + m[4] * y + m[12];
@@ -475,11 +474,11 @@ export const forEach = (function () {
   const vec = create();
 
   return function <T>(
-    a: number[],
+    a: { readonly length: number; [n: number]: number },
     stride: number,
     offset: number,
     count: number,
-    fn: (a: number[], b: number[], arg?: T) => void,
+    fn: (a: Vec2Array, b: Vec2Array, arg?: T) => void,
     arg?: T
   ) {
     let i, l;
