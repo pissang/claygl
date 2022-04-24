@@ -1,20 +1,17 @@
-// @ts-nocheck
-import vec4 from '../glmatrix/vec4';
+import * as vec4 from '../glmatrix/vec4';
+import type Quaternion from './Quaternion';
+import type Matrix4 from './Matrix4';
+import { matrixOrVectorClassToString } from './util';
 
 /**
  * @constructor
  * @alias clay.Vector4
- * @param {number} x
- * @param {number} y
- * @param {number} z
- * @param {number} w
+ * @param x
+ * @param y
+ * @param z
+ * @param w
  */
-const Vector4 = function (x, y, z, w) {
-  x = x || 0;
-  y = y || 0;
-  z = z || 0;
-  w = w || 0;
-
+class Vector4 {
   /**
    * Storage of Vector4, read and write of x, y, z, w will change the values in array
    * All methods also operate on the array instead of x, y, z, w components
@@ -22,696 +19,556 @@ const Vector4 = function (x, y, z, w) {
    * @type {Float32Array}
    * @memberOf clay.Vector4#
    */
-  this.array = vec4.fromValues(x, y, z, w);
+  array: vec4.Vec4Array;
 
-  /**
-   * Dirty flag is used by the Node to determine
-   * if the matrix is updated to latest
-   * @name _dirty
-   * @type {boolean}
-   * @memberOf clay.Vector4#
-   */
-  this._dirty = true;
-};
+  constructor(x: number, y: number, z: number, w: number) {
+    x = x || 0;
+    y = y || 0;
+    z = z || 0;
+    w = w || 0;
+    this.array = vec4.fromValues(x, y, z, w);
+  }
 
-Vector4.prototype = {
-  constructor: Vector4,
+  get x() {
+    return this.array[0];
+  }
+  set x(value: number) {
+    this.array[0] = value;
+  }
+
+  get y() {
+    return this.array[1];
+  }
+  set y(value: number) {
+    this.array[1] = value;
+  }
+
+  get z() {
+    return this.array[2];
+  }
+  set z(value: number) {
+    this.array[2] = value;
+  }
+
+  get w() {
+    return this.array[3];
+  }
+  set w(value: number) {
+    this.array[3] = value;
+  }
 
   /**
    * Add b to self
-   * @param  {clay.Vector4} b
-   * @return {clay.Vector4}
+   * @param b
    */
-  add: function (b) {
+  add(b: Vector4) {
     vec4.add(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Set x, y and z components
-   * @param  {number}  x
-   * @param  {number}  y
-   * @param  {number}  z
-   * @param  {number}  w
-   * @return {clay.Vector4}
+   * @param x
+   * @param y
+   * @param z
+   * @param w
    */
-  set: function (x, y, z, w) {
-    this.array[0] = x;
-    this.array[1] = y;
-    this.array[2] = z;
-    this.array[3] = w;
-    this._dirty = true;
+  set(x: number, y: number, z: number, w: number) {
+    const arr = this.array;
+    arr[0] = x;
+    arr[1] = y;
+    arr[2] = z;
+    arr[3] = w;
     return this;
-  },
+  }
 
   /**
    * Set x, y, z and w components from array
-   * @param  {Float32Array|number[]} arr
-   * @return {clay.Vector4}
+   * @param from
    */
-  setArray: function (arr) {
-    this.array[0] = arr[0];
-    this.array[1] = arr[1];
-    this.array[2] = arr[2];
-    this.array[3] = arr[3];
+  setArray(from: vec4.Vec4Array) {
+    const arr = this.array;
+    arr[0] = from[0];
+    arr[1] = from[1];
+    arr[2] = from[2];
+    arr[3] = from[3];
 
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Clone a new Vector4
-   * @return {clay.Vector4}
    */
-  clone: function () {
+  clone() {
     return new Vector4(this.x, this.y, this.z, this.w);
-  },
+  }
 
   /**
    * Copy from b
-   * @param  {clay.Vector4} b
-   * @return {clay.Vector4}
+   * @param b
    */
-  copy: function (b) {
+  copy(b: Vector4) {
     vec4.copy(this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Alias for distance
-   * @param  {clay.Vector4} b
-   * @return {number}
+   * @param b
    */
-  dist: function (b) {
+  dist(b: Vector4) {
     return vec4.dist(this.array, b.array);
-  },
+  }
 
   /**
    * Distance between self and b
-   * @param  {clay.Vector4} b
-   * @return {number}
+   * @param b
    */
-  distance: function (b) {
+  distance(b: Vector4) {
     return vec4.distance(this.array, b.array);
-  },
+  }
 
   /**
    * Alias for divide
-   * @param  {clay.Vector4} b
-   * @return {clay.Vector4}
+   * @param b
    */
-  div: function (b) {
+  div(b: Vector4) {
     vec4.div(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Divide self by b
-   * @param  {clay.Vector4} b
-   * @return {clay.Vector4}
+   * @param b
    */
-  divide: function (b) {
+  divide(b: Vector4) {
     vec4.divide(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Dot product of self and b
-   * @param  {clay.Vector4} b
-   * @return {number}
+   * @param b
    */
-  dot: function (b) {
+  dot(b: Vector4) {
     return vec4.dot(this.array, b.array);
-  },
+  }
 
   /**
    * Alias of length
-   * @return {number}
    */
-  len: function () {
+  len() {
     return vec4.len(this.array);
-  },
+  }
 
   /**
    * Calculate the length
-   * @return {number}
    */
-  length: function () {
+  length() {
     return vec4.length(this.array);
-  },
+  }
   /**
    * Linear interpolation between a and b
-   * @param  {clay.Vector4} a
-   * @param  {clay.Vector4} b
-   * @param  {number}  t
-   * @return {clay.Vector4}
+   * @param a
+   * @param b
+   * @param t
    */
-  lerp: function (a, b, t) {
+  lerp(a: Vector4, b: Vector4, t: number) {
     vec4.lerp(this.array, a.array, b.array, t);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Minimum of self and b
-   * @param  {clay.Vector4} b
-   * @return {clay.Vector4}
+   * @param b
    */
-  min: function (b) {
+  min(b: Vector4) {
     vec4.min(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Maximum of self and b
-   * @param  {clay.Vector4} b
-   * @return {clay.Vector4}
+   * @param b
    */
-  max: function (b) {
+  max(b: Vector4) {
     vec4.max(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Alias for multiply
-   * @param  {clay.Vector4} b
-   * @return {clay.Vector4}
+   * @param b
    */
-  mul: function (b) {
+  mul(b: Vector4) {
     vec4.mul(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Mutiply self and b
-   * @param  {clay.Vector4} b
-   * @return {clay.Vector4}
+   * @param b
    */
-  multiply: function (b) {
+  multiply(b: Vector4) {
     vec4.multiply(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Negate self
-   * @return {clay.Vector4}
    */
-  negate: function () {
+  negate() {
     vec4.negate(this.array, this.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Normalize self
-   * @return {clay.Vector4}
    */
-  normalize: function () {
+  normalize() {
     vec4.normalize(this.array, this.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Generate random x, y, z, w components with a given scale
-   * @param  {number} scale
-   * @return {clay.Vector4}
+   * @param scale
    */
-  random: function (scale) {
+  random(scale: number) {
     vec4.random(this.array, scale);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Scale self
-   * @param  {number}  scale
-   * @return {clay.Vector4}
+   * @param scale
    */
-  scale: function (s) {
+  scale(s: number) {
     vec4.scale(this.array, this.array, s);
-    this._dirty = true;
     return this;
-  },
+  }
   /**
    * Scale b and add to self
-   * @param  {clay.Vector4} b
-   * @param  {number}  scale
-   * @return {clay.Vector4}
+   * @param b
+   * @param scale
    */
-  scaleAndAdd: function (b, s) {
+  scaleAndAdd(b: Vector4, s: number) {
     vec4.scaleAndAdd(this.array, this.array, b.array, s);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Alias for squaredDistance
-   * @param  {clay.Vector4} b
-   * @return {number}
+   * @param b
    */
-  sqrDist: function (b) {
+  sqrDist(b: Vector4) {
     return vec4.sqrDist(this.array, b.array);
-  },
+  }
 
   /**
    * Squared distance between self and b
-   * @param  {clay.Vector4} b
-   * @return {number}
+   * @param b
    */
-  squaredDistance: function (b) {
+  squaredDistance(b: Vector4) {
     return vec4.squaredDistance(this.array, b.array);
-  },
+  }
 
   /**
    * Alias for squaredLength
-   * @return {number}
    */
-  sqrLen: function () {
+  sqrLen() {
     return vec4.sqrLen(this.array);
-  },
+  }
 
   /**
    * Squared length of self
-   * @return {number}
    */
-  squaredLength: function () {
+  squaredLength() {
     return vec4.squaredLength(this.array);
-  },
+  }
 
   /**
    * Alias for subtract
-   * @param  {clay.Vector4} b
-   * @return {clay.Vector4}
+   * @param b
    */
-  sub: function (b) {
+  sub(b: Vector4) {
     vec4.sub(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Subtract b from self
-   * @param  {clay.Vector4} b
-   * @return {clay.Vector4}
+   * @param b
    */
-  subtract: function (b) {
+  subtract(b: Vector4) {
     vec4.subtract(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Transform self with a Matrix4 m
-   * @param  {clay.Matrix4} m
-   * @return {clay.Vector4}
+   * @param {clay.Matrix4} m
    */
-  transformMat4: function (m) {
+  transformMat4(m: Matrix4) {
     vec4.transformMat4(this.array, this.array, m.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Transform self with a Quaternion q
-   * @param  {clay.Quaternion} q
-   * @return {clay.Vector4}
+   * @param {clay.Quaternion} q
    */
-  transformQuat: function (q) {
+  transformQuat(q: Quaternion) {
     vec4.transformQuat(this.array, this.array, q.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
-  toString: function () {
-    return '[' + Array.prototype.join.call(this.array, ',') + ']';
-  },
+  toString() {
+    return matrixOrVectorClassToString(this, 4);
+  }
 
-  toArray: function () {
+  toArray() {
     return Array.prototype.slice.call(this.array);
   }
-};
-
-const defineProperty = Object.defineProperty;
-// Getter and Setter
-if (defineProperty) {
-  const proto = Vector4.prototype;
   /**
-   * @name x
-   * @type {number}
-   * @memberOf clay.Vector4
-   * @instance
+   * @param out
+   * @param a
+   * @param b
    */
-  defineProperty(proto, 'x', {
-    get: function () {
-      return this.array[0];
-    },
-    set: function (value) {
-      this.array[0] = value;
-      this._dirty = true;
-    }
-  });
+  static add(out: Vector4, a: Vector4, b: Vector4) {
+    vec4.add(out.array, a.array, b.array);
+    return out;
+  }
 
   /**
-   * @name y
-   * @type {number}
-   * @memberOf clay.Vector4
-   * @instance
+   * @param out
+   * @param x
+   * @param y
+   * @param z
    */
-  defineProperty(proto, 'y', {
-    get: function () {
-      return this.array[1];
-    },
-    set: function (value) {
-      this.array[1] = value;
-      this._dirty = true;
-    }
-  });
+  static set(out: Vector4, x: number, y: number, z: number, w: number) {
+    vec4.set(out.array, x, y, z, w);
+  }
 
   /**
-   * @name z
-   * @type {number}
-   * @memberOf clay.Vector4
-   * @instance
+   * @param out
+   * @param b
    */
-  defineProperty(proto, 'z', {
-    get: function () {
-      return this.array[2];
-    },
-    set: function (value) {
-      this.array[2] = value;
-      this._dirty = true;
-    }
-  });
+  static copy(out: Vector4, b: Vector4) {
+    vec4.copy(out.array, b.array);
+    return out;
+  }
 
   /**
-   * @name w
-   * @type {number}
-   * @memberOf clay.Vector4
-   * @instance
+   * @param a
+   * @param b
    */
-  defineProperty(proto, 'w', {
-    get: function () {
-      return this.array[3];
-    },
-    set: function (value) {
-      this.array[3] = value;
-      this._dirty = true;
-    }
-  });
+  static dist(a: Vector4, b: Vector4) {
+    return vec4.distance(a.array, b.array);
+  }
+
+  /**
+   * @function
+   * @param a
+   * @param b
+   */
+  static distance = Vector4.dist;
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static div(out: Vector4, a: Vector4, b: Vector4) {
+    vec4.divide(out.array, a.array, b.array);
+    return out;
+  }
+
+  /**
+   * @function
+   * @param out
+   * @param a
+   * @param b
+   */
+  static divide = Vector4.div;
+
+  /**
+   * @param a
+   * @param b
+   */
+  static dot(a: Vector4, b: Vector4) {
+    return vec4.dot(a.array, b.array);
+  }
+
+  /**
+   * @param a
+   */
+  static len(b: Vector4) {
+    return vec4.length(b.array);
+  }
+
+  // Vector4.length = Vector4.len;
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   * @param t
+   */
+  static lerp(out: Vector4, a: Vector4, b: Vector4, t: number) {
+    vec4.lerp(out.array, a.array, b.array, t);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static min(out: Vector4, a: Vector4, b: Vector4) {
+    vec4.min(out.array, a.array, b.array);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static max(out: Vector4, a: Vector4, b: Vector4) {
+    vec4.max(out.array, a.array, b.array);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static mul(out: Vector4, a: Vector4, b: Vector4) {
+    vec4.multiply(out.array, a.array, b.array);
+    return out;
+  }
+
+  /**
+   * @function
+   * @param out
+   * @param a
+   * @param b
+   */
+  static multiply = Vector4.mul;
+
+  /**
+   * @param out
+   * @param a
+   */
+  static negate(out: Vector4, a: Vector4) {
+    vec4.negate(out.array, a.array);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param a
+   */
+  static normalize(out: Vector4, a: Vector4) {
+    vec4.normalize(out.array, a.array);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param scale
+   */
+  static random(out: Vector4, scale: number) {
+    vec4.random(out.array, scale);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param a
+   * @param scale
+   */
+  static scale(out: Vector4, a: Vector4, scale: number) {
+    vec4.scale(out.array, a.array, scale);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   * @param scale
+   */
+  static scaleAndAdd(out: Vector4, a: Vector4, b: Vector4, scale: number) {
+    vec4.scaleAndAdd(out.array, a.array, b.array, scale);
+    return out;
+  }
+
+  /**
+   * @param a
+   * @param b
+   */
+  static sqrDist(a: Vector4, b: Vector4) {
+    return vec4.sqrDist(a.array, b.array);
+  }
+
+  /**
+   * @function
+   * @param a
+   * @param b
+   */
+  static squaredDistance = Vector4.sqrDist;
+
+  /**
+   * @param a
+   */
+  static sqrLen(a: Vector4) {
+    return vec4.sqrLen(a.array);
+  }
+  /**
+   * @function
+   * @param a
+   */
+  static squaredLength = Vector4.sqrLen;
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static sub(out: Vector4, a: Vector4, b: Vector4) {
+    vec4.subtract(out.array, a.array, b.array);
+    return out;
+  }
+  /**
+   * @function
+   * @param out
+   * @param a
+   * @param b
+   */
+  static subtract = Vector4.sub;
+
+  /**
+   * @param out
+   * @param a
+   * @param m
+   */
+  static transformMat4(out: Vector4, a: Vector4, m: Matrix4) {
+    vec4.transformMat4(out.array, a.array, m.array);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param a
+   * @param q
+   */
+  static transformQuat(out: Vector4, a: Vector4, q: Quaternion) {
+    vec4.transformQuat(out.array, a.array, q.array);
+    return out;
+  }
 }
-
-// Supply methods that are not in place
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {clay.Vector4}
- */
-Vector4.add = function (out, a, b) {
-  vec4.add(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} out
- * @param  {number}  x
- * @param  {number}  y
- * @param  {number}  z
- * @return {clay.Vector4}
- */
-Vector4.set = function (out, x, y, z, w) {
-  vec4.set(out.array, x, y, z, w);
-  out._dirty = true;
-};
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} b
- * @return {clay.Vector4}
- */
-Vector4.copy = function (out, b) {
-  vec4.copy(out.array, b.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {number}
- */
-Vector4.dist = function (a, b) {
-  return vec4.distance(a.array, b.array);
-};
-
-/**
- * @function
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {number}
- */
-Vector4.distance = Vector4.dist;
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {clay.Vector4}
- */
-Vector4.div = function (out, a, b) {
-  vec4.divide(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @function
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {clay.Vector4}
- */
-Vector4.divide = Vector4.div;
-
-/**
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {number}
- */
-Vector4.dot = function (a, b) {
-  return vec4.dot(a.array, b.array);
-};
-
-/**
- * @param  {clay.Vector4} a
- * @return {number}
- */
-Vector4.len = function (b) {
-  return vec4.length(b.array);
-};
-
-// Vector4.length = Vector4.len;
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @param  {number}  t
- * @return {clay.Vector4}
- */
-Vector4.lerp = function (out, a, b, t) {
-  vec4.lerp(out.array, a.array, b.array, t);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {clay.Vector4}
- */
-Vector4.min = function (out, a, b) {
-  vec4.min(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {clay.Vector4}
- */
-Vector4.max = function (out, a, b) {
-  vec4.max(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {clay.Vector4}
- */
-Vector4.mul = function (out, a, b) {
-  vec4.multiply(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @function
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {clay.Vector4}
- */
-Vector4.multiply = Vector4.mul;
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @return {clay.Vector4}
- */
-Vector4.negate = function (out, a) {
-  vec4.negate(out.array, a.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @return {clay.Vector4}
- */
-Vector4.normalize = function (out, a) {
-  vec4.normalize(out.array, a.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} out
- * @param  {number}  scale
- * @return {clay.Vector4}
- */
-Vector4.random = function (out, scale) {
-  vec4.random(out.array, scale);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {number}  scale
- * @return {clay.Vector4}
- */
-Vector4.scale = function (out, a, scale) {
-  vec4.scale(out.array, a.array, scale);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @param  {number}  scale
- * @return {clay.Vector4}
- */
-Vector4.scaleAndAdd = function (out, a, b, scale) {
-  vec4.scaleAndAdd(out.array, a.array, b.array, scale);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {number}
- */
-Vector4.sqrDist = function (a, b) {
-  return vec4.sqrDist(a.array, b.array);
-};
-
-/**
- * @function
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {number}
- */
-Vector4.squaredDistance = Vector4.sqrDist;
-
-/**
- * @param  {clay.Vector4} a
- * @return {number}
- */
-Vector4.sqrLen = function (a) {
-  return vec4.sqrLen(a.array);
-};
-/**
- * @function
- * @param  {clay.Vector4} a
- * @return {number}
- */
-Vector4.squaredLength = Vector4.sqrLen;
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {clay.Vector4}
- */
-Vector4.sub = function (out, a, b) {
-  vec4.subtract(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @function
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Vector4} b
- * @return {clay.Vector4}
- */
-Vector4.subtract = Vector4.sub;
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Matrix4} m
- * @return {clay.Vector4}
- */
-Vector4.transformMat4 = function (out, a, m) {
-  vec4.transformMat4(out.array, a.array, m.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector4} out
- * @param  {clay.Vector4} a
- * @param  {clay.Quaternion} q
- * @return {clay.Vector4}
- */
-Vector4.transformQuat = function (out, a, q) {
-  vec4.transformQuat(out.array, a.array, q.array);
-  out._dirty = true;
-  return out;
-};
 
 export default Vector4;

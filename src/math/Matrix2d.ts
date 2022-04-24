@@ -1,269 +1,210 @@
-// @ts-nocheck
-import mat2d from '../glmatrix/mat2d';
+import * as mat2d from '../glmatrix/mat2d';
+import { matrixOrVectorClassToString } from './util';
+import type Vector2 from './Vector2';
 
-/**
- * @constructor
- * @alias clay.Matrix2d
- */
-const Matrix2d = function () {
-  /**
-   * Storage of Matrix2d
-   * @name array
-   * @type {Float32Array}
-   * @memberOf clay.Matrix2d#
-   */
-  this.array = mat2d.create();
-
-  /**
-   * @name _dirty
-   * @type {boolean}
-   * @memberOf clay.Matrix2d#
-   */
-  this._dirty = true;
-};
-
-Matrix2d.prototype = {
-  constructor: Matrix2d,
+class Matrix2d {
+  array = mat2d.create();
 
   /**
    * Set components from array
-   * @param  {Float32Array|number[]} arr
+   * @param arr
    */
-  setArray: function (arr) {
+  setArray(arr: mat2d.Mat2dArray) {
     for (let i = 0; i < this.array.length; i++) {
       this.array[i] = arr[i];
     }
-    this._dirty = true;
     return this;
-  },
+  }
   /**
    * Clone a new Matrix2d
-   * @return {clay.Matrix2d}
    */
-  clone: function () {
+  clone() {
     return new Matrix2d().copy(this);
-  },
+  }
 
   /**
    * Copy from b
-   * @param  {clay.Matrix2d} b
-   * @return {clay.Matrix2d}
+   * @param b
    */
-  copy: function (b) {
+  copy(b: Matrix2d) {
     mat2d.copy(this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Calculate matrix determinant
-   * @return {number}
    */
-  determinant: function () {
+  determinant() {
     return mat2d.determinant(this.array);
-  },
+  }
 
   /**
    * Set to a identity matrix
-   * @return {clay.Matrix2d}
    */
-  identity: function () {
+  identity() {
     mat2d.identity(this.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Invert self
-   * @return {clay.Matrix2d}
    */
-  invert: function () {
+  invert() {
     mat2d.invert(this.array, this.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Alias for mutiply
-   * @param  {clay.Matrix2d} b
-   * @return {clay.Matrix2d}
+   * @param b
    */
-  mul: function (b) {
+  mul(b: Matrix2d) {
     mat2d.mul(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Alias for multiplyLeft
-   * @param  {clay.Matrix2d} a
-   * @return {clay.Matrix2d}
+   * @param a
    */
-  mulLeft: function (b) {
+  mulLeft(b: Matrix2d) {
     mat2d.mul(this.array, b.array, this.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Multiply self and b
-   * @param  {clay.Matrix2d} b
-   * @return {clay.Matrix2d}
+   * @param b
    */
-  multiply: function (b) {
+  multiply(b: Matrix2d) {
     mat2d.multiply(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Multiply a and self, a is on the left
-   * @param  {clay.Matrix2d} a
-   * @return {clay.Matrix2d}
+   * @param a
    */
-  multiplyLeft: function (b) {
+  multiplyLeft(b: Matrix2d) {
     mat2d.multiply(this.array, b.array, this.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Rotate self by a given radian
-   * @param  {number}   rad
-   * @return {clay.Matrix2d}
+   * @param {number}   rad
    */
-  rotate: function (rad) {
+  rotate(rad: number) {
     mat2d.rotate(this.array, this.array, rad);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Scale self by s
-   * @param  {clay.Vector2}  s
-   * @return {clay.Matrix2d}
+   * @param {clay.Vector2}  s
    */
-  scale: function (s) {
+  scale(s: Vector2) {
     mat2d.scale(this.array, this.array, s.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
   /**
    * Translate self by v
-   * @param  {clay.Vector2}  v
-   * @return {clay.Matrix2d}
+   * @param {clay.Vector2}  v
    */
-  translate: function (v) {
+  translate(v: Vector2) {
     mat2d.translate(this.array, this.array, v.array);
-    this._dirty = true;
     return this;
-  },
+  }
 
-  toString: function () {
-    return '[' + Array.prototype.join.call(this.array, ',') + ']';
-  },
+  toString() {
+    return matrixOrVectorClassToString(this, 3);
+  }
 
-  toArray: function () {
+  toArray() {
     return Array.prototype.slice.call(this.array);
   }
-};
 
-/**
- * @param  {clay.Matrix2d} out
- * @param  {clay.Matrix2d} a
- * @return {clay.Matrix2d}
- */
-Matrix2d.copy = function (out, a) {
-  mat2d.copy(out.array, a.array);
-  out._dirty = true;
-  return out;
-};
+  /**
+   * @param out
+   * @param a
+   */
+  static copy(out: Matrix2d, a: Matrix2d) {
+    mat2d.copy(out.array, a.array);
+    return out;
+  }
 
-/**
- * @param  {clay.Matrix2d} a
- * @return {number}
- */
-Matrix2d.determinant = function (a) {
-  return mat2d.determinant(a.array);
-};
+  /**
+   * @param a
+   */
+  static determinant(a: Matrix2d) {
+    return mat2d.determinant(a.array);
+  }
 
-/**
- * @param  {clay.Matrix2d} out
- * @return {clay.Matrix2d}
- */
-Matrix2d.identity = function (out) {
-  mat2d.identity(out.array);
-  out._dirty = true;
-  return out;
-};
+  /**
+   * @param out
+   */
+  static identity(out: Matrix2d) {
+    mat2d.identity(out.array);
+    return out;
+  }
 
-/**
- * @param  {clay.Matrix2d} out
- * @param  {clay.Matrix2d} a
- * @return {clay.Matrix2d}
- */
-Matrix2d.invert = function (out, a) {
-  mat2d.invert(out.array, a.array);
-  out._dirty = true;
-  return out;
-};
+  /**
+   * @param out
+   * @param a
+   */
+  static invert(out: Matrix2d, a: Matrix2d) {
+    mat2d.invert(out.array, a.array);
+    return out;
+  }
 
-/**
- * @param  {clay.Matrix2d} out
- * @param  {clay.Matrix2d} a
- * @param  {clay.Matrix2d} b
- * @return {clay.Matrix2d}
- */
-Matrix2d.mul = function (out, a, b) {
-  mat2d.mul(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static mul(out: Matrix2d, a: Matrix2d, b: Matrix2d) {
+    mat2d.mul(out.array, a.array, b.array);
+    return out;
+  }
 
-/**
- * @function
- * @param  {clay.Matrix2d} out
- * @param  {clay.Matrix2d} a
- * @param  {clay.Matrix2d} b
- * @return {clay.Matrix2d}
- */
-Matrix2d.multiply = Matrix2d.mul;
+  /**
+   * @function
+   * @param out
+   * @param a
+   * @param b
+   */
+  static multiply = Matrix2d.mul;
 
-/**
- * @param  {clay.Matrix2d} out
- * @param  {clay.Matrix2d} a
- * @param  {number}   rad
- * @return {clay.Matrix2d}
- */
-Matrix2d.rotate = function (out, a, rad) {
-  mat2d.rotate(out.array, a.array, rad);
-  out._dirty = true;
-  return out;
-};
+  /**
+   * @param out
+   * @param a
+   * @param {number}   rad
+   */
+  static rotate(out: Matrix2d, a: Matrix2d, rad: number) {
+    mat2d.rotate(out.array, a.array, rad);
+    return out;
+  }
 
-/**
- * @param  {clay.Matrix2d} out
- * @param  {clay.Matrix2d} a
- * @param  {clay.Vector2}  v
- * @return {clay.Matrix2d}
- */
-Matrix2d.scale = function (out, a, v) {
-  mat2d.scale(out.array, a.array, v.array);
-  out._dirty = true;
-  return out;
-};
+  /**
+   * @param out
+   * @param a
+   * @param {clay.Vector2}  v
+   */
+  static scale(out: Matrix2d, a: Matrix2d, v: Vector2) {
+    mat2d.scale(out.array, a.array, v.array);
+    return out;
+  }
 
-/**
- * @param  {clay.Matrix2d} out
- * @param  {clay.Matrix2d} a
- * @param  {clay.Vector2}  v
- * @return {clay.Matrix2d}
- */
-Matrix2d.translate = function (out, a, v) {
-  mat2d.translate(out.array, a.array, v.array);
-  out._dirty = true;
-  return out;
-};
+  /**
+   * @param out
+   * @param a
+   * @param {clay.Vector2}  v
+   */
+  static translate(out: Matrix2d, a: Matrix2d, v: Vector2) {
+    mat2d.translate(out.array, a.array, v.array);
+    return out;
+  }
+}
 
 export default Matrix2d;

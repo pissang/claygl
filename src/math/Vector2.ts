@@ -1,75 +1,77 @@
-import vec2 from '../glmatrix/vec2';
+import * as vec2 from '../glmatrix/vec2';
+import type Matrix2 from './Matrix2';
+import type Matrix2d from './Matrix2d';
+import type Matrix3 from './Matrix3';
+import type Matrix4 from './Matrix4';
+import { matrixOrVectorClassToString } from './util';
+import Vector3 from './Vector3';
 
 /**
  * @constructor
  * @alias clay.Vector2
- * @param {number} x
- * @param {number} y
+ * @param
+ * @param
  */
 class Vector2 {
-  constructor(x, y) {
+  /**
+   * Storage of Vector2, read and write of x, y will change the values in array
+   * All methods also operate on the array instead of x, y components
+   */
+  array: vec2.Vec2Array;
+
+  constructor(x?: number, y?: number) {
     x = x || 0;
     y = y || 0;
 
-    /**
-     * Storage of Vector2, read and write of x, y will change the values in array
-     * All methods also operate on the array instead of x, y components
-     * @name array
-     * @type {Float32Array}
-     * @memberOf clay.Vector2#
-     */
     this.array = vec2.fromValues(x, y);
+  }
 
-    /**
-     * Dirty flag is used by the Node to determine
-     * if the matrix is updated to latest
-     * @name _dirty
-     * @type {boolean}
-     * @memberOf clay.Vector2#
-     */
-    this._dirty = true;
+  get x() {
+    return this.array[0];
+  }
+  set x(value: number) {
+    this.array[0] = value;
+  }
+
+  get y() {
+    return this.array[1];
+  }
+  set y(value: number) {
+    this.array[1] = value;
   }
 
   /**
    * Add b to self
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param b
    */
-  add(b) {
+  add(b: Vector2) {
     vec2.add(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Set x and y components
-   * @param  {number}  x
-   * @param  {number}  y
-   * @return {clay.Vector2}
+   * @param x
+   * @param y
    */
-  set(x, y) {
+  set(x: number, y: number) {
     this.array[0] = x;
     this.array[1] = y;
-    this._dirty = true;
     return this;
   }
 
   /**
    * Set x and y components from array
-   * @param  {Float32Array|number[]} arr
-   * @return {clay.Vector2}
+   * @param arr
    */
-  setArray(arr) {
+  setArray(arr: vec2.Vec2Array) {
     this.array[0] = arr[0];
     this.array[1] = arr[1];
-
-    this._dirty = true;
     return this;
   }
 
   /**
    * Clone a new Vector2
-   * @return {clay.Vector2}
    */
   clone() {
     return new Vector2(this.x, this.y);
@@ -77,87 +79,74 @@ class Vector2 {
 
   /**
    * Copy x, y from b
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param b
    */
-  copy(b) {
+  copy(b: Vector2) {
     vec2.copy(this.array, b.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Cross product of self and b, written to a Vector3 out
-   * @param  {clay.Vector3} out
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param out
+   * @param b
    */
-  cross(out, b) {
+  cross(out: Vector3, b: Vector2) {
     vec2.cross(out.array, this.array, b.array);
-    out._dirty = true;
     return this;
   }
 
   /**
    * Alias for distance
-   * @param  {clay.Vector2} b
-   * @return {number}
+   * @param b {number}
    */
-  dist(b) {
+  dist(b: Vector2) {
     return vec2.dist(this.array, b.array);
   }
 
   /**
    * Distance between self and b
-   * @param  {clay.Vector2} b
-   * @return {number}
+   * @param b {number}
    */
-  distance(b) {
+  distance(b: Vector2) {
     return vec2.distance(this.array, b.array);
   }
 
   /**
    * Alias for divide
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param b
    */
-  div(b) {
+  div(b: Vector2) {
     vec2.div(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Divide self by b
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param b
    */
-  divide(b) {
+  divide(b: Vector2) {
     vec2.divide(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Dot product of self and b
-   * @param  {clay.Vector2} b
-   * @return {number}
+   * @param b {number}
    */
-  dot(b) {
+  dot(b: Vector2) {
     return vec2.dot(this.array, b.array);
   }
 
   /**
-   * Alias of length
-   * @return {number}
+   * Alias of length {number}
    */
   len() {
     return vec2.len(this.array);
   }
 
   /**
-   * Calculate the length
-   * @return {number}
+   * Calculate the length {number}
    */
   length() {
     return vec2.length(this.array);
@@ -165,144 +154,120 @@ class Vector2 {
 
   /**
    * Linear interpolation between a and b
-   * @param  {clay.Vector2} a
-   * @param  {clay.Vector2} b
-   * @param  {number}  t
-   * @return {clay.Vector2}
+   * @param a
+   * @param b
+   * @param t
    */
-  lerp(a, b, t) {
+  lerp(a: Vector2, b: Vector2, t: number) {
     vec2.lerp(this.array, a.array, b.array, t);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Minimum of self and b
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param b
    */
-  min(b) {
+  min(b: Vector2) {
     vec2.min(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Maximum of self and b
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param b
    */
-  max(b) {
+  max(b: Vector2) {
     vec2.max(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Alias for multiply
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param b
    */
-  mul(b) {
+  mul(b: Vector2) {
     vec2.mul(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Mutiply self and b
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param b
    */
-  multiply(b) {
+  multiply(b: Vector2) {
     vec2.multiply(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Negate self
-   * @return {clay.Vector2}
    */
   negate() {
     vec2.negate(this.array, this.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Normalize self
-   * @return {clay.Vector2}
    */
   normalize() {
     vec2.normalize(this.array, this.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Generate random x, y components with a given scale
-   * @param  {number} scale
-   * @return {clay.Vector2}
+   * @param cale
    */
-  random(scale) {
+  random(scale: number) {
     vec2.random(this.array, scale);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Scale self
-   * @param  {number}  scale
-   * @return {clay.Vector2}
+   * @param scale
    */
-  scale(s) {
+  scale(s: number) {
     vec2.scale(this.array, this.array, s);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Scale b and add to self
-   * @param  {clay.Vector2} b
-   * @param  {number}  scale
-   * @return {clay.Vector2}
+   * @param b
+   * @param scale
    */
-  scaleAndAdd(b, s) {
+  scaleAndAdd(b: Vector2, s: number) {
     vec2.scaleAndAdd(this.array, this.array, b.array, s);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Alias for squaredDistance
-   * @param  {clay.Vector2} b
-   * @return {number}
+   * @param b {number}
    */
-  sqrDist(b) {
+  sqrDist(b: Vector2) {
     return vec2.sqrDist(this.array, b.array);
   }
 
   /**
    * Squared distance between self and b
-   * @param  {clay.Vector2} b
-   * @return {number}
+   * @param b {number}
    */
-  squaredDistance(b) {
+  squaredDistance(b: Vector2) {
     return vec2.squaredDistance(this.array, b.array);
   }
 
   /**
-   * Alias for squaredLength
-   * @return {number}
+   * Alias for squaredLength {number}
    */
   sqrLen() {
     return vec2.sqrLen(this.array);
   }
 
   /**
-   * Squared length of self
-   * @return {number}
+   * Squared length of self {number}
    */
   squaredLength() {
     return vec2.squaredLength(this.array);
@@ -310,415 +275,318 @@ class Vector2 {
 
   /**
    * Alias for subtract
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param b
    */
-  sub(b) {
+  sub(b: Vector2) {
     vec2.sub(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Subtract b from self
-   * @param  {clay.Vector2} b
-   * @return {clay.Vector2}
+   * @param b
    */
-  subtract(b) {
+  subtract(b: Vector2) {
     vec2.subtract(this.array, this.array, b.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Transform self with a Matrix2 m
-   * @param  {clay.Matrix2} m
-   * @return {clay.Vector2}
+   * @param m
    */
-  transformMat2(m) {
+  transformMat2(m: Matrix2) {
     vec2.transformMat2(this.array, this.array, m.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Transform self with a Matrix2d m
-   * @param  {clay.Matrix2d} m
-   * @return {clay.Vector2}
+   * @param m
    */
-  transformMat2d(m) {
+  transformMat2d(m: Matrix2d) {
     vec2.transformMat2d(this.array, this.array, m.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Transform self with a Matrix3 m
-   * @param  {clay.Matrix3} m
-   * @return {clay.Vector2}
+   * @param {clay.Matrix3} m
    */
-  transformMat3(m) {
+  transformMat3(m: Matrix3) {
     vec2.transformMat3(this.array, this.array, m.array);
-    this._dirty = true;
     return this;
   }
 
   /**
    * Transform self with a Matrix4 m
-   * @param  {clay.Matrix4} m
-   * @return {clay.Vector2}
+   * @param m
    */
-  transformMat4(m) {
+  transformMat4(m: Matrix4) {
     vec2.transformMat4(this.array, this.array, m.array);
-    this._dirty = true;
     return this;
   }
 
   toString() {
-    return '[' + Array.prototype.join.call(this.array, ',') + ']';
+    return matrixOrVectorClassToString(this, 2);
   }
 
   toArray() {
     return Array.prototype.slice.call(this.array);
   }
-}
 
-// Getter and Setter
-if (Object.defineProperty) {
-  const proto = Vector2.prototype;
-  /**
-   * @name x
-   * @type {number}
-   * @memberOf clay.Vector2
-   * @instance
-   */
-  Object.defineProperty(proto, 'x', {
-    get: function () {
-      return this.array[0];
-    },
-    set: function (value) {
-      this.array[0] = value;
-      this._dirty = true;
-    }
-  });
+  // Supply methods that are not in place
 
   /**
-   * @name y
-   * @type {number}
-   * @memberOf clay.Vector2
-   * @instance
+   * @param out
+   * @param a
+   * @param b
    */
-  Object.defineProperty(proto, 'y', {
-    get: function () {
-      return this.array[1];
-    },
-    set: function (value) {
-      this.array[1] = value;
-      this._dirty = true;
-    }
-  });
+  static add(out: Vector2, a: Vector2, b: Vector2) {
+    vec2.add(out.array, a.array, b.array);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param x
+   * @param y
+   */
+  static set(out: Vector2, x: number, y: number) {
+    vec2.set(out.array, x, y);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param b
+   */
+  static copy(out: Vector2, b: Vector2) {
+    vec2.copy(out.array, b.array);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static cross(out: Vector3, a: Vector2, b: Vector2) {
+    vec2.cross(out.array, a.array, b.array);
+    return out;
+  }
+  /**
+   * @param a
+   * @param b {number}
+   */
+  static dist(a: Vector2, b: Vector2) {
+    return vec2.distance(a.array, b.array);
+  }
+  /**
+   * @function
+   * @param a
+   * @param b {number}
+   */
+  static distance = Vector2.dist;
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static div(out: Vector2, a: Vector2, b: Vector2) {
+    vec2.divide(out.array, a.array, b.array);
+    return out;
+  }
+  /**
+   * @function
+   * @param out
+   * @param a
+   * @param b
+   */
+  static divide = Vector2.div;
+  /**
+   * @param a
+   * @param b {number}
+   */
+  static dot(a: Vector2, b: Vector2) {
+    return vec2.dot(a.array, b.array);
+  }
+
+  /**
+   * @param a {number}
+   */
+  static len(b: Vector2) {
+    return vec2.length(b.array);
+  }
+
+  // Vector2.length = Vector2.len;
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   * @param t
+   */
+  static lerp(out: Vector2, a: Vector2, b: Vector2, t: number) {
+    vec2.lerp(out.array, a.array, b.array, t);
+    return out;
+  }
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static min(out: Vector2, a: Vector2, b: Vector2) {
+    vec2.min(out.array, a.array, b.array);
+    return out;
+  }
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static max(out: Vector2, a: Vector2, b: Vector2) {
+    vec2.max(out.array, a.array, b.array);
+    return out;
+  }
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static mul(out: Vector2, a: Vector2, b: Vector2) {
+    vec2.multiply(out.array, a.array, b.array);
+    return out;
+  }
+  /**
+   * @function
+   * @param out
+   * @param a
+   * @param b
+   */
+  static multiply = Vector2.mul;
+  /**
+   * @param out
+   * @param a
+   */
+  static negate(out: Vector2, a: Vector2) {
+    vec2.negate(out.array, a.array);
+    return out;
+  }
+  /**
+   * @param out
+   * @param a
+   */
+  static normalize(out: Vector2, a: Vector2) {
+    vec2.normalize(out.array, a.array);
+    return out;
+  }
+  /**
+   * @param out
+   * @param scale
+   */
+  static random(out: Vector2, scale: number) {
+    vec2.random(out.array, scale);
+    return out;
+  }
+  /**
+   * @param out
+   * @param a
+   * @param scale
+   */
+  static scale(out: Vector2, a: Vector2, scale: number) {
+    vec2.scale(out.array, a.array, scale);
+    return out;
+  }
+  /**
+   * @param out
+   * @param a
+   * @param b
+   * @param scale
+   */
+  static scaleAndAdd(out: Vector2, a: Vector2, b: Vector2, scale: number) {
+    vec2.scaleAndAdd(out.array, a.array, b.array, scale);
+    return out;
+  }
+  /**
+   * @param a
+   * @param b {number}
+   */
+  static sqrDist(a: Vector2, b: Vector2) {
+    return vec2.sqrDist(a.array, b.array);
+  }
+  /**
+   * @function
+   * @param a
+   * @param b {number}
+   */
+  static squaredDistance = Vector2.sqrDist;
+
+  /**
+   * @param a {number}
+   */
+  static sqrLen(a: Vector2) {
+    return vec2.sqrLen(a.array);
+  }
+  /**
+   * @function
+   * @param a
+   */
+  static squaredLength = Vector2.sqrLen;
+
+  /**
+   * @param out
+   * @param a
+   * @param b
+   */
+  static sub(out: Vector2, a: Vector2, b: Vector2) {
+    vec2.subtract(out.array, a.array, b.array);
+    return out;
+  }
+  /**
+   * @function
+   * @param out
+   * @param a
+   * @param b
+   */
+  static subtract = Vector2.sub;
+  /**
+   * @param out
+   * @param a
+   * @param m
+   */
+  static transformMat2(out: Vector2, a: Vector2, m: Matrix2) {
+    vec2.transformMat2(out.array, a.array, m.array);
+    return out;
+  }
+  /**
+   * @param out
+   * @param a
+   * @param m
+   */
+  static transformMat2d(out: Vector2, a: Vector2, m: Matrix2d) {
+    vec2.transformMat2d(out.array, a.array, m.array);
+    return out;
+  }
+  /**
+   * @param out
+   * @param a
+   * @param m
+   */
+  static transformMat3(out: Vector2, a: Vector2, m: Matrix3) {
+    vec2.transformMat3(out.array, a.array, m.array);
+    return out;
+  }
+  /**
+   * @param out
+   * @param a
+   * @param m
+   */
+  static transformMat4(out: Vector2, a: Vector2, m: Matrix4) {
+    vec2.transformMat4(out.array, a.array, m.array);
+    return out;
+  }
 }
-
-// Supply methods that are not in place
-
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.add = function (out, a, b) {
-  vec2.add(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector2} out
- * @param  {number}  x
- * @param  {number}  y
- * @return {clay.Vector2}
- */
-Vector2.set = function (out, x, y) {
-  vec2.set(out.array, x, y);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.copy = function (out, b) {
-  vec2.copy(out.array, b.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector3} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.cross = function (out, a, b) {
-  vec2.cross(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {number}
- */
-Vector2.dist = function (a, b) {
-  return vec2.distance(a.array, b.array);
-};
-/**
- * @function
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {number}
- */
-Vector2.distance = Vector2.dist;
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.div = function (out, a, b) {
-  vec2.divide(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @function
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.divide = Vector2.div;
-/**
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {number}
- */
-Vector2.dot = function (a, b) {
-  return vec2.dot(a.array, b.array);
-};
-
-/**
- * @param  {clay.Vector2} a
- * @return {number}
- */
-Vector2.len = function (b) {
-  return vec2.length(b.array);
-};
-
-// Vector2.length = Vector2.len;
-
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @param  {number}  t
- * @return {clay.Vector2}
- */
-Vector2.lerp = function (out, a, b, t) {
-  vec2.lerp(out.array, a.array, b.array, t);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.min = function (out, a, b) {
-  vec2.min(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.max = function (out, a, b) {
-  vec2.max(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.mul = function (out, a, b) {
-  vec2.multiply(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @function
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.multiply = Vector2.mul;
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @return {clay.Vector2}
- */
-Vector2.negate = function (out, a) {
-  vec2.negate(out.array, a.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @return {clay.Vector2}
- */
-Vector2.normalize = function (out, a) {
-  vec2.normalize(out.array, a.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2} out
- * @param  {number}  scale
- * @return {clay.Vector2}
- */
-Vector2.random = function (out, scale) {
-  vec2.random(out.array, scale);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {number}  scale
- * @return {clay.Vector2}
- */
-Vector2.scale = function (out, a, scale) {
-  vec2.scale(out.array, a.array, scale);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @param  {number}  scale
- * @return {clay.Vector2}
- */
-Vector2.scaleAndAdd = function (out, a, b, scale) {
-  vec2.scaleAndAdd(out.array, a.array, b.array, scale);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {number}
- */
-Vector2.sqrDist = function (a, b) {
-  return vec2.sqrDist(a.array, b.array);
-};
-/**
- * @function
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {number}
- */
-Vector2.squaredDistance = Vector2.sqrDist;
-
-/**
- * @param  {clay.Vector2} a
- * @return {number}
- */
-Vector2.sqrLen = function (a) {
-  return vec2.sqrLen(a.array);
-};
-/**
- * @function
- * @param  {clay.Vector2} a
- * @return {number}
- */
-Vector2.squaredLength = Vector2.sqrLen;
-
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.sub = function (out, a, b) {
-  vec2.subtract(out.array, a.array, b.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @function
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Vector2} b
- * @return {clay.Vector2}
- */
-Vector2.subtract = Vector2.sub;
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Matrix2} m
- * @return {clay.Vector2}
- */
-Vector2.transformMat2 = function (out, a, m) {
-  vec2.transformMat2(out.array, a.array, m.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2}  out
- * @param  {clay.Vector2}  a
- * @param  {clay.Matrix2d} m
- * @return {clay.Vector2}
- */
-Vector2.transformMat2d = function (out, a, m) {
-  vec2.transformMat2d(out.array, a.array, m.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {Matrix3} m
- * @return {clay.Vector2}
- */
-Vector2.transformMat3 = function (out, a, m) {
-  vec2.transformMat3(out.array, a.array, m.array);
-  out._dirty = true;
-  return out;
-};
-/**
- * @param  {clay.Vector2} out
- * @param  {clay.Vector2} a
- * @param  {clay.Matrix4} m
- * @return {clay.Vector2}
- */
-Vector2.transformMat4 = function (out, a, m) {
-  vec2.transformMat4(out.array, a.array, m.array);
-  out._dirty = true;
-  return out;
-};
 
 export default Vector2;

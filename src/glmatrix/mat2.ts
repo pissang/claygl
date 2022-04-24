@@ -26,7 +26,7 @@
 
 import { Mat2Array, Vec2Array } from './common';
 
-export type { Vec2Array };
+export type { Mat2Array };
 /**
  * Creates a new identity mat2
  *
