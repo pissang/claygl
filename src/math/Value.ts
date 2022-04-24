@@ -1,140 +1,145 @@
-// @ts-nocheck
 import Vector3 from './Vector3';
 import Vector2 from './Vector2';
+import Vector4 from './Vector4';
 
 /**
  * Random or constant 1d, 2d, 3d vector generator
- * @constructor
- * @alias clay.Value
  */
-const Value = function () {};
 
-/**
- * @function
- * @param {number|clay.Vector2|clay.Vector3} [out]
- * @return {number|clay.Vector2|clay.Vector3}
- */
-Value.prototype.get = function (out) {};
+interface Value<T> {
+  get(out?: T): T;
+}
 
-// Constant
-const ConstantValue = function (val) {
-  this.get = function () {
-    return val;
-  };
-};
-ConstantValue.prototype = new Value();
-ConstantValue.prototype.constructor = ConstantValue;
+class ConstantValue implements Value<number> {
+  private _val: number;
+  constructor(val: number) {
+    this._val = val;
+  }
+  get() {
+    return this._val;
+  }
+}
 
-// Vector
-const VectorValue = function (val) {
-  const Constructor = val.constructor;
-  this.get = function (out) {
+type Vector = Vector2 | Vector3 | Vector4;
+class VectorValue<T extends Vector = Vector> implements Value<T> {
+  private _val: T;
+  constructor(val: T) {
+    this._val = val;
+  }
+
+  get(out?: T) {
+    const val = this._val;
     if (!out) {
-      out = new Constructor();
+      out = new (val.constructor as any)();
     }
-    out.copy(val);
-    return out;
-  };
-};
-VectorValue.prototype = new Value();
-VectorValue.prototype.constructor = VectorValue;
-//Random 1D
-const Random1D = function (min, max) {
-  const range = max - min;
-  this.get = function () {
-    return Math.random() * range + min;
-  };
-};
-Random1D.prototype = new Value();
-Random1D.prototype.constructor = Random1D;
+    out!.copy(val as any);
+    return out as T;
+  }
+}
 
-// Random2D
-const Random2D = function (min, max) {
-  const rangeX = max.x - min.x;
-  const rangeY = max.y - min.y;
+class Random1D {
+  private _min: number;
+  private _max: number;
+  constructor(min: number, max: number) {
+    this._min = min;
+    this._max = max;
+  }
 
-  this.get = function (out) {
+  get() {
+    return Math.random() * (this._max - this._min) + this._min;
+  }
+}
+
+class Random2D {
+  private _min: Vector2;
+  private _max: Vector2;
+  constructor(min: Vector2, max: Vector2) {
+    this._min = min;
+    this._max = max;
+  }
+
+  get(out?: Vector2): Vector2 {
+    const min = this._min.array;
+    const max = this._max.array;
     if (!out) {
       out = new Vector2();
     }
-    Vector2.set(out, rangeX * Math.random() + min.array[0], rangeY * Math.random() + min.array[1]);
+    Vector2.set(
+      out,
+      (max[0] - min[0]) * Math.random() + min[0],
+      (max[1] - min[1]) * Math.random() + min[1]
+    );
 
     return out;
-  };
-};
-Random2D.prototype = new Value();
-Random2D.prototype.constructor = Random2D;
+  }
+}
 
-const Random3D = function (min, max) {
-  const rangeX = max.x - min.x;
-  const rangeY = max.y - min.y;
-  const rangeZ = max.z - min.z;
+class Random3D {
+  private _min: Vector3;
+  private _max: Vector3;
+  constructor(min: Vector3, max: Vector3) {
+    this._min = min;
+    this._max = max;
+  }
 
-  this.get = function (out) {
+  get(out?: Vector3): Vector3 {
+    const min = this._min.array;
+    const max = this._max.array;
     if (!out) {
       out = new Vector3();
     }
     Vector3.set(
       out,
-      rangeX * Math.random() + min.array[0],
-      rangeY * Math.random() + min.array[1],
-      rangeZ * Math.random() + min.array[2]
+      (max[0] - min[0]) * Math.random() + min[0],
+      (max[1] - min[1]) * Math.random() + min[1],
+      (max[2] - min[2]) * Math.random() + min[2]
     );
 
     return out;
-  };
-};
-Random3D.prototype = new Value();
-Random3D.prototype.constructor = Random3D;
+  }
+}
 
 // Factory methods
 
 /**
  * Create a constant 1d value generator
- * @param  {number} constant
- * @return {clay.Value}
+ * @param constant
  */
-Value.constant = function (constant) {
+export function constant(constant: number) {
   return new ConstantValue(constant);
-};
+}
 
 /**
  * Create a constant vector value(2d or 3d) generator
- * @param  {clay.Vector2|clay.Vector3} vector
- * @return {clay.Value}
+ * @param vector
  */
-Value.vector = function (vector) {
+export function vector(vector: Vector) {
   return new VectorValue(vector);
-};
+}
 
 /**
  * Create a random 1d value generator
- * @param  {number} min
- * @param  {number} max
- * @return {clay.Value}
+ * @param min
+ * @param max
  */
-Value.random1D = function (min, max) {
+export function random1D(min: number, max: number) {
   return new Random1D(min, max);
-};
+}
 
 /**
  * Create a random 2d value generator
- * @param  {clay.Vector2} min
- * @param  {clay.Vector2} max
- * @return {clay.Value}
+ * @param min
+ * @param max
  */
-Value.random2D = function (min, max) {
+export function random2D(min: Vector2, max: Vector2) {
   return new Random2D(min, max);
-};
+}
 
 /**
  * Create a random 3d value generator
- * @param  {clay.Vector3} min
- * @param  {clay.Vector3} max
- * @return {clay.Value}
+ * @param min
+ * @param max
  */
-Value.random3D = function (min, max) {
+export function random3D(min: Vector3, max: Vector3) {
   return new Random3D(min, max);
-};
-
-export default Value;
+}
