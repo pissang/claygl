@@ -1,74 +1,78 @@
-// @ts-nocheck
-import Node from './Node';
+import { Color } from './core/type';
+import ClayNode, { ClayNodeOpts } from './Node';
 import Shader from './Shader';
 
 import lightShader from './shader/source/header/light';
 Shader.import(lightShader);
 
-/**
- * @constructor clay.Light
- * @extends clay.Node
- */
-const Light = Node.extend(
-  function () {
-    return /** @lends clay.Light# */ {
-      /**
-       * Light RGB color
-       * @type {number[]}
-       */
-      color: [1, 1, 1],
+export interface LightOpts extends ClayNodeOpts {
+  /**
+   * Light RGB color
+   */
+  color: Color;
 
-      /**
-       * Light intensity
-       * @type {number}
-       */
-      intensity: 1.0,
+  /**
+   * Light intensity
+   */
+  intensity: number;
 
-      // Config for shadow map
-      /**
-       * If light cast shadow
-       * @type {boolean}
-       */
-      castShadow: true,
+  // Config for shadow map
+  /**
+   * If light cast shadow
+   */
+  castShadow: boolean;
 
-      /**
-       * Shadow map size
-       * @type {number}
-       */
-      shadowResolution: 512,
+  /**
+   * Shadow map size
+   */
+  shadowResolution: number;
 
-      /**
-       * Light group, shader with same `lightGroup` will be affected
-       *
-       * Only useful in forward rendering
-       * @type {number}
-       */
-      group: 0
-    };
-  },
-  /** @lends clay.Light.prototype. */
-  {
-    /**
-     * Light type
-     * @type {string}
-     * @memberOf clay.Light#
-     */
-    type: '',
+  /**
+   * Light group, shader with same `lightGroup` will be affected
+   *
+   * Only useful in forward rendering
+   */
+  group: number;
+}
+interface Light extends LightOpts {}
+class Light extends ClayNode {
+  color = [1, 1, 1];
+  intensity = 1.0;
+  castShadow = true;
+  shadowResolution = 512;
+  group = 0;
 
-    /**
-     * @return {clay.Light}
-     * @memberOf clay.Light.prototype
-     */
-    clone: function () {
-      const light = Node.prototype.clone.call(this);
-      light.color = Array.prototype.slice.call(this.color);
-      light.intensity = this.intensity;
-      light.castShadow = this.castShadow;
-      light.shadowResolution = this.shadowResolution;
+  /**
+   * Light type
+   */
+  type = 'light';
 
-      return light;
+  uniformTemplates?: Record<
+    string,
+    {
+      type: string;
+      value: (instance: Light) => any;
     }
+  >;
+
+  constructor(opts?: Partial<LightOpts>) {
+    opts = opts || {};
+    super(opts);
+    Object.assign(this, opts);
   }
-);
+  /**
+   * @return {clay.Light}
+   * @memberOf clay.Light.prototype
+   */
+  clone() {
+    const light = super.clone.call(this);
+    light.color = Array.prototype.slice.call(this.color);
+    light.intensity = this.intensity;
+    light.castShadow = this.castShadow;
+    light.shadowResolution = this.shadowResolution;
+
+    return light;
+  }
+}
 
 export default Light;

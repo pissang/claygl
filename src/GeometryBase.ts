@@ -240,12 +240,12 @@ export class GeometryAttribute<TSize extends AttributeSize> {
   }
 }
 
-class AttributeBuffer {
+export class AttributeBuffer {
   readonly name: string;
   readonly type: AttributeType;
   readonly buffer: WebGLBuffer;
   readonly size: AttributeSize;
-  readonly semantic: string;
+  readonly semantic?: string;
 
   // To be set in mesh
   // symbol in the shader
@@ -258,7 +258,7 @@ class AttributeBuffer {
     type: AttributeType,
     buffer: WebGLBuffer,
     size: AttributeSize,
-    semantic: string
+    semantic?: string
   ) {
     this.name = name;
     this.type = type;
@@ -268,7 +268,7 @@ class AttributeBuffer {
   }
 }
 
-class IndicesBuffer {
+export class IndicesBuffer {
   buffer: WebGLBuffer;
   count: number = 0;
   constructor(buffer: WebGLBuffer) {

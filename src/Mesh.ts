@@ -3,6 +3,7 @@ import glenum from './core/glenum';
 import { optional } from './core/util';
 import type Skeleton from './Skeleton';
 import type Matrix4 from './math/Matrix4';
+import type BoundingBox from './math/BoundingBox';
 
 export interface MeshOpts extends RenderableOpts {
   /**

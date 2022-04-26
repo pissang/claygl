@@ -8,6 +8,8 @@ import { genGUID } from './core/util';
 import type Scene from './Scene';
 import type Mesh from './Mesh';
 import type Geometry from './Geometry';
+import type Renderable from './Renderable';
+import type Skeleton from './Skeleton';
 
 let nameId = 0;
 const tmpMat4Arr = mat4.create();
@@ -74,16 +76,16 @@ class ClayNode extends Notifier {
    */
   target?: Vector3;
 
-  private _children: ClayNode[] = [];
+  protected _children: ClayNode[] = [];
 
   /**
    * Parent of current scene node
    */
-  private _parent?: ClayNode;
+  protected _parent?: ClayNode;
   /**
    * The root scene mounted. Null if it is a isolated node
    */
-  private _scene: Scene;
+  protected _scene: Scene;
 
   private _inIterating = false;
 
@@ -111,14 +113,16 @@ class ClayNode extends Notifier {
    * If Node is a skinned mesh
    * @return {boolean}
    */
-  isSkinnedMesh() {
+  isSkinnedMesh(): this is Mesh & {
+    skeleton: Skeleton;
+  } {
     return false;
   }
   /**
    * Return true if it is a renderable scene node, like Mesh and ParticleSystem
    * @return {boolean}
    */
-  isRenderable() {
+  isRenderable(): this is Renderable {
     return false;
   }
 
@@ -240,6 +244,13 @@ class ClayNode extends Notifier {
    */
   children() {
     return this._children.slice();
+  }
+
+  /**
+   * Get the ref to children.
+   */
+  childrenRef() {
+    return this._children;
   }
 
   /**

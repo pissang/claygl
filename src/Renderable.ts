@@ -95,6 +95,11 @@ const properties = [
 
 interface Renderable extends RenderableOpts {}
 class Renderable extends ClayNode {
+  /**
+   * Bounding box of renderable
+   */
+  boundingBox?: BoundingBox;
+
   constructor(opts?: Partial<RenderableOpts>) {
     opts = opts || {};
     super(opts);
@@ -137,7 +142,7 @@ class Renderable extends ClayNode {
   afterRender(gl: WebGLRenderingContext, renderStat) {}
 
   getBoundingBox(filter: GetBoundingBoxFilter, out?: BoundingBox): BoundingBox {
-    out = ClayNode.prototype.getBoundingBox.call(this, filter, out);
+    out = super.getBoundingBox.call(this, filter, out);
     if (this.geometry && this.geometry.boundingBox) {
       out.union(this.geometry.boundingBox);
     }
@@ -151,7 +156,7 @@ class Renderable extends ClayNode {
    * @return {clay.Renderable}
    */
   clone() {
-    const renderable = ClayNode.prototype.clone.call(this);
+    const renderable = super.clone.call(this);
 
     renderable.geometry = this.geometry;
     renderable.material = this.material;

@@ -109,7 +109,7 @@ export interface TextureOpts {
   NPOT: boolean;
 }
 interface Texture extends Omit<TextureOpts, 'width' | 'height'> {}
-class Texture extends Notifier {
+abstract class Texture extends Notifier {
   protected _cache = new ClayCache();
   protected _width: number = 512;
   protected _height: number = 512;
@@ -252,9 +252,8 @@ class Texture extends Notifier {
   }
   /**
    * Test if image of texture is valid and loaded.
-   * @return {boolean}
    */
-  isRenderable() {}
+  abstract isRenderable(): boolean;
 
   /**
    * Test if texture size is power of two

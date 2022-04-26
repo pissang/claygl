@@ -1,126 +1,109 @@
-// @ts-nocheck
-import Node from './Node';
-import Matrix4 from './math/Matrix4';
+import ClayNode, { ClayNodeOpts } from './Node';
 import Frustum from './math/Frustum';
+import Matrix4 from './math/Matrix4';
 import Ray from './math/Ray';
 
-import vec4 from './glmatrix/vec4';
-import vec3 from './glmatrix/vec3';
+import * as vec4 from './glmatrix/vec4';
+import * as vec3 from './glmatrix/vec3';
+import { Vector2 } from './claygl';
 
-/**
- * @constructor clay.Camera
- * @extends clay.Node
- */
-const Camera = Node.extend(
-  function () {
-    return /** @lends clay.Camera# */ {
-      /**
-       * Camera projection matrix
-       * @type {clay.Matrix4}
-       */
-      projectionMatrix: new Matrix4(),
+export interface CameraOpts extends ClayNodeOpts {}
 
-      /**
-       * Inverse of camera projection matrix
-       * @type {clay.Matrix4}
-       */
-      invProjectionMatrix: new Matrix4(),
+const v4Arr = vec4.create();
 
-      /**
-       * View matrix, equal to inverse of camera's world matrix
-       * @type {clay.Matrix4}
-       */
-      viewMatrix: new Matrix4(),
+interface Camera extends ClayNodeOpts {}
+class Camera extends ClayNode {
+  /**
+   * Camera projection matrix
+   */
+  projectionMatrix = new Matrix4();
 
-      /**
-       * Camera frustum in view space
-       * @type {clay.Frustum}
-       */
-      frustum: new Frustum()
-    };
-  },
-  function () {
-    this.update(true);
-  },
-  /** @lends clay.Camera.prototype */
-  {
-    update: function (force) {
-      Node.prototype.update.call(this, force);
-      Matrix4.invert(this.viewMatrix, this.worldTransform);
+  /**
+   * Inverse of camera projection matrix
+   */
+  invProjectionMatrix = new Matrix4();
+  /**
+   * View matrix, equal to inverse of camera's world matrix
+   */
+  viewMatrix = new Matrix4();
+  /**
+   * Camera frustum in view space
+   */
+  frustum = new Frustum();
 
-      this.updateProjectionMatrix();
-      Matrix4.invert(this.invProjectionMatrix, this.projectionMatrix);
-
-      this.frustum.setFromProjection(this.projectionMatrix);
-    },
-
-    /**
-     * Set camera view matrix
-     */
-    setViewMatrix: function (viewMatrix) {
-      Matrix4.copy(this.viewMatrix, viewMatrix);
-      Matrix4.invert(this.worldTransform, viewMatrix);
-      this.decomposeWorldTransform();
-    },
-
-    /**
-     * Decompose camera projection matrix
-     */
-    decomposeProjectionMatrix: function () {},
-
-    /**
-     * Set camera projection matrix
-     * @param {clay.Matrix4} projectionMatrix
-     */
-    setProjectionMatrix: function (projectionMatrix) {
-      Matrix4.copy(this.projectionMatrix, projectionMatrix);
-      Matrix4.invert(this.invProjectionMatrix, projectionMatrix);
-      this.decomposeProjectionMatrix();
-    },
-    /**
-     * Update projection matrix, called after update
-     */
-    updateProjectionMatrix: function () {},
-
-    /**
-     * Cast a picking ray from camera near plane to far plane
-     * @function
-     * @param {clay.Vector2} ndc
-     * @param {clay.Ray} [out]
-     * @return {clay.Ray}
-     */
-    castRay: (function () {
-      const v4 = vec4.create();
-      return function (ndc, out) {
-        const ray = out !== undefined ? out : new Ray();
-        const x = ndc.array[0];
-        const y = ndc.array[1];
-        vec4.set(v4, x, y, -1, 1);
-        vec4.transformMat4(v4, v4, this.invProjectionMatrix.array);
-        vec4.transformMat4(v4, v4, this.worldTransform.array);
-        vec3.scale(ray.origin.array, v4, 1 / v4[3]);
-
-        vec4.set(v4, x, y, 1, 1);
-        vec4.transformMat4(v4, v4, this.invProjectionMatrix.array);
-        vec4.transformMat4(v4, v4, this.worldTransform.array);
-        vec3.scale(v4, v4, 1 / v4[3]);
-        vec3.sub(ray.direction.array, v4, ray.origin.array);
-
-        vec3.normalize(ray.direction.array, ray.direction.array);
-        ray.direction._dirty = true;
-        ray.origin._dirty = true;
-
-        return ray;
-      };
-    })()
-
-    /**
-     * @function
-     * @name clone
-     * @return {clay.Camera}
-     * @memberOf clay.Camera.prototype
-     */
+  constructor() {
+    super();
+    this.update();
   }
-);
+
+  update() {
+    super.update.call(this);
+    Matrix4.invert(this.viewMatrix, this.worldTransform);
+
+    this.updateProjectionMatrix();
+    Matrix4.invert(this.invProjectionMatrix, this.projectionMatrix);
+
+    this.frustum.setFromProjection(this.projectionMatrix);
+  }
+
+  /**
+   * Set camera view matrix
+   */
+  setViewMatrix(viewMatrix: Matrix4) {
+    Matrix4.copy(this.viewMatrix, viewMatrix);
+    Matrix4.invert(this.worldTransform, viewMatrix);
+    this.decomposeWorldTransform();
+  }
+
+  /**
+   * Decompose camera projection matrix
+   */
+  decomposeProjectionMatrix() {}
+
+  /**
+   * Set camera projection matrix
+   * @param {clay.Matrix4} projectionMatrix
+   */
+  setProjectionMatrix(projectionMatrix: Matrix4) {
+    Matrix4.copy(this.projectionMatrix, projectionMatrix);
+    Matrix4.invert(this.invProjectionMatrix, projectionMatrix);
+    this.decomposeProjectionMatrix();
+  }
+  /**
+   * Update projection matrix, called after update
+   */
+  updateProjectionMatrix() {}
+
+  /**
+   * Cast a picking ray from camera near plane to far plane
+   * @function
+   * @param {clay.Vector2} ndc
+   * @param {clay.Ray} [out]
+   * @return {clay.Ray}
+   */
+  castRay(ndc: Vector2, out: Ray) {
+    const ray = out !== undefined ? out : new Ray();
+    const x = ndc.array[0];
+    const y = ndc.array[1];
+    vec4.set(v4Arr, x, y, -1, 1);
+    vec4.transformMat4(v4Arr, v4Arr, this.invProjectionMatrix.array);
+    vec4.transformMat4(v4Arr, v4Arr, this.worldTransform.array);
+    vec3.scale(ray.origin.array, v4Arr as unknown as vec3.Vec3Array, 1 / v4Arr[3]);
+
+    vec4.set(v4Arr, x, y, 1, 1);
+    vec4.transformMat4(v4Arr, v4Arr, this.invProjectionMatrix.array);
+    vec4.transformMat4(v4Arr, v4Arr, this.worldTransform.array);
+    vec3.scale(
+      v4Arr as unknown as vec3.Vec3Array,
+      v4Arr as unknown as vec3.Vec3Array,
+      1 / v4Arr[3]
+    );
+    vec3.sub(ray.direction.array, v4Arr as unknown as vec3.Vec3Array, ray.origin.array);
+
+    vec3.normalize(ray.direction.array, ray.direction.array);
+
+    return ray;
+  }
+}
 
 export default Camera;

@@ -31,7 +31,7 @@ const uniformTypeMap = {
 } as const;
 
 type NativeUniformType = keyof typeof uniformTypeMap;
-type UniformType =
+export type UniformType =
   | typeof uniformTypeMap[NativeUniformType]
   | '1iv'
   | 'tv'
@@ -358,7 +358,7 @@ interface ParsedMatrixSemantic {
   semanticNoTranspose: string;
 }
 
-interface ParsedUniformSemantic {
+export interface ParsedUniformSemantic {
   symbol: string;
   type: UniformType;
 }
