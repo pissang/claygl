@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Mainly do the parse and compile of shader string
  * Support shader code chunk import and export
@@ -7,7 +6,6 @@
  * https://github.com/KhronosGroup/collada2json/issues/45
  */
 import * as util from './core/util';
-import vendor from './core/vendor';
 
 const uniformRegex =
   /uniform\s+(bool|float|int|vec2|vec3|vec4|ivec2|ivec3|ivec4|mat2|mat3|mat4|sampler2D|samplerCube)\s+([\s\S]*?);/g;
@@ -30,9 +28,25 @@ const uniformTypeMap = {
   mat2: 'm2',
   mat3: 'm3',
   mat4: 'm4'
-};
+} as const;
 
-function createZeroArray(len) {
+type NativeUniformType = keyof typeof uniformTypeMap;
+type UniformType =
+  | typeof uniformTypeMap[NativeUniformType]
+  | '1iv'
+  | 'tv'
+  | '1fv'
+  | '2fv'
+  | '3fv'
+  | '4fv'
+  | '2iv'
+  | '3iv'
+  | '4iv'
+  | 'm2v'
+  | 'm3v'
+  | 'm4v';
+
+function createZeroArray(len: number) {
   const arr = [];
   for (let i = 0; i < len; i++) {
     arr[i] = 0;
@@ -51,10 +65,10 @@ const uniformValueConstructor = {
     return 0;
   },
   sampler2D: function () {
-    return null;
+    return;
   },
   samplerCube: function () {
-    return null;
+    return;
   },
 
   vec2: function () {
@@ -150,7 +164,7 @@ const matrixSemantics = [
   'WORLDVIEWPROJECTIONINVERSETRANSPOSE'
 ];
 
-const attributeSizeMap = {
+const attributeSizeMap: Record<string, number> = {
   // WebGL does not support integer attributes
   vec4: 4,
   vec3: 3,
@@ -158,26 +172,32 @@ const attributeSizeMap = {
   float: 1
 };
 
-const shaderIDCache = {};
-const shaderCodeCache = {};
+const shaderIDCache: Record<string, string> = {};
+const shaderCodeCache: Record<
+  string,
+  {
+    vertex: string;
+    fragment: string;
+  }
+> = {};
 
-function getShaderID(vertex, fragment) {
+function getShaderID(vertex: string, fragment: string) {
   const key = 'vertex:' + vertex + 'fragment:' + fragment;
   if (shaderIDCache[key]) {
     return shaderIDCache[key];
   }
-  const id = util.genGUID();
+  const id = util.genGUID() + '';
   shaderIDCache[key] = id;
 
   shaderCodeCache[id] = {
-    vertex: vertex,
-    fragment: fragment
+    vertex,
+    fragment
   };
 
   return id;
 }
 
-function removeComment(code) {
+function removeComment(code: string) {
   return code
     .replace(/[ \t]*\/\/.*\n/g, '') // remove //
     .replace(/[ \t]*\/\*[\s\S]*?\*\//g, ''); // remove /* */
@@ -187,7 +207,7 @@ function logSyntaxError() {
   console.error('Wrong uniform/attributes syntax');
 }
 
-function parseDeclarations(type, line) {
+function parseDeclarations(type: string, line: string) {
   const speratorsRegexp = /[,=():]/;
   let tokens = line
     // Convert `symbol: [1,2,3]` to `symbol: vec3(1,2,3)`
@@ -213,22 +233,22 @@ function parseDeclarations(type, line) {
   const TYPE_NORMAL = 5;
 
   let opType = TYPE_SYMBOL;
-  const declarations = {};
-  let declarationValue = null;
-  let currentDeclaration;
+  const declarations: Record<string, ParsedDeclaration> = {};
+  let declarationValue: any;
+  let currentDeclaration: string = '';
 
   addSymbol(tokens[0]);
 
-  function addSymbol(symbol) {
+  function addSymbol(symbol: string) {
     if (!symbol) {
       logSyntaxError();
     }
     const arrResult = symbol.match(/\[(.*?)\]/);
     currentDeclaration = symbol.replace(/\[(.*?)\]/, '');
-    declarations[currentDeclaration] = {};
+    declarations[currentDeclaration] = {} as ParsedDeclaration;
     if (arrResult) {
       declarations[currentDeclaration].isArray = true;
-      declarations[currentDeclaration].arraySize = arrResult[1];
+      declarations[currentDeclaration].arraySize = +arrResult[1];
     }
   }
 
@@ -327,6 +347,55 @@ function parseDeclarations(type, line) {
   return declarations;
 }
 
+interface ParsedAttributeSemantic {
+  symbol: string;
+  type: string;
+}
+interface ParsedMatrixSemantic {
+  symbol: string;
+  type: UniformType;
+  isTranspose: boolean;
+  semanticNoTranspose: string;
+}
+
+interface ParsedUniformSemantic {
+  symbol: string;
+  type: UniformType;
+}
+
+interface ParsedDeclaration {
+  value: any;
+  isArray: boolean;
+  arraySize: number;
+  ignore: boolean;
+  semantic: string;
+}
+
+interface ParsedTexture {
+  shaderType: 'fragment' | 'vertex';
+  type: 'sampler2D' | 'samplerCube';
+}
+
+interface ParsedAttribute {
+  // TODO Can only be float
+  type: 'float';
+  size: number;
+  semantic?: string;
+}
+
+interface ParsedUniformTemplate {
+  type: UniformType;
+  value: () => void;
+  semantic?: string;
+}
+
+export interface ShaderUniform {
+  type: UniformType;
+  value: any;
+  semantic?: string;
+}
+
+export type ShaderDefineValue = boolean | string | number | undefined | null;
 /**
  * @constructor
  * @extends clay.core.Base
@@ -340,69 +409,78 @@ function parseDeclarations(type, line) {
  *      clay.Shader.source('clay.standard.fragment')
  * );
  */
-function Shader(vertex, fragment) {
-  // First argument can be { vertex, fragment }
-  if (typeof vertex === 'object') {
-    fragment = vertex.fragment;
-    vertex = vertex.vertex;
+
+export type ShaderType = 'vertex' | 'fragment';
+
+class Shader {
+  /**
+   * @readOnly
+   */
+  attributeSemantics: Record<string, ParsedAttributeSemantic> = {};
+  /**
+   * @readOnly
+   */
+  matrixSemantics: Record<string, ParsedMatrixSemantic> = {};
+  /**
+   * @readOnly
+   */
+  uniformSemantics: Record<string, ParsedUniformSemantic> = {};
+  /**
+   * @readOnly
+   */
+  matrixSemanticKeys: string[] = [];
+  /**
+   * @readOnly
+   */
+  uniformTemplates: Record<string, ParsedUniformTemplate> = {};
+  /**
+   * @readOnly
+   */
+  attributes: Record<string, ParsedAttribute> = {};
+  /**
+   * @readOnly
+   */
+  textures: Record<string, ParsedTexture> = {};
+  /**
+   * @readOnly
+   */
+  vertexDefines: Record<string, ShaderDefineValue> = {};
+  /**
+   * @readOnly
+   */
+  fragmentDefines: Record<string, ShaderDefineValue> = {};
+
+  private _shaderID: string;
+  private _vertexCode: string;
+  private _fragmentCode: string;
+
+  private _uniformList: string[] = [];
+
+  constructor(opts: { vertex: string; fragment: string });
+  constructor(vertex: string, fragment: string);
+  constructor(vertex: string | { vertex: string; fragment: string }, fragment?: string) {
+    // First argument can be { vertex, fragment }
+    if (typeof vertex === 'object') {
+      fragment = vertex.fragment;
+      vertex = vertex.vertex;
+    }
+
+    vertex = removeComment(vertex);
+    fragment = removeComment(fragment!);
+
+    this._shaderID = getShaderID(vertex, fragment);
+
+    this._vertexCode = Shader.parseImport(vertex);
+    this._fragmentCode = Shader.parseImport(fragment);
+
+    this._parseAttributes();
+    this._parseUniforms();
+    this._parseDefines();
   }
 
-  vertex = removeComment(vertex);
-  fragment = removeComment(fragment);
-
-  this._shaderID = getShaderID(vertex, fragment);
-
-  this._vertexCode = Shader.parseImport(vertex);
-  this._fragmentCode = Shader.parseImport(fragment);
-
-  /**
-   * @readOnly
-   */
-  this.attributeSemantics = {};
-  /**
-   * @readOnly
-   */
-  this.matrixSemantics = {};
-  /**
-   * @readOnly
-   */
-  this.uniformSemantics = {};
-  /**
-   * @readOnly
-   */
-  this.matrixSemanticKeys = [];
-  /**
-   * @readOnly
-   */
-  this.uniformTemplates = {};
-  /**
-   * @readOnly
-   */
-  this.attributes = {};
-  /**
-   * @readOnly
-   */
-  this.textures = {};
-  /**
-   * @readOnly
-   */
-  this.vertexDefines = {};
-  /**
-   * @readOnly
-   */
-  this.fragmentDefines = {};
-
-  this._parseAttributes();
-  this._parseUniforms();
-  this._parseDefines();
-}
-
-Shader.prototype = {
-  constructor: Shader,
-
   // Create a new uniform instance for material
-  createUniforms: function () {
-    const uniforms = {};
+  createUniforms() {
+    const uniforms: Record<string, ShaderUniform> = {};
 
     for (const symbol in this.uniformTemplates) {
       const uniformTpl = this.uniformTemplates[symbol];
@@ -413,14 +491,14 @@ Shader.prototype = {
     }
 
     return uniforms;
-  },
+  }
 
-  _parseImport: function () {
+  _parseImport() {
     this._vertexCode = Shader.parseImport(this.vertex);
     this._fragmentCode = Shader.parseImport(this.fragment);
-  },
+  }
 
-  _addSemanticUniform: function (symbol, uniformType, semantic) {
+  _addSemanticUniform(symbol: string, uniformType: UniformType, semantic: string) {
     // This case is only for SKIN_MATRIX
     // TODO
     if (attributeSemantics.indexOf(semantic) >= 0) {
@@ -447,29 +525,29 @@ Shader.prototype = {
         type: uniformType
       };
     }
-  },
+  }
 
-  _addMaterialUniform: function (
-    symbol,
-    type,
-    uniformType,
-    defaultValueFunc,
-    isArray,
-    materialUniforms
+  _addMaterialUniform(
+    symbol: string,
+    type: NativeUniformType,
+    uniformType: UniformType,
+    defaultValueFunc: (() => any) | undefined,
+    isArray: boolean,
+    materialUniforms: Record<string, ParsedUniformTemplate>
   ) {
     materialUniforms[symbol] = {
       type: uniformType,
       value: isArray
         ? uniformValueConstructor.array
         : defaultValueFunc || uniformValueConstructor[type],
-      semantic: null
+      semantic: undefined
     };
-  },
+  }
 
-  _parseUniforms: function () {
-    const uniforms = {};
+  _parseUniforms() {
+    const uniformsTemplates: Record<string, ParsedUniformTemplate> = {};
     const self = this;
-    let shaderType = 'vertex';
+    let shaderType: ShaderType = 'vertex';
     this._uniformList = [];
 
     this._vertexCode = this._vertexCode.replace(uniformRegex, _uniformParser);
@@ -478,15 +556,15 @@ Shader.prototype = {
 
     self.matrixSemanticKeys = Object.keys(this.matrixSemantics);
 
-    function makeDefaultValueFunc(value) {
+    function makeDefaultValueFunc(value: any) {
       return value != null
         ? function () {
             return value;
           }
-        : null;
+        : undefined;
     }
 
-    function _uniformParser(str, type, content) {
+    function _uniformParser(str: string, type: NativeUniformType, content: string) {
       const declaredUniforms = parseDeclarations(type, content);
       const uniformMainStr = [];
       for (const symbol in declaredUniforms) {
@@ -515,15 +593,15 @@ Shader.prototype = {
 
           if (semantic) {
             // TODO Should not declare multiple symbols if have semantic.
-            self._addSemanticUniform(symbol, uniformType, semantic);
+            self._addSemanticUniform(symbol, uniformType as UniformType, semantic);
           } else {
             self._addMaterialUniform(
               symbol,
               type,
-              uniformType,
+              uniformType as UniformType,
               defaultValueFunc,
               declaredUniforms[symbol].isArray,
-              uniforms
+              uniformsTemplates
             );
           }
         }
@@ -533,15 +611,15 @@ Shader.prototype = {
         : '';
     }
 
-    this.uniformTemplates = uniforms;
-  },
+    this.uniformTemplates = uniformsTemplates;
+  }
 
-  _parseAttributes: function () {
-    const attributes = {};
+  _parseAttributes() {
+    const attributes: Record<string, ParsedAttribute> = {};
     const self = this;
     this._vertexCode = this._vertexCode.replace(attributeRegex, _attributeParser);
 
-    function _attributeParser(str, type, content) {
+    function _attributeParser(str: string, type: string, content: string) {
       const declaredAttributes = parseDeclarations(type, content);
 
       const size = attributeSizeMap[type] || 1;
@@ -549,10 +627,9 @@ Shader.prototype = {
       for (const symbol in declaredAttributes) {
         const semantic = declaredAttributes[symbol].semantic;
         attributes[symbol] = {
-          // TODO Can only be float
           type: 'float',
-          size: size,
-          semantic: semantic || null
+          size,
+          semantic
         };
         // TODO Should not declare multiple symbols if have semantic.
         if (semantic) {
@@ -572,16 +649,16 @@ Shader.prototype = {
     }
 
     this.attributes = attributes;
-  },
+  }
 
-  _parseDefines: function () {
+  _parseDefines() {
     const self = this;
     let shaderType = 'vertex';
     this._vertexCode = this._vertexCode.replace(defineRegex, _defineParser);
     shaderType = 'fragment';
     this._fragmentCode = this._fragmentCode.replace(defineRegex, _defineParser);
 
-    function _defineParser(str, symbol, value) {
+    function _defineParser(str: string, symbol: string, value: string) {
       const defines = shaderType === 'vertex' ? self.vertexDefines : self.fragmentDefines;
       if (!defines[symbol]) {
         // Haven't been defined by user
@@ -595,118 +672,108 @@ Shader.prototype = {
               isNaN(parseFloat(value))
               ? value.trim()
               : parseFloat(value)
-            : null;
+            : undefined;
         }
       }
       return '';
     }
-  },
+  }
 
   /**
    * Clone a new shader
    * @return {clay.Shader}
    */
-  clone: function () {
+  clone() {
     const code = shaderCodeCache[this._shaderID];
     const shader = new Shader(code.vertex, code.fragment);
     return shader;
   }
-};
 
-if (Object.defineProperty) {
-  Object.defineProperty(Shader.prototype, 'shaderID', {
-    get: function () {
-      return this._shaderID;
-    }
-  });
-  Object.defineProperty(Shader.prototype, 'vertex', {
-    get: function () {
-      return this._vertexCode;
-    }
-  });
-  Object.defineProperty(Shader.prototype, 'fragment', {
-    get: function () {
-      return this._fragmentCode;
-    }
-  });
-  Object.defineProperty(Shader.prototype, 'uniforms', {
-    get: function () {
-      return this._uniformList;
-    }
-  });
-}
+  get shaderID() {
+    return this._shaderID;
+  }
+  get vertex() {
+    return this._vertexCode;
+  }
+  get fragment() {
+    return this._fragmentCode;
+  }
+  get uniforms() {
+    return this._uniformList;
+  }
 
-const importRegex = /(@import)\s*([0-9a-zA-Z_\-.]*)/g;
-Shader.parseImport = function (shaderStr) {
-  shaderStr = shaderStr.replace(importRegex, function (str, importSymbol, importName) {
-    str = Shader.source(importName);
-    if (str) {
-      // Recursively parse
-      return Shader.parseImport(str);
-    } else {
-      console.error('Shader chunk "' + importName + '" not existed in library');
+  static parseImport(shaderStr: string) {
+    const importRegex = /(@import)\s*([0-9a-zA-Z_\-.]*)/g;
+    shaderStr = shaderStr.replace(importRegex, function (str, importSymbol, importName) {
+      str = Shader.source(importName);
+      if (str) {
+        // Recursively parse
+        return Shader.parseImport(str);
+      } else {
+        console.error('Shader chunk "' + importName + '" not existed in library');
+        return '';
+      }
+    });
+    return shaderStr;
+  }
+
+  /**
+   * Import shader source
+   * @param  {string} shaderStr
+   * @memberOf clay.Shader
+   */
+  static import(shaderStr: string) {
+    const exportRegex = /(@export)\s*([0-9a-zA-Z_\-.]*)\s*\n([\s\S]*?)@end/g;
+
+    shaderStr.replace(exportRegex, function (str, exportSymbol, exportName, code) {
+      code = code.replace(/(^[\s\t\xa0\u3000]+)|([\u3000\xa0\s\t]+\x24)/g, '');
+      if (code) {
+        const parts = exportName.split('.');
+        let obj = Shader.codes;
+        let i = 0;
+        let key;
+        while (i < parts.length - 1) {
+          key = parts[i++];
+          if (!obj[key]) {
+            obj[key] = {};
+          }
+          obj = obj[key];
+        }
+        key = parts[i];
+        obj[key] = code;
+      }
+      return code;
+    });
+  }
+
+  /**
+   * Library to store all the loaded shader codes
+   * @type {Object}
+   * @readOnly
+   * @memberOf clay.Shader
+   */
+  static codes: Record<string, any> = {};
+
+  /**
+   * Get shader source
+   * @param  {string} name
+   * @return {string}
+   */
+  static source(name: string) {
+    const parts = name.split('.');
+    let obj = Shader.codes;
+    let i = 0;
+    while (obj && i < parts.length) {
+      const key = parts[i++];
+      obj = obj[key];
+    }
+    if (typeof obj !== 'string') {
+      // FIXME Use default instead
+      console.error('Shader "' + name + '" not existed in library');
       return '';
     }
-  });
-  return shaderStr;
-};
-
-const exportRegex = /(@export)\s*([0-9a-zA-Z_\-.]*)\s*\n([\s\S]*?)@end/g;
-
-/**
- * Import shader source
- * @param  {string} shaderStr
- * @memberOf clay.Shader
- */
-Shader.import = function (shaderStr) {
-  shaderStr.replace(exportRegex, function (str, exportSymbol, exportName, code) {
-    code = code.replace(/(^[\s\t\xa0\u3000]+)|([\u3000\xa0\s\t]+\x24)/g, '');
-    if (code) {
-      const parts = exportName.split('.');
-      let obj = Shader.codes;
-      let i = 0;
-      let key;
-      while (i < parts.length - 1) {
-        key = parts[i++];
-        if (!obj[key]) {
-          obj[key] = {};
-        }
-        obj = obj[key];
-      }
-      key = parts[i];
-      obj[key] = code;
-    }
-    return code;
-  });
-};
-
-/**
- * Library to store all the loaded shader codes
- * @type {Object}
- * @readOnly
- * @memberOf clay.Shader
- */
-Shader.codes = {};
-
-/**
- * Get shader source
- * @param  {string} name
- * @return {string}
- */
-Shader.source = function (name) {
-  const parts = name.split('.');
-  let obj = Shader.codes;
-  let i = 0;
-  while (obj && i < parts.length) {
-    const key = parts[i++];
-    obj = obj[key];
+    return obj;
   }
-  if (typeof obj !== 'string') {
-    // FIXME Use default instead
-    console.error('Shader "' + name + '" not existed in library');
-    return '';
-  }
-  return obj;
-};
+}
 
 export default Shader;

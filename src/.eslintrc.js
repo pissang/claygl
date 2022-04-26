@@ -12,14 +12,16 @@ module.exports = {
     'no-label-var': 2,
     'no-undef-init': 2,
     'no-dupe-class-members': 0,
+    'no-redeclare': 0,
+    'no-unused-vars': 0,
+    '@typescript-eslint/no-redeclare': 2,
     '@typescript-eslint/no-unused-vars': [1, { vars: 'local', args: 'none' }],
     '@typescript-eslint/no-dupe-class-members': 2
   },
+  env: {
+    browser: true
+  },
   globals: {
-    console: true,
-    window: true,
-    setTimeout: true,
-    clearTimeout: true,
-    requestAnimationFrame: true
+    self: false
   }
 };

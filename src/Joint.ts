@@ -1,31 +1,30 @@
-// @ts-nocheck
 import Base from './core/Base';
+import { optional } from './core/util';
+import type ClayNode from './Node';
 
 /**
  * @constructor clay.Joint
  * @extends clay.core.Base
  */
-const Joint = Base.extend(
-  /** @lends clay.Joint# */
-  {
-    // https://github.com/KhronosGroup/glTF/issues/193#issuecomment-29216576
-    /**
-     * Joint name
-     * @type {string}
-     */
-    name: '',
-    /**
-     * Index of joint in the skeleton
-     * @type {number}
-     */
-    index: -1,
 
-    /**
-     * Scene node attached to
-     * @type {clay.Node}
-     */
-    node: null
+export class Joint {
+  /**
+   * Joint name
+   */
+  name: string;
+  /**
+   * Index of joint in the skeleton
+   */
+  index: number;
+  /**
+   * Scene node attached to
+   */
+  node?: ClayNode;
+  constructor(name?: string, index?: number, node?: ClayNode) {
+    this.name = name || '';
+    this.index = optional(index, -1);
+    this.node = node;
   }
-);
+}
 
 export default Joint;

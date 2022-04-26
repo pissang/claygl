@@ -3,7 +3,6 @@ import Base from '../core/Base';
 import Vector3 from '../math/Vector3';
 import vendor from '../core/vendor';
 
-/* global document */
 const doc = typeof document === 'undefined' ? {} : document;
 
 /**

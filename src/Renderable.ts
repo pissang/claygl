@@ -1,225 +1,200 @@
-// @ts-nocheck
-import Node from './Node';
+import ClayNode, { ClayNodeOpts, GetBoundingBoxFilter } from './Node';
 import glenum from './core/glenum';
+import type Material from './Material';
+import type Geometry from './Geometry';
+import { BoundingBox } from './claygl';
 
-/**
- * @constructor
- * @alias clay.Renderable
- * @extends clay.Node
- */
-const Renderable = Node.extend(
-  /** @lends clay.Renderable# */ {
-    /**
-     * @type {clay.Material}
-     */
-    material: null,
+export interface RenderableOpts extends ClayNodeOpts {
+  material: Material;
+  geometry: Geometry;
 
-    /**
-     * @type {clay.Geometry}
-     */
-    geometry: null,
+  mode: number;
 
-    /**
-     * @type {number}
-     */
-    mode: glenum.TRIANGLES,
+  /**
+   * Group of received light.
+   */
+  lightGroup: number;
+  /**
+   * Render order, Nodes with smaller value renders before nodes with larger values.
+   */
+  renderOrder: number;
 
-    _renderInfo: null
-  },
-  /** @lends clay.Renderable.prototype */
-  {
-    __program: null,
+  /**
+   * Used when mode is LINES, LINE_STRIP or LINE_LOOP
+   */
+  lineWidth?: number;
 
-    /**
-     * Group of received light.
-     */
-    lightGroup: 0,
-    /**
-     * Render order, Nodes with smaller value renders before nodes with larger values.
-     * @type {Number}
-     */
-    renderOrder: 0,
+  /**
+   * If enable culling
+   */
+  culling: boolean;
 
-    /**
-     * Used when mode is LINES, LINE_STRIP or LINE_LOOP
-     * @type {number}
-     */
-    // lineWidth: 1,
+  /**
+   * Specify which side of polygon will be culled.
+   * Possible values:
+   *  + {@link clay.Renderable.BACK}
+   *  + {@link clay.Renderable.FRONT}
+   *  + {@link clay.Renderable.FRONT_AND_BACK}
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/cullFace
+   */
+  cullFace: number;
 
-    /**
-     * If enable culling
-     * @type {boolean}
-     */
-    culling: true,
-    /**
-     * Specify which side of polygon will be culled.
-     * Possible values:
-     *  + {@link clay.Renderable.BACK}
-     *  + {@link clay.Renderable.FRONT}
-     *  + {@link clay.Renderable.FRONT_AND_BACK}
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/cullFace
-     * @type {number}
-     */
-    cullFace: glenum.BACK,
-    /**
-     * Specify which side is front face.
-     * Possible values:
-     *  + {@link clay.Renderable.CW}
-     *  + {@link clay.Renderable.CCW}
-     * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/frontFace
-     * @type {number}
-     */
-    frontFace: glenum.CCW,
+  /**
+   * Specify which side is front face.
+   * Possible values:
+   *  + {@link clay.Renderable.CW}
+   *  + {@link clay.Renderable.CCW}
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/frontFace
+   */
+  frontFace: number;
 
-    /**
-     * If enable software frustum culling
-     * @type {boolean}
-     */
-    frustumCulling: true,
-    /**
-     * @type {boolean}
-     */
-    receiveShadow: true,
-    /**
-     * @type {boolean}
-     */
-    castShadow: true,
-    /**
-     * @type {boolean}
-     */
-    ignorePicking: false,
-    /**
-     * @type {boolean}
-     */
-    ignorePreZ: false,
+  /**
+   * If enable software frustum culling
+   */
+  frustumCulling: boolean;
 
-    /**
-     * @type {boolean}
-     */
-    ignoreGBuffer: false,
+  /**
+   * If cast shadow
+   */
+  castShadow: boolean;
+  /**
+   * If receive shadow
+   */
+  receiveShadow: boolean;
 
-    /**
-     * @return {boolean}
-     */
-    isRenderable: function () {
-      // TODO Shader ?
-      return (
-        this.geometry &&
-        this.material &&
-        this.material.shader &&
-        !this.invisible &&
-        this.geometry.vertexCount > 0
-      );
-    },
+  /**
+   * If ignore picking
+   */
+  ignorePicking: boolean;
+  /**
+   * If Ignore prez
+   */
+  ignorePreZ: boolean;
 
-    /**
-     * Before render hook
-     * @type {Function}
-     */
-    beforeRender: function (_gl) {},
+  /**
+   * If ignore gbuffer
+   */
+  ignoreGBuffer: boolean;
+}
 
-    /**
-     * Before render hook
-     * @type {Function}
-     */
-    afterRender: function (_gl, renderStat) {},
+const properties = [
+  'mode',
+  'lightGroup',
+  'renderOrder',
+  'lineWidth',
+  'culling',
+  'cullFace',
+  'frontFace',
+  'frustumCulling',
+  'castShadow',
+  'receiveShadow',
+  'ignorePicking',
+  'ignorePreZ',
+  'ignoreGBuffer'
+] as const;
 
-    getBoundingBox: function (filter, out) {
-      out = Node.prototype.getBoundingBox.call(this, filter, out);
-      if (this.geometry && this.geometry.boundingBox) {
-        out.union(this.geometry.boundingBox);
+interface Renderable extends RenderableOpts {}
+class Renderable extends ClayNode {
+  constructor(opts?: Partial<RenderableOpts>) {
+    opts = opts || {};
+    super(opts);
+
+    for (let i = 0; i < properties.length; i++) {
+      const name = properties[i];
+      if (opts[name] != null) {
+        (this as any)[name] = opts[name];
       }
+    }
 
-      return out;
-    },
-
-    /**
-     * Clone a new renderable
-     * @function
-     * @return {clay.Renderable}
-     */
-    clone: (function () {
-      const properties = [
-        'castShadow',
-        'receiveShadow',
-        'mode',
-        'culling',
-        'cullFace',
-        'frontFace',
-        'frustumCulling',
-        'renderOrder',
-        'lineWidth',
-        'ignorePicking',
-        'ignorePreZ',
-        'ignoreGBuffer'
-      ];
-      return function () {
-        const renderable = Node.prototype.clone.call(this);
-
-        renderable.geometry = this.geometry;
-        renderable.material = this.material;
-
-        for (let i = 0; i < properties.length; i++) {
-          const name = properties[i];
-          // Try not to overwrite the prototype property
-          if (renderable[name] !== this[name]) {
-            renderable[name] = this[name];
-          }
-        }
-
-        return renderable;
-      };
-    })()
+    opts.geometry && (this.geometry = opts.geometry);
+    opts.material && (this.material = opts.material);
   }
-);
 
-/**
- * @type {number}
- */
-Renderable.POINTS = glenum.POINTS;
-/**
- * @type {number}
- */
-Renderable.LINES = glenum.LINES;
-/**
- * @type {number}
- */
-Renderable.LINE_LOOP = glenum.LINE_LOOP;
-/**
- * @type {number}
- */
-Renderable.LINE_STRIP = glenum.LINE_STRIP;
-/**
- * @type {number}
- */
-Renderable.TRIANGLES = glenum.TRIANGLES;
-/**
- * @type {number}
- */
-Renderable.TRIANGLE_STRIP = glenum.TRIANGLE_STRIP;
-/**
- * @type {number}
- */
-Renderable.TRIANGLE_FAN = glenum.TRIANGLE_FAN;
-/**
- * @type {number}
- */
-Renderable.BACK = glenum.BACK;
-/**
- * @type {number}
- */
-Renderable.FRONT = glenum.FRONT;
-/**
- * @type {number}
- */
-Renderable.FRONT_AND_BACK = glenum.FRONT_AND_BACK;
-/**
- * @type {number}
- */
-Renderable.CW = glenum.CW;
-/**
- * @type {number}
- */
-Renderable.CCW = glenum.CCW;
+  /**
+   * @return {boolean}
+   */
+  isRenderable(): boolean {
+    // TODO Shader ?
+    return !!(
+      this.geometry &&
+      this.material &&
+      this.material.shader &&
+      !this.invisible &&
+      this.geometry.vertexCount > 0
+    );
+  }
+
+  /**
+   * Before render hook
+   * @type {Function}
+   */
+  beforeRender(gl: WebGLRenderingContext) {}
+
+  /**
+   * Before render hook
+   * @type {Function}
+   */
+  afterRender(gl: WebGLRenderingContext, renderStat) {}
+
+  getBoundingBox(filter: GetBoundingBoxFilter, out?: BoundingBox): BoundingBox {
+    out = ClayNode.prototype.getBoundingBox.call(this, filter, out);
+    if (this.geometry && this.geometry.boundingBox) {
+      out.union(this.geometry.boundingBox);
+    }
+
+    return out;
+  }
+
+  /**
+   * Clone a new renderable
+   * @function
+   * @return {clay.Renderable}
+   */
+  clone() {
+    const renderable = ClayNode.prototype.clone.call(this);
+
+    renderable.geometry = this.geometry;
+    renderable.material = this.material;
+
+    for (let i = 0; i < properties.length; i++) {
+      const name = properties[i];
+      // Try not to overwrite the prototype property
+      if (renderable[name] !== this[name]) {
+        renderable[name] = this[name];
+      }
+    }
+
+    return renderable;
+  }
+
+  static POINTS = glenum.POINTS;
+  static LINES = glenum.LINES;
+  static LINE_LOOP = glenum.LINE_LOOP;
+  static LINE_STRIP = glenum.LINE_STRIP;
+  static TRIANGLES = glenum.TRIANGLES;
+  static TRIANGLE_STRIP = glenum.TRIANGLE_STRIP;
+  static TRIANGLE_FAN = glenum.TRIANGLE_FAN;
+  static BACK = glenum.BACK;
+  static FRONT = glenum.FRONT;
+  static FRONT_AND_BACK = glenum.FRONT_AND_BACK;
+  static CW = glenum.CW;
+  static CCW = glenum.CCW;
+}
+
+Renderable.prototype.mode = glenum.TRIANGLES;
+
+Renderable.prototype.lightGroup = 0;
+Renderable.prototype.renderOrder = 0;
+
+Renderable.prototype.culling = true;
+Renderable.prototype.cullFace = glenum.BACK;
+Renderable.prototype.frontFace = glenum.CCW;
+
+Renderable.prototype.frustumCulling = true;
+Renderable.prototype.receiveShadow = true;
+Renderable.prototype.castShadow = true;
+Renderable.prototype.ignorePicking = false;
+Renderable.prototype.ignorePreZ = false;
+Renderable.prototype.ignoreGBuffer = false;
 
 export default Renderable;

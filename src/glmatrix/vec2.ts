@@ -261,6 +261,7 @@ export const sqrDist = squaredDistance;
  * @param a vector to calculate length of
  * @returns length of a
  */
+// eslint-disable-next-line
 export function length(a: Vec2Array) {
   const x = a[0],
     y = a[1];
@@ -478,7 +479,9 @@ export const forEach = (function () {
     stride: number,
     offset: number,
     count: number,
-    fn: (a: Vec2Array, b: Vec2Array, arg?: T) => void,
+    fn: undefined extends T
+      ? (a: Vec2Array, b: Vec2Array) => void
+      : (a: Vec2Array, b: Vec2Array, arg: T) => void,
     arg?: T
   ) {
     let i, l;

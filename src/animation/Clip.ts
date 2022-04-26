@@ -1,248 +1,120 @@
-// @ts-nocheck
-import Easing from './easing';
+import { builtinEasing, EasingFunc, createCubicEasingFunc } from './easing';
 
 function noop() {}
-/**
- * @constructor
- * @alias clay.animation.Clip
- * @param {Object} [opts]
- * @param {Object} [opts.target]
- * @param {number} [opts.life]
- * @param {number} [opts.delay]
- * @param {number} [opts.gap]
- * @param {number} [opts.playbackRate]
- * @param {boolean|number} [opts.loop] If loop is a number, it indicate the loop count of animation
- * @param {string|Function} [opts.easing]
- * @param {Function} [opts.onframe]
- * @param {Function} [opts.onfinish]
- * @param {Function} [opts.onrestart]
- */
-const Clip = function (opts) {
-  opts = opts || {};
 
-  /**
-   * @type {string}
-   */
-  this.name = opts.name || '';
+type Easing = keyof typeof builtinEasing | EasingFunc;
 
-  /**
-   * @type {Object}
-   */
-  this.target = opts.target;
+type OnframeCallback = (percent: number) => void;
+type ondestroyCallback = () => void;
+type onrestartCallback = () => void;
 
-  /**
-   * @type {number}
-   */
-  this.life = opts.life || 1000;
+export interface ClipProps {
+  life?: number;
+  delay?: number;
+  loop?: boolean;
+  easing?: Easing;
 
-  /**
-   * @type {number}
-   */
-  this.delay = opts.delay || 0;
+  playbackRatio?: number;
 
-  /**
-   * @type {number}
-   */
-  this.gap = opts.gap || 0;
+  onframe?: OnframeCallback;
+  ondestroy?: ondestroyCallback;
+  onrestart?: onrestartCallback;
+}
 
-  /**
-   * @type {number}
-   */
-  this.playbackRate = opts.playbackRate || 1;
+export default class Clip {
+  private _life: number;
+  private _delay: number;
 
-  this._initialized = false;
+  private _inited: boolean = false;
+  private _startTime = 0; // 开始时间单位毫秒
 
-  this._elapsedTime = 0;
+  private _pausedTime = 0;
+  private _paused = false;
 
-  this._loop = opts.loop == null ? false : opts.loop;
-  this.setLoop(this._loop);
+  loop: boolean;
+  playbackRatio: number = 1;
 
-  if (opts.easing != null) {
-    this.setEasing(opts.easing);
+  easingFunc?: (p: number) => number;
+
+  onframe: OnframeCallback;
+  ondestroy: ondestroyCallback;
+  onrestart: onrestartCallback;
+
+  constructor(opts: ClipProps) {
+    this._life = opts.life || 1000;
+    this._delay = opts.delay || 0;
+
+    this.loop = opts.loop || false;
+
+    this.onframe = opts.onframe || noop;
+    this.ondestroy = opts.ondestroy || noop;
+    this.onrestart = opts.onrestart || noop;
+
+    this.playbackRatio = opts.playbackRatio || 1;
+
+    opts.easing && this.setEasing(opts.easing);
   }
 
-  /**
-   * @type {Function}
-   */
-  this.onframe = opts.onframe || noop;
-
-  /**
-   * @type {Function}
-   */
-  this.onfinish = opts.onfinish || noop;
-
-  /**
-   * @type {Function}
-   */
-  this.onrestart = opts.onrestart || noop;
-
-  this._paused = false;
-};
-
-Clip.prototype = {
-  gap: 0,
-
-  life: 0,
-
-  delay: 0,
-
-  /**
-   * @param {number|boolean} loop
-   */
-  setLoop: function (loop) {
-    this._loop = loop;
-    if (loop) {
-      if (typeof loop === 'number') {
-        this._loopRemained = loop;
-      } else {
-        this._loopRemained = Infinity;
-      }
+  step(globalTime: number, deltaTime: number): boolean {
+    // Set startTime on first step, or _startTime may has milleseconds different between clips
+    // PENDING
+    if (!this._inited) {
+      this._startTime = globalTime + this._delay;
+      this._inited = true;
     }
-  },
-
-  /**
-   * @param {string|Function} easing
-   */
-  setEasing: function (easing) {
-    if (typeof easing === 'string') {
-      easing = Easing[easing];
-    }
-    this.easing = easing;
-  },
-
-  /**
-   * @param  {number} time
-   * @return {string}
-   */
-  step: function (time, deltaTime, silent) {
-    if (!this._initialized) {
-      this._startTime = time + this.delay;
-      this._initialized = true;
-    }
-    if (this._currentTime != null) {
-      deltaTime = time - this._currentTime;
-    }
-    this._currentTime = time;
 
     if (this._paused) {
-      return 'paused';
+      this._pausedTime += deltaTime;
+      return false;
     }
 
-    if (time < this._startTime) {
-      return;
-    }
+    const life = this._life;
+    const elapsedTime = (globalTime - this._startTime - this._pausedTime) * this.playbackRatio;
+    let percent = elapsedTime / life;
 
-    // PENDIGN Sync ?
-    this._elapse(time, deltaTime);
-
-    const percent = Math.min(this._elapsedTime / this.life, 1);
-
+    // PENDING: Not begin yet. Still run the loop.
+    // In the case callback needs to be invoked.
+    // Or want to update to the begin state at next frame when `setToFinal` and `delay` are both used.
+    // To avoid the unexpected blink.
     if (percent < 0) {
-      return;
+      percent = 0;
     }
 
-    let schedule;
-    if (this.easing) {
-      schedule = this.easing(percent);
-    } else {
-      schedule = percent;
-    }
+    percent = Math.min(percent, 1);
 
-    if (!silent) {
-      this.fire('frame', schedule);
-    }
+    const easingFunc = this.easingFunc;
+    const schedule = easingFunc ? easingFunc(percent) : percent;
+
+    this.onframe(schedule);
 
     if (percent === 1) {
-      if (this._loop && this._loopRemained > 0) {
-        this._restartInLoop(time);
-        this._loopRemained--;
-        return 'restart';
+      if (this.loop) {
+        // Restart
+        const remainder = elapsedTime % life;
+        this._startTime = globalTime - remainder;
+        this._pausedTime = 0;
+
+        this.onrestart();
       } else {
-        // Mark this clip to be deleted
-        // In the animation.update
-        this._needsRemove = true;
-
-        return 'finish';
+        return true;
       }
-    } else {
-      return null;
     }
-  },
 
-  /**
-   * @param  {number} time
-   * @return {string}
-   */
-  setTime: function (time) {
-    return this.step(time + this._startTime);
-  },
+    return false;
+  }
 
-  restart: function (time) {
-    // If user leave the page for a while, when he gets back
-    // All clips may be expired and all start from the beginning value(position)
-    // It is clearly wrong, so we use remainder to add a offset
-
-    let remainder = 0;
-    // Remainder ignored if restart is invoked manually
-    if (time) {
-      this._elapse(time);
-      remainder = this._elapsedTime % this.life;
-    }
-    time = time || Date.now();
-
-    this._startTime = time - remainder + this.delay;
-    this._elapsedTime = 0;
-
-    this._needsRemove = false;
-    this._paused = false;
-  },
-
-  getElapsedTime: function () {
-    return this._elapsedTime;
-  },
-
-  _restartInLoop: function (time) {
-    this._startTime = time + this.gap;
-    this._elapsedTime = 0;
-  },
-
-  _elapse: function (time, deltaTime) {
-    this._elapsedTime += deltaTime * this.playbackRate;
-  },
-
-  fire: function (eventType, arg) {
-    const eventName = 'on' + eventType;
-    if (this[eventName]) {
-      this[eventName](this.target, arg);
-    }
-  },
-
-  clone: function () {
-    const clip = new this.constructor();
-    clip.name = this.name;
-    clip._loop = this._loop;
-    clip._loopRemained = this._loopRemained;
-
-    clip.life = this.life;
-    clip.gap = this.gap;
-    clip.delay = this.delay;
-
-    return clip;
-  },
-  /**
-   * Pause the clip.
-   */
-  pause: function () {
+  pause() {
     this._paused = true;
-  },
+  }
 
-  /**
-   * Resume the clip.
-   */
-  resume: function () {
+  resume() {
     this._paused = false;
   }
-};
-Clip.prototype.constructor = Clip;
 
-export default Clip;
+  setEasing(easing: Easing) {
+    this.easingFunc =
+      typeof easing === 'function'
+        ? easing
+        : builtinEasing[easing] || createCubicEasingFunc(easing);
+  }
+}

@@ -1,7 +1,7 @@
 // @ts-nocheck
 // 2D Blend clip of blend tree
 // http://docs.unity3d.com/Documentation/Manual/2DBlending.html
-import Clip from './Clip';
+import Clip from './Runnerer';
 import delaunay from '../util/delaunay';
 import Vector2 from '../math/Vector2';
 

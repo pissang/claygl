@@ -97,7 +97,6 @@ const GamepadControl = Base.extend(
     this.update = this.update.bind(this);
 
     // If browser supports Gamepad API:
-    /* global navigator */
     if (typeof navigator.getGamepads === 'function') {
       this.init();
     }

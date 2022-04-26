@@ -1,5 +1,5 @@
 // @ts-nocheck
-import Clip from './Clip';
+import Clip from './Runnerer';
 
 import quat from '../glmatrix/quat';
 import vec3 from '../glmatrix/vec3';

@@ -16,7 +16,6 @@ Shader.import(gbufferEssl);
 Shader.import(chunkEssl);
 
 function createFillCanvas(color) {
-  /* global document */
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1;
   const ctx = canvas.getContext('2d');

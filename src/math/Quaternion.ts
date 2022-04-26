@@ -12,7 +12,7 @@ class Quaternion {
    * All methods also operate on the array instead of x, y, z, w components
    */
   array: quat.QuatArray;
-  constructor(x: number, y: number, z: number, w?: number) {
+  constructor(x?: number, y?: number, z?: number, w?: number) {
     x = x || 0;
     y = y || 0;
     z = z || 0;

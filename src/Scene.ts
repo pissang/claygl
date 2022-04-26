@@ -8,7 +8,7 @@ import mat4 from './glmatrix/mat4';
 import LRUCache from './core/LRU';
 import Matrix4 from './math/Matrix4';
 
-let IDENTITY = mat4.create();
+const IDENTITY = mat4.create();
 const WORLDVIEW = mat4.create();
 
 const programKeyCache = {};
@@ -21,13 +21,13 @@ function getProgramKey(lightNumbers) {
     const lightType = lightTypes[i];
     defineStr.push(lightType + ' ' + lightNumbers[lightType]);
   }
-  let key = defineStr.join('\n');
+  const key = defineStr.join('\n');
 
   if (programKeyCache[key]) {
     return programKeyCache[key];
   }
 
-  let id = util.genGUID();
+  const id = util.genGUID();
   programKeyCache[key] = id;
   return id;
 }
@@ -172,7 +172,7 @@ const Scene = Node.extend(
      * @param {claygl.Camera} camera
      */
     setMainCamera: function (camera) {
-      let idx = this._cameraList.indexOf(camera);
+      const idx = this._cameraList.indexOf(camera);
       if (idx >= 0) {
         this._cameraList.splice(idx, 1);
       }

@@ -2,7 +2,7 @@
 // 1D Blend clip of blend tree
 // http://docs.unity3d.com/Documentation/Manual/1DBlending.html
 
-import Clip from './Clip';
+import Clip from './Runnerer';
 
 const clipSortFunc = function (a, b) {
   return a.position < b.position;

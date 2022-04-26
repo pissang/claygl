@@ -1,5 +1,5 @@
 // @ts-nocheck
-import Clip from './Clip';
+import Clip from './Runnerer';
 import easingFuncs from './easing';
 
 const arraySlice = Array.prototype.slice;

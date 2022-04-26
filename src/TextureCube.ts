@@ -1,13 +1,30 @@
-// @ts-nocheck
-import Texture from './Texture';
+import Texture, { TextureImageSource, TextureOpts, TexturePixelSource } from './Texture';
 import glenum from './core/glenum';
-import * as util from './core/util';
-import mathUtil from './math/util';
+import * as mathUtil from './math/util';
 import vendor from './core/vendor';
+import Renderer from './Renderer';
+import { GLEnum } from './core/type';
+
 const isPowerOfTwo = mathUtil.isPowerOfTwo;
 
-const targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
+const targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
+type TargetName = typeof targetList[number];
 
+interface TextureCubeData {
+  image?: Record<TargetName, TextureImageSource>;
+  /**
+   * Pixels data. Will be ignored if image is set.
+   */
+  pixels?: Record<TargetName, TexturePixelSource>;
+}
+export interface TextureCubeOpts extends TextureOpts, TextureCubeData {
+  /**
+   * @type {Array.<Object>}
+   */
+  mipmaps: [];
+}
+
+interface TextureCube extends TextureCubeOpts {}
 /**
  * @constructor clay.TextureCube
  * @extends clay.Texture
@@ -35,224 +52,23 @@ const targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *         });
  *     });
  */
-const TextureCube = Texture.extend(
-  function () {
-    return /** @lends clay.TextureCube# */ {
-      /**
-       * @type {boolean}
-       * @default false
-       */
-      // PENDING cubemap should not flipY in default.
-      // flipY: false,
-
-      /**
-       * @type {Object}
-       * @property {?HTMLImageElement|HTMLCanvasElemnet} px
-       * @property {?HTMLImageElement|HTMLCanvasElemnet} nx
-       * @property {?HTMLImageElement|HTMLCanvasElemnet} py
-       * @property {?HTMLImageElement|HTMLCanvasElemnet} ny
-       * @property {?HTMLImageElement|HTMLCanvasElemnet} pz
-       * @property {?HTMLImageElement|HTMLCanvasElemnet} nz
-       */
-      image: {
-        px: null,
-        nx: null,
-        py: null,
-        ny: null,
-        pz: null,
-        nz: null
-      },
-      /**
-       * Pixels data of each side. Will be ignored if images are set.
-       * @type {Object}
-       * @property {?Uint8Array} px
-       * @property {?Uint8Array} nx
-       * @property {?Uint8Array} py
-       * @property {?Uint8Array} ny
-       * @property {?Uint8Array} pz
-       * @property {?Uint8Array} nz
-       */
-      pixels: {
-        px: null,
-        nx: null,
-        py: null,
-        ny: null,
-        pz: null,
-        nz: null
-      },
-
-      /**
-       * @type {Array.<Object>}
-       */
-      mipmaps: []
-    };
-  },
-  {
-    textureType: 'textureCube',
-
-    update: function (renderer) {
-      const _gl = renderer.gl;
-      _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
-
-      this.updateCommon(renderer);
-
-      const glFormat = this.format;
-      let glType = this.type;
-
-      _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, this.getAvailableWrapS());
-      _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, this.getAvailableWrapT());
-
-      _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, this.getAvailableMagFilter());
-      _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, this.getAvailableMinFilter());
-
-      const anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
-      if (anisotropicExt && this.anisotropic > 1) {
-        _gl.texParameterf(
-          _gl.TEXTURE_CUBE_MAP,
-          anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT,
-          this.anisotropic
-        );
-      }
-
-      // Fallback to float type if browser don't have half float extension
-      if (glType === 36193) {
-        const halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
-        if (!halfFloatExt) {
-          glType = glenum.FLOAT;
-        }
-      }
-
-      if (this.mipmaps.length) {
-        let width = this.width;
-        let height = this.height;
-        for (let i = 0; i < this.mipmaps.length; i++) {
-          const mipmap = this.mipmaps[i];
-          this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType);
-          width /= 2;
-          height /= 2;
-        }
-      } else {
-        this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType);
-
-        if (!this.NPOT && this.useMipmap) {
-          _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
-        }
-      }
-
-      _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
-    },
-
-    _updateTextureData: function (_gl, data, level, width, height, glFormat, glType) {
-      for (let i = 0; i < 6; i++) {
-        const target = targetList[i];
-        let img = data.image && data.image[target];
-        if (img) {
-          _gl.texImage2D(
-            _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            level,
-            glFormat,
-            glFormat,
-            glType,
-            img
-          );
-        } else {
-          _gl.texImage2D(
-            _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-            level,
-            glFormat,
-            width,
-            height,
-            0,
-            glFormat,
-            glType,
-            data.pixels && data.pixels[target]
-          );
-        }
-      }
-    },
-
-    /**
-     * @param  {clay.Renderer} renderer
-     * @memberOf clay.TextureCube.prototype
-     */
-    generateMipmap: function (renderer) {
-      const _gl = renderer.gl;
-      if (this.useMipmap && !this.NPOT) {
-        _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
-        _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
-      }
-    },
-
-    bind: function (renderer) {
-      renderer.gl.bindTexture(renderer.gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(renderer));
-    },
-
-    unbind: function (renderer) {
-      renderer.gl.bindTexture(renderer.gl.TEXTURE_CUBE_MAP, null);
-    },
-
-    // Overwrite the isPowerOfTwo method
-    isPowerOfTwo: function () {
-      if (this.image.px) {
-        return isPowerOfTwo(this.image.px.width) && isPowerOfTwo(this.image.px.height);
-      } else {
-        return isPowerOfTwo(this.width) && isPowerOfTwo(this.height);
-      }
-    },
-
-    isRenderable: function () {
-      if (this.image.px) {
-        return (
-          isImageRenderable(this.image.px) &&
-          isImageRenderable(this.image.nx) &&
-          isImageRenderable(this.image.py) &&
-          isImageRenderable(this.image.ny) &&
-          isImageRenderable(this.image.pz) &&
-          isImageRenderable(this.image.nz)
-        );
-      } else {
-        return !!(this.width && this.height);
-      }
-    },
-
-    load: function (imageList, crossOrigin) {
-      let loading = 0;
-      const self = this;
-      util.each(imageList, function (src, target) {
-        const image = vendor.createImage();
-        if (crossOrigin) {
-          image.crossOrigin = crossOrigin;
-        }
-        image.onload = function () {
-          loading--;
-          if (loading === 0) {
-            self.dirty();
-            self.trigger('success', self);
-          }
-        };
-        image.onerror = function () {
-          loading--;
-        };
-
-        loading++;
-        image.src = src;
-        self.image[target] = image;
-      });
-
-      return this;
-    }
+class TextureCube extends Texture {
+  readonly textureType = 'textureCube';
+  constructor(opts?: Partial<TextureCubeOpts>) {
+    opts = opts || {};
+    super(opts);
   }
-);
 
-Object.defineProperty(TextureCube.prototype, 'width', {
-  get: function () {
-    if (this.image && this.image.px) {
-      return this.image.px.width;
+  get width() {
+    const images = this.image;
+    if (images && images.px) {
+      return images.px.width;
     }
     return this._width;
-  },
-  set: function (value) {
-    if (this.image && this.image.px) {
+  }
+  set width(value: number) {
+    const images = this.image;
+    if (images && images.px) {
       console.warn("Texture from image can't set width");
     } else {
       if (this._width !== value) {
@@ -261,16 +77,16 @@ Object.defineProperty(TextureCube.prototype, 'width', {
       this._width = value;
     }
   }
-});
-Object.defineProperty(TextureCube.prototype, 'height', {
-  get: function () {
-    if (this.image && this.image.px) {
-      return this.image.px.height;
+  get height() {
+    const images = this.image;
+    if (images && images.px) {
+      return images.px.height;
     }
     return this._height;
-  },
-  set: function (value) {
-    if (this.image && this.image.px) {
+  }
+  set height(value: number) {
+    const images = this.image;
+    if (images && images.px) {
       console.warn("Texture from image can't set height");
     } else {
       if (this._height !== value) {
@@ -279,8 +95,164 @@ Object.defineProperty(TextureCube.prototype, 'height', {
       this._height = value;
     }
   }
-});
-function isImageRenderable(image) {
+
+  update(renderer: Renderer) {
+    const _gl = renderer.gl;
+    _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
+
+    this.updateCommon(renderer);
+
+    const glFormat = this.format;
+    let glType = this.type;
+
+    _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, this.getAvailableWrapS());
+    _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, this.getAvailableWrapT());
+
+    _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, this.getAvailableMagFilter());
+    _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, this.getAvailableMinFilter());
+
+    const anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
+    if (anisotropicExt && this.anisotropic > 1) {
+      _gl.texParameterf(
+        _gl.TEXTURE_CUBE_MAP,
+        anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT,
+        this.anisotropic
+      );
+    }
+
+    // Fallback to float type if browser don't have half float extension
+    if (glType === 36193) {
+      const halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
+      if (!halfFloatExt) {
+        glType = glenum.FLOAT;
+      }
+    }
+
+    if (this.mipmaps.length) {
+      let width = this.width;
+      let height = this.height;
+      for (let i = 0; i < this.mipmaps.length; i++) {
+        const mipmap = this.mipmaps[i];
+        this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType);
+        width /= 2;
+        height /= 2;
+      }
+    } else {
+      this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType);
+
+      if (!this.NPOT && this.useMipmap) {
+        _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
+      }
+    }
+
+    _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
+  }
+
+  _updateTextureData(
+    _gl: WebGLRenderingContext,
+    data: TextureCubeData,
+    level: number,
+    width: number,
+    height: number,
+    glFormat: GLEnum,
+    glType: GLEnum
+  ) {
+    for (let i = 0; i < 6; i++) {
+      const target = targetList[i];
+      const img = data.image && data.image[target];
+      const pixels = data.pixels && data.pixels[target];
+      if (img) {
+        _gl.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, level, glFormat, glFormat, glType, img);
+      } else if (pixels) {
+        _gl.texImage2D(
+          _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+          level,
+          glFormat,
+          width,
+          height,
+          0,
+          glFormat,
+          glType,
+          pixels
+        );
+      }
+    }
+  }
+
+  /**
+   * @param  {clay.Renderer} renderer
+   * @memberOf clay.TextureCube.prototype
+   */
+  generateMipmap(renderer: Renderer) {
+    const _gl = renderer.gl;
+    if (this.useMipmap && !this.NPOT) {
+      _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
+      _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
+    }
+  }
+
+  bind(renderer: Renderer) {
+    renderer.gl.bindTexture(renderer.gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(renderer));
+  }
+
+  unbind(renderer: Renderer) {
+    renderer.gl.bindTexture(renderer.gl.TEXTURE_CUBE_MAP, null);
+  }
+
+  // Overwrite the isPowerOfTwo method
+  isPowerOfTwo() {
+    if (this.image && this.image.px) {
+      return isPowerOfTwo(this.image.px.width) && isPowerOfTwo(this.image.px.height);
+    } else {
+      return isPowerOfTwo(this.width) && isPowerOfTwo(this.height);
+    }
+  }
+
+  isRenderable() {
+    if (this.image && this.image.px) {
+      return (
+        isImageRenderable(this.image.px) &&
+        isImageRenderable(this.image.nx) &&
+        isImageRenderable(this.image.py) &&
+        isImageRenderable(this.image.ny) &&
+        isImageRenderable(this.image.pz) &&
+        isImageRenderable(this.image.nz)
+      );
+    } else {
+      return !!(this.width && this.height);
+    }
+  }
+
+  load(imageList: Record<TargetName, string>, crossOrigin?: string) {
+    let loading = 0;
+    this.image = {} as Record<TargetName, TextureImageSource>;
+    (Object.keys(imageList) as TargetName[]).forEach((target) => {
+      const src = imageList[target];
+      const image = vendor.createImage();
+      if (crossOrigin) {
+        image.crossOrigin = crossOrigin;
+      }
+      image.onload = () => {
+        loading--;
+        if (loading === 0) {
+          this.dirty();
+          this.trigger('success', this);
+        }
+      };
+      image.onerror = function () {
+        loading--;
+      };
+
+      loading++;
+      image.src = src;
+      this.image![target] = image;
+    });
+
+    return this;
+  }
+}
+
+function isImageRenderable(image: TextureImageSource) {
   return image.width > 0 && image.height > 0;
 }
 

@@ -1,16 +1,12 @@
-// @ts-nocheck
-// 缓动函数来自 https://github.com/sole/tween.js/blob/master/src/Tween.js
+import { cubicAt, cubicRootAt } from '../math/cubic';
 
-/**
- * @namespace clay.animation.easing
- */
-const easing = {
+const builtinEasing = {
   /**
    * @alias clay.animation.easing.linear
    * @param {number} k
    * @return {number}
    */
-  linear: function (k) {
+  linear: function (k: number) {
     return k;
   },
   /**
@@ -18,7 +14,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  quadraticIn: function (k) {
+  quadraticIn: function (k: number) {
     return k * k;
   },
   /**
@@ -26,7 +22,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  quadraticOut: function (k) {
+  quadraticOut: function (k: number) {
     return k * (2 - k);
   },
   /**
@@ -34,7 +30,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  quadraticInOut: function (k) {
+  quadraticInOut: function (k: number) {
     if ((k *= 2) < 1) {
       return 0.5 * k * k;
     }
@@ -45,7 +41,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  cubicIn: function (k) {
+  cubicIn: function (k: number) {
     return k * k * k;
   },
   /**
@@ -53,7 +49,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  cubicOut: function (k) {
+  cubicOut: function (k: number) {
     return --k * k * k + 1;
   },
   /**
@@ -61,7 +57,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  cubicInOut: function (k) {
+  cubicInOut: function (k: number) {
     if ((k *= 2) < 1) {
       return 0.5 * k * k * k;
     }
@@ -72,7 +68,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  quarticIn: function (k) {
+  quarticIn: function (k: number) {
     return k * k * k * k;
   },
   /**
@@ -80,7 +76,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  quarticOut: function (k) {
+  quarticOut: function (k: number) {
     return 1 - --k * k * k * k;
   },
   /**
@@ -88,7 +84,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  quarticInOut: function (k) {
+  quarticInOut: function (k: number) {
     if ((k *= 2) < 1) {
       return 0.5 * k * k * k * k;
     }
@@ -99,7 +95,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  quinticIn: function (k) {
+  quinticIn: function (k: number) {
     return k * k * k * k * k;
   },
   /**
@@ -107,7 +103,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  quinticOut: function (k) {
+  quinticOut: function (k: number) {
     return --k * k * k * k * k + 1;
   },
   /**
@@ -115,7 +111,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  quinticInOut: function (k) {
+  quinticInOut: function (k: number) {
     if ((k *= 2) < 1) {
       return 0.5 * k * k * k * k * k;
     }
@@ -126,7 +122,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  sinusoidalIn: function (k) {
+  sinusoidalIn: function (k: number) {
     return 1 - Math.cos((k * Math.PI) / 2);
   },
   /**
@@ -134,7 +130,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  sinusoidalOut: function (k) {
+  sinusoidalOut: function (k: number) {
     return Math.sin((k * Math.PI) / 2);
   },
   /**
@@ -142,7 +138,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  sinusoidalInOut: function (k) {
+  sinusoidalInOut: function (k: number) {
     return 0.5 * (1 - Math.cos(Math.PI * k));
   },
   /**
@@ -150,7 +146,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  exponentialIn: function (k) {
+  exponentialIn: function (k: number) {
     return k === 0 ? 0 : Math.pow(1024, k - 1);
   },
   /**
@@ -158,7 +154,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  exponentialOut: function (k) {
+  exponentialOut: function (k: number) {
     return k === 1 ? 1 : 1 - Math.pow(2, -10 * k);
   },
   /**
@@ -166,7 +162,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  exponentialInOut: function (k) {
+  exponentialInOut: function (k: number) {
     if (k === 0) {
       return 0;
     }
@@ -183,7 +179,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  circularIn: function (k) {
+  circularIn: function (k: number) {
     return 1 - Math.sqrt(1 - k * k);
   },
   /**
@@ -191,7 +187,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  circularOut: function (k) {
+  circularOut: function (k: number) {
     return Math.sqrt(1 - --k * k);
   },
   /**
@@ -199,7 +195,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  circularInOut: function (k) {
+  circularInOut: function (k: number) {
     if ((k *= 2) < 1) {
       return -0.5 * (Math.sqrt(1 - k * k) - 1);
     }
@@ -210,7 +206,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  elasticIn: function (k) {
+  elasticIn: function (k: number) {
     let s,
       a = 0.1,
       p = 0.4;
@@ -233,7 +229,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  elasticOut: function (k) {
+  elasticOut: function (k: number) {
     let s,
       a = 0.1,
       p = 0.4;
@@ -256,7 +252,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  elasticInOut: function (k) {
+  elasticInOut: function (k: number) {
     let s,
       a = 0.1,
       p = 0.4;
@@ -282,7 +278,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  backIn: function (k) {
+  backIn: function (k: number) {
     const s = 1.70158;
     return k * k * ((s + 1) * k - s);
   },
@@ -291,7 +287,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  backOut: function (k) {
+  backOut: function (k: number) {
     const s = 1.70158;
     return --k * k * ((s + 1) * k + s) + 1;
   },
@@ -300,7 +296,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  backInOut: function (k) {
+  backInOut: function (k: number) {
     const s = 1.70158 * 1.525;
     if ((k *= 2) < 1) {
       return 0.5 * (k * k * ((s + 1) * k - s));
@@ -312,7 +308,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  bounceIn: function (k) {
+  bounceIn: function (k: number) {
     return 1 - easing.bounceOut(1 - k);
   },
   /**
@@ -320,7 +316,7 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  bounceOut: function (k) {
+  bounceOut: function (k: number) {
     if (k < 1 / 2.75) {
       return 7.5625 * k * k;
     } else if (k < 2 / 2.75) {
@@ -336,12 +332,40 @@ const easing = {
    * @param {number} k
    * @return {number}
    */
-  bounceInOut: function (k) {
+  bounceInOut: function (k: number) {
     if (k < 0.5) {
       return easing.bounceIn(k * 2) * 0.5;
     }
     return easing.bounceOut(k * 2 - 1) * 0.5 + 0.5;
   }
-};
+} as const;
 
-export default easing;
+export type EasingFunc = (t: number) => number;
+
+const regexp = /cubic-bezier\(([0-9,\.e ]+)\)/;
+
+export function createCubicEasingFunc(cubicEasingStr: string) {
+  const cubic = cubicEasingStr && regexp.exec(cubicEasingStr);
+  if (cubic) {
+    const points = cubic[1].split(',');
+    const a = +points[0].trim();
+    const b = +points[1].trim();
+    const c = +points[2].trim();
+    const d = +points[3].trim();
+
+    if (isNaN(a + b + c + d)) {
+      return;
+    }
+
+    const roots: number[] = [];
+    return (p: number) => {
+      return p <= 0
+        ? 0
+        : p >= 1
+        ? 1
+        : cubicRootAt(0, a, c, 1, p, roots) && cubicAt(0, b, d, 1, roots[0]);
+    };
+  }
+}
+
+export { builtinEasing };

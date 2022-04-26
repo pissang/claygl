@@ -18,7 +18,7 @@ class Notifier {
    * Trigger event
    * @param  {string} name
    */
-  trigger(name: string) {
+  trigger(name: string, ..._args: any[]) {
     if (!util.hasOwn(this._handlers, name)) {
       return;
     }

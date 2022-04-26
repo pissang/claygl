@@ -296,7 +296,6 @@ const GLTFLoader = Base.extend(
         if (chunkType === 0x4e4f534a) {
           const arr = new Uint8Array(buffer, i + 12, chunkLength);
           // TODO, for the browser not support TextDecoder.
-          /* global TextDecoder */
           const decoder = new TextDecoder();
           const str = decoder.decode(arr);
           try {
@@ -621,7 +620,6 @@ const GLTFLoader = Base.extend(
             if (imageInfo.uri) {
               uri = this.resolveTexturePath(imageInfo.uri);
             } else if (imageInfo.bufferView != null) {
-              /* global URL Blob */
               uri = URL.createObjectURL(
                 new Blob([lib.bufferViews[imageInfo.bufferView]], {
                   type: imageInfo.mimeType

@@ -148,7 +148,6 @@ const textureUtil = {
    * @return {HTMLCanvasElement}
    */
   heightToNormal: function (image, checkBump) {
-    /* global document */
     const canvas = document.createElement('canvas');
     const width = (canvas.width = image.width);
     const height = (canvas.height = image.height);

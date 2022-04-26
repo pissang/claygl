@@ -2,7 +2,7 @@ import * as util from './util';
 
 const DIRTY_PREFIX = '__dt__';
 
-class Cache<D extends Record<string, any> = Record<string, any>> {
+class ClayCache<D extends Record<string, any> = Record<string, any>> {
   private _contextId = 0;
   private _caches: D[] = [];
   private _context = {} as D;
@@ -30,13 +30,13 @@ class Cache<D extends Record<string, any> = Record<string, any>> {
     return this._context[key];
   }
 
-  dirty(field: string) {
+  dirty(field?: string) {
     field = field || '';
     const key = DIRTY_PREFIX + field;
     this.put(key, true as any);
   }
 
-  dirtyAll(field: string) {
+  dirtyAll(field?: string) {
     field = field || '';
     const key = DIRTY_PREFIX + field;
     const caches = this._caches;
@@ -47,13 +47,13 @@ class Cache<D extends Record<string, any> = Record<string, any>> {
     }
   }
 
-  fresh(field: string) {
+  fresh(field?: string) {
     field = field || '';
     const key = DIRTY_PREFIX + field;
     this.put(key, false as any);
   }
 
-  freshAll(field: string) {
+  freshAll(field?: string) {
     field = field || '';
     const key = DIRTY_PREFIX + field;
     const caches = this._caches;
@@ -64,7 +64,7 @@ class Cache<D extends Record<string, any> = Record<string, any>> {
     }
   }
 
-  isDirty(field: string) {
+  isDirty(field?: string) {
     field = field || '';
     const key = DIRTY_PREFIX + field;
     const context = this._context;
@@ -100,4 +100,4 @@ class Cache<D extends Record<string, any> = Record<string, any>> {
   }
 }
 
-export default Cache;
+export default ClayCache;

@@ -5,7 +5,6 @@ function get(options: {
   onload?: (data: any) => void;
   onerror?: () => void;
 }) {
-  /* global XMLHttpRequest */
   const xhr = new XMLHttpRequest();
 
   xhr.open('get', options.url);

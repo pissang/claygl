@@ -272,6 +272,7 @@ export const sqrDist = squaredDistance;
  * @param a vector to calculate length of
  * @returns length of a
  */
+// eslint-disable-next-line
 export function length(a: Vec3Array) {
   const x = a[0],
     y = a[1],
@@ -597,13 +598,14 @@ export function rotateZ(out: Vec3Array, a: Vec3Array, b: Vec3Array, c: number) {
  */
 export const forEach = (function () {
   const vec = create();
-
   return function <T>(
     a: { readonly length: number; [n: number]: number },
-    stride: number,
-    offset: number,
-    count: number,
-    fn: (a: Vec3Array, b: Vec3Array, arg?: T) => void,
+    stride: number | undefined,
+    offset: number | undefined,
+    count: number | undefined,
+    fn: undefined extends T
+      ? (a: Vec3Array, b: Vec3Array) => void
+      : (a: Vec3Array, b: Vec3Array, arg: T) => void,
     arg?: T
   ) {
     let i, l;

@@ -268,7 +268,7 @@ class Matrix4 {
    * @param position
    * @see http://msdn.microsoft.com/en-us/library/microsoft.xna.framework.matrix.decompose.aspx
    */
-  decomposeMatrixfunction(scale: Vector3, rotation: Quaternion, position: Vector3) {
+  decomposeMatrix(scale: Vector3 | undefined, rotation: Quaternion, position: Vector3) {
     const el = this.array;
     vec3.set(x, el[0], el[1], el[2]);
     vec3.set(y, el[4], el[5], el[6]);

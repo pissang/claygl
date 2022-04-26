@@ -80,8 +80,7 @@ export function each(obj: any, iterator: Function, context: any) {
 
 /**
  * Is object
- * @param  {}  obj
- * @return {boolean}
+ * @param obj
  * @memberOf clay.core.util
  */
 export function isObject(obj: any) {
@@ -90,8 +89,7 @@ export function isObject(obj: any) {
 
 /**
  * Is array like, which have a length property
- * @param  {}  obj
- * @return {boolean}
+ * @param obj
  * @memberOf clay.core.util
  */
 export function isArrayLike(obj: any): obj is ArrayLike<any> {
@@ -103,7 +101,7 @@ export function isArrayLike(obj: any): obj is ArrayLike<any> {
 }
 
 /**
- * @param  {} obj
+ * @param obj
  * @return {}
  * @memberOf clay.core.util
  */
@@ -126,4 +124,8 @@ export function clone<T>(obj: T): T {
 
 export function hasOwn(obj: any, key: string) {
   return obj != null && Object.prototype.hasOwnProperty.call(obj, key);
+}
+
+export function optional<T>(val: T, defaultVal: Exclude<T, undefined | null>) {
+  return val == null ? defaultVal : (val as Exclude<T, undefined | null>);
 }

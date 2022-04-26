@@ -23,7 +23,6 @@ const EXTENSION_LIST = [
 
 const PARAMETER_NAMES = ['MAX_TEXTURE_SIZE', 'MAX_CUBE_MAP_TEXTURE_SIZE'];
 
-/* global WebGLRenderingContext */
 class GLInfo {
   private _extensions: Record<string, any> = {};
   private _parameters: Record<string, any> = {};

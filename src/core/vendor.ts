@@ -5,7 +5,6 @@ let supportWebGL: boolean;
 interface Vendor {
   supportWebGL: () => boolean;
   requestAnimationFrame: (cb: () => void) => void;
-  /* global HTMLCanvasElement HTMLImageElement */
   createCanvas: () => HTMLCanvasElement;
   createImage: () => HTMLImageElement;
   request: {
@@ -23,7 +22,6 @@ const vendor = {} as Vendor;
 vendor.supportWebGL = function () {
   if (supportWebGL == null) {
     try {
-      /* global document */
       const canvas = document.createElement('canvas');
       const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
       if (!gl) {

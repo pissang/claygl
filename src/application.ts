@@ -414,7 +414,6 @@ function App3D(dom, appNS) {
 }
 
 function isImageLikeElement(val) {
-  /* global Image, HTMLCanvasElement, HTMLVideoElement */
   return (
     (typeof Image !== 'undefined' && val instanceof Image) ||
     (typeof HTMLCanvasElement !== 'undefined' && val instanceof HTMLCanvasElement) ||
