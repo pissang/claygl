@@ -8,6 +8,14 @@ import type { AttributeSize, AttributeType, AttributeValue } from './GeometryBas
 
 const tmpBoundingBox = new BoundingBox();
 
+export interface InstancedAttributeBuffer {
+  type: AttributeType;
+  symbol: string;
+  divisor: number;
+  size: number;
+  buffer: WebGLBuffer;
+}
+
 interface InstancedAttribute {
   symbol: string;
   type: AttributeType;
@@ -90,7 +98,7 @@ class InstancedMesh extends Mesh {
 
     cache.use(renderer.__uid__);
 
-    const buffers = cache.get('buffers') || [];
+    const buffers: InstancedAttributeBuffer[] = cache.get('buffers') || [];
 
     if (cache.isDirty('dirty')) {
       const gl = renderer.gl;
@@ -102,7 +110,7 @@ class InstancedMesh extends Mesh {
         if (!bufferObj) {
           bufferObj = {
             buffer: gl.createBuffer()
-          };
+          } as InstancedAttributeBuffer;
           buffers[i] = bufferObj;
         }
         bufferObj.symbol = attr.symbol;
@@ -111,7 +119,8 @@ class InstancedMesh extends Mesh {
         bufferObj.type = attr.type;
 
         gl.bindBuffer(gl.ARRAY_BUFFER, bufferObj.buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, attr.value, gl.DYNAMIC_DRAW);
+        // TODO Type
+        gl.bufferData(gl.ARRAY_BUFFER, attr.value as any as ArrayBufferView, gl.DYNAMIC_DRAW);
       }
 
       cache.fresh('dirty');

@@ -21,7 +21,7 @@ class Mesh extends Renderable {
   /**
    * Offset matrix used for multiple skinned mesh clone sharing one skeleton
    */
-  offsetMatrix?: Matrix4[];
+  offsetMatrix?: Matrix4;
 
   constructor(opts?: Partial<MeshOpts>) {
     opts = opts || {};

@@ -1,10 +1,17 @@
-// @ts-nocheck
+import Material from '../Material';
+import Renderer, { RenderableObject } from '../Renderer';
+import Scene from '../Scene';
+import { ShaderDefineValue, ShaderPrecision } from '../Shader';
 import GLProgram from './GLProgram';
 
 const loopRegex =
   /for\s*?\(int\s*?_idx_\s*=\s*([\w-]+);\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
 
-function unrollLoop(shaderStr, defines, lightsNumbers) {
+function unrollLoop(
+  shaderStr: string,
+  defines: Record<string, ShaderDefineValue>,
+  lightsNumbers: Record<string, number>
+) {
   // Loop unroll from three.js, https://github.com/mrdoob/three.js/blob/master/src/renderers/webgl/WebGLProgram.js#L175
   // In some case like shadowMap in loop use 'i' to index value much slower.
 
@@ -14,21 +21,21 @@ function unrollLoop(shaderStr, defines, lightsNumbers) {
   // for (int _idx_ = 0; _idx_ < 4; _idx_++) {{
   //     vec3 color = texture2D(textures[_idx_], uv).rgb;
   // }}
-  function replace(match, start, end, snippet) {
+  function replace(match: string, start: string, end: string, snippet: string) {
     let unroll = '';
     // Try to treat as define
-    if (isNaN(start)) {
+    if (isNaN(start as any as number)) {
       if (start in defines) {
-        start = defines[start];
+        start = defines[start] as string;
       } else {
-        start = lightNumberDefines[start];
+        start = lightNumberDefines[start] as any as string;
       }
     }
-    if (isNaN(end)) {
+    if (isNaN(end as any as number)) {
       if (end in defines) {
-        end = defines[end];
+        end = defines[end] as string;
       } else {
-        end = lightNumberDefines[end];
+        end = lightNumberDefines[end] as any as string;
       }
     }
     // TODO Error checking
@@ -44,14 +51,18 @@ function unrollLoop(shaderStr, defines, lightsNumbers) {
     return unroll;
   }
 
-  const lightNumberDefines = {};
+  const lightNumberDefines: Record<string, number> = {};
   for (const lightType in lightsNumbers) {
     lightNumberDefines[lightType + '_COUNT'] = lightsNumbers[lightType];
   }
   return shaderStr.replace(loopRegex, replace);
 }
 
-function getDefineCode(defines, lightsNumbers, enabledTextures) {
+function getDefineCode(
+  defines: Record<string, ShaderDefineValue>,
+  lightsNumbers?: Record<string, number>,
+  enabledTextures?: string[]
+) {
   const defineStr = [];
   if (lightsNumbers) {
     for (const lightType in lightsNumbers) {
@@ -70,7 +81,7 @@ function getDefineCode(defines, lightsNumbers, enabledTextures) {
   // Custom Defines
   for (const symbol in defines) {
     const value = defines[symbol];
-    if (value === null) {
+    if (value == null) {
       defineStr.push('#define ' + symbol);
     } else {
       defineStr.push('#define ' + symbol + ' ' + value.toString());
@@ -79,7 +90,7 @@ function getDefineCode(defines, lightsNumbers, enabledTextures) {
   return defineStr.join('\n');
 }
 
-function getExtensionCode(exts) {
+function getExtensionCode(exts: string[][]) {
   // Extension declaration must before all non-preprocessor codes
   // TODO vertex ? extension enum ?
   const extensionStr = [];
@@ -89,7 +100,7 @@ function getExtensionCode(exts) {
   return extensionStr.join('\n');
 }
 
-function getPrecisionCode(precision) {
+function getPrecisionCode(precision: ShaderPrecision) {
   return (
     ['precision', precision, 'float'].join(' ') +
     ';\n' +
@@ -101,101 +112,106 @@ function getPrecisionCode(precision) {
   );
 }
 
-function ProgramManager(renderer) {
-  this._renderer = renderer;
-  this._cache = {};
-}
+class ProgramManager {
+  private _renderer: Renderer;
+  private _cache: Record<string, GLProgram> = {};
+  constructor(renderer: Renderer) {
+    this._renderer = renderer;
+  }
 
-ProgramManager.prototype.getProgram = function (renderable, material, scene, renderer) {
-  const cache = this._cache;
+  getProgram(renderable: RenderableObject, material: Material, scene: Scene) {
+    const cache = this._cache;
+    const renderer = this._renderer;
 
-  const isSkinnedMesh = renderable.isSkinnedMesh && renderable.isSkinnedMesh();
-  const isInstancedMesh = renderable.isInstancedMesh && renderable.isInstancedMesh();
-  let key = 's' + material.shader.shaderID + 'm' + material.getProgramKey();
-  if (scene) {
-    key += 'se' + scene.getProgramKey(renderable.lightGroup);
-  }
-  if (isSkinnedMesh) {
-    key += ',sk' + renderable.joints.length;
-  }
-  if (isInstancedMesh) {
-    key += ',is';
-  }
-  if (renderer.logDepthBuffer) {
-    key += ',ld';
-  }
-  let program = cache[key];
+    const isSkinnedMesh = renderable.isSkinnedMesh && renderable.isSkinnedMesh();
+    const isInstancedMesh = renderable.isInstancedMesh && renderable.isInstancedMesh();
+    const shader = material.shader!;
+    let key = 's' + material.shader!.shaderID + 'm' + material.getProgramKey();
+    if (scene) {
+      key += 'se' + scene.getProgramKey(renderable.lightGroup || 0);
+    }
+    if (isSkinnedMesh) {
+      key += ',sk' + renderable.joints.length;
+    }
+    if (isInstancedMesh) {
+      key += ',is';
+    }
+    if (renderer.logDepthBuffer) {
+      key += ',ld';
+    }
+    let program = cache[key];
 
-  if (program) {
+    if (program) {
+      return program;
+    }
+
+    const lightsNumbers = scene ? scene.getLightsNumbers(renderable.lightGroup || 0) : {};
+    const _gl = renderer.gl;
+    const enabledTextures = material.getEnabledTextures();
+    let extraDefineCode = '';
+    if (isSkinnedMesh) {
+      const skinDefines: Record<string, ShaderDefineValue> = {
+        SKINNING: null,
+        JOINT_COUNT: renderable.joints.length
+      };
+      if (renderable.joints.length > renderer.getMaxJointNumber()) {
+        skinDefines.USE_SKIN_MATRICES_TEXTURE = null;
+      }
+      // TODO Add skinning code?
+      extraDefineCode += '\n' + getDefineCode(skinDefines) + '\n';
+    }
+    if (isInstancedMesh) {
+      extraDefineCode += '\n#define INSTANCING\n';
+    }
+    if (renderer.logDepthBuffer) {
+      extraDefineCode += '\n#define LOG_DEPTH\n';
+    }
+    // TODO Optimize key generation
+    // VERTEX
+    let vertexDefineStr =
+      extraDefineCode + getDefineCode(material.vertexDefines, lightsNumbers, enabledTextures);
+    // FRAGMENT
+    let fragmentDefineStr =
+      extraDefineCode + getDefineCode(material.fragmentDefines, lightsNumbers, enabledTextures);
+
+    const extensions = [
+      ['OES_standard_derivatives', 'STANDARD_DERIVATIVES'],
+      ['EXT_shader_texture_lod', 'TEXTURE_LOD'],
+      ['EXT_frag_depth', 'FRAG_DEPTH']
+    ].filter(function (ext) {
+      return renderer.getGLExtension(ext[0]) != null;
+    });
+
+    for (let i = 0; i < extensions.length; i++) {
+      const extDefineCode = '\n#define SUPPORT_' + extensions[i][1];
+      fragmentDefineStr += extDefineCode;
+      vertexDefineStr += extDefineCode;
+    }
+
+    const vertexCode = vertexDefineStr + '\n' + shader.vertex;
+
+    const fragmentCode =
+      getExtensionCode(extensions) +
+      '\n' +
+      getPrecisionCode(material.precision) +
+      '\n' +
+      fragmentDefineStr +
+      '\n' +
+      shader!.fragment;
+
+    const finalVertexCode = unrollLoop(vertexCode, material.vertexDefines, lightsNumbers);
+    const finalFragmentCode = unrollLoop(fragmentCode, material.fragmentDefines, lightsNumbers);
+
+    program = new GLProgram();
+    program.uniformSemantics = shader.uniformSemantics;
+    program.attributes = shader.attributes;
+    const errorMsg = program.buildProgram(_gl, shader, finalVertexCode, finalFragmentCode);
+    program.__error = errorMsg;
+
+    cache[key] = program;
+
     return program;
   }
-
-  const lightsNumbers = scene ? scene.getLightsNumbers(renderable.lightGroup) : {};
-  const _gl = renderer.gl;
-  const enabledTextures = material.getEnabledTextures();
-  let extraDefineCode = '';
-  if (isSkinnedMesh) {
-    const skinDefines = {
-      SKINNING: null,
-      JOINT_COUNT: renderable.joints.length
-    };
-    if (renderable.joints.length > renderer.getMaxJointNumber()) {
-      skinDefines.USE_SKIN_MATRICES_TEXTURE = null;
-    }
-    // TODO Add skinning code?
-    extraDefineCode += '\n' + getDefineCode(skinDefines) + '\n';
-  }
-  if (isInstancedMesh) {
-    extraDefineCode += '\n#define INSTANCING\n';
-  }
-  if (renderer.logDepthBuffer) {
-    extraDefineCode += '\n#define LOG_DEPTH\n';
-  }
-  // TODO Optimize key generation
-  // VERTEX
-  let vertexDefineStr =
-    extraDefineCode + getDefineCode(material.vertexDefines, lightsNumbers, enabledTextures);
-  // FRAGMENT
-  let fragmentDefineStr =
-    extraDefineCode + getDefineCode(material.fragmentDefines, lightsNumbers, enabledTextures);
-
-  const extensions = [
-    ['OES_standard_derivatives', 'STANDARD_DERIVATIVES'],
-    ['EXT_shader_texture_lod', 'TEXTURE_LOD'],
-    ['EXT_frag_depth', 'FRAG_DEPTH']
-  ].filter(function (ext) {
-    return renderer.getGLExtension(ext[0]) != null;
-  });
-
-  for (let i = 0; i < extensions.length; i++) {
-    const extDefineCode = '\n#define SUPPORT_' + extensions[i][1];
-    fragmentDefineStr += extDefineCode;
-    vertexDefineStr += extDefineCode;
-  }
-
-  const vertexCode = vertexDefineStr + '\n' + material.shader.vertex;
-
-  const fragmentCode =
-    getExtensionCode(extensions) +
-    '\n' +
-    getPrecisionCode(material.precision) +
-    '\n' +
-    fragmentDefineStr +
-    '\n' +
-    material.shader.fragment;
-
-  const finalVertexCode = unrollLoop(vertexCode, material.vertexDefines, lightsNumbers);
-  const finalFragmentCode = unrollLoop(fragmentCode, material.fragmentDefines, lightsNumbers);
-
-  program = new GLProgram();
-  program.uniformSemantics = material.shader.uniformSemantics;
-  program.attributes = material.shader.attributes;
-  const errorMsg = program.buildProgram(_gl, material.shader, finalVertexCode, finalFragmentCode);
-  program.__error = errorMsg;
-
-  cache[key] = program;
-
-  return program;
-};
+}
 
 export default ProgramManager;

@@ -1,3 +1,4 @@
+import { genGUID } from '../core/util';
 import type Renderer from '../Renderer';
 import Shader, { ParsedUniformSemantic } from '../Shader';
 import type Texture from '../Texture';
@@ -38,8 +39,10 @@ function checkShaderErrorMsg(
 const tmpFloat32Array16 = new Float32Array(16);
 
 class GLProgram {
+  readonly __uid__ = genGUID();
+
   uniformSemantics: Record<string, ParsedUniformSemantic> = {};
-  attributes: Record<string, boolean> = {};
+  attributes: Shader['attributes'] = {};
 
   vertexCode: string = '';
   fragmentCode: string = '';
@@ -50,6 +53,9 @@ class GLProgram {
 
   // @ts-ignore
   private _program: WebGLProgram;
+
+  // Error message
+  __error?: string;
 
   constructor() {}
   bind(renderer: Renderer) {
@@ -62,7 +68,7 @@ class GLProgram {
     return location !== null && location !== undefined;
   }
 
-  useTextureSlot(renderer: Renderer, texture: Texture, slot: number) {
+  useTextureSlot(renderer: Renderer, texture: Texture | undefined, slot: number) {
     if (texture) {
       renderer.gl.activeTexture(renderer.gl.TEXTURE0 + slot);
       // Maybe texture is not loaded yet;
@@ -83,7 +89,7 @@ class GLProgram {
     this._textureSlot = slot || 0;
   }
 
-  takeCurrentTextureSlot(renderer: Renderer, texture: Texture) {
+  takeCurrentTextureSlot(renderer: Renderer, texture?: Texture) {
     const textureSlot = this._textureSlot;
 
     this.useTextureSlot(renderer, texture, textureSlot);
@@ -189,7 +195,7 @@ class GLProgram {
     return true;
   }
 
-  setUniformOfSemantic(_gl: WebGLRenderingContext, semantic: string, val: string) {
+  setUniformOfSemantic(_gl: WebGLRenderingContext, semantic: string, val: any) {
     const semanticInfo = this.uniformSemantics[semantic];
     if (semanticInfo) {
       return this.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, val);

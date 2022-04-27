@@ -1,6 +1,6 @@
 import * as util from './core/util';
 import * as colorUtil from './core/color';
-import Shader, { ShaderDefineValue, ShaderType, ShaderUniform } from './Shader';
+import Shader, { ShaderDefineValue, ShaderPrecision, ShaderType, ShaderUniform } from './Shader';
 const parseColor = colorUtil.parseToFloat;
 
 const programKeyCache: Record<string, string> = {};
@@ -103,7 +103,7 @@ class Material {
    */
   autoUpdateTextureStatus = true;
 
-  precision: 'highp' | 'lowp' | 'mediump' = 'highp';
+  precision: ShaderPrecision = 'highp';
 
   uniforms: Record<string, ShaderUniform> = {};
   vertexDefines: Record<string, ShaderDefineValue> = {};

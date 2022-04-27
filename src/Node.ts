@@ -10,6 +10,8 @@ import type Mesh from './Mesh';
 import type Geometry from './Geometry';
 import type Renderable from './Renderable';
 import type Skeleton from './Skeleton';
+import type Renderer from './Renderer';
+import type InstancedMesh from './InstancedMesh';
 
 let nameId = 0;
 const tmpMat4Arr = mat4.create();
@@ -55,7 +57,9 @@ export interface ClayNodeOpts {
   invisible?: boolean;
 }
 
-interface ClayNode extends ClayNodeOpts {}
+interface ClayNode extends ClayNodeOpts {
+  dispose(renderer: Renderer): void;
+}
 class ClayNode extends Notifier {
   readonly __uid__: number = genGUID();
 
@@ -89,9 +93,6 @@ class ClayNode extends Notifier {
 
   private _inIterating = false;
 
-  // Depth for transparent list sorting
-  __depth = 0;
-
   constructor(opts?: Partial<ClayNodeOpts>) {
     super();
 
@@ -123,6 +124,9 @@ class ClayNode extends Notifier {
    * @return {boolean}
    */
   isRenderable(): this is Renderable {
+    return false;
+  }
+  isInstancedMesh(): this is InstancedMesh {
     return false;
   }
 

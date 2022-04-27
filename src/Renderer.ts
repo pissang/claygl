@@ -18,15 +18,23 @@ Shader.import(prezEssl);
 import * as mat4 from './glmatrix/mat4';
 import * as vec3 from './glmatrix/vec3';
 import type Renderable from './Renderable';
-import type { IndicesBuffer } from './GeometryBase';
+import GeometryBase, { AttributeBuffer, IndicesBuffer } from './GeometryBase';
 import type FrameBuffer from './FrameBuffer';
 import type Scene from './Scene';
 import { Color, GLEnum } from './core/type';
-import { genGUID } from './core/util';
+import { genGUID, optional } from './core/util';
+import type Camera from './Camera';
+import type Texture from './Texture';
+import type ClayNode from './Node';
+import GLProgram from './gpu/GLProgram';
+import type InstancedMesh from './InstancedMesh';
+import type Mesh from './Mesh';
+import type Skeleton from './Skeleton';
+import Matrix4 from './math/Matrix4';
 
 const mat4Create = mat4.create;
 
-const errorShader = {};
+const errorShader: Record<string, boolean> = {};
 
 function defaultGetMaterial(renderable: Renderable) {
   return renderable.material;
@@ -42,7 +50,7 @@ function defaultIsMaterialChanged(
 ) {
   return material !== prevMaterial;
 }
-function defaultIfRender(renderable: Renderable) {
+function defaultIfRender() {
   return true;
 }
 
@@ -58,12 +66,12 @@ const attributeBufferTypeMap = {
 
 class VertexArrayObject {
   vao?: any;
-  availableAttributes: string[];
+  availableAttributes: AttributeBuffer[];
   availableAttributeSymbols: string[];
   indicesBuffer: IndicesBuffer;
 
   constructor(
-    availableAttributes: string[],
+    availableAttributes: AttributeBuffer[],
     availableAttributeSymbols: string[],
     indicesBuffer: IndicesBuffer
   ) {
@@ -73,11 +81,15 @@ class VertexArrayObject {
   }
 }
 
-function PlaceHolderTexture(renderer: Renderer) {
+const vaoMap = new WeakMap<GeometryBase, Record<string, VertexArrayObject>>();
+
+function createPlaceHolderTexture() {
   let blankCanvas: HTMLCanvasElement;
   let webglTexture: WebGLTexture;
 
   return {
+    __slot: -1,
+
     bind(renderer: Renderer) {
       if (!blankCanvas) {
         // TODO Environment not support createCanvas.
@@ -105,6 +117,65 @@ function PlaceHolderTexture(renderer: Renderer) {
   };
 }
 
+/**
+ * A very basic renderable that is used in renderPass
+ */
+export interface RenderableObject {
+  geometry: GeometryBase;
+  material: Material;
+  mode?: GLEnum;
+  lightGroup?: number;
+  worldTransform?: Matrix4;
+
+  cullFace?: GLEnum;
+  frontFace?: GLEnum;
+
+  culling?: boolean;
+  ignorePreZ?: boolean;
+
+  isSkinnedMesh(): this is Mesh & { skeleton: Skeleton };
+  isInstancedMesh(): this is InstancedMesh;
+
+  beforeRender(renderer: Renderer): void;
+  afterRender(renderer: Renderer): void;
+}
+
+interface ExtendedRenderableObject extends RenderableObject {
+  __program: GLProgram;
+  // Depth for transparent list sorting
+  __depth: number;
+  renderOrder: number;
+}
+
+export interface RenderPassConfig<T extends RenderableObject = RenderableObject> {
+  ifRender?(renderable: T): boolean;
+  /**
+   * Get material of renderable
+   */
+  getMaterial?(renderable: T): Material;
+
+  /**
+   * Get uniform from material
+   */
+  getUniform?(renderable: T, material: Material, symbol: string): any;
+
+  isMaterialChanged?(
+    renderable: T,
+    prevRenderable: T,
+    material: Material,
+    prevMaterial: Material
+  ): boolean;
+
+  sortCompare?: (a: T & ExtendedRenderableObject, b: T & ExtendedRenderableObject) => number;
+
+  beforeRender?: (
+    renderer: Renderer,
+    renderable: T,
+    material: Material,
+    prevMaterial: Material | undefined
+  ) => void;
+  afterRender?: (renderer: Renderer, renderable: T) => void;
+}
 interface ExtendedWebGLRenderingContext extends WebGLRenderingContext {
   targetRenderer: Renderer;
 }
@@ -127,24 +198,6 @@ interface RendererOpts {
    * Canvas width
    */
   height: number;
-}
-
-interface Renderer extends Omit<RendererOpts, 'width' | 'height'> {}
-/**
- * @constructor clay.Renderer
- * @extends clay.core.Base
- */
-class Renderer extends Notifier {
-  __uid__ = genGUID();
-  /**
-   * Canvas width, set by resize method
-   */
-  private _width = 100;
-
-  /**
-   * Canvas width, set by resize method
-   */
-  private _height = 100;
 
   /**
    * Device pixel ratio, set by setDevicePixelRatio method
@@ -153,18 +206,18 @@ class Renderer extends Notifier {
    * @type {number}
    * @private
    */
-  devicePixelRatio = (typeof window !== 'undefined' && window.devicePixelRatio) || 1.0;
+  devicePixelRatio: number;
 
   /**
    * Clear color
    */
-  clearColor: Color = [0.0, 0.0, 0.0, 0.0];
+  clearColor: Color;
 
   /**
    * Default:
    *     _gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT | _gl.STENCIL_BUFFER_BIT
    */
-  clearBit: GLEnum = 17664;
+  clearBit: GLEnum;
 
   // Settings when getting context
   // http://www.khronos.org/registry/webgl/specs/latest/#2.4
@@ -172,35 +225,72 @@ class Renderer extends Notifier {
   /**
    * If enable log depth buffer
    */
-  logDepthBuffer = false;
+  logDepthBuffer: boolean;
   /**
    * If enable alpha, default true
    */
-  alpha = true;
+  alpha: boolean;
   /**
    * If enable depth buffer, default true
    */
-  depth = true;
+  depth: boolean;
   /**
    * If enable stencil buffer, default false
    */
-  stencil = false;
+  stencil: boolean;
   /**
    * If enable antialias, default true
    */
-  antialias = true;
+  antialias: boolean;
   /**
    * If enable premultiplied alpha, default true
    */
-  premultipliedAlpha = true;
+  premultipliedAlpha: boolean;
   /**
    * If preserve drawing buffer, default false
    */
-  preserveDrawingBuffer = false;
+  preserveDrawingBuffer: boolean;
   /**
    * If throw context error, usually turned on in debug mode
    */
-  throwError = true;
+  throwError: boolean;
+}
+
+interface Renderer
+  extends Pick<
+    RendererOpts,
+    'canvas' | 'clearColor' | 'clearBit' | 'logDepthBuffer' | 'throwError'
+  > {}
+/**
+ * @constructor clay.Renderer
+ * @extends clay.core.Base
+ */
+class Renderer extends Notifier {
+  __uid__ = genGUID();
+
+  canvas: HTMLCanvasElement;
+  /**
+   * Canvas width, set by resize method
+   */
+  private _width: number;
+
+  /**
+   * Canvas width, set by resize method
+   */
+  private _height: number;
+
+  /**
+   * Device pixel ratio, set by setDevicePixelRatio method
+   * Specially for high defination display
+   * @see http://www.khronos.org/webgl/wiki/HandlingHighDPI
+   * @type {number}
+   * @private
+   */
+  private _devicePixelRatio: number;
+
+  // Settings when getting context
+  // http://www.khronos.org/registry/webgl/specs/latest/#2.4
+
   /**
    * WebGL Context created from given canvas
    */
@@ -229,25 +319,31 @@ class Renderer extends Notifier {
 
   private _glinfo: GLInfo;
 
+  private _placeholderTexture: {
+    bind(renderer: Renderer): void;
+    unbind(renderer: Renderer): void;
+    __slot: number;
+  };
+  private _prezMaterial?: Material;
+
+  private _programMgr: ProgramManager;
+
   constructor(opts?: Partial<RendererOpts>) {
     opts = opts || {};
     super();
 
-    if (!this.canvas) {
-      this.canvas = vendor.createCanvas();
-    }
-    const canvas = this.canvas;
+    const canvas = (this.canvas = opts.canvas || vendor.createCanvas());
     try {
-      const opts = {
-        alpha: this.alpha,
-        depth: this.depth,
-        stencil: this.stencil,
-        antialias: this.antialias,
-        premultipliedAlpha: this.premultipliedAlpha,
-        preserveDrawingBuffer: this.preserveDrawingBuffer
+      const webglOpts = {
+        alpha: optional(opts.alpha, true),
+        depth: optional(opts.depth, true),
+        stencil: opts.stencil || false,
+        antialias: optional(opts.antialias, true),
+        premultipliedAlpha: optional(opts.premultipliedAlpha, true),
+        preserveDrawingBuffer: optional(opts.preserveDrawingBuffer, false)
       };
 
-      this.gl = canvas.getContext('webgl', opts) as ExtendedWebGLRenderingContext;
+      this.gl = canvas.getContext('webgl', webglOpts) as ExtendedWebGLRenderingContext;
 
       if (!this.gl) {
         throw new Error();
@@ -260,15 +356,25 @@ class Renderer extends Notifier {
       }
       this.gl.targetRenderer = this;
 
-      this.resize();
+      this._width = opts.width || 100;
+      this._height = opts.height || 100;
+      this._devicePixelRatio =
+        opts.devicePixelRatio || (typeof window !== 'undefined' ? window.devicePixelRatio : 1.0);
+      this.resize(this._width, this._height);
     } catch (e) {
       throw 'Error creating WebGL Context ' + e;
     }
 
+    this.throwError = optional(opts.throwError, true);
+    this.logDepthBuffer = opts.logDepthBuffer || false;
+    this.clearColor = opts.clearColor || [0.0, 0.0, 0.0, 0.0];
+    // gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT
+    this.clearBit = opts.clearBit || 17664;
+
     // Init managers
     this._programMgr = new ProgramManager(this);
 
-    this._placeholderTexture = new PlaceHolderTexture(this);
+    this._placeholderTexture = createPlaceHolderTexture();
   }
   /**
    * Resize the canvas
@@ -279,7 +385,7 @@ class Renderer extends Notifier {
     const canvas = this.canvas;
     // http://www.khronos.org/webgl/wiki/HandlingHighDPI
     // set the display size of the canvas.
-    const dpr = this.devicePixelRatio;
+    const dpr = this._devicePixelRatio;
     if (width != null) {
       if (canvas.style) {
         canvas.style.width = width + 'px';
@@ -328,8 +434,8 @@ class Renderer extends Notifier {
    * Set devicePixelRatio
    * @param {number} devicePixelRatio
    */
-  setDevicePixelRatio(devicePixelRatio) {
-    this.devicePixelRatio = devicePixelRatio;
+  setDevicePixelRatio(devicePixelRatio: number) {
+    this._devicePixelRatio = devicePixelRatio;
     this.resize(this._width, this._height);
   }
 
@@ -338,7 +444,7 @@ class Renderer extends Notifier {
    * @param {number} devicePixelRatio
    */
   getDevicePixelRatio() {
-    return this.devicePixelRatio;
+    return this._devicePixelRatio;
   }
 
   /**
@@ -391,7 +497,7 @@ class Renderer extends Notifier {
       height = obj.height;
       dpr = obj.devicePixelRatio;
     }
-    dpr = dpr || this.devicePixelRatio;
+    dpr = dpr || this._devicePixelRatio;
 
     this.gl.viewport(x * dpr, y! * dpr, width! * dpr, height! * dpr);
     // Use a fresh new object, not write property.
@@ -415,8 +521,9 @@ class Renderer extends Notifier {
    * Pop viewport from stack, restore in the renderer
    */
   restoreViewport() {
-    if (this._viewportStack.length > 0) {
-      this.setViewport(this._viewportStack.pop()!);
+    const viewport = this._viewportStack.pop();
+    if (viewport) {
+      this.setViewport(viewport);
     }
   }
 
@@ -434,14 +541,14 @@ class Renderer extends Notifier {
    * Pop clear from stack, restore in the renderer
    */
   restoreClear() {
-    if (this._clearStack.length > 0) {
-      const opt = this._clearStack.pop();
+    const opt = this._clearStack.pop();
+    if (opt) {
       this.clearColor = opt.clearColor;
       this.clearBit = opt.clearBit;
     }
   }
 
-  bindSceneRendering(scene) {
+  bindSceneRendering(scene: Scene) {
     this._sceneRendering = scene;
   }
 
@@ -453,7 +560,7 @@ class Renderer extends Notifier {
    * @param  {boolean}     [preZ]           If use preZ optimization, default false
    * @return {IRenderInfo}
    */
-  render(scene, camera, notUpdateScene, preZ) {
+  render(scene: Scene, camera: Camera, notUpdateScene?: boolean, preZ?: boolean) {
     const _gl = this.gl;
 
     const clearColor = this.clearColor;
@@ -468,7 +575,7 @@ class Renderer extends Notifier {
       if (
         viewport.width !== this._width ||
         viewport.height !== this._height ||
-        (viewportDpr && viewportDpr !== this.devicePixelRatio) ||
+        (viewportDpr && viewportDpr !== this._devicePixelRatio) ||
         viewport.x ||
         viewport.y
       ) {
@@ -493,7 +600,7 @@ class Renderer extends Notifier {
     // If the scene have been updated in the prepass like shadow map
     // There is no need to update it again
     if (!notUpdateScene) {
-      scene.update(false);
+      scene.update();
     }
     scene.updateLights();
 
@@ -536,28 +643,28 @@ class Renderer extends Notifier {
       getMaterial(renderable) {
         return sceneMaterial || renderable.material;
       },
-      sortCompare: this.opaqueSortCompare
+      sortCompare: Renderer.opaqueSortCompare
     });
 
     this.renderPass(transparentList, camera, {
       getMaterial(renderable) {
         return sceneMaterial || renderable.material;
       },
-      sortCompare: this.transparentSortCompare
+      sortCompare: Renderer.transparentSortCompare
     });
 
     scene.trigger('afterrender', this, scene, camera, renderList);
 
     // Cleanup
-    this._sceneRendering = null;
+    this._sceneRendering = undefined;
   }
 
-  getProgram(renderable, renderMaterial, scene) {
+  getProgram(renderable: RenderableObject, renderMaterial: Material, scene: Scene) {
     renderMaterial = renderMaterial || renderable.material;
-    return this._programMgr.getProgram(renderable, renderMaterial, scene, this);
+    return this._programMgr.getProgram(renderable, renderMaterial, scene);
   }
 
-  validateProgram(program) {
+  validateProgram(program: GLProgram) {
     if (program.__error) {
       const errorMsg = program.__error;
       if (errorShader[program.__uid__]) {
@@ -573,7 +680,7 @@ class Renderer extends Notifier {
     }
   }
 
-  updatePrograms(list, scene, passConfig) {
+  updatePrograms(list: RenderableObject[], scene: Scene, passConfig: RenderPassConfig) {
     const getMaterial = (passConfig && passConfig.getMaterial) || defaultGetMaterial;
     scene = scene || null;
     for (let i = 0; i < list.length; i++) {
@@ -581,24 +688,28 @@ class Renderer extends Notifier {
       const renderMaterial = getMaterial.call(this, renderable);
       if (i > 0) {
         const prevRenderable = list[i - 1];
-        const prevJointsLen = prevRenderable.joints ? prevRenderable.joints.length : 0;
-        const jointsLen = renderable.joints ? renderable.joints.length : 0;
+        const prevJointsLen = (prevRenderable as Mesh).joints
+          ? (prevRenderable as Mesh).joints.length
+          : 0;
+        const jointsLen = (renderable as Mesh).joints ? (renderable as Mesh).joints.length : 0;
         // Keep program not change if joints, material, lightGroup are same of two renderables.
         if (
           jointsLen === prevJointsLen &&
           renderable.material === prevRenderable.material &&
           renderable.lightGroup === prevRenderable.lightGroup
         ) {
-          renderable.__program = prevRenderable.__program;
+          (renderable as ExtendedRenderableObject).__program = (
+            prevRenderable as ExtendedRenderableObject
+          ).__program;
           continue;
         }
       }
 
-      const program = this._programMgr.getProgram(renderable, renderMaterial, scene, this);
+      const program = this._programMgr.getProgram(renderable, renderMaterial, scene);
 
       this.validateProgram(program);
 
-      renderable.__program = program;
+      (renderable as ExtendedRenderableObject).__program = program;
     }
   }
 
@@ -616,7 +727,7 @@ class Renderer extends Notifier {
    * @param {Function} [passConfig.sortCompare] Sort compare function.
    * @return {IRenderInfo}
    */
-  renderPass(list, camera, passConfig) {
+  renderPass(list: RenderableObject[], camera: Camera, passConfig?: RenderPassConfig) {
     this.trigger('beforerenderpass', this, list, camera, passConfig);
 
     passConfig = passConfig || {};
@@ -627,11 +738,11 @@ class Renderer extends Notifier {
     passConfig.beforeRender = passConfig.beforeRender || noop;
     passConfig.afterRender = passConfig.afterRender || noop;
 
-    let ifRenderObject = passConfig.ifRender || defaultIfRender;
+    const ifRenderObject = passConfig.ifRender || defaultIfRender;
 
-    this.updatePrograms(list, this._sceneRendering, passConfig);
+    this.updatePrograms(list, this._sceneRendering!, passConfig);
     if (passConfig.sortCompare) {
-      list.sort(passConfig.sortCompare);
+      (list as ExtendedRenderableObject[]).sort(passConfig.sortCompare);
     }
 
     // Some common builtin uniforms
@@ -643,7 +754,7 @@ class Renderer extends Notifier {
       viewport.width * vDpr,
       viewport.height * vDpr
     ];
-    const windowDpr = this.devicePixelRatio;
+    const windowDpr = this._devicePixelRatio;
     const windowSizeUniform = this.__currentFrameBuffer
       ? [this.__currentFrameBuffer.getTextureWidth(), this.__currentFrameBuffer.getTextureHeight()]
       : [this._width * windowDpr, this._height * windowDpr];
@@ -668,26 +779,26 @@ class Renderer extends Notifier {
     const _gl = this.gl;
     const scene = this._sceneRendering;
 
-    let prevMaterial;
-    let prevProgram;
-    let prevRenderable;
+    let prevMaterial: Material | undefined;
+    let prevProgram: GLProgram | undefined;
+    let prevRenderable: RenderableObject | undefined;
 
     // Status
-    let depthTest, depthMask;
-    let culling, cullFace, frontFace;
-    let transparent;
-    let drawID;
-    let currentVAO;
-    let materialTakesTextureSlot;
+    let depthTest: boolean | undefined, depthMask: boolean | undefined;
+    let culling: boolean | undefined, cullFace: GLEnum | undefined, frontFace: GLEnum | undefined;
+    let transparent: boolean | undefined;
+    let drawID: string | undefined;
+    let currentVAO: VertexArrayObject | undefined;
+    let materialTakesTextureSlot: number | undefined;
 
     // const vaoExt = this.getGLExtension('OES_vertex_array_object');
     // not use vaoExt, some platforms may mess it up.
-    const vaoExt = null;
+    let vaoExt: any;
 
     for (let i = 0; i < list.length; i++) {
       const renderable = list[i];
       const isSceneNode = renderable.worldTransform != null;
-      let worldM;
+      let worldM: mat4.Mat4Array;
 
       if (!ifRenderObject(renderable)) {
         continue;
@@ -701,13 +812,13 @@ class Renderer extends Notifier {
               renderable.offsetMatrix
               ? renderable.offsetMatrix.array
               : matrices.IDENTITY
-            : renderable.worldTransform.array;
+            : renderable.worldTransform!.array;
       }
       const geometry = renderable.geometry;
       const material = passConfig.getMaterial.call(this, renderable);
 
-      let program = renderable.__program;
-      const shader = material.shader;
+      let program = (renderable as ExtendedRenderableObject).__program;
+      const shader = material.shader!;
 
       const currentDrawID = geometry.__uid__ + '-' + program.__uid__;
       const drawIDChanged = currentDrawID !== drawID;
@@ -717,11 +828,11 @@ class Renderer extends Notifier {
         vaoExt.bindVertexArrayOES(null);
       }
       if (isSceneNode) {
-        mat4.copy(matrices.WORLD, worldM);
-        mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION, worldM);
-        mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW, worldM);
+        mat4.copy(matrices.WORLD, worldM!);
+        mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION, worldM!);
+        mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW, worldM!);
         if (shader.matrixSemantics.WORLDINVERSE || shader.matrixSemantics.WORLDINVERSETRANSPOSE) {
-          mat4.invert(matrices.WORLDINVERSE, worldM);
+          mat4.invert(matrices.WORLDINVERSE, worldM!);
         }
         if (
           shader.matrixSemantics.WORLDVIEWINVERSE ||
@@ -739,7 +850,7 @@ class Renderer extends Notifier {
 
       // Before render hook
       renderable.beforeRender && renderable.beforeRender(this);
-      passConfig.beforeRender.call(this, renderable, material, prevMaterial);
+      passConfig.beforeRender(this, renderable, material, prevMaterial);
 
       const programChanged = program !== prevProgram;
       if (programChanged) {
@@ -769,16 +880,16 @@ class Renderer extends Notifier {
         // Set lights uniforms
         // TODO needs optimized
         if (scene) {
-          scene.setLightUniforms(program, renderable.lightGroup, this);
+          scene.setLightUniforms(program, renderable.lightGroup!, this);
         }
       } else {
-        program = prevProgram;
+        program = prevProgram!;
       }
 
       // Program changes also needs reset the materials.
       if (
         programChanged ||
-        passConfig.isMaterialChanged(renderable, prevRenderable, material, prevMaterial)
+        passConfig.isMaterialChanged(renderable, prevRenderable!, material, prevMaterial!)
       ) {
         if (material.depthTest !== depthTest) {
           material.depthTest ? _gl.enable(_gl.DEPTH_TEST) : _gl.disable(_gl.DEPTH_TEST);
@@ -812,9 +923,9 @@ class Renderer extends Notifier {
           renderable,
           material,
           program,
-          prevRenderable || null,
-          prevMaterial || null,
-          prevProgram || null,
+          prevRenderable,
+          prevMaterial,
+          prevProgram,
           passConfig.getUniform
         );
         prevMaterial = material;
@@ -837,22 +948,22 @@ class Renderer extends Notifier {
 
       if (renderable.cullFace !== cullFace) {
         cullFace = renderable.cullFace;
-        _gl.cullFace(cullFace);
+        _gl.cullFace(cullFace!);
       }
       if (renderable.frontFace !== frontFace) {
         frontFace = renderable.frontFace;
-        _gl.frontFace(frontFace);
+        _gl.frontFace(frontFace!);
       }
       if (renderable.culling !== culling) {
         culling = renderable.culling;
         culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
       }
       // TODO Not update skeleton in each renderable.
-      this._updateSkeleton(renderable, program, materialTakesTextureSlot);
+      this._updateSkeleton(renderable as Mesh, program, materialTakesTextureSlot!);
       if (drawIDChanged) {
         currentVAO = this._bindVAO(vaoExt, shader, geometry, program);
       }
-      this._renderObject(renderable, currentVAO, program);
+      this._renderObject(renderable, currentVAO!, program);
 
       // After render hook
       passConfig.afterRender(this, renderable);
@@ -874,7 +985,7 @@ class Renderer extends Notifier {
     return this.maxJointNumber;
   }
 
-  _updateSkeleton(object, program, slot) {
+  _updateSkeleton(object: Mesh, program: GLProgram, slot: number) {
     const _gl = this.gl;
     const skeleton = object.skeleton;
     // Set pose matrices of skinned mesh
@@ -896,7 +1007,7 @@ class Renderer extends Notifier {
     }
   }
 
-  _renderObject(renderable, vao, program) {
+  _renderObject(renderable: RenderableObject, vao: VertexArrayObject, program: GLProgram) {
     const _gl = this.gl;
     const geometry = renderable.geometry;
 
@@ -915,7 +1026,10 @@ class Renderer extends Notifier {
       }
     }
 
-    let instancedAttrLocations;
+    let instancedAttrLocations: {
+      location: number;
+      enabled: boolean;
+    }[];
     if (isInstanced) {
       instancedAttrLocations = this._bindInstancedAttributes(renderable, program, ext);
     }
@@ -952,19 +1066,22 @@ class Renderer extends Notifier {
     }
 
     if (isInstanced) {
-      for (let i = 0; i < instancedAttrLocations.length; i++) {
-        if (!instancedAttrLocations[i].enabled) {
-          _gl.disableVertexAttribArray(instancedAttrLocations[i].location);
+      for (let i = 0; i < instancedAttrLocations!.length; i++) {
+        if (!instancedAttrLocations![i].enabled) {
+          _gl.disableVertexAttribArray(instancedAttrLocations![i].location);
         }
-        ext.vertexAttribDivisorANGLE(instancedAttrLocations[i].location, 0);
+        ext.vertexAttribDivisorANGLE(instancedAttrLocations![i].location, 0);
       }
     }
   }
 
-  _bindInstancedAttributes(renderable, program, ext) {
+  _bindInstancedAttributes(renderable: InstancedMesh, program: GLProgram, ext: any) {
     const _gl = this.gl;
-    let instancedBuffers = renderable.getInstancedAttributesBuffers(this);
-    const locations = [];
+    const instancedBuffers = renderable.getInstancedAttributesBuffers(this);
+    const locations: {
+      location: number;
+      enabled: boolean;
+    }[] = [];
 
     for (let i = 0; i < instancedBuffers.length; i++) {
       const bufferObj = instancedBuffers[i];
@@ -974,7 +1091,7 @@ class Renderer extends Notifier {
       }
 
       const glType = attributeBufferTypeMap[bufferObj.type] || _gl.FLOAT;
-      let isEnabled = program.isAttribEnabled(this, location);
+      const isEnabled = program.isAttribEnabled(this, location);
       if (!program.isAttribEnabled(this, location)) {
         _gl.enableVertexAttribArray(location);
       }
@@ -991,13 +1108,13 @@ class Renderer extends Notifier {
   }
 
   _bindMaterial(
-    renderable,
-    material,
-    program,
-    prevRenderable,
-    prevMaterial,
-    prevProgram,
-    getUniformValue
+    renderable: RenderableObject,
+    material: Material,
+    program: GLProgram,
+    prevRenderable: RenderableObject | undefined,
+    prevMaterial: Material | undefined,
+    prevProgram: GLProgram | undefined,
+    getUniformValue: RenderPassConfig['getUniform']
   ) {
     const _gl = this.gl;
     // PENDING Same texture in different material take different slot?
@@ -1012,7 +1129,7 @@ class Renderer extends Notifier {
 
     for (let u = 0; u < textureUniforms.length; u++) {
       const symbol = textureUniforms[u];
-      const uniformValue = getUniformValue(renderable, material, symbol);
+      const uniformValue = getUniformValue!(renderable, material, symbol);
       const uniformType = material.uniforms[symbol].type;
       // Not use `instanceof` to determine if a value is texture in Material#bind.
       // Use type instead, in some case texture may be in different namespaces.
@@ -1035,7 +1152,7 @@ class Renderer extends Notifier {
     for (let u = 0; u < enabledUniforms.length; u++) {
       const symbol = enabledUniforms[u];
       const uniform = material.uniforms[symbol];
-      let uniformValue = getUniformValue(renderable, material, symbol);
+      let uniformValue = getUniformValue!(renderable, material, symbol);
       const uniformType = uniform.type;
       const isTexture = uniformType === 't';
 
@@ -1049,7 +1166,7 @@ class Renderer extends Notifier {
       // Many uniforms will be be set twice even if they have the same value
       // So add a evaluation to see if the uniform is really needed to be set
       if (prevMaterial && sameProgram) {
-        let prevUniformValue = getUniformValue(prevRenderable, prevMaterial, symbol);
+        let prevUniformValue = getUniformValue!(prevRenderable!, prevMaterial, symbol);
         if (isTexture) {
           if (!prevUniformValue || !prevUniformValue.isRenderable()) {
             prevUniformValue = placeholderTexture;
@@ -1059,10 +1176,10 @@ class Renderer extends Notifier {
         if (prevUniformValue === uniformValue) {
           if (isTexture) {
             // Still take the slot to make sure same texture in different materials have same slot.
-            program.takeCurrentTextureSlot(this, null);
+            program.takeCurrentTextureSlot(this);
           } else if (uniformType === 'tv' && uniformValue) {
             for (let i = 0; i < uniformValue.length; i++) {
-              program.takeCurrentTextureSlot(this, null);
+              program.takeCurrentTextureSlot(this);
             }
           }
           continue;
@@ -1123,12 +1240,18 @@ class Renderer extends Notifier {
     return newSlot;
   }
 
-  _bindVAO(vaoExt, shader, geometry, program) {
+  _bindVAO(
+    vaoExt: any,
+    shader: Shader,
+    geometry: GeometryBase,
+    program: GLProgram
+  ): VertexArrayObject | undefined {
     const isStatic = !geometry.dynamic;
     const _gl = this.gl;
 
     const vaoId = this.__uid__ + '-' + program.__uid__;
-    let vao = geometry.__vaoCache[vaoId];
+    let geometryVaos = vaoMap.get(geometry);
+    let vao = geometryVaos && geometryVaos[vaoId];
     if (!vao) {
       const chunks = geometry.getBufferChunks(this);
       if (!chunks || !chunks.length) {
@@ -1161,7 +1284,9 @@ class Renderer extends Notifier {
       vao = new VertexArrayObject(availableAttributes, availableAttributeSymbols, indicesBuffer);
 
       if (isStatic) {
-        geometry.__vaoCache[vaoId] = vao;
+        geometryVaos = geometryVaos || {};
+        geometryVaos[vaoId] = vao;
+        vaoMap.set(geometry, geometryVaos);
       }
     }
 
@@ -1212,7 +1337,7 @@ class Renderer extends Notifier {
     return vao;
   }
 
-  renderPreZ(list, scene, camera) {
+  renderPreZ(list: RenderableObject[], scene: Scene, camera: Camera) {
     const _gl = this.gl;
     const preZPassMaterial =
       this._prezMaterial ||
@@ -1263,7 +1388,7 @@ class Renderer extends Notifier {
       getMaterial() {
         return preZPassMaterial;
       },
-      sort: this.opaqueSortCompare
+      sortCompare: Renderer.opaqueSortCompare
     });
 
     _gl.colorMask(true, true, true, true);
@@ -1274,7 +1399,7 @@ class Renderer extends Notifier {
    * Dispose given scene, including all geometris, textures and shaders in the scene
    * @param {clay.Scene} scene
    */
-  disposeScene(scene) {
+  disposeScene(scene: Scene) {
     this.disposeNode(scene, true, true);
     scene.dispose();
   }
@@ -1285,16 +1410,17 @@ class Renderer extends Notifier {
    * @param {boolean} [disposeGeometry=false] If dispose the geometries used in the descendant mesh
    * @param {boolean} [disposeTexture=false] If dispose the textures used in the descendant mesh
    */
-  disposeNode(root, disposeGeometry, disposeTexture) {
+  disposeNode(root: ClayNode, disposeGeometry?: boolean, disposeTexture?: boolean) {
+    const parent = root.getParent();
     // Dettached from parent
-    if (root.getParent()) {
-      root.getParent().remove(root);
+    if (parent) {
+      parent.remove(root);
     }
-    const disposedMap = {};
-    root.traverse(function (node) {
-      const material = node.material;
-      if (node.geometry && disposeGeometry) {
-        node.geometry.dispose(this);
+    const disposedMap: Record<number, boolean> = {};
+    root.traverse((node) => {
+      const material = (node as Renderable).material;
+      if ((node as Renderable).geometry && disposeGeometry) {
+        (node as Renderable).geometry.dispose(this);
       }
       if (disposeTexture && material && !disposedMap[material.__uid__]) {
         const textureUniforms = material.getTextureUniforms();
@@ -1321,22 +1447,37 @@ class Renderer extends Notifier {
       if (node.dispose) {
         node.dispose(this);
       }
-    }, this);
+    });
   }
 
   /**
    * Dispose given geometry
    * @param {clay.Geometry} geometry
    */
-  disposeGeometry(geometry) {
+  disposeGeometry(geometry: GeometryBase) {
     geometry.dispose(this);
+  }
+
+  /**
+   * @todo
+   * @deprecated
+   */
+  __getGeometryVaoCache(geometry: GeometryBase) {
+    return vaoMap.get(geometry);
+  }
+  /**
+   * @todo
+   * @deprecated
+   */
+  __removeGeometryVaoCache(geometry: GeometryBase) {
+    return vaoMap.delete(geometry);
   }
 
   /**
    * Dispose given texture
    * @param {clay.Texture} texture
    */
-  disposeTexture(texture) {
+  disposeTexture(texture: Texture) {
     texture.dispose(this);
   }
 
@@ -1344,7 +1485,7 @@ class Renderer extends Notifier {
    * Dispose given frame buffer
    * @param {clay.FrameBuffer} frameBuffer
    */
-  disposeFrameBuffer(frameBuffer) {
+  disposeFrameBuffer(frameBuffer: FrameBuffer) {
     frameBuffer.dispose(this);
   }
 
@@ -1363,7 +1504,7 @@ class Renderer extends Notifier {
    * @param  {clay.Vector2} [out]
    * @return {clay.Vector2}
    */
-  screenToNDC(x, y, out) {
+  screenToNDC(x: number, y: number, out: Vector2): Vector2 {
     if (!out) {
       out = new Vector2();
     }
@@ -1379,44 +1520,17 @@ class Renderer extends Notifier {
 
     return out;
   }
-}
 
-/**
- * Opaque renderables compare function
- * @param  {clay.Renderable} x
- * @param  {clay.Renderable} y
- * @return {boolean}
- * @static
- */
-Renderer.opaqueSortCompare = Renderer.prototype.opaqueSortCompare = function (x, y) {
-  // Priority renderOrder -> program -> material -> geometry
-  if (x.renderOrder === y.renderOrder) {
-    if (x.__program === y.__program) {
-      if (x.material === y.material) {
-        return x.geometry.__uid__ - y.geometry.__uid__;
-      }
-      return x.material.__uid__ - y.material.__uid__;
-    }
-    if (x.__program && y.__program) {
-      return x.__program.__uid__ - y.__program.__uid__;
-    }
-    return 0;
-  }
-  return x.renderOrder - y.renderOrder;
-};
-
-/**
- * Transparent renderables compare function
- * @param  {clay.Renderable} a
- * @param  {clay.Renderable} b
- * @return {boolean}
- * @static
- */
-Renderer.transparentSortCompare = Renderer.prototype.transparentSortCompare = function (x, y) {
-  // Priority renderOrder -> depth -> program -> material -> geometry
-
-  if (x.renderOrder === y.renderOrder) {
-    if (x.__depth === y.__depth) {
+  /**
+   * Opaque renderables compare function
+   * @param  {clay.Renderable} x
+   * @param  {clay.Renderable} y
+   * @return {boolean}
+   * @static
+   */
+  static opaqueSortCompare(x: ExtendedRenderableObject, y: ExtendedRenderableObject) {
+    // Priority renderOrder -> program -> material -> geometry
+    if (x.renderOrder === y.renderOrder) {
       if (x.__program === y.__program) {
         if (x.material === y.material) {
           return x.geometry.__uid__ - y.geometry.__uid__;
@@ -1428,15 +1542,45 @@ Renderer.transparentSortCompare = Renderer.prototype.transparentSortCompare = fu
       }
       return 0;
     }
-    // Depth is negative
-    // So farther object has smaller depth value
-    return x.__depth - y.__depth;
+    return x.renderOrder - y.renderOrder;
   }
-  return x.renderOrder - y.renderOrder;
-};
 
+  /**
+   * Transparent renderables compare function
+   * @param  {clay.Renderable} a
+   * @param  {clay.Renderable} b
+   * @return {boolean}
+   * @static
+   */
+  static transparentSortCompare(x: ExtendedRenderableObject, y: ExtendedRenderableObject) {
+    // Priority renderOrder -> depth -> program -> material -> geometry
+
+    if (x.renderOrder === y.renderOrder) {
+      if (x.__depth === y.__depth) {
+        if (x.__program === y.__program) {
+          if (x.material === y.material) {
+            return x.geometry.__uid__ - y.geometry.__uid__;
+          }
+          return x.material.__uid__ - y.material.__uid__;
+        }
+        if (x.__program && y.__program) {
+          return x.__program.__uid__ - y.__program.__uid__;
+        }
+        return 0;
+      }
+      // Depth is negative
+      // So farther object has smaller depth value
+      return x.__depth - y.__depth;
+    }
+    return x.renderOrder - y.renderOrder;
+  }
+
+  static COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT;
+  static DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT;
+  static STENCIL_BUFFER_BIT = glenum.STENCIL_BUFFER_BIT;
+}
 // Temporary variables
-const matrices = {
+const matrices: Record<string, mat4.Mat4Array> = {
   IDENTITY: mat4Create(),
 
   WORLD: mat4Create(),
@@ -1466,21 +1610,5 @@ const matrices = {
   VIEWPROJECTIONINVERSETRANSPOSE: mat4Create(),
   WORLDVIEWPROJECTIONINVERSETRANSPOSE: mat4Create()
 };
-
-/**
- * @name clay.Renderer.COLOR_BUFFER_BIT
- * @type {number}
- */
-Renderer.COLOR_BUFFER_BIT = glenum.COLOR_BUFFER_BIT;
-/**
- * @name clay.Renderer.DEPTH_BUFFER_BIT
- * @type {number}
- */
-Renderer.DEPTH_BUFFER_BIT = glenum.DEPTH_BUFFER_BIT;
-/**
- * @name clay.Renderer.STENCIL_BUFFER_BIT
- * @type {number}
- */
-Renderer.STENCIL_BUFFER_BIT = glenum.STENCIL_BUFFER_BIT;
 
 export default Renderer;

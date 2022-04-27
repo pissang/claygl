@@ -1,12 +1,13 @@
 import glenum from './core/glenum';
 import ClayCache from './core/Cache';
-import { Vector2 } from './claygl';
 import Ray from './math/Ray';
+import { genGUID } from './core/util';
 import { Vec3Array } from './glmatrix/common';
 
 import type Renderer from './Renderer';
 import type Camera from './Camera';
 import type Renderable from './Renderable';
+import type Vector2 from './math/Vector2';
 
 export type AttributeType = 'byte' | 'ubyte' | 'short' | 'ushort' | 'float';
 export type AttributeSize = 1 | 2 | 3 | 4;
@@ -291,6 +292,8 @@ export interface GeometryBaseOpts {
 
 interface GeometryBase extends GeometryBaseOpts {}
 class GeometryBase {
+  readonly __uid__ = genGUID();
+
   /**
    * Attributes of geometry.
    */
@@ -333,8 +336,6 @@ class GeometryBase {
   protected _cache = new ClayCache();
   private _attributeList: string[];
   private _enabledAttributes?: string[];
-
-  __vaoCache: Record<string, { vao: any }> = {};
 
   constructor(opts?: Partial<GeometryBaseOpts>) {
     opts = opts || {};
@@ -655,16 +656,18 @@ class GeometryBase {
         }
       }
     }
-    if (this.__vaoCache) {
+
+    const vaoCache = renderer.__getGeometryVaoCache(this);
+    if (vaoCache) {
       const vaoExt = renderer.getGLExtension('OES_vertex_array_object');
-      for (const id in this.__vaoCache) {
-        const vao = this.__vaoCache[id].vao;
+      for (const id in vaoCache) {
+        const vao = vaoCache[id].vao;
         if (vao) {
           vaoExt.deleteVertexArrayOES(vao);
         }
       }
     }
-    this.__vaoCache = {};
+    renderer.__removeGeometryVaoCache(this);
     cache.deleteContext(renderer.__uid__);
   }
 

@@ -1,8 +1,10 @@
 import ClayNode, { ClayNodeOpts, GetBoundingBoxFilter } from './Node';
 import glenum from './core/glenum';
+import BoundingBox from './math/BoundingBox';
+import type Renderer from './Renderer';
 import type Material from './Material';
 import type Geometry from './Geometry';
-import { BoundingBox } from './claygl';
+import { GLEnum } from './core/type';
 
 export interface RenderableOpts extends ClayNodeOpts {
   material: Material;
@@ -37,7 +39,7 @@ export interface RenderableOpts extends ClayNodeOpts {
    *  + {@link clay.Renderable.FRONT_AND_BACK}
    * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/cullFace
    */
-  cullFace: number;
+  cullFace: GLEnum;
 
   /**
    * Specify which side is front face.
@@ -46,7 +48,7 @@ export interface RenderableOpts extends ClayNodeOpts {
    *  + {@link clay.Renderable.CCW}
    * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/frontFace
    */
-  frontFace: number;
+  frontFace: GLEnum;
 
   /**
    * If enable software frustum culling
@@ -100,6 +102,9 @@ class Renderable extends ClayNode {
    */
   boundingBox?: BoundingBox;
 
+  // Depth for transparent list sorting
+  __depth = 0;
+
   constructor(opts?: Partial<RenderableOpts>) {
     opts = opts || {};
     super(opts);
@@ -133,13 +138,13 @@ class Renderable extends ClayNode {
    * Before render hook
    * @type {Function}
    */
-  beforeRender(gl: WebGLRenderingContext) {}
+  beforeRender(renderer: Renderer) {}
 
   /**
    * Before render hook
    * @type {Function}
    */
-  afterRender(gl: WebGLRenderingContext, renderStat) {}
+  afterRender(renderer: Renderer) {}
 
   getBoundingBox(filter: GetBoundingBoxFilter, out?: BoundingBox): BoundingBox {
     out = super.getBoundingBox.call(this, filter, out);

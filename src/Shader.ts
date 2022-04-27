@@ -46,6 +46,73 @@ export type UniformType =
   | 'm3v'
   | 'm4v';
 
+interface ParsedAttributeSemantic {
+  symbol: string;
+  type: string;
+}
+interface ParsedMatrixSemantic {
+  symbol: string;
+  type: UniformType;
+  isTranspose: boolean;
+  semanticNoTranspose: string;
+}
+
+export interface ParsedUniformSemantic {
+  symbol: string;
+  type: UniformType;
+}
+
+interface ParsedDeclaration {
+  value: any;
+  isArray: boolean;
+  arraySize: number;
+  ignore: boolean;
+  semantic: string;
+}
+
+interface ParsedTexture {
+  shaderType: 'fragment' | 'vertex';
+  type: 'sampler2D' | 'samplerCube';
+}
+
+interface ParsedAttribute {
+  // TODO Can only be float
+  type: 'float';
+  size: number;
+  semantic?: string;
+}
+
+interface ParsedUniformTemplate {
+  type: UniformType;
+  value: () => void;
+  semantic?: string;
+}
+
+export type ShaderPrecision = 'highp' | 'lowp' | 'mediump';
+
+export interface ShaderUniform {
+  type: UniformType;
+  value: any;
+  semantic?: string;
+}
+
+export type ShaderDefineValue = boolean | string | number | undefined | null;
+/**
+ * @constructor
+ * @extends clay.core.Base
+ * @alias clay.Shader
+ * @param {string} vertex
+ * @param {string} fragment
+ * @example
+ * // Create a phong shader
+ * const shader = new clay.Shader(
+ *      clay.Shader.source('clay.standard.vertex'),
+ *      clay.Shader.source('clay.standard.fragment')
+ * );
+ */
+
+export type ShaderType = 'vertex' | 'fragment';
+
 function createZeroArray(len: number) {
   const arr = [];
   for (let i = 0; i < len; i++) {
@@ -346,71 +413,6 @@ function parseDeclarations(type: string, line: string) {
 
   return declarations;
 }
-
-interface ParsedAttributeSemantic {
-  symbol: string;
-  type: string;
-}
-interface ParsedMatrixSemantic {
-  symbol: string;
-  type: UniformType;
-  isTranspose: boolean;
-  semanticNoTranspose: string;
-}
-
-export interface ParsedUniformSemantic {
-  symbol: string;
-  type: UniformType;
-}
-
-interface ParsedDeclaration {
-  value: any;
-  isArray: boolean;
-  arraySize: number;
-  ignore: boolean;
-  semantic: string;
-}
-
-interface ParsedTexture {
-  shaderType: 'fragment' | 'vertex';
-  type: 'sampler2D' | 'samplerCube';
-}
-
-interface ParsedAttribute {
-  // TODO Can only be float
-  type: 'float';
-  size: number;
-  semantic?: string;
-}
-
-interface ParsedUniformTemplate {
-  type: UniformType;
-  value: () => void;
-  semantic?: string;
-}
-
-export interface ShaderUniform {
-  type: UniformType;
-  value: any;
-  semantic?: string;
-}
-
-export type ShaderDefineValue = boolean | string | number | undefined | null;
-/**
- * @constructor
- * @extends clay.core.Base
- * @alias clay.Shader
- * @param {string} vertex
- * @param {string} fragment
- * @example
- * // Create a phong shader
- * const shader = new clay.Shader(
- *      clay.Shader.source('clay.standard.vertex'),
- *      clay.Shader.source('clay.standard.fragment')
- * );
- */
-
-export type ShaderType = 'vertex' | 'fragment';
 
 class Shader {
   /**

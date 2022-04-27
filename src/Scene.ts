@@ -11,6 +11,7 @@ import type Material from './Material';
 import Mesh from './Mesh';
 import { ShaderUniform, UniformType } from './Shader';
 import Renderer from './Renderer';
+import GLProgram from './gpu/GLProgram';
 
 const IDENTITY = mat4.create();
 const WORLDVIEW = mat4.create();
@@ -513,7 +514,7 @@ class Scene extends ClayNode {
     return this._lightProgramKeys[lightGroup];
   }
 
-  setLightUniformsfunction(program, lightGroup: number, renderer: Renderer) {
+  setLightUniforms(program: GLProgram, lightGroup: number, renderer: Renderer) {
     setUniforms(this._lightUniforms[lightGroup], program, renderer);
     // Set shadows
     setUniforms(this.shadowUniforms, program, renderer);
