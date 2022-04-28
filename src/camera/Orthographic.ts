@@ -1,74 +1,55 @@
-// @ts-nocheck
-import Camera from '../Camera';
+import Camera, { CameraOpts } from '../Camera';
+
+export interface OrthographicCameraOpts extends CameraOpts {
+  left: number;
+  right: number;
+  near: number;
+  far: number;
+  top: number;
+  bottom: number;
+}
+interface OrthographicCamera extends OrthographicCameraOpts {}
 /**
  * @constructor clay.camera.Orthographic
  * @extends clay.Camera
  */
-const Orthographic = Camera.extend(
-  /** @lends clay.camera.Orthographic# */
-  {
-    /**
-     * @type {number}
-     */
-    left: -1,
-    /**
-     * @type {number}
-     */
-    right: 1,
-    /**
-     * @type {number}
-     */
-    near: -1,
-    /**
-     * @type {number}
-     */
-    far: 1,
-    /**
-     * @type {number}
-     */
-    top: 1,
-    /**
-     * @type {number}
-     */
-    bottom: -1
-  },
-  /** @lends clay.camera.Orthographic.prototype */
-  {
-    updateProjectionMatrix: function () {
-      this.projectionMatrix.ortho(
-        this.left,
-        this.right,
-        this.bottom,
-        this.top,
-        this.near,
-        this.far
-      );
-    },
+class OrthographicCamera extends Camera {
+  left = -1;
+  right = 1;
+  near = -1;
+  far = 1;
+  top = 1;
+  bottom = -1;
 
-    decomposeProjectionMatrix: function () {
-      const m = this.projectionMatrix.array;
-      this.left = (-1 - m[12]) / m[0];
-      this.right = (1 - m[12]) / m[0];
-      this.top = (1 - m[13]) / m[5];
-      this.bottom = (-1 - m[13]) / m[5];
-      this.near = -(-1 - m[14]) / m[10];
-      this.far = -(1 - m[14]) / m[10];
-    },
-    /**
-     * @return {clay.camera.Orthographic}
-     */
-    clone: function () {
-      const camera = Camera.prototype.clone.call(this);
-      camera.left = this.left;
-      camera.right = this.right;
-      camera.near = this.near;
-      camera.far = this.far;
-      camera.top = this.top;
-      camera.bottom = this.bottom;
-
-      return camera;
-    }
+  constructor(opts?: Partial<OrthographicCameraOpts>) {
+    opts = opts || {};
+    super(opts);
   }
-);
 
-export default Orthographic;
+  updateProjectionMatrix() {
+    this.projectionMatrix.ortho(this.left, this.right, this.bottom, this.top, this.near, this.far);
+  }
+
+  decomposeProjectionMatrix() {
+    const m = this.projectionMatrix.array;
+    this.left = (-1 - m[12]) / m[0];
+    this.right = (1 - m[12]) / m[0];
+    this.top = (1 - m[13]) / m[5];
+    this.bottom = (-1 - m[13]) / m[5];
+    this.near = -(-1 - m[14]) / m[10];
+    this.far = -(1 - m[14]) / m[10];
+  }
+  clone() {
+    const camera = super.call(this);
+    camera.left = this.left;
+    camera.right = this.right;
+    camera.near = this.near;
+    camera.far = this.far;
+    camera.top = this.top;
+    camera.bottom = this.bottom;
+
+    return camera;
+  }
+}
+
+export default OrthographicCamera;

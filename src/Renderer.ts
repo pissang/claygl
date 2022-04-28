@@ -31,6 +31,7 @@ import type InstancedMesh from './InstancedMesh';
 import type Mesh from './Mesh';
 import type Skeleton from './Skeleton';
 import Matrix4 from './math/Matrix4';
+import PerspectiveCamera from './camera/Perspective';
 
 const mat4Create = mat4.create;
 
@@ -860,15 +861,15 @@ class Renderer extends Notifier {
         program.setUniformOfSemantic(_gl, 'VIEWPORT', viewportUniform);
         program.setUniformOfSemantic(_gl, 'WINDOW_SIZE', windowSizeUniform);
         if (camera) {
-          program.setUniformOfSemantic(_gl, 'NEAR', camera.near);
-          program.setUniformOfSemantic(_gl, 'FAR', camera.far);
+          program.setUniformOfSemantic(_gl, 'NEAR', (camera as PerspectiveCamera).near);
+          program.setUniformOfSemantic(_gl, 'FAR', (camera as PerspectiveCamera).far);
 
           if (this.logDepthBuffer) {
             // TODO Semantic?
             program.setUniformOfSemantic(
               _gl,
               'LOG_DEPTH_BUFFER_FC',
-              2.0 / (Math.log(camera.far + 1.0) / Math.LN2)
+              2.0 / (Math.log((camera as PerspectiveCamera).far + 1.0) / Math.LN2)
             );
           }
         }
@@ -1346,7 +1347,10 @@ class Renderer extends Notifier {
       });
     this._prezMaterial = preZPassMaterial;
     if (this.logDepthBuffer) {
-      this._prezMaterial.setUniform('logDepthBufFC', 2.0 / (Math.log(camera.far + 1.0) / Math.LN2));
+      this._prezMaterial.setUniform(
+        'logDepthBufFC',
+        2.0 / (Math.log((camera as PerspectiveCamera).far + 1.0) / Math.LN2)
+      );
     }
 
     _gl.colorMask(false, false, false, false);

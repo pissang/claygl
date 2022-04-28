@@ -5,7 +5,7 @@ import GeometryBase, { AttributeValue, GeometryAttribute, GeometryBaseOpts } fro
 import type Matrix4 from './math/Matrix4';
 import type Renderer from './Renderer';
 
-interface GeometryOpts extends GeometryBaseOpts {}
+export interface GeometryOpts extends GeometryBaseOpts {}
 
 /**
  * Geometry in ClayGL contains vertex attributes of mesh. These vertex attributes will be finally provided to the {@link clay.Shader}.
@@ -83,7 +83,27 @@ class Geometry extends GeometryBase {
    */
   boundingBox?: BoundingBox;
 
-  constructor(opts?: GeometryOpts) {
+  attributes: {
+    position: GeometryAttribute<3>;
+    texcoord0: GeometryAttribute<2>;
+    texcoord1: GeometryAttribute<2>;
+    normal: GeometryAttribute<3>;
+    tangent: GeometryAttribute<4>;
+    color: GeometryAttribute<4>;
+    // Skinning Geometryattributes
+    // Each vertex can be bind to 4 bones, because the
+    // sum of weights is 1, so the weights is stored in vec3 and the last
+    // can be calculated by 1-w.x-w.y-w.z
+    weight: GeometryAttribute<3>;
+    joint: GeometryAttribute<4>;
+    // For wireframe display
+    // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
+    barycentric: GeometryAttribute<3>;
+
+    // Any other attributes
+    [key: string]: GeometryAttribute;
+  };
+  constructor(opts?: Partial<GeometryOpts>) {
     super(opts);
 
     this.attributes = {
@@ -93,14 +113,8 @@ class Geometry extends GeometryBase {
       normal: new GeometryAttribute('normal', 'float', 3, 'NORMAL'),
       tangent: new GeometryAttribute('tangent', 'float', 4, 'TANGENT'),
       color: new GeometryAttribute('color', 'float', 4, 'COLOR'),
-      // Skinning Geometryattributes
-      // Each vertex can be bind to 4 bones, because the
-      // sum of weights is 1, so the weights is stored in vec3 and the last
-      // can be calculated by 1-w.x-w.y-w.z
       weight: new GeometryAttribute('weight', 'float', 3, 'WEIGHT'),
       joint: new GeometryAttribute('joint', 'float', 4, 'JOINT'),
-      // For wireframe display
-      // http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
       barycentric: new GeometryAttribute('barycentric', 'float', 3, undefined)
     };
   }
@@ -503,41 +517,7 @@ class Geometry extends GeometryBase {
       this.updateBoundingBox();
     }
   }
-  /**
-   * Dispose geometry data in GL context.
-   * @param {clay.Renderer} renderer
-   */
-  dispose(renderer: Renderer) {
-    const cache = this._cache;
 
-    cache.use(renderer.__uid__);
-    const chunks = cache.get('chunks');
-    if (chunks) {
-      for (let c = 0; c < chunks.length; c++) {
-        const chunk = chunks[c];
-
-        for (let k = 0; k < chunk.attributeBuffers.length; k++) {
-          const attribs = chunk.attributeBuffers[k];
-          renderer.gl.deleteBuffer(attribs.buffer);
-        }
-
-        if (chunk.indicesBuffer) {
-          renderer.gl.deleteBuffer(chunk.indicesBuffer.buffer);
-        }
-      }
-    }
-    if (this.__vaoCache) {
-      const vaoExt = renderer.getGLExtension('OES_vertex_array_object');
-      for (const id in this.__vaoCache) {
-        const vao = this.__vaoCache[id].vao;
-        if (vao) {
-          vaoExt.deleteVertexArrayOES(vao);
-        }
-      }
-    }
-    this.__vaoCache = {};
-    cache.deleteContext(renderer.__uid__);
-  }
   static STATIC_DRAW = GeometryBase.STATIC_DRAW;
   static DYNAMIC_DRAW = GeometryBase.DYNAMIC_DRAW;
   static STREAM_DRAW = GeometryBase.STREAM_DRAW;

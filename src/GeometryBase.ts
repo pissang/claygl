@@ -43,7 +43,7 @@ type AttributeArraySetter = (idx: number, value: number[]) => number[];
 /**
  * GeometryBase attribute
  */
-export class GeometryAttribute<TSize extends AttributeSize> {
+export class GeometryAttribute<TSize extends AttributeSize = AttributeSize> {
   /**
    * Attribute name
    * @type {string}

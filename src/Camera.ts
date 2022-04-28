@@ -31,8 +31,9 @@ class Camera extends ClayNode {
    */
   frustum = new Frustum();
 
-  constructor() {
-    super();
+  constructor(opts: Partial<ClayNodeOpts>) {
+    opts = opts || {};
+    super(opts);
     this.update();
   }
 
