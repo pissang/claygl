@@ -38,6 +38,10 @@ abstract class BlendAnimator {
         this.setTime(elapsedTime);
       }
     });
+
+    if (this.timeline) {
+      this.timeline.addClip(this._clip);
+    }
   }
 
   getClip(): Clip | undefined {

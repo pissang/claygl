@@ -47,6 +47,10 @@ class TrackAnimator {
         this.setTime(elapsedTime + (range ? range[0] : 0));
       }
     });
+
+    if (this.timeline) {
+      this.timeline.addClip(this._clip);
+    }
   }
 
   setRange(range: number[]) {
