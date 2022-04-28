@@ -1,24 +1,23 @@
-import { builtinEasing, EasingFunc, createCubicEasingFunc } from './easing';
+import { builtinEasing, EasingFunc, createCubicEasingFunc, AnimationEasing } from './easing';
+import type Timeline from '../Timeline';
 
 function noop() {}
 
-type Easing = keyof typeof builtinEasing | EasingFunc;
+type OnframeCallback = (percent: number, elapsedTime: number) => void;
+type OndestroyCallback = () => void;
+type OnrestartCallback = () => void;
 
-type OnframeCallback = (percent: number) => void;
-type ondestroyCallback = () => void;
-type onrestartCallback = () => void;
+export interface ClipOpts {
+  life: number;
+  delay: number;
+  loop: boolean;
+  easing: AnimationEasing;
 
-export interface ClipProps {
-  life?: number;
-  delay?: number;
-  loop?: boolean;
-  easing?: Easing;
+  playbackRatio: number;
 
-  playbackRatio?: number;
-
-  onframe?: OnframeCallback;
-  ondestroy?: ondestroyCallback;
-  onrestart?: onrestartCallback;
+  onframe: OnframeCallback;
+  ondestroy: OndestroyCallback;
+  onrestart: OnrestartCallback;
 }
 
 export default class Clip {
@@ -26,31 +25,34 @@ export default class Clip {
   private _delay: number;
 
   private _inited: boolean = false;
-  private _startTime = 0; // 开始时间单位毫秒
+  private _startTime = 0;
 
   private _pausedTime = 0;
-  private _paused = false;
+  protected _paused = false;
 
-  loop: boolean;
-  playbackRatio: number = 1;
+  timeline?: Timeline;
+  // Properties used in linked list in Timeline module
+  next?: Clip;
+  prev?: Clip;
+
+  _loop: boolean;
 
   easingFunc?: (p: number) => number;
 
-  onframe: OnframeCallback;
-  ondestroy: ondestroyCallback;
-  onrestart: onrestartCallback;
+  onframe?: OnframeCallback;
+  ondestroy?: OndestroyCallback;
+  onrestart?: OnrestartCallback;
 
-  constructor(opts: ClipProps) {
+  constructor(opts?: Partial<ClipOpts>) {
+    opts = opts || {};
     this._life = opts.life || 1000;
     this._delay = opts.delay || 0;
 
-    this.loop = opts.loop || false;
+    this._loop = opts.loop || false;
 
     this.onframe = opts.onframe || noop;
     this.ondestroy = opts.ondestroy || noop;
     this.onrestart = opts.onrestart || noop;
-
-    this.playbackRatio = opts.playbackRatio || 1;
 
     opts.easing && this.setEasing(opts.easing);
   }
@@ -69,7 +71,7 @@ export default class Clip {
     }
 
     const life = this._life;
-    const elapsedTime = (globalTime - this._startTime - this._pausedTime) * this.playbackRatio;
+    const elapsedTime = globalTime - this._startTime - this._pausedTime;
     let percent = elapsedTime / life;
 
     // PENDING: Not begin yet. Still run the loop.
@@ -85,16 +87,20 @@ export default class Clip {
     const easingFunc = this.easingFunc;
     const schedule = easingFunc ? easingFunc(percent) : percent;
 
-    this.onframe(schedule);
+    if (this.onframe) {
+      this.onframe(schedule, elapsedTime);
+    }
 
     if (percent === 1) {
-      if (this.loop) {
+      if (this._loop) {
         // Restart
         const remainder = elapsedTime % life;
         this._startTime = globalTime - remainder;
         this._pausedTime = 0;
 
-        this.onrestart();
+        if (this.onrestart) {
+          this.onrestart();
+        }
       } else {
         return true;
       }
@@ -111,7 +117,15 @@ export default class Clip {
     this._paused = false;
   }
 
-  setEasing(easing: Easing) {
+  getLife() {
+    return this._life;
+  }
+
+  setLife(life: number) {
+    this._life = life;
+  }
+
+  setEasing(easing: AnimationEasing) {
     this.easingFunc =
       typeof easing === 'function'
         ? easing

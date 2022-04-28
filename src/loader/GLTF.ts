@@ -25,7 +25,7 @@ import glenum from '../core/glenum';
 
 import BoundingBox from '../math/BoundingBox';
 
-import TrackClip from '../animation/TrackClip';
+import TrackAnimator from '../animation/TrackAnimator';
 import SamplerTrack from '../animation/SamplerTrack';
 
 import Geometry from '../Geometry';
@@ -1283,7 +1283,7 @@ const GLTFLoader = Base.extend(
           for (const hash in tracks) {
             tracksList.push(tracks[hash]);
           }
-          const clip = new TrackClip({
+          const clip = new TrackAnimator({
             name: animationInfo.name,
             loop: true,
             tracks: tracksList

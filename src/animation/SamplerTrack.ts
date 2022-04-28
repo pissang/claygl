@@ -1,12 +1,22 @@
-// @ts-nocheck
 // Sampler clip is especially for the animation sampler in glTF
 // Use Typed Array can reduce a lot of heap memory
 
-import quat from '../glmatrix/quat';
-import vec3 from '../glmatrix/vec3';
+import * as quat from '../glmatrix/quat';
+import * as vec3 from '../glmatrix/vec3';
+import ClayNode from '../Node';
+
+const q1 = quat.create();
+const q2 = quat.create();
 
 // lerp function with offset in large array
-function vec3lerp(out, a, b, t, oa, ob) {
+function vec3lerp(
+  out: vec3.Vec3Array,
+  a: Float32Array,
+  b: Float32Array,
+  t: number,
+  oa: number,
+  ob: number
+) {
   const ax = a[oa];
   const ay = a[oa + 1];
   const az = a[oa + 2];
@@ -17,7 +27,14 @@ function vec3lerp(out, a, b, t, oa, ob) {
   return out;
 }
 
-function quatSlerp(out, a, b, t, oa, ob) {
+function quatSlerp(
+  out: quat.QuatArray,
+  a: Float32Array,
+  b: Float32Array,
+  t: number,
+  oa: number,
+  ob: number
+) {
   // benchmarks:
   //    http://jsperf.com/quaternion-slerp-implementations
 
@@ -64,6 +81,11 @@ function quatSlerp(out, a, b, t, oa, ob) {
   return out;
 }
 
+interface SamplerTrackOpts {
+  name?: string;
+  target?: ClayNode;
+}
+
 /**
  * SamplerTrack manages `position`, `rotation`, `scale` tracks in animation of single scene node.
  * @constructor
@@ -72,251 +94,260 @@ function quatSlerp(out, a, b, t, oa, ob) {
  * @param {string} [opts.name] Track name
  * @param {clay.Node} [opts.target] Target node's transform will updated automatically
  */
-const SamplerTrack = function (opts) {
-  opts = opts || {};
+class SamplerTrack {
+  name?: string;
 
-  this.name = opts.name || '';
-  /**
-   * @param {clay.Node}
-   */
-  this.target = opts.target || null;
-  /**
-   * @type {Array}
-   */
-  this.position = vec3.create();
-  /**
-   * Rotation is represented by a quaternion
-   * @type {Array}
-   */
-  this.rotation = quat.create();
-  /**
-   * @type {Array}
-   */
-  this.scale = vec3.fromValues(1, 1, 1);
+  target?: ClayNode;
 
-  this.channels = {
-    time: null,
-    position: null,
-    rotation: null,
-    scale: null
+  position = vec3.create();
+  rotation = quat.create();
+  scale = vec3.fromValues(1, 1, 1);
+
+  channels = {} as {
+    time: Float32Array;
+    position?: Float32Array;
+    rotation?: Float32Array;
+    scale?: Float32Array;
   };
 
-  this._cacheKey = 0;
-  this._cacheTime = 0;
-};
+  life: number = 0;
 
-SamplerTrack.prototype.setTime = function (time) {
-  if (!this.channels.time) {
-    return;
+  private _cacheKey = 0;
+  private _cacheTime = 0;
+
+  constructor(opts?: SamplerTrackOpts) {
+    opts = opts || {};
+    this.name = opts.name || '';
   }
-  const channels = this.channels;
-  const len = channels.time.length;
-  let key = -1;
-  // Only one frame
-  if (len === 1) {
-    if (channels.rotation) {
-      quat.copy(this.rotation, channels.rotation);
+
+  setTime(time: number) {
+    if (!this.channels.time) {
+      return;
     }
-    if (channels.position) {
-      vec3.copy(this.position, channels.position);
-    }
-    if (channels.scale) {
-      vec3.copy(this.scale, channels.scale);
-    }
-    return;
-  }
-  // Clamp
-  else if (time <= channels.time[0]) {
-    time = channels.time[0];
-    key = 0;
-  } else if (time >= channels.time[len - 1]) {
-    time = channels.time[len - 1];
-    key = len - 2;
-  } else {
-    if (time < this._cacheTime) {
-      const s = Math.min(len - 1, this._cacheKey + 1);
-      for (let i = s; i >= 0; i--) {
-        if (channels.time[i - 1] <= time && channels.time[i] > time) {
-          key = i - 1;
-          break;
-        }
+    const channels = this.channels;
+    const len = channels.time.length;
+    let key = -1;
+    // Only one frame
+    if (len === 1) {
+      if (channels.rotation) {
+        quat.copy(this.rotation, channels.rotation as any);
       }
+      if (channels.position) {
+        vec3.copy(this.position, channels.position as any);
+      }
+      if (channels.scale) {
+        vec3.copy(this.scale, channels.scale as any);
+      }
+      return;
+    }
+    // Clamp
+    else if (time <= channels.time[0]) {
+      time = channels.time[0];
+      key = 0;
+    } else if (time >= channels.time[len - 1]) {
+      time = channels.time[len - 1];
+      key = len - 2;
     } else {
-      for (let i = this._cacheKey; i < len - 1; i++) {
-        if (channels.time[i] <= time && channels.time[i + 1] > time) {
-          key = i;
-          break;
+      if (time < this._cacheTime) {
+        const s = Math.min(len - 1, this._cacheKey + 1);
+        for (let i = s; i >= 0; i--) {
+          if (channels.time[i - 1] <= time && channels.time[i] > time) {
+            key = i - 1;
+            break;
+          }
+        }
+      } else {
+        for (let i = this._cacheKey; i < len - 1; i++) {
+          if (channels.time[i] <= time && channels.time[i + 1] > time) {
+            key = i;
+            break;
+          }
         }
       }
     }
-  }
-  if (key > -1) {
-    this._cacheKey = key;
-    this._cacheTime = time;
-    const start = key;
-    const end = key + 1;
-    const startTime = channels.time[start];
-    const endTime = channels.time[end];
-    const range = endTime - startTime;
-    const percent = range === 0 ? 0 : (time - startTime) / range;
+    if (key > -1) {
+      this._cacheKey = key;
+      this._cacheTime = time;
+      const start = key;
+      const end = key + 1;
+      const startTime = channels.time[start];
+      const endTime = channels.time[end];
+      const range = endTime - startTime;
+      const percent = range === 0 ? 0 : (time - startTime) / range;
 
-    if (channels.rotation) {
-      quatSlerp(this.rotation, channels.rotation, channels.rotation, percent, start * 4, end * 4);
+      if (channels.rotation) {
+        quatSlerp(this.rotation, channels.rotation, channels.rotation, percent, start * 4, end * 4);
+      }
+      if (channels.position) {
+        vec3lerp(this.position, channels.position, channels.position, percent, start * 3, end * 3);
+      }
+      if (channels.scale) {
+        vec3lerp(this.scale, channels.scale, channels.scale, percent, start * 3, end * 3);
+      }
     }
-    if (channels.position) {
-      vec3lerp(this.position, channels.position, channels.position, percent, start * 3, end * 3);
+    // Loop handling
+    if (key === len - 2) {
+      this._cacheKey = 0;
+      this._cacheTime = 0;
     }
-    if (channels.scale) {
-      vec3lerp(this.scale, channels.scale, channels.scale, percent, start * 3, end * 3);
-    }
-  }
-  // Loop handling
-  if (key === len - 2) {
-    this._cacheKey = 0;
-    this._cacheTime = 0;
-  }
 
-  this.updateTarget();
-};
-
-/**
- * Update transform of target node manually
- */
-SamplerTrack.prototype.updateTarget = function () {
-  const channels = this.channels;
-  if (this.target) {
-    // Only update target prop if have data.
-    if (channels.position) {
-      this.target.position.setArray(this.position);
-    }
-    if (channels.rotation) {
-      this.target.rotation.setArray(this.rotation);
-    }
-    if (channels.scale) {
-      this.target.scale.setArray(this.scale);
-    }
+    this.updateTarget();
   }
-};
-
-/**
- * @return {number}
- */
-SamplerTrack.prototype.getMaxTime = function () {
-  return this.channels.time[this.channels.time.length - 1];
-};
-
-/**
- * @param {number} startTime
- * @param {number} endTime
- * @return {clay.animation.SamplerTrack}
- */
-SamplerTrack.prototype.getSubTrack = function (startTime, endTime) {
-  const subClip = new SamplerTrack({
-    name: this.name
-  });
-  const minTime = this.channels.time[0];
-  startTime = Math.min(Math.max(startTime, minTime), this.life);
-  endTime = Math.min(Math.max(endTime, minTime), this.life);
-
-  const rangeStart = this._findRange(startTime);
-  const rangeEnd = this._findRange(endTime);
-
-  let count = rangeEnd[0] - rangeStart[0] + 1;
-  if (rangeStart[1] === 0 && rangeEnd[1] === 0) {
-    count -= 1;
-  }
-  if (this.channels.rotation) {
-    subClip.channels.rotation = new Float32Array(count * 4);
-  }
-  if (this.channels.position) {
-    subClip.channels.position = new Float32Array(count * 3);
-  }
-  if (this.channels.scale) {
-    subClip.channels.scale = new Float32Array(count * 3);
-  }
-  if (this.channels.time) {
-    subClip.channels.time = new Float32Array(count);
-  }
-  // Clip at the start
-  this.setTime(startTime);
-  for (let i = 0; i < 3; i++) {
-    subClip.channels.rotation[i] = this.rotation[i];
-    subClip.channels.position[i] = this.position[i];
-    subClip.channels.scale[i] = this.scale[i];
-  }
-  subClip.channels.time[0] = 0;
-  subClip.channels.rotation[3] = this.rotation[3];
-
-  for (let i = 1; i < count - 1; i++) {
-    let i2;
-    for (let j = 0; j < 3; j++) {
-      i2 = rangeStart[0] + i;
-      subClip.channels.rotation[i * 4 + j] = this.channels.rotation[i2 * 4 + j];
-      subClip.channels.position[i * 3 + j] = this.channels.position[i2 * 3 + j];
-      subClip.channels.scale[i * 3 + j] = this.channels.scale[i2 * 3 + j];
-    }
-    subClip.channels.time[i] = this.channels.time[i2] - startTime;
-    subClip.channels.rotation[i * 4 + 3] = this.channels.rotation[i2 * 4 + 3];
-  }
-  // Clip at the end
-  this.setTime(endTime);
-  for (let i = 0; i < 3; i++) {
-    subClip.channels.rotation[(count - 1) * 4 + i] = this.rotation[i];
-    subClip.channels.position[(count - 1) * 3 + i] = this.position[i];
-    subClip.channels.scale[(count - 1) * 3 + i] = this.scale[i];
-  }
-  subClip.channels.time[count - 1] = endTime - startTime;
-  subClip.channels.rotation[(count - 1) * 4 + 3] = this.rotation[3];
-
-  // TODO set back ?
-  subClip.life = endTime - startTime;
-  return subClip;
-};
-
-SamplerTrack.prototype._findRange = function (time) {
-  const channels = this.channels;
-  const len = channels.time.length;
-  let start = -1;
-  for (let i = 0; i < len - 1; i++) {
-    if (channels.time[i] <= time && channels.time[i + 1] > time) {
-      start = i;
+  /**
+   * Update transform of target node manually
+   */
+  updateTarget() {
+    const channels = this.channels;
+    if (this.target) {
+      // Only update target prop if have data.
+      if (channels.position) {
+        this.target.position.setArray(this.position);
+      }
+      if (channels.rotation) {
+        this.target.rotation.setArray(this.rotation);
+      }
+      if (channels.scale) {
+        this.target.scale.setArray(this.scale);
+      }
     }
   }
-  let percent = 0;
-  if (start >= 0) {
-    const startTime = channels.time[start];
-    const endTime = channels.time[start + 1];
-    percent = (time - startTime) / (endTime - startTime);
-  }
-  // Percent [0, 1)
-  return [start, percent];
-};
 
-/**
- * 1D blending between two clips
- * @function
- * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
- * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
- * @param  {number} w
- */
-SamplerTrack.prototype.blend1D = function (t1, t2, w) {
-  vec3.lerp(this.position, t1.position, t2.position, w);
-  vec3.lerp(this.scale, t1.scale, t2.scale, w);
-  quat.slerp(this.rotation, t1.rotation, t2.rotation, w);
-};
-/**
- * 2D blending between three clips
- * @function
- * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
- * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
- * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c3
- * @param  {number} f
- * @param  {number} g
- */
-SamplerTrack.prototype.blend2D = (function () {
-  const q1 = quat.create();
-  const q2 = quat.create();
-  return function (t1, t2, t3, f, g) {
+  /**
+   * @return {number}
+   */
+  getMaxTime() {
+    return this.channels.time[this.channels.time.length - 1];
+  }
+
+  /**
+   * @param {number} startTime
+   * @param {number} endTime
+   * @return {clay.animation.SamplerTrack}
+   */
+  getSubTrack(startTime: number, endTime: number) {
+    const subTrack = new SamplerTrack({
+      name: this.name
+    });
+    const channels = this.channels;
+    const minTime = channels.time[0];
+    startTime = Math.min(Math.max(startTime, minTime), this.life);
+    endTime = Math.min(Math.max(endTime, minTime), this.life);
+
+    const rangeStart = this._findRange(startTime);
+    const rangeEnd = this._findRange(endTime);
+
+    let count = rangeEnd[0] - rangeStart[0] + 1;
+    if (rangeStart[1] === 0 && rangeEnd[1] === 0) {
+      count -= 1;
+    }
+    const rotationChannel = channels.rotation;
+    const positionChannel = channels.position;
+    const scaleChannel = channels.scale;
+    const subTrackChannels = subTrack.channels;
+    if (rotationChannel) {
+      subTrackChannels.rotation = new Float32Array(count * 4);
+    }
+    if (positionChannel) {
+      subTrackChannels.position = new Float32Array(count * 3);
+    }
+    if (scaleChannel) {
+      subTrackChannels.scale = new Float32Array(count * 3);
+    }
+    if (this.channels.time) {
+      subTrackChannels.time = new Float32Array(count);
+    }
+    // Clip at the start
+    this.setTime(startTime);
+    for (let i = 0; i < 3; i++) {
+      if (subTrackChannels.rotation) {
+        subTrackChannels.rotation[i] = this.rotation[i];
+      }
+      if (subTrackChannels.position) {
+        subTrackChannels.position[i] = this.position[i];
+      }
+      if (subTrackChannels.scale) {
+        subTrackChannels.scale[i] = this.scale[i];
+      }
+    }
+    subTrackChannels.time[0] = 0;
+    if (subTrackChannels.rotation) {
+      subTrackChannels.rotation[3] = this.rotation[3];
+    }
+
+    for (let i = 1; i < count - 1; i++) {
+      let i2 = 0;
+      for (let j = 0; j < 3; j++) {
+        i2 = rangeStart[0] + i;
+        if (rotationChannel) {
+          subTrack.channels.rotation![i * 4 + j] = rotationChannel[i2 * 4 + j];
+        }
+        if (positionChannel) {
+          subTrack.channels.position![i * 3 + j] = positionChannel[i2 * 3 + j];
+        }
+        if (scaleChannel) {
+          subTrack.channels.scale![i * 3 + j] = scaleChannel[i2 * 3 + j];
+        }
+      }
+      subTrackChannels.time[i] = this.channels.time[i2] - startTime;
+      if (rotationChannel!) {
+        subTrackChannels.rotation![i * 4 + 3] = rotationChannel[i2 * 4 + 3];
+      }
+    }
+    // Clip at the end
+    this.setTime(endTime);
+    for (let i = 0; i < 3; i++) {
+      if (subTrackChannels.rotation) {
+        subTrackChannels.rotation[(count - 1) * 4 + i] = this.rotation[i];
+      }
+      if (subTrackChannels.position) {
+        subTrackChannels.position[(count - 1) * 3 + i] = this.position[i];
+      }
+      if (subTrackChannels.scale) {
+        subTrackChannels.scale[(count - 1) * 3 + i] = this.scale[i];
+      }
+    }
+    subTrackChannels.time[count - 1] = endTime - startTime;
+
+    if (subTrackChannels.rotation) {
+      subTrackChannels.rotation[(count - 1) * 4 + 3] = this.rotation[3];
+    }
+
+    // TODO set back ?
+    subTrack.life = endTime - startTime;
+    return subTrack;
+  }
+
+  _findRange(time: number) {
+    const channels = this.channels;
+    const len = channels.time.length;
+    let start = -1;
+    for (let i = 0; i < len - 1; i++) {
+      if (channels.time[i] <= time && channels.time[i + 1] > time) {
+        start = i;
+      }
+    }
+    let percent = 0;
+    if (start >= 0) {
+      const startTime = channels.time[start];
+      const endTime = channels.time[start + 1];
+      percent = (time - startTime) / (endTime - startTime);
+    }
+    // Percent [0, 1)
+    return [start, percent];
+  }
+
+  /**
+   * 1D blending between two clips
+   */
+  blend1D(t1: SamplerTrack, t2: SamplerTrack, w: number) {
+    vec3.lerp(this.position, t1.position, t2.position, w);
+    vec3.lerp(this.scale, t1.scale, t2.scale, w);
+    quat.slerp(this.rotation, t1.rotation, t2.rotation, w);
+  }
+  /**
+   * 2D blending between three clips
+   */
+  blend2D(t1: SamplerTrack, t2: SamplerTrack, t3: SamplerTrack, f: number, g: number) {
     const a = 1 - f - g;
 
     this.position[0] = t1.position[0] * a + t2.position[0] * f + t3.position[0] * g;
@@ -337,52 +368,46 @@ SamplerTrack.prototype.blend2D = (function () {
       quat.slerp(q2, t1.rotation, t3.rotation, s);
       quat.slerp(this.rotation, q1, q2, g / s);
     }
-  };
-})();
-/**
- * Additive blending between two clips
- * @function
- * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
- * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
- */
-SamplerTrack.prototype.additiveBlend = function (t1, t2) {
-  vec3.add(this.position, t1.position, t2.position);
-  vec3.add(this.scale, t1.scale, t2.scale);
-  quat.multiply(this.rotation, t2.rotation, t1.rotation);
-};
-/**
- * Subtractive blending between two clips
- * @function
- * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c1
- * @param  {clay.animation.SamplerTrack|clay.animation.TransformTrack} c2
- */
-SamplerTrack.prototype.subtractiveBlend = function (t1, t2) {
-  vec3.sub(this.position, t1.position, t2.position);
-  vec3.sub(this.scale, t1.scale, t2.scale);
-  quat.invert(this.rotation, t2.rotation);
-  quat.multiply(this.rotation, this.rotation, t1.rotation);
-};
+  }
+  /**
+   * Additive blending between two clips
+   */
+  additiveBlend(t1: SamplerTrack, t2: SamplerTrack) {
+    vec3.add(this.position, t1.position, t2.position);
+    vec3.add(this.scale, t1.scale, t2.scale);
+    quat.multiply(this.rotation, t2.rotation, t1.rotation);
+  }
+  /**
+   * Subtractive blending between two clips
+   */
+  subtractiveBlend(t1: SamplerTrack, t2: SamplerTrack) {
+    vec3.sub(this.position, t1.position, t2.position);
+    vec3.sub(this.scale, t1.scale, t2.scale);
+    quat.invert(this.rotation, t2.rotation);
+    quat.multiply(this.rotation, this.rotation, t1.rotation);
+  }
 
-/**
- * Clone a new SamplerTrack
- * @return {clay.animation.SamplerTrack}
- */
-SamplerTrack.prototype.clone = function () {
-  const track = SamplerTrack.prototype.clone.call(this);
-  track.channels = {
-    time: this.channels.time || null,
-    position: this.channels.position || null,
-    rotation: this.channels.rotation || null,
-    scale: this.channels.scale || null
-  };
-  vec3.copy(track.position, this.position);
-  quat.copy(track.rotation, this.rotation);
-  vec3.copy(track.scale, this.scale);
+  /**
+   * Clone a new SamplerTrack
+   * @return {clay.animation.SamplerTrack}
+   */
+  clone() {
+    const track = new SamplerTrack();
+    track.channels = {
+      time: this.channels.time,
+      position: this.channels.position,
+      rotation: this.channels.rotation,
+      scale: this.channels.scale
+    };
+    vec3.copy(track.position, this.position);
+    quat.copy(track.rotation, this.rotation);
+    vec3.copy(track.scale, this.scale);
 
-  track.target = this.target;
-  track.updateTarget();
+    track.target = this.target;
+    track.updateTarget();
 
-  return track;
-};
+    return track;
+  }
+}
 
 export default SamplerTrack;

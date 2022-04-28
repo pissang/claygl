@@ -100,6 +100,21 @@ export function isArrayLike(obj: any): obj is ArrayLike<any> {
   }
 }
 
+export function isFunction(value: any): value is Function {
+  return typeof value === 'function';
+}
+
+export function isString(value: any): value is string {
+  // Faster than `objToString.call` several times in chromium and webkit.
+  // And `new String()` is rarely used.
+  return typeof value === 'string';
+}
+
+export function isNumber(value: any): value is number {
+  // Faster than `objToString.call` several times in chromium and webkit.
+  // And `new Number()` is rarely used.
+  return typeof value === 'number';
+}
 /**
  * @param obj
  * @return {}

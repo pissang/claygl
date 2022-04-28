@@ -309,7 +309,7 @@ const builtinEasing = {
    * @return {number}
    */
   bounceIn: function (k: number) {
-    return 1 - easing.bounceOut(1 - k);
+    return 1 - builtinEasing.bounceOut(1 - k);
   },
   /**
    * @alias clay.animation.easing.bounceOut
@@ -334,15 +334,15 @@ const builtinEasing = {
    */
   bounceInOut: function (k: number) {
     if (k < 0.5) {
-      return easing.bounceIn(k * 2) * 0.5;
+      return builtinEasing.bounceIn(k * 2) * 0.5;
     }
-    return easing.bounceOut(k * 2 - 1) * 0.5 + 0.5;
+    return builtinEasing.bounceOut(k * 2 - 1) * 0.5 + 0.5;
   }
 } as const;
 
 export type EasingFunc = (t: number) => number;
 
-const regexp = /cubic-bezier\(([0-9,\.e ]+)\)/;
+const regexp = /cubic-bezier\(([0-9,.e ]+)\)/;
 
 export function createCubicEasingFunc(cubicEasingStr: string) {
   const cubic = cubicEasingStr && regexp.exec(cubicEasingStr);
@@ -367,5 +367,7 @@ export function createCubicEasingFunc(cubicEasingStr: string) {
     };
   }
 }
+
+export type AnimationEasing = keyof typeof builtinEasing | EasingFunc;
 
 export { builtinEasing };

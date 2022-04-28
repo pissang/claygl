@@ -1,16 +1,14 @@
-// @ts-nocheck
-import vendor from './core/vendor';
-import Animator from './animation/Animator';
+import ProceduralKeyframeAnimator from './animation/ProceduralKeyframeAnimator';
+import { Animator } from './animation/Animator';
 import Notifier from './core/notifier';
+import Clip from './animation/Clip';
 
 interface Stage {
-  render: () => void;
+  render?: () => void;
 }
 
 /**
  * Animation is global timeline that schedule all clips. each frame animation will set the time of clips to current and update the states of clips
- * @constructor clay.Timeline
- * @extends clay.core.Base
  *
  * @example
  * const animation = new clay.Timeline();
@@ -29,188 +27,230 @@ interface Stage {
  *     })
  *     .start('spline');
  */
-class Timeline extends Notifier {
-  /**
-   * stage is an object with render method, each frame if there exists any animating clips, stage.render will be called
-   */
+
+export function getTime() {
+  return new Date().getTime();
+}
+
+interface TimelineOption {
   stage?: Stage;
+}
 
-  private _clips: [];
+export default class Timeline extends Notifier {
+  stage: Stage;
 
-  private _running: false;
+  // Use linked list to store clip
+  private _head?: Clip;
+  private _tail?: Clip;
 
-  private _time: 0;
+  private _running = false;
 
-  private _paused: false;
+  private _time = 0;
+  private _pausedTime = 0;
+  private _pauseStart = 0;
 
-  private _pausedTime: 0;
+  private _paused = false;
 
+  constructor(opts?: TimelineOption) {
+    super();
+
+    opts = opts || {};
+
+    this.stage = opts.stage || {};
+  }
+
+  /**
+   * Add clip
+   */
+  addClip(clip: Clip) {
+    if (clip.timeline) {
+      // Clip has been added
+      this.removeClip(clip);
+    }
+
+    if (!this._head) {
+      this._head = this._tail = clip;
+    } else {
+      this._tail!.next = clip;
+      clip.prev = this._tail;
+      clip.next = undefined;
+      this._tail = clip;
+    }
+    clip.timeline = this;
+  }
   /**
    * Add animator
-   * @param {clay.animate.Animator} animator
    */
-  addAnimator(animator) {
-    animator.animation = this;
-    const clips = animator.getClips();
-    for (let i = 0; i < clips.length; i++) {
-      this.addClip(clips[i]);
+  addAnimator(animator: Animator) {
+    animator.timeline = this;
+    const clip = animator.getClip();
+    if (clip) {
+      this.addClip(clip);
     }
+  }
+  /**
+   * Delete animation clip
+   */
+  removeClip(clip: Clip) {
+    if (!clip.timeline) {
+      return;
+    }
+    const prev = clip.prev;
+    const next = clip.next;
+    if (prev) {
+      prev.next = next;
+    } else {
+      // Is head
+      this._head = next;
+    }
+    if (next) {
+      next.prev = prev;
+    } else {
+      // Is tail
+      this._tail = prev;
+    }
+    clip.next = clip.prev = clip.timeline = undefined;
   }
 
   /**
-   * @param {clay.animation.Clip} clip
+   * Delete animation clip
    */
-  addClip(clip) {
-    if (this._clips.indexOf(clip) < 0) {
-      this._clips.push(clip);
+  removeAnimator(animator: Animator) {
+    const clip = animator.getClip();
+    if (clip) {
+      this.removeClip(clip);
     }
+    animator.timeline = undefined;
   }
 
-  /**
-   * @param  {clay.animation.Clip} clip
-   */
-  removeClip(clip) {
-    const idx = this._clips.indexOf(clip);
-    if (idx >= 0) {
-      this._clips.splice(idx, 1);
-    }
-  }
-
-  /**
-   * Remove animator
-   * @param {clay.animate.Animator} animator
-   */
-  removeAnimator(animator) {
-    const clips = animator.getClips();
-    for (let i = 0; i < clips.length; i++) {
-      this.removeClip(clips[i]);
-    }
-    animator.animation = null;
-  }
-
-  private _update() {
-    const time = Date.now() - this._pausedTime;
+  update(notTriggerFrameAndStageUpdate?: boolean) {
+    const time = getTime() - this._pausedTime;
     const delta = time - this._time;
-    const clips = this._clips;
-    let len = clips.length;
+    let clip = this._head;
 
-    const deferredEvents = [];
-    const deferredClips = [];
-    for (let i = 0; i < len; i++) {
-      const clip = clips[i];
-      const e = clip.step(time, delta, false);
-      // Throw out the events need to be called after
-      // stage.render, like finish
-      if (e) {
-        deferredEvents.push(e);
-        deferredClips.push(clip);
-      }
-    }
-
-    // Remove the finished clip
-    for (let i = 0; i < len; ) {
-      if (clips[i]._needsRemove) {
-        clips[i] = clips[len - 1];
-        clips.pop();
-        len--;
+    while (clip) {
+      // Save the nextClip before step.
+      // So the loop will not been affected if the clip is removed in the callback
+      const nextClip = clip.next;
+      const finished = clip.step(time, delta);
+      if (finished) {
+        clip.ondestroy && clip.ondestroy();
+        this.removeClip(clip);
+        clip = nextClip;
       } else {
-        i++;
+        clip = nextClip;
       }
-    }
-
-    len = deferredEvents.length;
-    for (let i = 0; i < len; i++) {
-      deferredClips[i].fire(deferredEvents[i]);
     }
 
     this._time = time;
 
-    this.trigger('frame', delta);
+    if (!notTriggerFrameAndStageUpdate) {
+      // 'frame' should be triggered before stage, because upper application
+      // depends on the sequence (e.g., echarts-stream and finish
+      // event judge)
+      this.trigger('frame', delta);
 
-    if (this.stage && this.stage.render) {
-      this.stage.render();
+      this.stage.render && this.stage.render();
     }
   }
-  /**
-   * Start running animation
-   */
-  start() {
+
+  _startLoop() {
     const self = this;
 
     this._running = true;
-    this._time = Date.now();
-
-    this._pausedTime = 0;
-
-    const requestAnimationFrame = vendor.requestAnimationFrame;
 
     function step() {
       if (self._running) {
         requestAnimationFrame(step);
-
-        if (!self._paused) {
-          self._update();
-        }
+        !self._paused && self.update();
       }
     }
 
     requestAnimationFrame(step);
   }
+
   /**
-   * Stop running animation
+   * Start animation.
+   */
+  start() {
+    if (this._running) {
+      return;
+    }
+
+    this._time = getTime();
+    this._pausedTime = 0;
+
+    this._startLoop();
+  }
+
+  /**
+   * Stop animation.
    */
   stop() {
     this._running = false;
   }
 
   /**
-   * Pause
+   * Pause animation.
    */
   pause() {
     if (!this._paused) {
-      this._pauseStart = Date.now();
+      this._pauseStart = getTime();
       this._paused = true;
     }
   }
 
   /**
-   * Resume
+   * Resume animation.
    */
   resume() {
     if (this._paused) {
-      this._pausedTime += Date.now() - this._pauseStart;
+      this._pausedTime += getTime() - this._pauseStart;
       this._paused = false;
     }
   }
 
   /**
-   * Remove all clips
+   * Clear animation.
    */
-  removeClipsAll() {
-    this._clips = [];
+  clear() {
+    let clip = this._head;
+
+    while (clip) {
+      const nextClip = clip.next;
+      clip.prev = clip.next = clip.timeline = undefined;
+      clip = nextClip;
+    }
+
+    this._head = this._tail = undefined;
   }
+
   /**
-   * Create an animator
-   * @param  {Object} target
-   * @param  {Object} [options]
-   * @param  {boolean} [options.loop]
-   * @param  {Function} [options.getter]
-   * @param  {Function} [options.setter]
-   * @param  {Function} [options.interpolater]
-   * @return {clay.animation.Animator}
+   * Whether animation finished.
    */
-  animate(target, options) {
+  isFinished() {
+    return this._head == null;
+  }
+
+  /**
+   * Creat animator for a target, whose props can be animated.
+   */
+  // TODO Gap
+  animate<T>(
+    target: T,
+    options?: {
+      loop?: boolean; // Whether loop animation
+    }
+  ) {
     options = options || {};
-    const animator = new Animator(
-      target,
-      options.loop,
-      options.getter,
-      options.setter,
-      options.interpolater
-    );
-    animator.animation = this;
+
+    // Start animation loop
+    this.start();
+
+    const animator = new ProceduralKeyframeAnimator(target, options.loop, true);
+
+    this.addAnimator(animator);
+
     return animator;
   }
 }
-
-export default Timeline;

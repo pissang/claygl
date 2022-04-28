@@ -51,8 +51,7 @@ class GLProgram {
   private _uniformLocations: Record<string, WebGLUniformLocation> = {};
   private _textureSlot: number = 0;
 
-  // @ts-ignore
-  private _program: WebGLProgram;
+  private _program!: WebGLProgram;
 
   // Error message
   __error?: string;
