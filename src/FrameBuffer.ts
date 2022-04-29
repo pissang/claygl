@@ -49,7 +49,7 @@ class FrameBuffer {
 
   private _cache = new ClayCache();
 
-  constructor() {
+  constructor(opts?: Partial<FrameBufferOpts>) {
     this.depthBuffer = true;
   }
   /**
@@ -239,7 +239,7 @@ class FrameBuffer {
    * @param  {number} [attachment=gl.COLOR_ATTACHMENT0]
    * @param  {number} [target=gl.TEXTURE_2D]
    */
-  attach(texture: Texture, attachment: GLEnum, target: GLEnum) {
+  attach(texture: Texture, attachment?: GLEnum, target?: GLEnum) {
     if (!texture.width) {
       throw new Error('The texture attached to color buffer is not a valid.');
     }
@@ -382,7 +382,7 @@ class FrameBuffer {
    * Dispose
    * @param  {WebGLRenderingContext} _gl
    */
-  dispose(renderer) {
+  dispose(renderer: Renderer) {
     const _gl = renderer.gl;
     const cache = this._cache;
 

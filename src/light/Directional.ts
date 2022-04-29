@@ -1,11 +1,22 @@
 // @ts-nocheck
-import Light from '../Light';
+import Light, { LightOpts } from '../Light';
 import Vector3 from '../math/Vector3';
 
+export interface DirectionalLightOpts extends LightOpts {
+  shadowBias: 0.001;
+  shadowSlopeScale: 2.0;
+  /**
+   * Shadow cascade.
+   * Use PSSM technique when it is larger than 1 and have a unique directional light in scene.
+   */
+  shadowCascade: 1;
+
+  /**
+   * Available when shadowCascade is larger than 1 and have a unique directional light in scene.
+   */
+  cascadeSplitLogFactor: 0.2;
+}
 /**
- * @constructor clay.light.Directional
- * @extends clay.Light
- *
  * @example
  *     const light = new clay.light.Directional({
  *         intensity: 0.5,
@@ -15,61 +26,43 @@ import Vector3 from '../math/Vector3';
  *     light.lookAt(clay.Vector3.ZERO);
  *     scene.add(light);
  */
-const DirectionalLight = Light.extend(
-  /** @lends clay.light.Directional# */ {
-    /**
-     * @type {number}
-     */
-    shadowBias: 0.001,
-    /**
-     * @type {number}
-     */
-    shadowSlopeScale: 2.0,
-    /**
-     * Shadow cascade.
-     * Use PSSM technique when it is larger than 1 and have a unique directional light in scene.
-     * @type {number}
-     */
-    shadowCascade: 1,
+class DirectionalLight extends Light {
+  shadowBias = 0.001;
+  shadowSlopeScale = 2.0;
+  shadowCascade = 1;
+  cascadeSplitLogFactor = 0.2;
 
-    /**
-     * Available when shadowCascade is larger than 1 and have a unique directional light in scene.
-     * @type {number}
-     */
-    cascadeSplitLogFactor: 0.2
+  readonly type = 'DIRECTIONAL_LIGHT';
+
+  constructor(opts?: Partial<LightOpts>) {
+    super(opts);
+    Object.assign(this, opts);
+  }
+
+  clone() {
+    const light = super.clone();
+    light.shadowBias = this.shadowBias;
+    light.shadowSlopeScale = this.shadowSlopeScale;
+    return light;
+  }
+}
+
+DirectionalLight.prototype.uniformTemplates = {
+  directionalLightDirection: {
+    type: '3f',
+    value(instance) {
+      instance.__dir = instance.__dir || new Vector3();
+      // Direction is target to eye
+      return instance.__dir.copy(instance.worldTransform.z).normalize().negate().array;
+    }
   },
-  {
-    type: 'DIRECTIONAL_LIGHT',
-
-    uniformTemplates: {
-      directionalLightDirection: {
-        type: '3f',
-        value: function (instance) {
-          instance.__dir = instance.__dir || new Vector3();
-          // Direction is target to eye
-          return instance.__dir.copy(instance.worldTransform.z).normalize().negate().array;
-        }
-      },
-      directionalLightColor: {
-        type: '3f',
-        value: function (instance) {
-          const color = instance.color;
-          const intensity = instance.intensity;
-          return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
-        }
-      }
-    },
-    /**
-     * @return {clay.light.Directional}
-     * @memberOf clay.light.Directional.prototype
-     */
-    clone: function () {
-      const light = Light.prototype.clone.call(this);
-      light.shadowBias = this.shadowBias;
-      light.shadowSlopeScale = this.shadowSlopeScale;
-      return light;
+  directionalLightColor: {
+    type: '3f',
+    value(instance) {
+      const color = instance.color;
+      const intensity = instance.intensity;
+      return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
     }
   }
-);
-
+};
 export default DirectionalLight;

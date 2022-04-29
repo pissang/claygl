@@ -1,57 +1,46 @@
-// @ts-nocheck
-import Light from '../Light';
+import Light, { LightOpts } from '../Light';
 
-/**
- * @constructor clay.light.Point
- * @extends clay.Light
- */
-const PointLight = Light.extend(
-  /** @lends clay.light.Point# */ {
-    /**
-     * @type {number}
-     */
-    range: 100,
+export interface PointLightOpts extends LightOpts {
+  range: number;
+}
 
-    /**
-     * @type {number}
-     */
-    castShadow: false
+class PointLight extends Light {
+  range = 100;
+  castShadow: boolean = false;
+
+  readonly type = 'POINT_LIGHT';
+
+  constructor(opts?: Partial<PointLightOpts>) {
+    super(opts);
+    Object.assign(this, opts);
+  }
+  clone() {
+    const light = super.clone();
+    light.range = this.range;
+    return light;
+  }
+}
+
+PointLight.prototype.uniformTemplates = {
+  pointLightPosition: {
+    type: '3f',
+    value: function (instance) {
+      return instance.getWorldPosition().array;
+    }
   },
-  {
-    type: 'POINT_LIGHT',
-
-    uniformTemplates: {
-      pointLightPosition: {
-        type: '3f',
-        value: function (instance) {
-          return instance.getWorldPosition().array;
-        }
-      },
-      pointLightRange: {
-        type: '1f',
-        value: function (instance) {
-          return instance.range;
-        }
-      },
-      pointLightColor: {
-        type: '3f',
-        value: function (instance) {
-          const color = instance.color;
-          const intensity = instance.intensity;
-          return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
-        }
-      }
-    },
-    /**
-     * @return {clay.light.Point}
-     * @memberOf clay.light.Point.prototype
-     */
-    clone: function () {
-      const light = Light.prototype.clone.call(this);
-      light.range = this.range;
-      return light;
+  pointLightRange: {
+    type: '1f',
+    value: function (instance) {
+      return (instance as PointLight).range;
+    }
+  },
+  pointLightColor: {
+    type: '3f',
+    value: function (instance) {
+      const color = instance.color;
+      const intensity = instance.intensity;
+      return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
     }
   }
-);
-
+};
 export default PointLight;

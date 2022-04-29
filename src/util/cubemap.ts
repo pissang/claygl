@@ -1,9 +1,8 @@
-// @ts-nocheck
 // Cubemap prefilter utility
 // http://www.unrealengine.com/files/downloads/2013SiggraphPresentationsNotes.pdf
 // http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
 import Texture2D from '../Texture2D';
-import TextureCube from '../TextureCube';
+import TextureCube, { TextureCubeOpts } from '../TextureCube';
 import Texture from '../Texture';
 import FrameBuffer from '../FrameBuffer';
 import Pass from '../compositor/Pass';
@@ -17,37 +16,27 @@ import textureUtil from './texture';
 
 import integrateBRDFShaderCode from './shader/integrateBRDF.glsl.js';
 import prefilterFragCode from './shader/prefilter.glsl.js';
+import Renderer from '../Renderer';
 
-const cubemapUtil = {};
-
-const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
+const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
 
 // TODO Downsample
-/**
- * @name clay.util.cubemap.prefilterEnvironmentMap
- * @param  {clay.Renderer} renderer
- * @param  {clay.Texture} envMap
- * @param  {Object} [textureOpts]
- * @param  {number} [textureOpts.width=64]
- * @param  {number} [textureOpts.height=64]
- * @param  {number} [textureOpts.type]
- * @param  {boolean} [textureOpts.encodeRGBM=false]
- * @param  {boolean} [textureOpts.decodeRGBM=false]
- * @param  {clay.Texture2D} [normalDistribution]
- * @param  {clay.Texture2D} [brdfLookup]
- */
-cubemapUtil.prefilterEnvironmentMap = function (
-  renderer,
-  envMap,
-  textureOpts,
-  normalDistribution,
-  brdfLookup
+// TODO ggx
+export function prefilterEnvironmentMap(
+  renderer: Renderer,
+  envMap: TextureCube | Texture2D,
+  textureOpts: Partial<TextureCubeOpts> & {
+    encodeRGBM?: boolean;
+    decodeRGBM?: boolean;
+  },
+  normalDistribution?: Texture2D,
+  brdfLookup?: Texture2D
 ) {
   // Not create other renderer, it is easy having issue of cross reference of resources like framebuffer
   // PENDING preserveDrawingBuffer?
   if (!brdfLookup || !normalDistribution) {
-    normalDistribution = cubemapUtil.generateNormalDistribution();
-    brdfLookup = cubemapUtil.integrateBRDF(renderer, normalDistribution);
+    normalDistribution = generateNormalDistribution();
+    brdfLookup = integrateBRDF(renderer, normalDistribution);
   }
   textureOpts = textureOpts || {};
 
@@ -122,11 +111,11 @@ cubemapUtil.prefilterEnvironmentMap = function (
   const frameBuffer = new FrameBuffer({
     depthBuffer: false
   });
-  const ArrayCtor = vendor[textureType === Texture.UNSIGNED_BYTE ? 'Uint8Array' : 'Float32Array'];
+  const ArrayCtor = textureType === Texture.UNSIGNED_BYTE ? Uint8Array : Float32Array;
   for (let i = 0; i < mipmapNum; i++) {
     // console.time('prefilter');
     prefilteredCubeMap.mipmaps[i] = {
-      pixels: {}
+      pixels: {} as TextureCubeOpts['pixels']
     };
     skyEnv.material.set('roughness', i / (mipmapNum - 1));
 
@@ -165,7 +154,7 @@ cubemapUtil.prefilterEnvironmentMap = function (
       // document.body.appendChild(canvas);
 
       frameBuffer.unbind(renderer);
-      prefilteredCubeMap.mipmaps[i].pixels[targets[j]] = pixels;
+      prefilteredCubeMap.mipmaps[i].pixels![targets[j]] = pixels;
     }
 
     renderTargetTmp.width /= 2;
@@ -188,10 +177,10 @@ cubemapUtil.prefilterEnvironmentMap = function (
     normalDistribution: normalDistribution,
     maxMipmapLevel: mipmapNum
   };
-};
+}
 
-cubemapUtil.integrateBRDF = function (renderer, normalDistribution) {
-  normalDistribution = normalDistribution || cubemapUtil.generateNormalDistribution();
+export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D) {
+  normalDistribution = normalDistribution || generateNormalDistribution();
   const framebuffer = new FrameBuffer({
     depthBuffer: false
   });
@@ -229,9 +218,9 @@ cubemapUtil.integrateBRDF = function (renderer, normalDistribution) {
   framebuffer.dispose(renderer);
 
   return texture;
-};
+}
 
-cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) {
+export function generateNormalDistribution(roughnessLevels?: number, sampleSize?: number) {
   // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
   // GLSL not support bit operation, use lookup instead
   // V -> i / N, U -> roughness
@@ -289,6 +278,4 @@ cubemapUtil.generateNormalDistribution = function (roughnessLevels, sampleSize) 
   normalDistribution.pixels = pixels;
 
   return normalDistribution;
-};
-
-export default cubemapUtil;
+}

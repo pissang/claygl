@@ -1,56 +1,47 @@
-// @ts-nocheck
-import Light from '../Light';
+import Light, { LightOpts } from '../Light';
 
-/**
- * Spherical Harmonic Ambient Light
- * @constructor clay.light.AmbientSH
- * @extends clay.Light
- */
-const AmbientSHLight = Light.extend(
-  {
-    castShadow: false,
+export interface AmbientSHLightOpts extends LightOpts {
+  coefficients: number[];
+}
+class AmbientSHLight extends Light {
+  coefficients: number[];
 
-    /**
-     * Spherical Harmonic Coefficients
-     * @type {Array.<number>}
-     * @memberOf clay.light.AmbientSH#
-     */
-    coefficients: []
-  },
-  function () {
-    this._coefficientsTmpArr = new Float32Array(9 * 3);
-  },
-  {
-    type: 'AMBIENT_SH_LIGHT',
+  readonly type = 'AMBIENT_SH_LIGHT';
 
-    uniformTemplates: {
-      ambientSHLightColor: {
-        type: '3f',
-        value: function (instance) {
-          const color = instance.color;
-          const intensity = instance.intensity;
-          return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
-        }
-      },
-
-      ambientSHLightCoefficients: {
-        type: '3f',
-        value: function (instance) {
-          const coefficientsTmpArr = instance._coefficientsTmpArr;
-          for (let i = 0; i < instance.coefficients.length; i++) {
-            coefficientsTmpArr[i] = instance.coefficients[i];
-          }
-          return coefficientsTmpArr;
-        }
-      }
-    }
-    /**
-     * @function
-     * @name clone
-     * @return {clay.light.Ambient}
-     * @memberOf clay.light.Ambient.prototype
-     */
+  __coefficientsTmpArr = new Float32Array(9 * 3);
+  constructor(opts?: Partial<AmbientSHLightOpts>) {
+    opts = opts || {};
+    super(opts);
+    this.coefficients = opts.coefficients || [];
   }
-);
+
+  clone() {
+    const light = super.clone();
+    light.coefficients = this.coefficients;
+    return light;
+  }
+}
+
+AmbientSHLight.prototype.uniformTemplates = {
+  ambientSHLightColor: {
+    type: '3f',
+    value(instance) {
+      const color = instance.color;
+      const intensity = instance.intensity;
+      return [color[0] * intensity, color[1] * intensity, color[2] * intensity];
+    }
+  },
+
+  ambientSHLightCoefficients: {
+    type: '3f',
+    value(instance) {
+      const coefficientsTmpArr = (instance as AmbientSHLight).__coefficientsTmpArr;
+      for (let i = 0; i < (instance as AmbientSHLight).coefficients.length; i++) {
+        coefficientsTmpArr[i] = (instance as AmbientSHLight).coefficients[i];
+      }
+      return coefficientsTmpArr;
+    }
+  }
+};
 
 export default AmbientSHLight;

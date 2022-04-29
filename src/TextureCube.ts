@@ -21,7 +21,7 @@ export interface TextureCubeOpts extends TextureOpts, TextureCubeData {
   /**
    * @type {Array.<Object>}
    */
-  mipmaps: [];
+  mipmaps: TextureCubeData[];
 }
 
 interface TextureCube extends TextureCubeOpts {}

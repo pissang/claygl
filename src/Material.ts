@@ -298,7 +298,7 @@ class Material {
    * @param  {string} symbol
    * @param  {number} [val]
    */
-  define(shaderType: ShaderType | 'both', symbol: string, val: ShaderDefineValue) {
+  define(shaderType: ShaderType | 'both', symbol: string, val?: ShaderDefineValue) {
     const vertexDefines = this.vertexDefines;
     const fragmentDefines = this.fragmentDefines;
     if (

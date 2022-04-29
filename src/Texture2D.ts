@@ -64,7 +64,7 @@ export interface Texture2DOpts extends TextureOpts, Texture2DData {
  *     });
  */
 
-interface Texture2D extends Omit<Texture2DOpts, 'image' | 'pixels'> {}
+interface Texture2D extends Omit<Texture2DOpts, 'image'> {}
 class Texture2D extends Texture {
   readonly textureType: string = 'texture2D';
 
