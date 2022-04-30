@@ -102,6 +102,10 @@ class Renderable extends ClayNode {
    */
   boundingBox?: BoundingBox;
 
+  /**
+   * Customized shadow depth material
+   */
+  shadowDepthMaterial?: Material;
   // Depth for transparent list sorting
   __depth = 0;
 

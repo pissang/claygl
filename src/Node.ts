@@ -504,7 +504,7 @@ class ClayNode extends Notifier {
   // TODO Skinning
   getBoundingBox(filter?: GetBoundingBoxFilter, out?: BoundingBox): BoundingBox {
     out = out || new BoundingBox();
-    filter = filter || defaultBoundingBoxNodeFilter;
+    const meshFilter = filter || defaultBoundingBoxNodeFilter;
     const invWorldTransform = tmpMat4;
 
     if (this._parent) {
@@ -515,7 +515,7 @@ class ClayNode extends Notifier {
 
     this.traverse(function (mesh) {
       const geo = (mesh as Mesh).geometry;
-      if (geo && geo.boundingBox && filter(mesh as Mesh)) {
+      if (geo && geo.boundingBox && meshFilter(mesh as Mesh)) {
         tmpBBox.copy(geo.boundingBox);
         Matrix4.multiply(tmpMat4, invWorldTransform, mesh.worldTransform);
         tmpBBox.applyTransform(tmpMat4);

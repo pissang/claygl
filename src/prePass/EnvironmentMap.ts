@@ -1,15 +1,11 @@
 import Vector3 from '../math/Vector3';
 import PerspectiveCamera from '../camera/Perspective';
 import FrameBuffer from '../FrameBuffer';
-import TextureCube from '../TextureCube';
+import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
 
 import type ShadowMapPass from './ShadowMap';
 import type Renderer from '../Renderer';
 import type Scene from '../Scene';
-
-const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
-
-type CameraTarget = typeof targets[number];
 
 interface EnvironmentMapPassOpts {
   /**
@@ -79,20 +75,17 @@ class EnvironmentMapPass {
    */
   shadowMapPass?: ShadowMapPass;
 
-  private _cameras: Record<CameraTarget, PerspectiveCamera>;
+  private _cameras: Record<CubeTarget, PerspectiveCamera>;
   private _frameBuffer: FrameBuffer;
 
   constructor(opts?: Partial<EnvironmentMapPassOpts>) {
     Object.assign(this, opts);
 
-    const cameras = (this._cameras = {
-      px: new PerspectiveCamera({ fov: 90 }),
-      nx: new PerspectiveCamera({ fov: 90 }),
-      py: new PerspectiveCamera({ fov: 90 }),
-      ny: new PerspectiveCamera({ fov: 90 }),
-      pz: new PerspectiveCamera({ fov: 90 }),
-      nz: new PerspectiveCamera({ fov: 90 })
-    });
+    const cameras = (this._cameras = cubeTargets.reduce((obj, target) => {
+      obj[target] = new PerspectiveCamera({ fov: 90 });
+      return obj;
+    }, {} as Record<CubeTarget, PerspectiveCamera>));
+
     cameras.px.lookAt(Vector3.POSITIVE_X, Vector3.NEGATIVE_Y);
     cameras.nx.lookAt(Vector3.NEGATIVE_X, Vector3.NEGATIVE_Y);
     cameras.py.lookAt(Vector3.POSITIVE_Y, Vector3.POSITIVE_Z);
@@ -103,7 +96,7 @@ class EnvironmentMapPass {
     // FIXME In windows, use one framebuffer only renders one side of cubemap
     this._frameBuffer = new FrameBuffer();
   }
-  getCamera(target: CameraTarget) {
+  getCamera(target: CubeTarget) {
     return this._cameras[target];
   }
   render(renderer: Renderer, scene: Scene, notUpdateScene?: boolean) {
@@ -122,7 +115,7 @@ class EnvironmentMapPass {
     const fov = ((2 * Math.atan(n / (n - 0.5))) / Math.PI) * 180;
 
     for (let i = 0; i < 6; i++) {
-      const target = targets[i];
+      const target = cubeTargets[i];
       const camera = this._cameras[target];
       Vector3.copy(camera.position, this.position);
 

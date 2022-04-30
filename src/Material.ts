@@ -56,6 +56,7 @@ interface MaterialOpts {
   depthMask: boolean;
   transparent: boolean;
   shader: Shader;
+  precision: ShaderPrecision;
 }
 
 interface Material extends Omit<MaterialOpts, 'shader'> {}
@@ -103,8 +104,6 @@ class Material {
    */
   autoUpdateTextureStatus = true;
 
-  precision: ShaderPrecision = 'highp';
-
   uniforms: Record<string, ShaderUniform> = {};
   vertexDefines: Record<string, ShaderDefineValue> = {};
   fragmentDefines: Record<string, ShaderDefineValue> = {};
@@ -127,6 +126,7 @@ class Material {
     this.depthTest = util.optional(opts.depthTest, true);
     this.depthMask = util.optional(opts.depthMask, true);
     this.transparent = opts.transparent || false;
+    this.precision = opts.precision || 'highp';
   }
 
   get shader() {

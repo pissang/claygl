@@ -8,10 +8,6 @@ class Handler {
     this.context = context;
   }
 }
-/**
- * @mixin
- * @alias clay.core.mixin.notifier
- */
 class Notifier {
   private _handlers?: Record<string, Handler[]>;
   /**

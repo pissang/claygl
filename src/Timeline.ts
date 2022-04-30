@@ -1,6 +1,6 @@
 import ProceduralKeyframeAnimator from './animation/ProceduralKeyframeAnimator';
 import { Animator } from './animation/Animator';
-import Notifier from './core/notifier';
+import Notifier from './core/Notifier';
 import Clip from './animation/Clip';
 
 interface Stage {

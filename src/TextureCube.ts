@@ -7,15 +7,15 @@ import { GLEnum } from './core/type';
 
 const isPowerOfTwo = mathUtil.isPowerOfTwo;
 
-const targetList = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
-type TargetName = typeof targetList[number];
+export const cubeTargets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
+export type CubeTarget = 'px' | 'nx' | 'py' | 'ny' | 'pz' | 'nz';
 
 interface TextureCubeData {
-  image?: Record<TargetName, TextureImageSource>;
+  image?: Record<CubeTarget, TextureImageSource>;
   /**
    * Pixels data. Will be ignored if image is set.
    */
-  pixels?: Record<TargetName, TexturePixelSource>;
+  pixels?: Record<CubeTarget, TexturePixelSource>;
 }
 export interface TextureCubeOpts extends TextureOpts, TextureCubeData {
   /**
@@ -155,7 +155,7 @@ class TextureCube extends Texture {
     glType: GLEnum
   ) {
     for (let i = 0; i < 6; i++) {
-      const target = targetList[i];
+      const target = cubeTargets[i];
       const img = data.image && data.image[target];
       const pixels = data.pixels && data.pixels[target];
       if (img) {
@@ -220,10 +220,10 @@ class TextureCube extends Texture {
     }
   }
 
-  load(imageList: Record<TargetName, string>, crossOrigin?: string) {
+  load(imageList: Record<CubeTarget, string>, crossOrigin?: string) {
     let loading = 0;
-    this.image = {} as Record<TargetName, TextureImageSource>;
-    (Object.keys(imageList) as TargetName[]).forEach((target) => {
+    this.image = {} as Record<CubeTarget, TextureImageSource>;
+    (Object.keys(imageList) as CubeTarget[]).forEach((target) => {
       const src = imageList[target];
       const image = vendor.createImage();
       if (crossOrigin) {

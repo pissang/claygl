@@ -111,7 +111,7 @@ class Scene extends ClayNode {
   viewBoundingBoxLastFrame = new BoundingBox();
 
   // Uniforms for shadow map.
-  shadowUniforms = {};
+  shadowUniforms: Record<string, ShaderUniform> = {};
 
   private _cameraList: Camera[] = [];
 
