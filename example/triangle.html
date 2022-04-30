@@ -4,54 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script src="../dist/claygl.js"></script>
     <title>Triangle Dynamic</title>
   </head>
   <body>
     <canvas id="main"></canvas>
 
-    <script>
-      var TRIANGLE_POSITIONS = [
-        [-0.5, -0.5, 0],
-        [0.5, -0.5, 0],
-        [0, 0.5, 0]
-      ];
-      var TRIANGLE_POSITIONS2 = [
-        [-1, -1, 0],
-        [1, -1, 0],
-        [0, 1, 0]
-      ];
-
-      var renderer = new clay.Renderer({
-        canvas: document.getElementById('main')
-      });
-      renderer.resize(400, 400);
-      var scene = new clay.Scene();
-      var camera = new clay.OrthographicCamera();
-      var geometry = new clay.Geometry({
-        dynamic: true
-      });
-      // Add triangle vertices to position attribute.
-      geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
-
-      var mesh = new clay.Mesh({
-        geometry: geometry,
-        material: new clay.Material({
-          shader: new clay.BasicShader()
-        })
-      });
-      mesh.material.set('color', [0, 0, 1]);
-      scene.add(mesh);
-
-      renderer.render(scene, camera);
-
-      var i = 0;
-      setInterval(function () {
-        i++;
-        geometry.attributes.position.fromArray(i % 2 ? TRIANGLE_POSITIONS2 : TRIANGLE_POSITIONS);
-        geometry.dirty();
-        renderer.render(scene, camera);
-      }, 500);
-    </script>
+    <script type="module" src="./triangle.ts"></script>
   </body>
 </html>

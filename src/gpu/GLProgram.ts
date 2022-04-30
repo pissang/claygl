@@ -99,10 +99,10 @@ class GLProgram {
   }
 
   setUniform(_gl: WebGLRenderingContext, type: string, symbol: string, value: any) {
-    const locationMap = this._attrLocations;
+    const locationMap = this._uniformLocations;
     const location = locationMap[symbol];
     // Uniform is not existed in the shader
-    if (location === null || location === undefined) {
+    if (location == null) {
       return false;
     }
 
