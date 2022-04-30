@@ -45,3 +45,11 @@ export * from './math';
 export { color } from './core';
 
 export * as easing from './animation/easing';
+
+export {
+  BasicShader,
+  LambertShader,
+  WireframeShader,
+  StandardShader,
+  StandardMRShader
+} from './shader/index';

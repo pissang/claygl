@@ -27,7 +27,7 @@
       });
       renderer.resize(400, 400);
       var scene = new clay.Scene();
-      var camera = new clay.camera.Orthographic();
+      var camera = new clay.OrthographicCamera();
       var geometry = new clay.StaticGeometry();
 
       // Add triangle vertices to position attribute.
@@ -37,7 +37,7 @@
       var mesh = new clay.Mesh({
         geometry: geometry,
         material: new clay.Material({
-          shader: clay.shader.library.get('clay.basic')
+          shader: new clay.BasicShader()
         })
       });
       mesh.material.define('both', 'VERTEX_COLOR');

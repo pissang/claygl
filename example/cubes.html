@@ -11,8 +11,6 @@
       var Shader = clay.Shader;
       var Material = clay.Material;
       var Mesh = clay.Mesh;
-      var Cube = clay.geometry.Cube;
-      var meshUtil = clay.util.mesh;
       var shaderLibrary = clay.shader.library;
       var timeline = new clay.Timeline();
       timeline.start();
@@ -28,7 +26,7 @@
         far: 500
       });
 
-      var cube = new Cube();
+      var cube = new clay.CubeGeometry();
       cube.generateTangents();
       var shader = shaderLibrary.get('clay.standard');
       var material = new Material({

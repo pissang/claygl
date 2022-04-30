@@ -226,7 +226,7 @@ class Material {
 
     // Ignore if uniform can use in shader.
     this.uniforms = shader.createUniforms();
-    this.shader = shader;
+    this._shader = shader;
 
     const uniforms = this.uniforms;
     this._enabledUniforms = Object.keys(uniforms);
@@ -298,7 +298,13 @@ class Material {
    * @param  {string} symbol
    * @param  {number} [val]
    */
-  define(shaderType: ShaderType | 'both', symbol: string, val?: ShaderDefineValue) {
+  define(symbol: string, val?: ShaderDefineValue): void;
+  define(shaderType: ShaderType | 'both', symbol?: string, val?: ShaderDefineValue): void;
+  define(
+    shaderType: ShaderType | 'both',
+    symbol?: string | ShaderDefineValue,
+    val?: ShaderDefineValue
+  ) {
     const vertexDefines = this.vertexDefines;
     const fragmentDefines = this.fragmentDefines;
     if (
@@ -314,15 +320,15 @@ class Material {
     }
     val = val != null ? val : null;
     if (shaderType === 'vertex' || shaderType === 'both') {
-      if (vertexDefines[symbol] !== val) {
-        vertexDefines[symbol] = val;
+      if (vertexDefines[symbol as string] !== val) {
+        vertexDefines[symbol as string] = val;
         // Mark as dirty
         this._programKey = '';
       }
     }
     if (shaderType === 'fragment' || shaderType === 'both') {
-      if (fragmentDefines[symbol] !== val) {
-        fragmentDefines[symbol] = val;
+      if (fragmentDefines[symbol as string] !== val) {
+        fragmentDefines[symbol as string] = val;
         if (shaderType !== 'both') {
           this._programKey = '';
         }
@@ -335,7 +341,9 @@ class Material {
    * @param  {string} shaderType Can be vertex, fragment or both
    * @param  {string} symbol
    */
-  undefine(shaderType: ShaderType | 'both', symbol: string) {
+  undefine(symbol?: string): void;
+  undefine(shaderType: ShaderType | 'both', symbol?: string): void;
+  undefine(shaderType: ShaderType | 'both' | string, symbol?: string) {
     if (
       shaderType !== 'vertex' &&
       shaderType !== 'fragment' &&
@@ -347,15 +355,15 @@ class Material {
       shaderType = 'both';
     }
     if (shaderType === 'vertex' || shaderType === 'both') {
-      if (this.isDefined('vertex', symbol)) {
-        delete this.vertexDefines[symbol];
+      if (this.isDefined('vertex', symbol as string)) {
+        delete this.vertexDefines[symbol as string];
         // Mark as dirty
         this._programKey = '';
       }
     }
     if (shaderType === 'fragment' || shaderType === 'both') {
-      if (this.isDefined('fragment', symbol)) {
-        delete this.fragmentDefines[symbol];
+      if (this.isDefined('fragment', symbol as string)) {
+        delete this.fragmentDefines[symbol as string];
         if (shaderType !== 'both') {
           this._programKey = '';
         }

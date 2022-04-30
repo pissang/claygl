@@ -7,10 +7,12 @@ export default {
     {
       format: 'umd',
       name: 'clay',
+      sourcemap: true,
       file: 'dist/claygl.js'
     },
     {
       format: 'es',
+      sourcemap: true,
       file: 'dist/claygl.es.js'
     }
   ]
