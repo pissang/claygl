@@ -51,15 +51,22 @@ class GLProgram {
   private _uniformLocations: Record<string, WebGLUniformLocation> = {};
   private _textureSlot: number = 0;
 
-  private _program!: WebGLProgram;
+  private _program?: WebGLProgram;
 
   // Error message
   __error?: string;
 
   constructor() {}
+
   bind(renderer: Renderer) {
     this._textureSlot = 0;
-    renderer.gl.useProgram(this._program);
+    if (this._program) {
+      renderer.gl.useProgram(this._program);
+    }
+  }
+
+  isValid() {
+    return !!this._program;
   }
 
   hasUniform(symbol: string) {
@@ -215,6 +222,9 @@ class GLProgram {
   ) {
     const _gl = renderer.gl;
     const program = this._program;
+    if (!program) {
+      return [];
+    }
 
     const locationMap = this._attrLocations;
 
@@ -283,7 +293,7 @@ class GLProgram {
     const locationMap = this._attrLocations;
 
     let location = locationMap[symbol];
-    if (location == null) {
+    if (location == null && this._program) {
       location = _gl.getAttribLocation(this._program, symbol);
       locationMap[symbol] = location;
     }

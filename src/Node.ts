@@ -605,4 +605,6 @@ class ClayNode extends Notifier {
   }
 }
 
+ClayNode.prototype.autoUpdateLocalTransform = true;
+
 export default ClayNode;

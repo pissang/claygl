@@ -2,6 +2,7 @@ lockfileVersion: 5.3
 
 specifiers:
   '@rollup/plugin-typescript': ^8.3.2
+  '@types/stats.js': ^0.17.0
   '@typescript-eslint/eslint-plugin': ^5.20.0
   '@typescript-eslint/parser': ^5.20.0
   electron: 1.7.9
@@ -14,6 +15,7 @@ specifiers:
   mocha: ^4.0.1
   remap-istanbul: ^0.9.5
   rollup: ^2.70.2
+  stats.js: ^0.17.0
   terser: ^5.12.1
   tslib: ^2.3.1
   typescript: ^4.6.4
@@ -24,6 +26,7 @@ dependencies:
   tslib: 2.3.1
 
 devDependencies:
+  '@types/stats.js': 0.17.0
   '@typescript-eslint/eslint-plugin': 5.20.0_bd994e352ae473ad3e507fadfa78fd8c
   '@typescript-eslint/parser': 5.20.0_eslint@8.13.0+typescript@4.6.4
   electron: 1.7.9
@@ -36,6 +39,7 @@ devDependencies:
   mocha: 4.1.0
   remap-istanbul: 0.9.6
   rollup: 2.70.2
+  stats.js: 0.17.0
   terser: 5.12.1
   typescript: 4.6.4
   vite: 2.9.6
@@ -132,6 +136,10 @@ packages:
 
   /@types/node/7.10.14:
     resolution: {integrity: sha512-29GS75BE8asnTno3yB6ubOJOO0FboExEqNJy4bpz0GSmW/8wPTNL4h9h63c6s1uTrOopCmJYe/4yJLh5r92ZUA==}
+    dev: true
+
+  /@types/stats.js/0.17.0:
+    resolution: {integrity: sha512-9w+a7bR8PeB0dCT/HBULU2fMqf6BAzvKbxFboYhmDtDkKPiyXYbjoe2auwsXlEFI7CFNMF1dCv3dFH5Poy9R1w==}
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.20.0_bd994e352ae473ad3e507fadfa78fd8c:
@@ -2724,6 +2732,10 @@ packages:
       jsbn: 0.1.1
       safer-buffer: 2.1.2
       tweetnacl: 0.14.5
+    dev: true
+
+  /stats.js/0.17.0:
+    resolution: {integrity: sha1-scPcRtlEmLV4t/05hbgaznExzH0=}
     dev: true
 
   /string-width/1.0.2:

@@ -38,6 +38,7 @@
     "url": "https://github.com/pissang/claygl.git"
   },
   "devDependencies": {
+    "@types/stats.js": "^0.17.0",
     "@typescript-eslint/eslint-plugin": "^5.20.0",
     "@typescript-eslint/parser": "^5.20.0",
     "electron": "1.7.9",
@@ -50,6 +51,7 @@
     "mocha": "^4.0.1",
     "remap-istanbul": "^0.9.5",
     "rollup": "^2.70.2",
+    "stats.js": "^0.17.0",
     "terser": "^5.12.1",
     "typescript": "^4.6.4",
     "vite": "^2.9.6"

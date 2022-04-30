@@ -39,7 +39,6 @@ function unrollLoop(
       }
     }
     // TODO Error checking
-
     for (let idx = parseInt(start); idx < parseInt(end); idx++) {
       // PENDING Add scope?
       unroll +=
@@ -199,7 +198,7 @@ class ProgramManager {
       '\n' +
       fragmentDefineStr +
       '\n' +
-      shader!.fragment;
+      shader.fragment;
 
     const finalVertexCode = unrollLoop(vertexCode, material.vertexDefines, lightsNumbers);
     const finalFragmentCode = unrollLoop(fragmentCode, material.fragmentDefines, lightsNumbers);

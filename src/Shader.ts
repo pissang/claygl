@@ -65,7 +65,7 @@ export interface ParsedUniformSemantic {
 interface ParsedDeclaration {
   value: any;
   isArray: boolean;
-  arraySize: number;
+  arraySize: string;
   ignore: boolean;
   semantic: string;
 }
@@ -315,7 +315,7 @@ function parseDeclarations(type: string, line: string) {
     declarations[currentDeclaration] = {} as ParsedDeclaration;
     if (arrResult) {
       declarations[currentDeclaration].isArray = true;
-      declarations[currentDeclaration].arraySize = +arrResult[1];
+      declarations[currentDeclaration].arraySize = arrResult[1] as any;
     }
   }
 

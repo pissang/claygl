@@ -819,6 +819,12 @@ class Renderer extends Notifier {
       const material = passConfig.getMaterial.call(this, renderable);
 
       let program = (renderable as ExtendedRenderableObject).__program;
+
+      // If has error in shader and program is invalid
+      if (!program.isValid()) {
+        continue;
+      }
+
       const shader = material.shader!;
 
       const currentDrawID = geometry.__uid__ + '-' + program.__uid__;

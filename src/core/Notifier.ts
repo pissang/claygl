@@ -59,12 +59,8 @@ class Notifier {
   }
   /**
    * Register event handler
-   * @param  {string} name
-   * @param  {Function} action
-   * @param  {Object} [context]
-   * @chainable
    */
-  on(name: string, action: Function, context: any) {
+  on(name: string, action: Function, context?: any) {
     if (!name || !action) {
       return;
     }

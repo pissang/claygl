@@ -75,6 +75,7 @@ class Texture2D extends Texture {
   }
   set image(val: TextureImageSource | undefined) {
     if (this._image !== val) {
+      this._image = val;
       this.dirty();
     }
   }

@@ -10,41 +10,6 @@
   <body>
     <canvas id="main"></canvas>
 
-    <script>
-      var TRIANGLE_POSITIONS = [
-        [-0.5, -0.5, 0],
-        [0.5, -0.5, 0],
-        [0, 0.5, 0]
-      ];
-      var VERTEX_COLORS = [
-        [1, 0, 0, 1],
-        [0, 1, 0, 1],
-        [0, 0, 1, 1]
-      ];
-
-      var renderer = new clay.Renderer({
-        canvas: document.getElementById('main')
-      });
-      renderer.resize(400, 400);
-      var scene = new clay.Scene();
-      var camera = new clay.OrthographicCamera();
-      var geometry = new clay.StaticGeometry();
-
-      // Add triangle vertices to position attribute.
-      geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
-      geometry.attributes.color.fromArray(VERTEX_COLORS);
-
-      var mesh = new clay.Mesh({
-        geometry: geometry,
-        material: new clay.Material({
-          shader: new clay.BasicShader()
-        })
-      });
-      mesh.material.define('both', 'VERTEX_COLOR');
-      mesh.material.set('color', [1, 1, 1]);
-      scene.add(mesh);
-
-      renderer.render(scene, camera);
-    </script>
+    <script type="module" src="./triangle_vertexcolor.ts"></script>
   </body>
 </html>
