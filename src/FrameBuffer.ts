@@ -16,8 +16,6 @@ const GL_RENDERBUFFER = glenum.RENDERBUFFER;
 const GL_DEPTH_ATTACHMENT = glenum.DEPTH_ATTACHMENT;
 const GL_COLOR_ATTACHMENT0 = glenum.COLOR_ATTACHMENT0;
 
-const currentFrameBufferMap = new WeakMap();
-
 interface FrameBufferOpts {
   /**
    * If use depth buffer
@@ -74,7 +72,7 @@ class FrameBuffer {
    * @param  {clay.Renderer} renderer
    */
   bind(renderer: Renderer) {
-    const currentFrameBuffer = currentFrameBufferMap.get(renderer);
+    const currentFrameBuffer = renderer.__currentFrameBuffer;
     if (currentFrameBuffer) {
       // Already bound
       if (currentFrameBuffer === this) {
@@ -83,7 +81,7 @@ class FrameBuffer {
 
       console.warn('Renderer already bound with another framebuffer. Unbind it first');
     }
-    currentFrameBuffer.set(renderer, this);
+    renderer.__currentFrameBuffer = this;
 
     const _gl = renderer.gl;
 
@@ -172,7 +170,7 @@ class FrameBuffer {
    */
   unbind(renderer: Renderer) {
     // Remove status record on renderer
-    currentFrameBufferMap.set(renderer, undefined);
+    renderer.__currentFrameBuffer = undefined;
 
     const _gl = renderer.gl;
 

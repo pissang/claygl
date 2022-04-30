@@ -106,17 +106,15 @@ class Geometry extends GeometryBase {
   constructor(opts?: Partial<GeometryOpts>) {
     super(opts);
 
-    this.attributes = {
-      position: new GeometryAttribute('position', 'float', 3, 'POSITION'),
-      texcoord0: new GeometryAttribute('texcoord0', 'float', 2, 'TEXCOORD_0'),
-      texcoord1: new GeometryAttribute('texcoord1', 'float', 2, 'TEXCOORD_1'),
-      normal: new GeometryAttribute('normal', 'float', 3, 'NORMAL'),
-      tangent: new GeometryAttribute('tangent', 'float', 4, 'TANGENT'),
-      color: new GeometryAttribute('color', 'float', 4, 'COLOR'),
-      weight: new GeometryAttribute('weight', 'float', 3, 'WEIGHT'),
-      joint: new GeometryAttribute('joint', 'float', 4, 'JOINT'),
-      barycentric: new GeometryAttribute('barycentric', 'float', 3, undefined)
-    };
+    this.createAttribute('position', 'float', 3, 'POSITION');
+    this.createAttribute('texcoord0', 'float', 2, 'TEXCOORD_0');
+    this.createAttribute('texcoord1', 'float', 2, 'TEXCOORD_1');
+    this.createAttribute('normal', 'float', 3, 'NORMAL');
+    this.createAttribute('tangent', 'float', 4, 'TANGENT');
+    this.createAttribute('color', 'float', 4, 'COLOR');
+    this.createAttribute('weight', 'float', 3, 'WEIGHT');
+    this.createAttribute('joint', 'float', 4, 'JOINT');
+    this.createAttribute('barycentric', 'float', 3);
   }
   /**
    * Update boundingBox of Geometry

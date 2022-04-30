@@ -1,12 +1,12 @@
 export { default as Renderer } from './Renderer';
 export { default as Material } from './Material';
 export { default as Shader } from './Shader';
-export { default as Geometry } from './Geometry';
 export { default as Node } from './Node';
 export { default as Renderable } from './Renderable';
 export { default as Mesh } from './Mesh';
 export { default as InstancedMesh } from './InstancedMesh';
 export { default as GeometryBase } from './GeometryBase';
+export { default as StaticGeometry } from './StaticGeometry';
 export { default as Skeleton } from './Skeleton';
 export { default as Joint } from './Joint';
 export { default as FrameBuffer } from './FrameBuffer';

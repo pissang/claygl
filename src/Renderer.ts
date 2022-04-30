@@ -189,7 +189,7 @@ interface Viewport {
   devicePixelRatio: number;
 }
 interface RendererOpts {
-  canvas: HTMLCanvasElement;
+  canvas: HTMLCanvasElement | null;
 
   /**
    * Canvas width
@@ -308,7 +308,7 @@ class Renderer extends Notifier {
   maxJointNumber = 20;
 
   // Set by FrameBuffer#bind
-  private __currentFrameBuffer?: FrameBuffer;
+  __currentFrameBuffer?: FrameBuffer;
 
   private _viewportStack: Viewport[] = [];
   private _clearStack: {

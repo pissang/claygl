@@ -4,54 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script src="../dist/claygl.js"></script>
     <title>Triangle with Custom Shader</title>
-
-    <script type="x-shader/x-vertex" id="vs">
-      attribute vec3 position: POSITION;
-      void main() {
-          gl_Position = vec4(position, 1.0);
-      }
-    </script>
-    <script type="x-shader/x-fragment" id="fs">
-      void main() {
-          gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
-      }
-    </script>
   </head>
   <body>
     <canvas id="main"></canvas>
 
-    <script>
-      var TRIANGLE_POSITIONS = [
-        [-0.5, -0.5, 0],
-        [0.5, -0.5, 0],
-        [0, 0.5, 0]
-      ];
-
-      var renderer = new clay.Renderer({
-        canvas: document.getElementById('main')
-      });
-      renderer.resize(400, 400);
-      var scene = new clay.Scene();
-      var dummyCamera = new clay.camera.Perspective();
-      var geometry = new clay.StaticGeometry();
-
-      // Add triangle vertices to position attribute.
-      geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
-
-      var mesh = new clay.Mesh({
-        geometry: geometry,
-        material: new clay.Material({
-          shader: new clay.Shader({
-            vertex: document.getElementById('vs').textContent,
-            fragment: document.getElementById('fs').textContent
-          })
-        })
-      });
-      scene.add(mesh);
-
-      renderer.render(scene, dummyCamera);
-    </script>
+    <script type="module" src="./triangle_customshader.ts"></script>
   </body>
 </html>

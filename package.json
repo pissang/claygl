@@ -10,8 +10,7 @@
     "name": "Yi Shen",
     "url": "https://github.com/pissang"
   },
-  "jsnext:main": "dist/claygl.es.js",
-  "module": "src/claygl.js",
+  "module": "lib/claygl.js",
   "main": "dist/claygl.js",
   "types": "index.d.ts",
   "sideEffects": false,
@@ -20,7 +19,8 @@
     "build:lib": "npx tsc",
     "prepublishOnly": "npm run build && npm run build:lib",
     "lint": "npx eslint --quiet src/**/*.ts",
-    "dev": "rollup --sourcemap inline -c -w",
+    "watch": "rollup --sourcemap inline -c -w",
+    "dev": "vite ./ --config example/vite.config.js",
     "glsl2js": "node build/glsl2js.js",
     "gen:entry": "node build/genentry.js",
     "gen:fixture": "npm run pretest && electron-mocha --require-main \"./test/genfixture-env.js\" --renderer \"./test/integration/**/*.spec.js\"",
@@ -51,7 +51,8 @@
     "remap-istanbul": "^0.9.5",
     "rollup": "^2.70.2",
     "terser": "^5.12.1",
-    "typescript": "^4.6.4"
+    "typescript": "^4.6.4",
+    "vite": "^2.9.6"
   },
   "dependencies": {
     "@rollup/plugin-typescript": "^8.3.2",

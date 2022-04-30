@@ -459,7 +459,7 @@ class GeometryBase {
     name: string,
     type: AttributeType,
     size: T,
-    semantic: string
+    semantic?: string
   ) {
     const attrib = new GeometryAttribute<T>(name, type, size, semantic);
     if (this.attributes[name]) {
@@ -635,7 +635,6 @@ class GeometryBase {
 
   /**
    * Dispose geometry data in GL context.
-   * @param {clay.Renderer} renderer
    */
   dispose(renderer: Renderer) {
     const cache = this._cache;
