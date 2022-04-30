@@ -49,10 +49,9 @@ class InstancedMesh extends Mesh {
   private _attributesSymbols: string[] = [];
 
   constructor(opts?: Partial<InstancedMeshOpts>) {
-    opts = opts || {};
     super(opts);
 
-    this.instances = optional(opts.instances, []);
+    this.instances = optional(opts && opts.instances, []);
     this.createInstancedAttribute('instanceMat1', 'float', 4, 1);
     this.createInstancedAttribute('instanceMat2', 'float', 4, 1);
     this.createInstancedAttribute('instanceMat3', 'float', 4, 1);

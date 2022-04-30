@@ -8,8 +8,8 @@ import * as mat4 from './glmatrix/mat4';
 import * as vec3 from './glmatrix/vec3';
 import * as quat from './glmatrix/quat';
 import type ClayNode from './Node';
-import type SkinningClip from './animation/SkinningClip';
 import type Geometry from './Geometry';
+import TrackAnimator from './animation/TrackAnimator';
 
 const tmpBoundingBox = new BoundingBox();
 const tmpMat4 = new Matrix4();
@@ -40,9 +40,9 @@ class Skeleton {
    */
   boundingBox?: BoundingBox;
 
-  private _clips: {
+  private _animations: {
     maps: number[];
-    clip: SkinningClip;
+    animator: TrackAnimator;
   }[] = [];
 
   // Matrix to joint space (relative to root joint)
@@ -70,13 +70,13 @@ class Skeleton {
 
   /**
    * Add a skinning clip and create a map between clip and skeleton
-   * @param clip
+   * @param animator
    * @param mapRule Map between joint name in skeleton and joint name in clip
    */
-  addClip(clip: SkinningClip, mapRule?: Record<string, string>) {
+  addAnimator(animator: TrackAnimator, mapRule?: Record<string, string>) {
     // Clip have been exists in
-    for (let i = 0; i < this._clips.length; i++) {
-      if (this._clips[i].clip === clip) {
+    for (let i = 0; i < this._animations.length; i++) {
+      if (this._animations[i].animator === animator) {
         return;
       }
     }
@@ -86,10 +86,10 @@ class Skeleton {
       maps[i] = -1;
     }
     // Create avatar
-    for (let i = 0; i < clip.tracks.length; i++) {
+    for (let i = 0; i < animator.tracks.length; i++) {
       for (let j = 0; j < this.joints.length; j++) {
         const joint = this.joints[j];
-        const track = clip.tracks[i];
+        const track = animator.tracks[i];
         let jointName = joint.name;
         if (mapRule) {
           jointName = mapRule[jointName];
@@ -101,51 +101,51 @@ class Skeleton {
       }
     }
 
-    this._clips.push({
+    this._animations.push({
       maps: maps,
-      clip: clip
+      animator: animator
     });
 
-    return this._clips.length - 1;
+    return this._animations.length - 1;
   }
 
   /**
-   * @param clip
+   * @param animator
    */
-  removeClip(clip: SkinningClip) {
+  removeAnimator(animator: TrackAnimator) {
     let idx = -1;
-    for (let i = 0; i < this._clips.length; i++) {
-      if (this._clips[i].clip === clip) {
+    for (let i = 0; i < this._animations.length; i++) {
+      if (this._animations[i].animator === animator) {
         idx = i;
         break;
       }
     }
     if (idx > 0) {
-      this._clips.splice(idx, 1);
+      this._animations.splice(idx, 1);
     }
   }
   /**
    * Remove all clips
    */
-  removeClipsAll() {
-    this._clips = [];
+  removeAnimatorsAll() {
+    this._animations = [];
   }
 
   /**
-   * Get clip by index
+   * Get animator by index
    * @param index
    */
-  getClip(index: number) {
-    if (this._clips[index]) {
-      return this._clips[index].clip;
+  getAnimator(index: number) {
+    if (this._animations[index]) {
+      return this._animations[index].animator;
     }
   }
 
   /**
    * Return clips number
    */
-  getClipsCount() {
-    return this._clips.length;
+  getAnimatorsCount() {
+    return this._animations.length;
   }
 
   /**
@@ -338,16 +338,16 @@ class Skeleton {
   }
 
   _setPose() {
-    if (this._clips[0]) {
-      const clip = this._clips[0].clip;
-      const maps = this._clips[0].maps;
+    if (this._animations[0]) {
+      const animator = this._animations[0].animator;
+      const maps = this._animations[0].maps;
 
       for (let i = 0; i < this.joints.length; i++) {
         const joint = this.joints[i];
         if (maps[i] === -1) {
           continue;
         }
-        const pose = clip.tracks[maps[i]];
+        const pose = animator.tracks[maps[i]];
         const node = joint.node;
         if (node) {
           // Not update if there is no data.

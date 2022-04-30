@@ -56,7 +56,6 @@ class Light extends ClayNode {
   >;
 
   constructor(opts?: Partial<LightOpts>) {
-    opts = opts || {};
     super(opts);
     Object.assign(this, opts);
   }

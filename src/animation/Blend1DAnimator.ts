@@ -29,16 +29,12 @@ class Blend1DAnimator extends BlendAnimator {
   private _cacheKey: number = 0;
   private _cachePosition: number = -Infinity;
 
-  private _loop?: boolean;
-
-  private _elpasedTime?: number;
-
   protected _output?: BlendAnimatorTarget;
   protected _inputs: Blend1DAnimatorInput[];
 
   constructor(opts?: Partial<Blend1DAnimatorOpts>) {
-    opts = opts || {};
     super(opts);
+    opts = opts || {};
 
     this._inputs = (opts.inputs || []).sort(clipSortFunc);
     this._output = opts.output;

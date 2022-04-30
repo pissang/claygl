@@ -44,7 +44,9 @@ function unrollLoop(
       // PENDING Add scope?
       unroll +=
         '{' +
-        snippet.replace(/float\s*\(\s*_idx_\s*\)/g, idx.toFixed(1)).replace(/_idx_/g, idx) +
+        snippet
+          .replace(/float\s*\(\s*_idx_\s*\)/g, idx.toFixed(1))
+          .replace(/_idx_/g, idx as any as string) +
         '}';
     }
 

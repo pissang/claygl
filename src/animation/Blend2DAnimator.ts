@@ -3,11 +3,6 @@
 import Vector2 from '../math/Vector2';
 import delaunay from '../util/delaunay';
 import { BlendAnimator, BlendAnimatorOpts, BlendAnimatorTarget } from './BlendAnimator';
-import Clip from './Clip';
-
-const clipSortFunc = function (a: { position: number }, b: { position: number }) {
-  return a.position - b.position;
-};
 
 interface Blend2DAnimatorInput {
   position: Vector2;
@@ -32,9 +27,6 @@ interface Triangle {
 class Blend2DAnimator extends BlendAnimator {
   position = new Vector2();
 
-  private _cacheKey: number = 0;
-  private _cachePosition: number = -Infinity;
-
   protected _output?: BlendAnimatorTarget;
   protected _inputs: Blend2DAnimatorInput[];
 
@@ -42,9 +34,8 @@ class Blend2DAnimator extends BlendAnimator {
   private _triangles?: Triangle[];
 
   constructor(opts?: Partial<Blend2DAnimatorOpts>) {
-    opts = opts || {};
-
     super();
+    opts = opts || {};
 
     this._inputs = opts.inputs || [];
     this._output = opts.output;

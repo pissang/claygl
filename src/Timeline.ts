@@ -54,9 +54,7 @@ export default class Timeline extends Notifier {
   constructor(opts?: TimelineOption) {
     super();
 
-    opts = opts || {};
-
-    this.stage = opts.stage || {};
+    this.stage = (opts && opts.stage) || {};
   }
 
   /**

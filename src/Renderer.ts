@@ -330,8 +330,8 @@ class Renderer extends Notifier {
   private _programMgr: ProgramManager;
 
   constructor(opts?: Partial<RendererOpts>) {
-    opts = opts || {};
     super();
+    opts = opts || {};
 
     const canvas = (this.canvas = opts.canvas || vendor.createCanvas());
     try {

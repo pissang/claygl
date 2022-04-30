@@ -1,16 +1,42 @@
-// @ts-nocheck
-import Base from '../core/Base';
 import Vector3 from '../math/Vector3';
 import PerspectiveCamera from '../camera/Perspective';
 import FrameBuffer from '../FrameBuffer';
+import TextureCube from '../TextureCube';
 
-const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
+import type ShadowMapPass from './ShadowMap';
+import type Renderer from '../Renderer';
+import type Scene from '../Scene';
 
+const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
+
+type CameraTarget = typeof targets[number];
+
+interface EnvironmentMapPassOpts {
+  /**
+   * Camera position
+   */
+  position: Vector3;
+  /**
+   * Camera far plane
+   */
+  far: number;
+  /**
+   * Camera near plane
+   */
+  near: number;
+  /**
+   * Environment cube map
+   */
+  texture: TextureCube;
+
+  /**
+   * Used if you wan't have shadow in environment map
+   */
+  shadowMapPass: ShadowMapPass;
+}
 /**
  * Pass rendering scene to a environment cube map
  *
- * @constructor clay.prePass.EnvironmentMap
- * @extends clay.core.Base
  * @example
  *     // Example of car reflection
  *     const envMap = new clay.TextureCube({
@@ -30,41 +56,36 @@ const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
  *         renderer.render(scene, camera);
  *     });
  */
-const EnvironmentMapPass = Base.extend(
-  function () {
-    const ret = /** @lends clay.prePass.EnvironmentMap# */ {
-      /**
-       * Camera position
-       * @type {clay.Vector3}
-       * @memberOf clay.prePass.EnvironmentMap#
-       */
-      position: new Vector3(),
-      /**
-       * Camera far plane
-       * @type {number}
-       * @memberOf clay.prePass.EnvironmentMap#
-       */
-      far: 1000,
-      /**
-       * Camera near plane
-       * @type {number}
-       * @memberOf clay.prePass.EnvironmentMap#
-       */
-      near: 0.1,
-      /**
-       * Environment cube map
-       * @type {clay.TextureCube}
-       * @memberOf clay.prePass.EnvironmentMap#
-       */
-      texture: null,
+class EnvironmentMapPass {
+  /**
+   * Camera position
+   */
+  position = new Vector3();
+  /**
+   * Camera far plane
+   */
+  far = 1000;
+  /**
+   * Camera near plane
+   */
+  near = 0.1;
+  /**
+   * Environment cube map
+   */
+  texture?: TextureCube;
 
-      /**
-       * Used if you wan't have shadow in environment map
-       * @type {clay.prePass.ShadowMap}
-       */
-      shadowMapPass: null
-    };
-    const cameras = (ret._cameras = {
+  /**
+   * Used if you wan't have shadow in environment map
+   */
+  shadowMapPass?: ShadowMapPass;
+
+  private _cameras: Record<CameraTarget, PerspectiveCamera>;
+  private _frameBuffer: FrameBuffer;
+
+  constructor(opts?: Partial<EnvironmentMapPassOpts>) {
+    Object.assign(this, opts);
+
+    const cameras = (this._cameras = {
       px: new PerspectiveCamera({ fov: 90 }),
       nx: new PerspectiveCamera({ fov: 90 }),
       py: new PerspectiveCamera({ fov: 90 }),
@@ -80,69 +101,53 @@ const EnvironmentMapPass = Base.extend(
     cameras.nz.lookAt(Vector3.NEGATIVE_Z, Vector3.NEGATIVE_Y);
 
     // FIXME In windows, use one framebuffer only renders one side of cubemap
-    ret._frameBuffer = new FrameBuffer();
+    this._frameBuffer = new FrameBuffer();
+  }
+  getCamera(target: CameraTarget) {
+    return this._cameras[target];
+  }
+  render(renderer: Renderer, scene: Scene, notUpdateScene?: boolean) {
+    const _gl = renderer.gl;
+    const texture = this.texture;
+    if (!notUpdateScene) {
+      scene.update();
+    }
+    if (!texture) {
+      console.error('texture not provided');
+      return;
+    }
+    // Tweak fov
+    // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
+    const n = texture.width;
+    const fov = ((2 * Math.atan(n / (n - 0.5))) / Math.PI) * 180;
 
-    return ret;
-  },
-  /** @lends clay.prePass.EnvironmentMap# */ {
-    /**
-     * @param  {string} target
-     * @return  {clay.Camera}
-     */
-    getCamera: function (target) {
-      return this._cameras[target];
-    },
-    /**
-     * @param  {clay.Renderer} renderer
-     * @param  {clay.Scene} scene
-     * @param  {boolean} [notUpdateScene=false]
-     */
-    render: function (renderer, scene, notUpdateScene) {
-      const _gl = renderer.gl;
-      if (!notUpdateScene) {
-        scene.update();
+    for (let i = 0; i < 6; i++) {
+      const target = targets[i];
+      const camera = this._cameras[target];
+      Vector3.copy(camera.position, this.position);
+
+      camera.far = this.far;
+      camera.near = this.near;
+      camera.fov = fov;
+
+      if (this.shadowMapPass) {
+        camera.update();
+
+        // update boundingBoxLastFrame
+        const bbox = scene.getBoundingBox();
+        bbox.applyTransform(camera.viewMatrix);
+        scene.viewBoundingBoxLastFrame.copy(bbox);
+
+        this.shadowMapPass.render(renderer, scene, camera, true);
       }
-      // Tweak fov
-      // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
-      const n = this.texture.width;
-      const fov = ((2 * Math.atan(n / (n - 0.5))) / Math.PI) * 180;
-
-      for (let i = 0; i < 6; i++) {
-        const target = targets[i];
-        const camera = this._cameras[target];
-        Vector3.copy(camera.position, this.position);
-
-        camera.far = this.far;
-        camera.near = this.near;
-        camera.fov = fov;
-
-        if (this.shadowMapPass) {
-          camera.update();
-
-          // update boundingBoxLastFrame
-          const bbox = scene.getBoundingBox();
-          bbox.applyTransform(camera.viewMatrix);
-          scene.viewBoundingBoxLastFrame.copy(bbox);
-
-          this.shadowMapPass.render(renderer, scene, camera, true);
-        }
-        this._frameBuffer.attach(
-          this.texture,
-          _gl.COLOR_ATTACHMENT0,
-          _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i
-        );
-        this._frameBuffer.bind(renderer);
-        renderer.render(scene, camera, true);
-        this._frameBuffer.unbind(renderer);
-      }
-    },
-    /**
-     * @param {clay.Renderer} renderer
-     */
-    dispose: function (renderer) {
-      this._frameBuffer.dispose(renderer);
+      this._frameBuffer.attach(texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i);
+      this._frameBuffer.bind(renderer);
+      renderer.render(scene, camera, true);
+      this._frameBuffer.unbind(renderer);
     }
   }
-);
-
+  dispose(renderer: Renderer) {
+    this._frameBuffer.dispose(renderer);
+  }
+}
 export default EnvironmentMapPass;

@@ -106,8 +106,8 @@ class Renderable extends ClayNode {
   __depth = 0;
 
   constructor(opts?: Partial<RenderableOpts>) {
-    opts = opts || {};
     super(opts);
+    opts = opts || {};
 
     for (let i = 0; i < properties.length; i++) {
       const name = properties[i];

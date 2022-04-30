@@ -89,7 +89,7 @@ class ClayNode extends Notifier {
   /**
    * The root scene mounted. Null if it is a isolated node
    */
-  protected _scene: Scene;
+  protected _scene?: Scene;
 
   private _inIterating = false;
 
@@ -135,12 +135,6 @@ class ClayNode extends Notifier {
    * @param {string} name
    */
   setName(name: string) {
-    const scene = this._scene;
-    if (scene) {
-      const nodeRepository = scene._nodeRepository;
-      delete nodeRepository[this.name];
-      nodeRepository[name] = this;
-    }
     this.name = name;
   }
 
@@ -194,7 +188,7 @@ class ClayNode extends Notifier {
       children[idx]._parent = undefined;
 
       if (this._scene) {
-        children[idx].traverse(this._removeSelfFromScene, this);
+        children[idx].traverse((child) => this._removeSelfFromScene(child));
       }
     }
 
@@ -218,12 +212,12 @@ class ClayNode extends Notifier {
   }
 
   _removeSelfFromScene(descendant: ClayNode) {
-    descendant._scene.removeFromScene(descendant);
-    descendant._scene = null;
+    descendant._scene!.removeFromScene(descendant);
+    descendant._scene = undefined;
   }
 
   _addSelfToScene(descendant: ClayNode) {
-    this._scene.addToScene(descendant);
+    this._scene!.addToScene(descendant);
     descendant._scene = this._scene;
   }
 
@@ -508,7 +502,7 @@ class ClayNode extends Notifier {
    * @return {clay.BoundingBox}
    */
   // TODO Skinning
-  getBoundingBox(filter: GetBoundingBoxFilter, out?: BoundingBox): BoundingBox {
+  getBoundingBox(filter?: GetBoundingBoxFilter, out?: BoundingBox): BoundingBox {
     out = out || new BoundingBox();
     filter = filter || defaultBoundingBoxNodeFilter;
     const invWorldTransform = tmpMat4;
@@ -521,7 +515,7 @@ class ClayNode extends Notifier {
 
     this.traverse(function (mesh) {
       const geo = (mesh as Mesh).geometry;
-      if (geo && geo.boundingBox && filter(mesh)) {
+      if (geo && geo.boundingBox && filter(mesh as Mesh)) {
         tmpBBox.copy(geo.boundingBox);
         Matrix4.multiply(tmpMat4, invWorldTransform, mesh.worldTransform);
         tmpBBox.applyTransform(tmpMat4);

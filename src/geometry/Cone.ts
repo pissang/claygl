@@ -23,7 +23,6 @@ class ConeGeometry extends Geometry {
   heightSegments = 1;
 
   constructor(opts?: Partial<ConeGeometryOpts>) {
-    opts = opts || {};
     super(opts);
     Object.assign(this, opts);
     this.build();

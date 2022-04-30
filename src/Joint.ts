@@ -1,4 +1,3 @@
-import Base from './core/Base';
 import { optional } from './core/util';
 import type ClayNode from './Node';
 

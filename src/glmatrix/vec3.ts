@@ -627,7 +627,7 @@ export const forEach = (function () {
       vec[0] = a[i];
       vec[1] = a[i + 1];
       vec[2] = a[i + 2];
-      fn(vec, vec, arg);
+      fn(vec, vec, arg as T);
       a[i] = vec[0];
       a[i + 1] = vec[1];
       a[i + 2] = vec[2];

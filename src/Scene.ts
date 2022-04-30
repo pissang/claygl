@@ -40,7 +40,11 @@ function getProgramKey(lightNumbers: Record<string, number>) {
   return id;
 }
 
-function setUniforms(uniforms: Record<string, ShaderUniform>, program, renderer: Renderer) {
+function setUniforms(
+  uniforms: Record<string, ShaderUniform>,
+  program: GLProgram,
+  renderer: Renderer
+) {
   for (const symbol in uniforms) {
     const lu = uniforms[symbol];
     if (lu.type === 'tv') {
@@ -135,10 +139,9 @@ class Scene extends ClayNode {
   private _renderLists = new LRUCache<RenderList>(20);
 
   constructor(opts?: Partial<SceneOpts>) {
-    opts = opts || {};
     super(opts);
 
-    this.material = opts.material;
+    this.material = opts && opts.material;
 
     this._scene = this;
   }

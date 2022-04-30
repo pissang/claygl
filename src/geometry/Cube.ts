@@ -23,7 +23,6 @@ class CubeGeometry extends Geometry {
   inside = false;
 
   constructor(opts?: Partial<CubeGeometryOpts>) {
-    opts = opts || {};
     super(opts);
     Object.assign(this, opts);
     this.build();

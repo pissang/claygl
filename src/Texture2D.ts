@@ -2,7 +2,6 @@ import Texture, { TextureImageSource, TextureOpts, TexturePixelSource } from './
 import glenum from './core/glenum';
 import vendor from './core/vendor';
 import Renderer from './Renderer';
-import * as mathUtil from './math/util';
 import { GLEnum } from './core/type';
 
 function nearestPowerOfTwo(val: number) {
@@ -110,11 +109,6 @@ class Texture2D extends Texture {
       }
       this._height = value;
     }
-  }
-
-  constructor(opts?: Partial<Texture2DOpts>) {
-    opts = opts || {};
-    super(opts);
   }
 
   update(renderer: Renderer) {

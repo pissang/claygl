@@ -18,7 +18,6 @@ class ParametricSurfaceGeometry extends Geometry {
   generator: SurfaceGenerator;
 
   constructor(opts?: Partial<ParametricSurfaceGeometryOpts>) {
-    opts = opts || {};
     super(opts);
     Object.assign(this, opts);
     this.build();

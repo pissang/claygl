@@ -24,8 +24,8 @@ class Mesh extends Renderable {
   offsetMatrix?: Matrix4;
 
   constructor(opts?: Partial<MeshOpts>) {
-    opts = opts || {};
     super(opts);
+    opts = opts || {};
     if (opts.skeleton) {
       this.skeleton = opts.skeleton;
     }

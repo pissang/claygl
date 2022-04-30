@@ -22,8 +22,9 @@ class OrthographicCamera extends Camera {
   bottom = -1;
 
   constructor(opts?: Partial<OrthographicCameraOpts>) {
-    opts = opts || {};
     super(opts);
+    Object.assign(this, opts || {});
+    this.update();
   }
 
   updateProjectionMatrix() {
@@ -40,7 +41,7 @@ class OrthographicCamera extends Camera {
     this.far = -(1 - m[14]) / m[10];
   }
   clone() {
-    const camera = super.call(this);
+    const camera = super.clone.call(this);
     camera.left = this.left;
     camera.right = this.right;
     camera.near = this.near;

@@ -27,6 +27,12 @@ class PerspectiveCamera extends Camera {
   near = 0.1;
   far = 2000;
 
+  constructor(opts?: Partial<PerspectiveCameraOpts>) {
+    super(opts);
+    Object.assign(this, opts);
+    this.update();
+  }
+
   updateProjectionMatrix() {
     const rad = (this.fov / 180) * Math.PI;
     this.projectionMatrix.perspective(rad, this.aspect, this.near, this.far);

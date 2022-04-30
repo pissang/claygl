@@ -16,7 +16,6 @@ class CylinderGeometry extends Geometry {
   heightSegments = 1;
 
   constructor(opts?: Partial<CylinderGeometryOpts>) {
-    opts = opts || {};
     super(opts);
     Object.assign(this, opts);
     this.build();

@@ -5,13 +5,12 @@ import Texture2D from '../Texture2D';
 import TextureCube, { TextureCubeOpts } from '../TextureCube';
 import Texture from '../Texture';
 import FrameBuffer from '../FrameBuffer';
-import Pass from '../compositor/Pass';
+import CompositorFullscreenQuadPass from '../compositor/Pass';
 import Material from '../Material';
 import Shader from '../Shader';
 import Skybox from '../plugin/Skybox';
 import Scene from '../Scene';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
-import vendor from '../core/vendor';
 import textureUtil from './texture';
 
 import integrateBRDFShaderCode from './shader/integrateBRDF.glsl.js';
@@ -50,9 +49,9 @@ export function prefilterEnvironmentMap(
     width: width,
     height: height,
     type: textureType,
-    flipY: false,
-    mipmaps: []
+    flipY: false
   });
+  prefilteredCubeMap.mipmaps = [];
 
   if (!prefilteredCubeMap.isPowerOfTwo()) {
     console.warn('Width and height must be power of two to enable mipmap.');
@@ -184,9 +183,7 @@ export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D)
   const framebuffer = new FrameBuffer({
     depthBuffer: false
   });
-  const pass = new Pass({
-    fragment: integrateBRDFShaderCode
-  });
+  const quadPass = new CompositorFullscreenQuadPass(integrateBRDFShaderCode);
 
   const texture = new Texture2D({
     width: 512,
@@ -198,10 +195,10 @@ export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D)
     magFilter: Texture.NEAREST,
     useMipmap: false
   });
-  pass.setUniform('normalDistribution', normalDistribution);
-  pass.setUniform('viewportSize', [512, 256]);
-  pass.attachOutput(texture);
-  pass.render(renderer, framebuffer);
+  quadPass.setUniform('normalDistribution', normalDistribution);
+  quadPass.setUniform('viewportSize', [512, 256]);
+  quadPass.attachOutput(texture);
+  quadPass.render(renderer, framebuffer);
 
   // FIXME Only chrome and firefox can readPixels with float type.
   // framebuffer.bind(renderer);

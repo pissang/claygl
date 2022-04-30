@@ -5,7 +5,7 @@ import Ray from './math/Ray';
 
 import * as vec4 from './glmatrix/vec4';
 import * as vec3 from './glmatrix/vec3';
-import { Vector2 } from './claygl';
+import Vector2 from './math/Vector2';
 
 export interface CameraOpts extends ClayNodeOpts {}
 
@@ -30,12 +30,6 @@ class Camera extends ClayNode {
    * Camera frustum in view space
    */
   frustum = new Frustum();
-
-  constructor(opts: Partial<ClayNodeOpts>) {
-    opts = opts || {};
-    super(opts);
-    this.update();
-  }
 
   update() {
     super.update.call(this);

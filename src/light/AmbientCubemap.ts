@@ -27,10 +27,8 @@ class AmbientCubemapLight extends Light {
   readonly type = 'AMBIENT_CUBEMAP_LIGHT';
 
   constructor(opts?: Partial<AmbientCubemapLightOpts>) {
-    opts = opts || {};
-
     super(opts);
-    this.cubemap = opts.cubemap;
+    this.cubemap = opts && opts.cubemap;
   }
 
   /**

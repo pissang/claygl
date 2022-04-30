@@ -21,7 +21,7 @@ export interface TextureCubeOpts extends TextureOpts, TextureCubeData {
   /**
    * @type {Array.<Object>}
    */
-  mipmaps: TextureCubeData[];
+  mipmaps?: TextureCubeData[];
 }
 
 interface TextureCube extends TextureCubeOpts {}
@@ -54,10 +54,6 @@ interface TextureCube extends TextureCubeOpts {}
  */
 class TextureCube extends Texture {
   readonly textureType = 'textureCube';
-  constructor(opts?: Partial<TextureCubeOpts>) {
-    opts = opts || {};
-    super(opts);
-  }
 
   get width() {
     const images = this.image;
@@ -103,6 +99,7 @@ class TextureCube extends Texture {
     this.updateCommon(renderer);
 
     const glFormat = this.format;
+    const mipmaps = this.mipmaps;
     let glType = this.type;
 
     _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, this.getAvailableWrapS());
@@ -128,11 +125,11 @@ class TextureCube extends Texture {
       }
     }
 
-    if (this.mipmaps.length) {
+    if (mipmaps && mipmaps.length) {
       let width = this.width;
       let height = this.height;
-      for (let i = 0; i < this.mipmaps.length; i++) {
-        const mipmap = this.mipmaps[i];
+      for (let i = 0; i < mipmaps.length; i++) {
+        const mipmap = mipmaps[i];
         this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType);
         width /= 2;
         height /= 2;

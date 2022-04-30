@@ -12,7 +12,6 @@ class PlaneGeometry extends Geometry {
   heightSegments = 1;
 
   constructor(opts?: Partial<PlaneGeometryOpts>) {
-    opts = opts || {};
     super(opts);
     Object.assign(this, opts);
     this.build();

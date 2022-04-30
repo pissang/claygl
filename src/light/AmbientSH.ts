@@ -10,9 +10,8 @@ class AmbientSHLight extends Light {
 
   __coefficientsTmpArr = new Float32Array(9 * 3);
   constructor(opts?: Partial<AmbientSHLightOpts>) {
-    opts = opts || {};
     super(opts);
-    this.coefficients = opts.coefficients || [];
+    this.coefficients = (opts && opts.coefficients) || [];
   }
 
   clone() {

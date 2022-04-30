@@ -26,7 +26,6 @@ class SphereGeometry extends Geometry {
   radius = 1;
 
   constructor(opts?: Partial<SphereGeometryOpts>) {
-    opts = opts || {};
     super(opts);
     Object.assign(this, opts);
     this.build();
