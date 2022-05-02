@@ -207,7 +207,7 @@ class Texture2D extends Texture {
         imgData = this._potCanvas;
       }
       gl.texImage2D(glenum.TEXTURE_2D, level, glFormat, glFormat, glType, imgData);
-    } else if (data.pixels) {
+    } else {
       // Can be used as a blank texture when writing render to texture(RTT)
       if (
         // S3TC
@@ -235,7 +235,7 @@ class Texture2D extends Texture {
           0,
           glFormat,
           glType,
-          data.pixels
+          data.pixels || null
         );
       }
     }

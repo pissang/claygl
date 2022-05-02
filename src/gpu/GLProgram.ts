@@ -71,7 +71,7 @@ class GLProgram {
   }
 
   hasUniform(symbol: string) {
-    const location = this._attrLocations[symbol];
+    const location = this._uniformLocations[symbol];
     return location !== null && location !== undefined;
   }
 

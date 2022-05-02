@@ -638,7 +638,7 @@ class ShadowMapPass extends Notifier {
     let shadowMaterial = this._lightMaterials[light.__uid__];
     const isPointLight = light.type === 'POINT_LIGHT';
     if (!shadowMaterial) {
-      const shaderPrefix = isPointLight ? 'clay.sm.distance.' : 'clay.sm.depth.';
+      const shaderPrefix = 'clay.sm.' + (isPointLight ? 'distance.' : 'depth.');
       shadowMaterial = new Material({
         precision: this.precision,
         shader: new Shader(

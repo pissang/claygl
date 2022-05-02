@@ -130,7 +130,7 @@ class FrameBuffer {
     const attachedTextures = cache.get('attached_textures');
     if (attachedTextures) {
       for (const attachment in attachedTextures) {
-        if (!this._textures[attachment as unknown as GLEnum]) {
+        if (!textures[attachment as unknown as GLEnum]) {
           const target = attachedTextures[attachment];
           this._doDetach(_gl, attachment as unknown as GLEnum, target);
         }
@@ -252,6 +252,7 @@ class FrameBuffer {
 
     const boundRenderer = this._boundRenderer;
     const _gl = boundRenderer && boundRenderer.gl;
+    const textures = this._textures;
     let attachedTextures;
 
     if (_gl) {
@@ -261,7 +262,7 @@ class FrameBuffer {
     }
 
     // Check if texture attached
-    const previous = this._textures[attachment];
+    const previous = textures[attachment];
     if (
       previous &&
       previous.target === target &&
@@ -282,20 +283,21 @@ class FrameBuffer {
     }
 
     if (canAttach) {
-      this._textures[attachment] = this._textures[attachment] || ({} as any);
-      this._textures[attachment]!.texture = texture;
-      this._textures[attachment]!.target = target;
+      textures[attachment] = textures[attachment] || ({} as any);
+      textures[attachment]!.texture = texture;
+      textures[attachment]!.target = target;
     }
   }
 
   _doAttach(renderer: Renderer, texture: Texture, attachment: GLEnum, target: GLEnum): boolean {
     const _gl = renderer.gl;
+    const cache = this._cache;
     // Make sure texture is always updated
     // Because texture width or height may be changed and in this we can't be notified
     // FIXME awkward;
     const webglTexture = texture.getWebGLTexture(renderer);
     // Assume cache has been used.
-    let attachedTextures = this._cache.get('attached_textures');
+    let attachedTextures = cache.get('attached_textures');
     if (attachedTextures && attachedTextures[attachment]) {
       const obj = attachedTextures[attachment];
       // Check if texture and target not changed
@@ -321,15 +323,15 @@ class FrameBuffer {
 
       // Dispose render buffer created previous
       if (canAttach) {
-        const renderbuffer = this._cache.get(KEY_RENDERBUFFER);
+        const renderbuffer = cache.get(KEY_RENDERBUFFER);
         if (renderbuffer) {
           _gl.framebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, null);
           _gl.deleteRenderbuffer(renderbuffer);
-          this._cache.put(KEY_RENDERBUFFER, false);
+          cache.put(KEY_RENDERBUFFER, false);
         }
 
-        this._cache.put(KEY_RENDERBUFFER_ATTACHED, false);
-        this._cache.put(KEY_DEPTHTEXTURE_ATTACHED, true);
+        cache.put(KEY_RENDERBUFFER_ATTACHED, false);
+        cache.put(KEY_DEPTHTEXTURE_ATTACHED, true);
       }
     }
 
@@ -338,7 +340,7 @@ class FrameBuffer {
 
     if (!attachedTextures) {
       attachedTextures = {};
-      this._cache.put('attached_textures', attachedTextures);
+      cache.put('attached_textures', attachedTextures);
     }
     attachedTextures[attachment] = attachedTextures[attachment] || {};
     attachedTextures[attachment].texture = texture;
@@ -352,14 +354,15 @@ class FrameBuffer {
     // https://github.com/KhronosGroup/WebGL/blob/master/conformance-suites/1.0.0/conformance/framebuffer-test.html#L145
     _gl.framebufferTexture2D(GL_FRAMEBUFFER, attachment, target, null, 0);
 
+    const cache = this._cache;
     // Assume cache has been used.
-    const attachedTextures = this._cache.get('attached_textures');
+    const attachedTextures = cache.get('attached_textures');
     if (attachedTextures && attachedTextures[attachment]) {
       attachedTextures[attachment] = null;
     }
 
     if (attachment === GL_DEPTH_ATTACHMENT || attachment === glenum.DEPTH_STENCIL_ATTACHMENT) {
-      this._cache.put(KEY_DEPTHTEXTURE_ATTACHED, false);
+      cache.put(KEY_DEPTHTEXTURE_ATTACHED, false);
     }
   }
 
@@ -371,10 +374,11 @@ class FrameBuffer {
   detach(attachment: GLEnum, target: GLEnum) {
     // TODO depth extension check ?
     this._textures[attachment] = undefined;
-    if (this._boundRenderer) {
+    const boundRenderer = this._boundRenderer;
+    if (boundRenderer) {
       const cache = this._cache;
-      cache.use(this._boundRenderer.__uid__);
-      this._doDetach(this._boundRenderer.gl, attachment, target);
+      cache.use(boundRenderer.__uid__);
+      this._doDetach(boundRenderer.gl, attachment, target);
     }
   }
   /**

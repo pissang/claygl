@@ -175,7 +175,7 @@ class TextureCube extends Texture {
           glType,
           img
         );
-      } else if (pixels) {
+      } else {
         _gl.texImage2D(
           glenum.TEXTURE_CUBE_MAP_POSITIVE_X + i,
           level,
@@ -185,7 +185,7 @@ class TextureCube extends Texture {
           0,
           glFormat,
           glType,
-          pixels
+          pixels || null
         );
       }
     }

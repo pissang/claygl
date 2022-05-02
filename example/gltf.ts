@@ -12,22 +12,22 @@ import {
   Timeline
 } from 'claygl';
 
-const renderer = new Renderer({
-  canvas: document.getElementById('main') as HTMLCanvasElement
-});
-renderer.resize(window.innerWidth, window.innerHeight);
-const shadowMapPass = new ShadowMapPass();
-const environmentMap = new TextureCube({
-  width: 256,
-  height: 256
-});
-const environmentMapPass = new EnvironmentMapPass({
-  texture: environmentMap
-});
-const timeline = new Timeline();
-timeline.start();
-
 loadGLTFAsync('assets/models/basic_scene/scene.gltf').then((res) => {
+  const renderer = new Renderer({
+    canvas: document.getElementById('main') as HTMLCanvasElement
+  });
+  renderer.resize(window.innerWidth, window.innerHeight);
+  const shadowMapPass = new ShadowMapPass();
+  const environmentMap = new TextureCube({
+    width: 256,
+    height: 256
+  });
+  const environmentMapPass = new EnvironmentMapPass({
+    texture: environmentMap
+  });
+  const timeline = new Timeline();
+  timeline.start();
+
   const scene = res.scene!;
   scene.rotation.rotateX(-Math.PI / 2);
   const camera = new PerspectiveCamera({
