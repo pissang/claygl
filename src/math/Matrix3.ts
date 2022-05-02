@@ -179,7 +179,7 @@ class Matrix3 {
   }
 
   toArray() {
-    return Array.prototype.slice.call(this.array);
+    return this.array.slice() as mat3.Mat3Array;
   }
 
   /**

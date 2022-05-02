@@ -328,7 +328,7 @@ class Vector4 {
   }
 
   toArray() {
-    return Array.prototype.slice.call(this.array);
+    return this.array as vec4.Vec4Array;
   }
   /**
    * @param out

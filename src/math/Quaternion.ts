@@ -332,7 +332,7 @@ class Quaternion {
   }
 
   toArray() {
-    return Array.prototype.slice.call(this.array);
+    return this.array.slice() as quat.QuatArray;
   }
 
   /**

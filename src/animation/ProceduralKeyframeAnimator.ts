@@ -498,7 +498,7 @@ export type OnframeCallback<T> = (target: T, percent: number) => void;
 export type AnimationPropGetter<T> = (target: T, key: string) => InterpolatableType;
 export type AnimationPropSetter<T> = (target: T, key: string, value: InterpolatableType) => void;
 
-export default class ProceduralKeyframeAnimator<T> implements Animator {
+export default class ProceduralKeyframeAnimator<T = any> implements Animator {
   timeline?: Timeline;
 
   targetName?: string;
@@ -846,7 +846,7 @@ export default class ProceduralKeyframeAnimator<T> implements Animator {
    * 添加动画每一帧的回调函数
    * @param callback
    */
-  during(cb: OnframeCallback<T>) {
+  during(cb?: OnframeCallback<T>) {
     if (cb) {
       this._onframeCbs.push(cb);
     }
@@ -856,14 +856,14 @@ export default class ProceduralKeyframeAnimator<T> implements Animator {
    * Add callback for animation end
    * @param cb
    */
-  done(cb: DoneCallback) {
+  done(cb?: DoneCallback) {
     if (cb) {
       this._doneCbs.push(cb);
     }
     return this;
   }
 
-  aborted(cb: AbortCallback) {
+  aborted(cb?: AbortCallback) {
     if (cb) {
       this._abortedCbs.push(cb);
     }

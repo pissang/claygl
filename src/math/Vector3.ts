@@ -402,7 +402,7 @@ class Vector3 {
   }
 
   toArray() {
-    return Array.prototype.slice.call(this.array);
+    return this.array.slice() as vec3.Vec3Array;
   }
 
   /**

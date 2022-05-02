@@ -1,31 +1,42 @@
-// @ts-nocheck
 import * as util from '../core/util';
 
-const GestureMgr = function () {
-  this._track = [];
-};
+type Target = any;
+interface TrackItem {
+  points: number[][];
+  touches: Touch[];
+  target: Target;
+  event: TouchEvent;
+}
 
-GestureMgr.prototype = {
-  constructor: GestureMgr,
+export interface PinchEvent extends TouchEvent {
+  pinchScale: number;
+  pinchX: number;
+  pinchY: number;
+}
 
-  recognize: function (event, target, root) {
+export class GestureMgr {
+  private _track: TrackItem[] = [];
+
+  constructor() {}
+
+  recognize(event: TouchEvent, target: Target, root: HTMLElement) {
     this._doTrack(event, target, root);
     return this._recognize(event);
-  },
+  }
 
-  clear: function () {
+  clear() {
     this._track.length = 0;
     return this;
-  },
+  }
 
-  _doTrack: function (event, target, root) {
-    const touches = event.targetTouches;
+  _doTrack(event: TouchEvent, target: Target, root: HTMLElement) {
+    const touches = event.touches;
 
     if (!touches) {
       return;
     }
 
-    const trackItem = {
+    const trackItem: TrackItem = {
       points: [],
       touches: [],
       target: target,
@@ -39,9 +50,9 @@ GestureMgr.prototype = {
     }
 
     this._track.push(trackItem);
-  },
+  }
 
-  _recognize: function (event) {
+  _recognize(event: TouchEvent) {
     for (const eventName in recognizers) {
       if (util.hasOwn(recognizers, eventName)) {
         const gestureInfo = recognizers[eventName](this._track, event);
@@ -51,47 +62,59 @@ GestureMgr.prototype = {
       }
     }
   }
-};
+}
 
-function dist(pointPair) {
+function dist(pointPair: number[][]): number {
   const dx = pointPair[1][0] - pointPair[0][0];
   const dy = pointPair[1][1] - pointPair[0][1];
 
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-function center(pointPair) {
+function center(pointPair: number[][]): number[] {
   return [(pointPair[0][0] + pointPair[1][0]) / 2, (pointPair[0][1] + pointPair[1][1]) / 2];
 }
 
-const recognizers = {
-  pinch: function (track, event) {
-    const trackLen = track.length;
+type Recognizer = (
+  tracks: TrackItem[],
+  event: TouchEvent
+) =>
+  | {
+      type: 'pinch';
+      target: Target;
+      event: PinchEvent;
+    }
+  | undefined;
+
+const recognizers: Record<string, Recognizer> = {
+  pinch(tracks: TrackItem[], event: TouchEvent) {
+    const trackLen = tracks.length;
 
     if (!trackLen) {
       return;
     }
 
-    const pinchEnd = (track[trackLen - 1] || {}).points;
-    const pinchPre = (track[trackLen - 2] || {}).points || pinchEnd;
+    const pinchEnd = (tracks[trackLen - 1] || {}).points;
+    const pinchPre = (tracks[trackLen - 2] || {}).points || pinchEnd;
 
     if (pinchPre && pinchPre.length > 1 && pinchEnd && pinchEnd.length > 1) {
       let pinchScale = dist(pinchEnd) / dist(pinchPre);
       !isFinite(pinchScale) && (pinchScale = 1);
 
-      event.pinchScale = pinchScale;
+      (event as PinchEvent).pinchScale = pinchScale;
 
       const pinchCenter = center(pinchEnd);
-      event.pinchX = pinchCenter[0];
-      event.pinchY = pinchCenter[1];
+      (event as PinchEvent).pinchX = pinchCenter[0];
+      (event as PinchEvent).pinchY = pinchCenter[1];
 
       return {
         type: 'pinch',
-        target: track[0].target,
-        event: event
+        target: tracks[0].target,
+        event: event as PinchEvent
       };
     }
   }
-};
 
+  // Only pinch currently.
+};
 export default GestureMgr;

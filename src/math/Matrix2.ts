@@ -132,7 +132,7 @@ class Matrix2 {
   }
 
   toArray() {
-    return Array.prototype.slice.call(this.array);
+    return this.array.slice() as mat2.Mat2Array;
   }
 
   /**

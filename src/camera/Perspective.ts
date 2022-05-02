@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Camera, { CameraOpts } from '../Camera';
 
 export interface PerspectiveCameraOpts extends CameraOpts {

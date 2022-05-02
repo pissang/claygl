@@ -1,10 +1,18 @@
-// @ts-nocheck
-import Base from '../core/Base';
 import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
-import GestureMgr from './GestureMgr';
+import GestureMgr, { PinchEvent } from './GestureMgr';
 import vendor from '../core/vendor';
 import PerspectiveCamera from '../camera/Perspective';
+import Notifier from '../core/Notifier';
+import Timeline from '../Timeline';
+import ClayNode from '../Node';
+import type { vec3 } from '../glmatrix';
+import type { AnimationEasing } from '../animation/easing';
+import type ProceduralKeyframeAnimator from '../animation/ProceduralKeyframeAnimator';
+import OrthographicCamera from '../camera/Orthographic';
+
+const addEvent = vendor.addEventListener;
+const removeEvent = vendor.removeEventListener;
 
 const MOUSE_BUTTON_KEY_MAP = {
   left: 0,
@@ -12,168 +20,187 @@ const MOUSE_BUTTON_KEY_MAP = {
   right: 2
 };
 
-function convertToArray(val) {
+function convertToArray(val: number | number[]): number[] {
   if (!Array.isArray(val)) {
     val = [val, val];
   }
   return val;
 }
 
-/**
- * @constructor
- * @alias clay.plugin.OrbitControl
- * @extends clay.core.Base
- */
-const OrbitControl = Base.extend(
-  function () {
-    return /** @lends clay.plugin.OrbitControl# */ {
-      /**
-       * @type {clay.Timeline}
-       */
-      timeline: null,
+type AnimatableControlOpts = Pick<
+  OrbitControlOpts,
+  'distance' | 'orthographicSize' | 'alpha' | 'beta' | 'center'
+>;
 
-      /**
-       * @type {HTMLElement}
-       */
-      domElement: null,
+interface OrbitControlOpts {
+  timeline?: Timeline;
+  domElement: HTMLElement;
 
-      /**
-       * @type {clay.Node}
-       */
-      target: null,
-      /**
-       * @type {clay.Vector3}
-       */
-      _center: new Vector3(),
+  /**
+   * States of orbit
+   */
+  distance: number;
+  orthographicSize: number;
+  alpha: number;
+  beta: number;
+  center: vec3.Vec3Array;
 
-      /**
-       * Minimum distance to the center
-       * @type {number}
-       * @default 0.5
-       */
-      minDistance: 0.1,
+  /**
+   * Minimum distance to the center
+   * @type {number}
+   * @default 0.5
+   */
+  minDistance: number;
 
-      /**
-       * Maximum distance to the center
-       * @type {number}
-       * @default 2
-       */
-      maxDistance: 1000,
+  /**
+   * Maximum distance to the center
+   * @type {number}
+   * @default 2
+   */
+  maxDistance: number;
 
-      /**
-       * Only available when camera is orthographic
-       */
-      maxOrthographicSize: 300,
+  /**
+   * Only available when camera is orthographic
+   */
+  maxOrthographicSize: number;
 
-      /**
-       * Only available when camera is orthographic
-       */
-      minOrthographicSize: 30,
+  /**
+   * Only available when camera is orthographic
+   */
+  minOrthographicSize: number;
 
-      /**
-       * Aspect of orthographic camera
-       * Only available when camera is orthographic
-       */
-      orthographicAspect: 1,
+  /**
+   * Aspect of orthographic camera
+   * Only available when camera is orthographic
+   */
+  orthographicAspect: number;
 
-      /**
-       * Minimum alpha rotation
-       */
-      minAlpha: -90,
+  /**
+   * Minimum alpha rotation
+   */
+  minAlpha: number;
 
-      /**
-       * Maximum alpha rotation
-       */
-      maxAlpha: 90,
+  /**
+   * Maximum alpha rotation
+   */
+  maxAlpha: number;
 
-      /**
-       * Minimum beta rotation
-       */
-      minBeta: -Infinity,
-      /**
-       * Maximum beta rotation
-       */
-      maxBeta: Infinity,
+  /**
+   * Minimum beta rotation
+   */
+  minBeta: number;
+  /**
+   * Maximum beta rotation
+   */
+  maxBeta: number;
 
-      /**
-       * Start auto rotating after still for the given time
-       */
-      autoRotateAfterStill: 0,
+  /**
+   * Start auto rotating after still for the given time
+   */
+  autoRotateAfterStill: number;
 
-      /**
-       * Direction of autoRotate. cw or ccw when looking top down.
-       */
-      autoRotateDirection: 'cw',
+  /**
+   * Direction of autoRotate. cw or ccw when looking top down.
+   */
+  autoRotateDirection: 'cw' | 'ccw';
 
-      /**
-       * Degree per second
-       */
-      autoRotateSpeed: 60,
+  /**
+   * Degree per second
+   */
+  autoRotateSpeed: number;
 
-      panMouseButton: 'middle',
-      rotateMouseButton: 'left',
+  panMouseButton: 'middle' | 'left' | 'right';
+  rotateMouseButton: 'left' | 'middle' | 'right';
 
-      /**
-       * Pan or rotate
-       * @type {String}
-       */
-      _mode: 'rotate',
+  damping: number;
 
-      /**
-       * @param {number}
-       */
-      damping: 0.8,
+  rotateSensitivity: number;
 
-      /**
-       * @param {number}
-       */
-      rotateSensitivity: 1,
+  zoomSensitivity: number;
 
-      /**
-       * @param {number}
-       */
-      zoomSensitivity: 1,
+  /**
+   * Invert zoom direction?
+   */
+  invertZoomDirection: false;
 
-      /**
-       * Invert zoom direction?
-       *
-       * @type {boolean}
-       */
-      invertZoomDirection: false,
+  panSensitivity: number;
 
-      /**
-       * @param {number}
-       */
-      panSensitivity: 1,
+  autoRotate: boolean;
+  target: ClayNode;
+}
 
-      _needsUpdate: false,
+interface OrbitControl
+  extends Omit<
+    OrbitControlOpts,
+    'autoRotate' | 'target' | 'distance' | 'orthographicSize' | 'alpha' | 'beta' | 'center'
+  > {}
 
-      _rotating: false,
+class OrbitControl extends Notifier {
+  private _autoRotate: boolean = false;
+  private _target?: ClayNode;
+  private _center = new Vector3();
 
-      // Rotation around yAxis
-      _phi: 0,
-      // Rotation around xAxis
-      _theta: 0,
+  private _orthoSize?: number;
 
-      _mouseX: 0,
-      _mouseY: 0,
+  private _mode?: 'rotate' | 'pan' = 'rotate';
 
-      _rotateVelocity: new Vector2(),
+  private _needsUpdate = false;
 
-      _panVelocity: new Vector2(),
+  private _rotating = false;
 
-      _distance: 20,
+  // Rotation around yAxis
+  private _phi = 0;
+  // Rotation around xAxis
+  private _theta = 0;
 
-      _zoomSpeed: 0,
+  private _mouseX = 0;
+  private _mouseY = 0;
 
-      _stillTimeout: 0,
+  private _rotateVelocity = new Vector2();
 
-      _animators: [],
+  private _panVelocity = new Vector2();
 
-      _gestureMgr: new GestureMgr()
-    };
-  },
-  function () {
+  private _distance = 20;
+
+  private _zoomSpeed = 0;
+
+  private _stillTimeout = 0;
+
+  private _animators: ProceduralKeyframeAnimator[] = [];
+
+  private _gestureMgr = new GestureMgr();
+
+  constructor(opts?: Partial<OrbitControlOpts>) {
+    super();
+
+    this.setOption(
+      Object.assign(
+        {
+          autoRotate: false,
+          autoRotateAfterStill: 0,
+          autoRotateDirection: 'cw',
+          autoRotateSpeed: 60,
+          damping: 0.8,
+          minDistance: 0.1,
+          maxDistance: 1000,
+          maxOrthographicSize: 300,
+          minOrthographicSize: 30,
+          orthographicAspect: 1,
+          minAlpha: -90,
+          maxAlpha: 90,
+          minBeta: -Infinity,
+          maxBeta: Infinity,
+          panMouseButton: 'middle',
+          rotateMouseButton: 'left',
+          invertZoomDirection: false,
+          rotateSensitivity: 1,
+          zoomSensitivity: 1,
+          panSensitivity: 1
+        },
+        opts
+      )
+    );
+
     // Each OrbitControl has it's own handler
     this._mouseDownHandler = this._mouseDownHandler.bind(this);
     this._mouseWheelHandler = this._mouseWheelHandler.bind(this);
@@ -182,146 +209,171 @@ const OrbitControl = Base.extend(
     this._pinchHandler = this._pinchHandler.bind(this);
 
     this.init();
-  },
-  /** @lends clay.plugin.OrbitControl# */ {
-    /**
-     * Initialize.
-     * Mouse event binding
-     */
-    init: function () {
-      const dom = this.domElement;
+  }
 
-      vendor.addEventListener(dom, 'touchstart', this._mouseDownHandler);
+  /**
+   * If auto rotate the target
+   */
+  get autoRotate() {
+    return this._autoRotate;
+  }
 
-      vendor.addEventListener(dom, 'mousedown', this._mouseDownHandler);
-      vendor.addEventListener(dom, 'wheel', this._mouseWheelHandler);
+  set autoRotate(val: boolean) {
+    this._autoRotate = val;
+    this._rotating = val;
+  }
 
-      if (this.timeline) {
-        this.timeline.on('frame', this.update, this);
-      }
-      if (this.target) {
-        this.decomposeTransform();
-      }
-    },
+  get target(): ClayNode | undefined {
+    return this._target;
+  }
 
-    /**
-     * Dispose.
-     * Mouse event unbinding
-     */
-    dispose: function () {
-      const dom = this.domElement;
+  set target(val: ClayNode | undefined) {
+    if (val && val.target) {
+      this.setCenter(val.target.toArray());
+    }
+    this._target = val;
+    this.decomposeTransform();
+  }
 
-      vendor.removeEventListener(dom, 'touchstart', this._mouseDownHandler);
-      vendor.removeEventListener(dom, 'touchmove', this._mouseMoveHandler);
-      vendor.removeEventListener(dom, 'touchend', this._mouseUpHandler);
+  /**
+   * Initialize.
+   * Mouse event binding
+   */
+  init() {
+    const dom = this.domElement;
 
-      vendor.removeEventListener(dom, 'mousedown', this._mouseDownHandler);
-      vendor.removeEventListener(dom, 'mousemove', this._mouseMoveHandler);
-      vendor.removeEventListener(dom, 'mouseup', this._mouseUpHandler);
-      vendor.removeEventListener(dom, 'wheel', this._mouseWheelHandler);
-      vendor.removeEventListener(dom, 'mouseout', this._mouseUpHandler);
+    addEvent(dom, 'touchstart', this._mouseDownHandler);
 
-      if (this.timeline) {
-        this.timeline.off('frame', this.update);
-      }
-      this.stopAllAnimation();
-    },
+    addEvent(dom, 'mousedown', this._mouseDownHandler);
+    addEvent(dom, 'wheel', this._mouseWheelHandler);
 
-    /**
-     * Get distance
-     * @return {number}
-     */
-    getDistance: function () {
-      return this._distance;
-    },
+    if (this.timeline) {
+      this.timeline.on('frame', this.update, this);
+    }
+    if (this.target) {
+      this.decomposeTransform();
+    }
+  }
 
-    /**
-     * Set distance
-     * @param {number} distance
-     */
-    setDistance: function (distance) {
-      this._distance = distance;
-      this._needsUpdate = true;
-    },
+  /**
+   * Dispose.
+   * Mouse event unbinding
+   */
+  dispose() {
+    const dom = this.domElement;
 
-    /**
-     * Get size of orthographic viewing volume
-     * @return {number}
-     */
-    getOrthographicSize: function () {
-      return this._orthoSize;
-    },
+    removeEvent(dom, 'touchstart', this._mouseDownHandler);
+    removeEvent(dom, 'touchmove', this._mouseMoveHandler);
+    removeEvent(dom, 'touchend', this._mouseUpHandler);
 
-    /**
-     * Set size of orthographic viewing volume
-     * @param {number} size
-     */
-    setOrthographicSize: function (size) {
-      this._orthoSize = size;
-      this._needsUpdate = true;
-    },
+    removeEvent(dom, 'mousedown', this._mouseDownHandler);
+    removeEvent(dom, 'mousemove', this._mouseMoveHandler);
+    removeEvent(dom, 'mouseup', this._mouseUpHandler);
+    removeEvent(dom, 'wheel', this._mouseWheelHandler);
+    removeEvent(dom, 'mouseout', this._mouseUpHandler);
 
-    /**
-     * Get alpha rotation
-     * Alpha angle for top-down rotation. Positive to rotate to top.
-     *
-     * Which means camera rotation around x axis.
-     */
-    getAlpha: function () {
-      return (this._theta / Math.PI) * 180;
-    },
+    if (this.timeline) {
+      this.timeline.off('frame', this.update);
+    }
+    this.stopAllAnimation();
+  }
 
-    /**
-     * Get beta rotation
-     * Beta angle for left-right rotation. Positive to rotate to right.
-     *
-     * Which means camera rotation around y axis.
-     */
-    getBeta: function () {
-      return (-this._phi / Math.PI) * 180;
-    },
+  /**
+   * Get distance
+   * @return {number}
+   */
+  getDistance() {
+    return this._distance;
+  }
 
-    /**
-     * Get control center
-     * @return {Array.<number>}
-     */
-    getCenter: function () {
-      return this._center.toArray();
-    },
+  /**
+   * Set distance
+   * @param {number} distance
+   */
+  setDistance(distance: number) {
+    this._distance = distance;
+    this._needsUpdate = true;
+  }
 
-    /**
-     * Set alpha rotation angle
-     * @param {number} alpha
-     */
-    setAlpha: function (alpha) {
-      alpha = Math.max(Math.min(this.maxAlpha, alpha), this.minAlpha);
+  /**
+   * Get size of orthographic viewing volume
+   * @return {number}
+   */
+  getOrthographicSize() {
+    return this._orthoSize;
+  }
 
-      this._theta = (alpha / 180) * Math.PI;
-      this._needsUpdate = true;
-    },
+  /**
+   * Set size of orthographic viewing volume
+   * @param {number} size
+   */
+  setOrthographicSize(size: number) {
+    this._orthoSize = size;
+    this._needsUpdate = true;
+  }
 
-    /**
-     * Set beta rotation angle
-     * @param {number} beta
-     */
-    setBeta: function (beta) {
-      beta = Math.max(Math.min(this.maxBeta, beta), this.minBeta);
+  /**
+   * Get alpha rotation
+   * Alpha angle for top-down rotation. Positive to rotate to top.
+   *
+   * Which means camera rotation around x axis.
+   */
+  getAlpha() {
+    return (this._theta / Math.PI) * 180;
+  }
 
-      this._phi = (-beta / 180) * Math.PI;
-      this._needsUpdate = true;
-    },
+  /**
+   * Get beta rotation
+   * Beta angle for left-right rotation. Positive to rotate to right.
+   *
+   * Which means camera rotation around y axis.
+   */
+  getBeta() {
+    return (-this._phi / Math.PI) * 180;
+  }
 
-    /**
-     * Set control center
-     * @param {Array.<number>} center
-     */
-    setCenter: function (centerArr) {
-      this._center.setArray(centerArr);
-    },
+  /**
+   * Get control center
+   * @return {Array.<number>}
+   */
+  getCenter() {
+    return this._center.toArray();
+  }
 
-    setOption: function (opts) {
-      opts = opts || {};
+  /**
+   * Set alpha rotation angle
+   * @param {number} alpha
+   */
+  setAlpha(alpha: number) {
+    alpha = Math.max(Math.min(this.maxAlpha, alpha), this.minAlpha);
 
+    this._theta = (alpha / 180) * Math.PI;
+    this._needsUpdate = true;
+  }
+
+  /**
+   * Set beta rotation angle
+   * @param {number} beta
+   */
+  setBeta(beta: number) {
+    beta = Math.max(Math.min(this.maxBeta, beta), this.minBeta);
+
+    this._phi = (-beta / 180) * Math.PI;
+    this._needsUpdate = true;
+  }
+
+  /**
+   * Set control center
+   * @param {Array.<number>} center
+   */
+  setCenter(centerArr: vec3.Vec3Array) {
+    this._center.setArray(centerArr);
+  }
+
+  setOption(opts?: Partial<OrbitControlOpts>) {
+    opts = opts || {};
+
+    (
       [
         'autoRotate',
         'autoRotateAfterStill',
@@ -337,496 +389,473 @@ const OrbitControl = Base.extend(
         'maxAlpha',
         'minBeta',
         'maxBeta',
+        'panMouseButton',
+        'rotateMouseButton',
+        'invertZoomDirection',
         'rotateSensitivity',
         'zoomSensitivity',
         'panSensitivity'
-      ].forEach(function (key) {
-        if (opts[key] != null) {
-          this[key] = opts[key];
-        }
-      }, this);
-
-      if (opts.distance != null) {
-        this.setDistance(opts.distance);
+      ] as const
+    ).forEach((key) => {
+      if (opts![key] != null) {
+        (this as any)[key] = opts![key];
       }
-      if (opts.orthographicSize != null) {
-        this.setOrthographicSize(opts.orthographicSize);
-      }
+    });
 
-      if (opts.alpha != null) {
-        this.setAlpha(opts.alpha);
-      }
-      if (opts.beta != null) {
-        this.setBeta(opts.beta);
-      }
+    if (opts.distance != null) {
+      this.setDistance(opts.distance);
+    }
+    if (opts.orthographicSize != null) {
+      this.setOrthographicSize(opts.orthographicSize);
+    }
 
-      if (opts.center) {
-        this.setCenter(opts.center);
-      }
+    if (opts.alpha != null) {
+      this.setAlpha(opts.alpha);
+    }
+    if (opts.beta != null) {
+      this.setBeta(opts.beta);
+    }
 
-      if (this.target) {
-        this._updateTransform();
-        this.target.update();
-      }
-    },
+    if (opts.center) {
+      this.setCenter(opts.center);
+    }
 
-    /**
-     * @param {Object} opts
-     * @param {number} opts.distance
-     * @param {number} opts.orthographicSize
-     * @param {number} opts.alpha
-     * @param {number} opts.beta
-     * @param {Array.<number>} opts.center
-     * @param {number} [opts.duration=1000]
-     * @param {number} [opts.easing='linear']
-     * @param {number} [opts.done]
-     */
-    animateTo: function (opts) {
-      const self = this;
-
-      const obj = {};
-      const target = {};
-      const timeline = this.timeline;
-      if (!timeline) {
-        return;
-      }
-      if (opts.distance != null) {
-        obj.distance = this.getDistance();
-        target.distance = opts.distance;
-      }
-      if (opts.orthographicSize != null) {
-        obj.orthographicSize = this.getOrthographicSize();
-        target.orthographicSize = opts.orthographicSize;
-      }
-      if (opts.alpha != null) {
-        obj.alpha = this.getAlpha();
-        target.alpha = opts.alpha;
-      }
-      if (opts.beta != null) {
-        obj.beta = this.getBeta();
-        target.beta = opts.beta;
-      }
-      if (opts.center != null) {
-        obj.center = this.getCenter();
-        target.center = opts.center;
-      }
-
-      return this._addAnimator(
-        timeline
-          .animate(obj)
-          .when(opts.duration || 1000, target)
-          .during(function () {
-            if (obj.alpha != null) {
-              self.setAlpha(obj.alpha);
-            }
-            if (obj.beta != null) {
-              self.setBeta(obj.beta);
-            }
-            if (obj.distance != null) {
-              self.setDistance(obj.distance);
-            }
-            if (obj.orthographicSize != null) {
-              self.setOrthographicSize(obj.orthographicSize);
-            }
-            if (obj.center != null) {
-              self.setCenter(obj.center);
-            }
-            self._needsUpdate = true;
-          })
-          .done(opts.done)
-      ).start(opts.easing || 'linear');
-    },
-
-    /**
-     * Stop all animations
-     */
-    stopAllAnimation: function () {
-      for (let i = 0; i < this._animators.length; i++) {
-        this._animators[i].stop();
-      }
-      this._animators.length = 0;
-    },
-
-    _isAnimating: function () {
-      return this._animators.length > 0;
-    },
-    /**
-     * Call update each frame
-     * @param  {number} deltaTime Frame time
-     */
-    update: function (deltaTime) {
-      deltaTime = deltaTime || 16;
-
-      if (this._rotating) {
-        const radian =
-          (((this.autoRotateDirection === 'cw' ? 1 : -1) * this.autoRotateSpeed) / 180) * Math.PI;
-        this._phi -= (radian * deltaTime) / 1000;
-        this._needsUpdate = true;
-      } else if (this._rotateVelocity.len() > 0) {
-        this._needsUpdate = true;
-      }
-
-      if (Math.abs(this._zoomSpeed) > 0.01 || this._panVelocity.len() > 0) {
-        this._needsUpdate = true;
-      }
-
-      if (!this._needsUpdate) {
-        return;
-      }
-
-      // Fixed deltaTime
-      this._updateDistanceOrSize(Math.min(deltaTime, 50));
-      this._updatePan(Math.min(deltaTime, 50));
-
-      this._updateRotate(Math.min(deltaTime, 50));
-
-      this._updateTransform();
-
+    this._updateTransform();
+    if (this.target) {
       this.target.update();
+    }
+  }
 
-      this.trigger('update');
-
-      this._needsUpdate = false;
-    },
-
-    _updateRotate: function (deltaTime) {
-      const velocity = this._rotateVelocity;
-      this._phi = (velocity.y * deltaTime) / 20 + this._phi;
-      this._theta = (velocity.x * deltaTime) / 20 + this._theta;
-
-      this.setAlpha(this.getAlpha());
-      this.setBeta(this.getBeta());
-
-      this._vectorDamping(velocity, this.damping);
-    },
-
-    _updateDistanceOrSize: function (deltaTime) {
-      this._setDistance(this._distance + (this._zoomSpeed * deltaTime) / 20);
-      if (!(this.target instanceof PerspectiveCamera)) {
-        this._setOrthoSize(this._orthoSize + (this._zoomSpeed * deltaTime) / 20);
+  animateTo(
+    opts: Partial<
+      AnimatableControlOpts & {
+        duration: number;
+        easing: AnimationEasing;
+        done: () => void;
       }
+    >
+  ) {
+    const self = this;
 
-      this._zoomSpeed *= Math.pow(this.damping, deltaTime / 16);
-    },
+    const obj = {} as AnimatableControlOpts;
+    const target = {} as AnimatableControlOpts;
+    const timeline = this.timeline;
+    if (!timeline) {
+      return;
+    }
+    if (opts.distance != null) {
+      obj.distance = this.getDistance();
+      target.distance = opts.distance;
+    }
+    if (opts.orthographicSize != null) {
+      obj.orthographicSize = this.getOrthographicSize() as number;
+      target.orthographicSize = opts.orthographicSize;
+    }
+    if (opts.alpha != null) {
+      obj.alpha = this.getAlpha();
+      target.alpha = opts.alpha;
+    }
+    if (opts.beta != null) {
+      obj.beta = this.getBeta();
+      target.beta = opts.beta;
+    }
+    if (opts.center != null) {
+      obj.center = this.getCenter();
+      target.center = opts.center;
+    }
 
-    _setDistance: function (distance) {
-      this._distance = Math.max(Math.min(distance, this.maxDistance), this.minDistance);
-    },
+    return this._addAnimator(
+      timeline
+        .animate(obj)
+        .when(opts.duration || 1000, target)
+        .during(function () {
+          if (obj.alpha != null) {
+            self.setAlpha(obj.alpha);
+          }
+          if (obj.beta != null) {
+            self.setBeta(obj.beta);
+          }
+          if (obj.distance != null) {
+            self.setDistance(obj.distance);
+          }
+          if (obj.orthographicSize != null) {
+            self.setOrthographicSize(obj.orthographicSize);
+          }
+          if (obj.center != null) {
+            self.setCenter(obj.center);
+          }
+          self._needsUpdate = true;
+        })
+        .done(opts.done)
+    ).start(opts.easing || 'linear');
+  }
 
-    _setOrthoSize: function (size) {
-      this._orthoSize = Math.max(
-        Math.min(size, this.maxOrthographicSize),
-        this.minOrthographicSize
-      );
-      const camera = this.target;
-      const cameraHeight = this._orthoSize;
-      // TODO
-      const cameraWidth = cameraHeight * this.orthographicAspect;
-      camera.left = -cameraWidth / 2;
-      camera.right = cameraWidth / 2;
-      camera.top = cameraHeight / 2;
-      camera.bottom = -cameraHeight / 2;
-    },
+  /**
+   * Stop all animations
+   */
+  stopAllAnimation() {
+    for (let i = 0; i < this._animators.length; i++) {
+      this._animators[i].stop();
+    }
+    this._animators.length = 0;
+  }
 
-    _updatePan: function (deltaTime) {
-      const velocity = this._panVelocity;
-      const len = this._distance;
+  _isAnimating() {
+    return this._animators.length > 0;
+  }
+  /**
+   * Call update each frame
+   * @param  {number} deltaTime Frame time
+   */
+  update(deltaTime?: number) {
+    deltaTime = deltaTime || 16;
 
-      const target = this.target;
-      const yAxis = target.worldTransform.y;
-      const xAxis = target.worldTransform.x;
+    if (this._rotating) {
+      const radian =
+        (((this.autoRotateDirection === 'cw' ? 1 : -1) * this.autoRotateSpeed) / 180) * Math.PI;
+      this._phi -= (radian * deltaTime) / 1000;
+      this._needsUpdate = true;
+    } else if (this._rotateVelocity.len() > 0) {
+      this._needsUpdate = true;
+    }
 
-      // PENDING
-      this._center
-        .scaleAndAdd(xAxis, (-velocity.x * len) / 200)
-        .scaleAndAdd(yAxis, (-velocity.y * len) / 200);
+    if (Math.abs(this._zoomSpeed) > 0.01 || this._panVelocity.len() > 0) {
+      this._needsUpdate = true;
+    }
 
-      this._vectorDamping(velocity, 0);
+    if (!this._needsUpdate) {
+      return;
+    }
 
-      velocity.x = velocity.y = 0;
-    },
+    // Fixed deltaTime
+    this._updateDistanceOrSize(Math.min(deltaTime, 50));
+    this._updatePan(Math.min(deltaTime, 50));
 
-    _updateTransform: function () {
-      const camera = this.target;
+    this._updateRotate(Math.min(deltaTime, 50));
 
-      const dir = new Vector3();
-      const theta = this._theta + Math.PI / 2;
-      const phi = this._phi + Math.PI / 2;
-      const r = Math.sin(theta);
+    this._updateTransform();
 
-      dir.x = r * Math.cos(phi);
-      dir.y = -Math.cos(theta);
-      dir.z = r * Math.sin(phi);
+    if (this.target) {
+      this.target.update();
+    }
 
-      camera.position.copy(this._center).scaleAndAdd(dir, this._distance);
-      camera.rotation
-        .identity()
-        // First around y, then around x
-        .rotateY(-this._phi)
-        .rotateX(-this._theta);
-    },
+    this.trigger('update');
 
-    _startCountingStill: function () {
-      clearTimeout(this._stillTimeout);
+    this._needsUpdate = false;
+  }
 
-      const time = this.autoRotateAfterStill;
-      const self = this;
-      if (!isNaN(time) && time > 0) {
-        this._stillTimeout = setTimeout(function () {
-          self._rotating = true;
-        }, time * 1000);
-      }
-    },
+  _updateRotate(deltaTime: number) {
+    const velocity = this._rotateVelocity;
+    this._phi = (velocity.y * deltaTime) / 20 + this._phi;
+    this._theta = (velocity.x * deltaTime) / 20 + this._theta;
 
-    _vectorDamping: function (v, damping) {
-      let speed = v.len();
-      speed = speed * damping;
-      if (speed < 1e-4) {
-        speed = 0;
-      }
-      v.normalize().scale(speed);
-    },
+    this.setAlpha(this.getAlpha());
+    this.setBeta(this.getBeta());
 
-    decomposeTransform: function () {
-      if (!this.target) {
-        return;
-      }
+    this._vectorDamping(velocity, this.damping);
+  }
 
-      this.target.updateWorldTransform();
+  _updateDistanceOrSize(deltaTime: number) {
+    this._setDistance(this._distance + (this._zoomSpeed * deltaTime) / 20);
+    if (!(this.target instanceof PerspectiveCamera)) {
+      this._setOrthoSize((this._orthoSize as number) + (this._zoomSpeed * deltaTime) / 20);
+    }
 
-      const forward = this.target.worldTransform.z;
-      const alpha = Math.asin(forward.y);
-      const beta = Math.atan2(forward.x, forward.z);
+    this._zoomSpeed *= Math.pow(this.damping, deltaTime / 16);
+  }
 
-      this._theta = alpha;
-      this._phi = -beta;
+  _setDistance(distance: number) {
+    this._distance = Math.max(Math.min(distance, this.maxDistance), this.minDistance);
+  }
 
-      this.setBeta(this.getBeta());
-      this.setAlpha(this.getAlpha());
+  _setOrthoSize(size: number) {
+    this._orthoSize = Math.max(Math.min(size, this.maxOrthographicSize), this.minOrthographicSize);
+    const camera = this.target as OrthographicCamera;
+    const cameraHeight = this._orthoSize;
+    // TODO
+    const cameraWidth = cameraHeight * this.orthographicAspect;
+    camera.left = -cameraWidth / 2;
+    camera.right = cameraWidth / 2;
+    camera.top = cameraHeight / 2;
+    camera.bottom = -cameraHeight / 2;
+  }
 
-      this._setDistance(this.target.position.dist(this._center));
-      if (!(this.target instanceof PerspectiveCamera)) {
-        this._setOrthoSize(this.target.top - this.target.bottom);
-      }
-    },
+  _updatePan(deltaTime: number) {
+    const velocity = this._panVelocity;
+    const len = this._distance;
 
-    _mouseDownHandler: function (e) {
-      if (this._isAnimating()) {
-        return;
-      }
-      let x = e.clientX;
-      let y = e.clientY;
-      // Touch
-      if (e.targetTouches) {
-        const touch = e.targetTouches[0];
-        x = touch.clientX;
-        y = touch.clientY;
+    const target = this.target;
+    if (!target) {
+      return;
+    }
+    const yAxis = target.worldTransform.y;
+    const xAxis = target.worldTransform.x;
 
+    // PENDING
+    this._center
+      .scaleAndAdd(xAxis, (-velocity.x * len) / 200)
+      .scaleAndAdd(yAxis, (-velocity.y * len) / 200);
+
+    this._vectorDamping(velocity, 0);
+
+    velocity.x = velocity.y = 0;
+  }
+
+  _updateTransform() {
+    const camera = this.target;
+    if (!camera) {
+      return;
+    }
+
+    const dir = new Vector3();
+    const theta = this._theta + Math.PI / 2;
+    const phi = this._phi + Math.PI / 2;
+    const r = Math.sin(theta);
+
+    dir.x = r * Math.cos(phi);
+    dir.y = -Math.cos(theta);
+    dir.z = r * Math.sin(phi);
+
+    camera.position.copy(this._center).scaleAndAdd(dir, this._distance);
+    camera.rotation
+      .identity()
+      // First around y, then around x
+      .rotateY(-this._phi)
+      .rotateX(-this._theta);
+  }
+
+  _startCountingStill() {
+    clearTimeout(this._stillTimeout);
+
+    const time = this.autoRotateAfterStill;
+    const self = this;
+    if (!isNaN(time) && time > 0) {
+      this._stillTimeout = setTimeout(function () {
+        self._rotating = true;
+      }, time * 1000) as any;
+    }
+  }
+
+  _vectorDamping(v: Vector2, damping: number) {
+    let speed = v.len();
+    speed = speed * damping;
+    if (speed < 1e-4) {
+      speed = 0;
+    }
+    v.normalize().scale(speed);
+  }
+
+  decomposeTransform() {
+    if (!this.target) {
+      return;
+    }
+
+    this.target.updateWorldTransform();
+
+    const forward = this.target.worldTransform.z;
+    const alpha = Math.asin(forward.y);
+    const beta = Math.atan2(forward.x, forward.z);
+
+    this._theta = alpha;
+    this._phi = -beta;
+
+    this.setBeta(this.getBeta());
+    this.setAlpha(this.getAlpha());
+
+    this._setDistance(this.target.position.dist(this._center));
+    if (this.target instanceof OrthographicCamera) {
+      this._setOrthoSize(this.target.top - this.target.bottom);
+    }
+  }
+
+  _mouseDownHandler(e: MouseEvent | TouchEvent) {
+    if (this._isAnimating()) {
+      return;
+    }
+    let x = (e as MouseEvent).clientX;
+    let y = (e as MouseEvent).clientY;
+    // Touch
+    if ((e as TouchEvent).targetTouches) {
+      const touch = (e as TouchEvent).targetTouches[0];
+      x = touch.clientX;
+      y = touch.clientY;
+
+      this._mode = 'rotate';
+
+      this._processGesture(e as TouchEvent, 'start');
+    } else {
+      if ((e as MouseEvent).button === MOUSE_BUTTON_KEY_MAP[this.rotateMouseButton]) {
         this._mode = 'rotate';
+      } else if ((e as MouseEvent).button === MOUSE_BUTTON_KEY_MAP[this.panMouseButton]) {
+        this._mode = 'pan';
 
-        this._processGesture(e, 'start');
+        /**
+         * Vendors like Mozilla provide a mouse-driven panning feature
+         * that is activated when the middle mouse button is pressed.
+         *
+         * @see https://w3c.github.io/uievents/#event-type-mousedown
+         */
+        e.preventDefault();
       } else {
-        if (e.button === MOUSE_BUTTON_KEY_MAP[this.rotateMouseButton]) {
-          this._mode = 'rotate';
-        } else if (e.button === MOUSE_BUTTON_KEY_MAP[this.panMouseButton]) {
-          this._mode = 'pan';
-
-          /**
-           * Vendors like Mozilla provide a mouse-driven panning feature
-           * that is activated when the middle mouse button is pressed.
-           *
-           * @see https://w3c.github.io/uievents/#event-type-mousedown
-           */
-          e.preventDefault();
-        } else {
-          this._mode = null;
-        }
+        this._mode = undefined;
       }
+    }
 
-      const dom = this.domElement;
-      vendor.addEventListener(dom, 'touchmove', this._mouseMoveHandler);
-      vendor.addEventListener(dom, 'touchend', this._mouseUpHandler);
+    const dom = this.domElement;
+    addEvent(dom, 'touchmove', this._mouseMoveHandler);
+    addEvent(dom, 'touchend', this._mouseUpHandler);
 
-      vendor.addEventListener(dom, 'mousemove', this._mouseMoveHandler);
-      vendor.addEventListener(dom, 'mouseup', this._mouseUpHandler);
-      vendor.addEventListener(dom, 'mouseout', this._mouseUpHandler);
+    addEvent(dom, 'mousemove', this._mouseMoveHandler);
+    addEvent(dom, 'mouseup', this._mouseUpHandler);
+    addEvent(dom, 'mouseout', this._mouseUpHandler);
 
-      // Reset rotate velocity
-      this._rotateVelocity.set(0, 0);
-      this._rotating = false;
-      if (this.autoRotate) {
-        this._startCountingStill();
+    // Reset rotate velocity
+    this._rotateVelocity.set(0, 0);
+    this._rotating = false;
+    if (this.autoRotate) {
+      this._startCountingStill();
+    }
+
+    this._mouseX = x;
+    this._mouseY = y;
+  }
+
+  _mouseMoveHandler(e: MouseEvent | TouchEvent) {
+    if (this._isAnimating()) {
+      return;
+    }
+    let x = (e as MouseEvent).clientX;
+    let y = (e as MouseEvent).clientY;
+
+    let haveGesture;
+    // Touch
+    if ((e as TouchEvent).targetTouches) {
+      const touch = (e as TouchEvent).targetTouches[0];
+      x = touch.clientX;
+      y = touch.clientY;
+
+      haveGesture = this._processGesture(e as TouchEvent, 'change');
+    }
+
+    const panSensitivity = convertToArray(this.panSensitivity);
+    const rotateSensitivity = convertToArray(this.rotateSensitivity);
+
+    if (!haveGesture) {
+      if (this._mode === 'rotate') {
+        this._rotateVelocity.y +=
+          ((x - this._mouseX) / this.domElement.clientWidth) * 2 * rotateSensitivity[0];
+        this._rotateVelocity.x +=
+          ((y - this._mouseY) / this.domElement.clientHeight) * 2 * rotateSensitivity[1];
+      } else if (this._mode === 'pan') {
+        this._panVelocity.x +=
+          ((x - this._mouseX) / this.domElement.clientWidth) * panSensitivity[0] * 400;
+        this._panVelocity.y +=
+          ((-y + this._mouseY) / this.domElement.clientHeight) * panSensitivity[1] * 400;
       }
+    }
 
-      this._mouseX = x;
-      this._mouseY = y;
-    },
+    this._mouseX = x;
+    this._mouseY = y;
 
-    _mouseMoveHandler: function (e) {
-      if (this._isAnimating()) {
-        return;
-      }
-      let x = e.clientX;
-      let y = e.clientY;
+    e.preventDefault && e.preventDefault();
+  }
 
-      let haveGesture;
-      // Touch
-      if (e.targetTouches) {
-        const touch = e.targetTouches[0];
-        x = touch.clientX;
-        y = touch.clientY;
+  _mouseWheelHandler(e: WheelEvent) {
+    if (this._isAnimating()) {
+      return;
+    }
+    const delta = e.deltaY;
+    if (delta === 0) {
+      return;
+    }
 
-        haveGesture = this._processGesture(e, 'change');
-      }
-
-      const panSensitivity = convertToArray(this.panSensitivity);
-      const rotateSensitivity = convertToArray(this.rotateSensitivity);
-
-      if (!haveGesture) {
-        if (this._mode === 'rotate') {
-          this._rotateVelocity.y +=
-            ((x - this._mouseX) / this.domElement.clientWidth) * 2 * rotateSensitivity[0];
-          this._rotateVelocity.x +=
-            ((y - this._mouseY) / this.domElement.clientHeight) * 2 * rotateSensitivity[1];
-        } else if (this._mode === 'pan') {
-          this._panVelocity.x +=
-            ((x - this._mouseX) / this.domElement.clientWidth) * panSensitivity[0] * 400;
-          this._panVelocity.y +=
-            ((-y + this._mouseY) / this.domElement.clientHeight) * panSensitivity[1] * 400;
-        }
-      }
-
-      this._mouseX = x;
-      this._mouseY = y;
-
-      e.preventDefault && e.preventDefault();
-    },
-
-    _mouseWheelHandler: function (e) {
-      if (this._isAnimating()) {
-        return;
-      }
-      const delta = e.deltaY;
-      if (delta === 0) {
-        return;
-      }
-
-      if (this.invertZoomDirection) {
-        this._zoomHandler(e, delta > 0 ? -1 : 1);
-      } else {
-        this._zoomHandler(e, delta > 0 ? 1 : -1);
-      }
-    },
-
-    _pinchHandler: function (e) {
-      if (this._isAnimating()) {
-        return;
-      }
-      this._zoomHandler(e, e.pinchScale > 1 ? 0.4 : -0.4);
-    },
-
-    _zoomHandler: function (e, delta) {
-      let speed;
-      if (this.target instanceof PerspectiveCamera) {
-        speed = Math.max(
-          Math.max(Math.min(this._distance - this.minDistance, this.maxDistance - this._distance)) /
-            20,
-          0.5
-        );
-      } else {
-        speed = Math.max(
-          Math.max(
-            Math.min(
-              this._orthoSize - this.minOrthographicSize,
-              this.maxOrthographicSize - this._orthoSize
-            )
-          ) / 20,
-          0.5
-        );
-      }
-
-      this._zoomSpeed = (delta > 0 ? -1 : 1) * speed * this.zoomSensitivity;
-
-      this._rotating = false;
-
-      if (this.autoRotate && this._mode === 'rotate') {
-        this._startCountingStill();
-      }
-
-      e.preventDefault && e.preventDefault();
-    },
-
-    _mouseUpHandler: function (event) {
-      const dom = this.domElement;
-      vendor.removeEventListener(dom, 'touchmove', this._mouseMoveHandler);
-      vendor.removeEventListener(dom, 'touchend', this._mouseUpHandler);
-      vendor.removeEventListener(dom, 'mousemove', this._mouseMoveHandler);
-      vendor.removeEventListener(dom, 'mouseup', this._mouseUpHandler);
-      vendor.removeEventListener(dom, 'mouseout', this._mouseUpHandler);
-
-      this._processGesture(event, 'end');
-    },
-
-    _addAnimator: function (animator) {
-      const animators = this._animators;
-      animators.push(animator);
-      animator.done(function () {
-        const idx = animators.indexOf(animator);
-        if (idx >= 0) {
-          animators.splice(idx, 1);
-        }
-      });
-      return animator;
-    },
-
-    _processGesture: function (event, stage) {
-      const gestureMgr = this._gestureMgr;
-
-      stage === 'start' && gestureMgr.clear();
-
-      const gestureInfo = gestureMgr.recognize(event, null, this.domElement);
-
-      stage === 'end' && gestureMgr.clear();
-
-      // Do not do any preventDefault here. Upper application do that if necessary.
-      if (gestureInfo) {
-        const type = gestureInfo.type;
-        event.gestureEvent = type;
-
-        this._pinchHandler(gestureInfo.event);
-      }
-
-      return gestureInfo;
+    if (this.invertZoomDirection) {
+      this._zoomHandler(e, delta > 0 ? -1 : 1);
+    } else {
+      this._zoomHandler(e, delta > 0 ? 1 : -1);
     }
   }
-);
 
-/**
- * If auto rotate the target
- * @type {boolean}
- * @default false
- */
-Object.defineProperty(OrbitControl.prototype, 'autoRotate', {
-  get: function () {
-    return this._autoRotate;
-  },
-  set: function (val) {
-    this._autoRotate = val;
-    this._rotating = val;
-  }
-});
-
-Object.defineProperty(OrbitControl.prototype, 'target', {
-  get: function () {
-    return this._target;
-  },
-  set: function (val) {
-    if (val && val.target) {
-      this.setCenter(val.target.toArray());
+  _pinchHandler(e: PinchEvent) {
+    if (this._isAnimating()) {
+      return;
     }
-    this._target = val;
-    this.decomposeTransform();
+    this._zoomHandler(e as any, e.pinchScale > 1 ? 0.4 : -0.4);
   }
-});
+
+  _zoomHandler(e: WheelEvent, delta: number) {
+    let speed;
+    if (this.target instanceof PerspectiveCamera) {
+      speed = Math.max(
+        Math.max(Math.min(this._distance - this.minDistance, this.maxDistance - this._distance)) /
+          20,
+        0.5
+      );
+    } else {
+      speed = Math.max(
+        Math.max(
+          Math.min(
+            (this._orthoSize as number) - this.minOrthographicSize,
+            this.maxOrthographicSize - (this._orthoSize as number)
+          )
+        ) / 20,
+        0.5
+      );
+    }
+
+    this._zoomSpeed = (delta > 0 ? -1 : 1) * speed * this.zoomSensitivity;
+
+    this._rotating = false;
+
+    if (this.autoRotate && this._mode === 'rotate') {
+      this._startCountingStill();
+    }
+
+    e.preventDefault && e.preventDefault();
+  }
+
+  _mouseUpHandler(event: MouseEvent | TouchEvent) {
+    const dom = this.domElement;
+    removeEvent(dom, 'touchmove', this._mouseMoveHandler);
+    removeEvent(dom, 'touchend', this._mouseUpHandler);
+    removeEvent(dom, 'mousemove', this._mouseMoveHandler);
+    removeEvent(dom, 'mouseup', this._mouseUpHandler);
+    removeEvent(dom, 'mouseout', this._mouseUpHandler);
+
+    this._processGesture(event as TouchEvent, 'end');
+  }
+
+  _addAnimator(animator: ProceduralKeyframeAnimator) {
+    const animators = this._animators;
+    animators.push(animator);
+    animator.done(function () {
+      const idx = animators.indexOf(animator);
+      if (idx >= 0) {
+        animators.splice(idx, 1);
+      }
+    });
+    return animator;
+  }
+
+  _processGesture(event: TouchEvent, stage: 'start' | 'end' | 'change') {
+    const gestureMgr = this._gestureMgr;
+
+    stage === 'start' && gestureMgr.clear();
+
+    const gestureInfo = gestureMgr.recognize(event, null, this.domElement);
+
+    stage === 'end' && gestureMgr.clear();
+
+    // Do not do any preventDefault here. Upper application do that if necessary.
+    if (gestureInfo) {
+      const type = gestureInfo.type;
+      (event as any).gestureEvent = type;
+
+      this._pinchHandler(gestureInfo.event);
+    }
+
+    return gestureInfo;
+  }
+}
 
 export default OrbitControl;

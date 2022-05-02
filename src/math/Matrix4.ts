@@ -379,7 +379,7 @@ class Matrix4 {
   }
 
   toArray() {
-    return Array.prototype.slice.call(this.array);
+    return this.array.slice() as mat4.Mat4Array;
   }
 
   /**

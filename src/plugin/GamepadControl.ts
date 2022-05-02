@@ -1,93 +1,92 @@
-// @ts-nocheck
-import Base from '../core/Base';
 import Vector3 from '../math/Vector3';
 import vendor from '../core/vendor';
+import Notifier from '../core/Notifier';
+import type ClayNode from '../Node';
+import type Timeline from '../Timeline';
 
+const addEvent = vendor.addEventListener;
+const removeEvent = vendor.removeEventListener;
+
+interface GamepadControlOpts {
+  /*
+   * Scene node to control, mostly it is a camera.
+   *
+   */
+  target?: ClayNode;
+
+  /**
+   * Move speed.
+   */
+  moveSpeed: number;
+
+  /**
+   * Look around speed.
+   */
+  lookAroundSpeed: number;
+
+  /**
+   * Up axis.
+   */
+  up: Vector3;
+
+  /**
+   * Timeline.
+   */
+  timeline?: Timeline;
+
+  /**
+   * Function to be called when a standard gamepad is ready to use.
+   */
+  onStandardGamepadReady?: (gamepad) => void;
+
+  /**
+   * Function to be called when a gamepad is disconnected.
+   */
+  onGamepadDisconnected?: (gamepad) => void;
+}
+
+interface GamepadControl extends GamepadControlOpts {}
 /**
  * Gamepad Control plugin.
  *
- * @constructor clay.plugin.GamepadControl
- *
  * @example
- *   init: function(app) {
+ *   init(app) {
  *     this._gamepadControl = new clay.plugin.GamepadControl({
  *         target: camera,
  *         onStandardGamepadReady: customCallback
  *     });
  *   },
  *
- *   loop: function(app) {
+ *   loop(app) {
  *     this._gamepadControl.update(app.frameTime);
  *   }
  */
-const GamepadControl = Base.extend(
-  function () {
-    return /** @lends clay.plugin.GamepadControl# */ {
-      /**
-       * Scene node to control, mostly it is a camera.
-       *
-       * @type {clay.Node}
-       */
-      target: null,
 
-      /**
-       * Move speed.
-       *
-       * @type {number}
-       */
-      moveSpeed: 0.1,
+class GamepadControl extends Notifier {
+  private _moveForward = false;
+  private _moveBackward = false;
+  private _moveLeft = false;
+  private _moveRight = false;
 
-      /**
-       * Look around speed.
-       *
-       * @type {number}
-       */
-      lookAroundSpeed: 0.1,
+  private _offsetPitch = 0;
+  private _offsetRoll = 0;
 
-      /**
-       * Up axis.
-       *
-       * @type {clay.Vector3}
-       */
-      up: new Vector3(0, 1, 0),
+  private _standardGamepadIndex = 0;
+  private _standardGamepadAvailable = false;
+  private _gamepadAxisThreshold = 0.3;
 
-      /**
-       * Timeline.
-       *
-       * @type {clay.Timeline}
-       */
-      timeline: null,
+  constructor(opts?: Partial<GamepadControlOpts>) {
+    super();
+    Object.assign(
+      this,
+      {
+        moveSpeed: 0.1,
+        lookAroundSpeed: 0.1,
+        up: Vector3.UP
+      },
+      opts
+    );
 
-      /**
-       * Function to be called when a standard gamepad is ready to use.
-       *
-       * @type {function}
-       */
-      onStandardGamepadReady: function (gamepad) {},
-
-      /**
-       * Function to be called when a gamepad is disconnected.
-       *
-       * @type {function}
-       */
-      onGamepadDisconnected: function (gamepad) {},
-
-      // Private properties:
-
-      _moveForward: false,
-      _moveBackward: false,
-      _moveLeft: false,
-      _moveRight: false,
-
-      _offsetPitch: 0,
-      _offsetRoll: 0,
-
-      _connectedGamepadIndex: 0,
-      _standardGamepadAvailable: false,
-      _gamepadAxisThreshold: 0.3
-    };
-  },
-  function () {
     this._checkGamepadCompatibility = this._checkGamepadCompatibility.bind(this);
     this._disconnectGamepad = this._disconnectGamepad.bind(this);
     this._getStandardGamepad = this._getStandardGamepad.bind(this);
@@ -100,203 +99,207 @@ const GamepadControl = Base.extend(
     if (typeof navigator.getGamepads === 'function') {
       this.init();
     }
-  },
-  /** @lends clay.plugin.GamepadControl.prototype */
-  {
+  }
+
+  /**
+   * Init. control.
+   */
+  init() {
     /**
-     * Init. control.
-     */
-    init: function () {
-      /**
-       * When user begins to interact with connected gamepad:
-       *
-       * @see https://w3c.github.io/gamepad/#dom-gamepadevent
-       */
-      vendor.addEventListener(window, 'gamepadconnected', this._checkGamepadCompatibility);
-
-      if (this.timeline) {
-        this.timeline.on('frame', this.update);
-      }
-
-      vendor.addEventListener(window, 'gamepaddisconnected', this._disconnectGamepad);
-    },
-
-    /**
-     * Dispose control.
-     */
-    dispose: function () {
-      vendor.removeEventListener(window, 'gamepadconnected', this._checkGamepadCompatibility);
-
-      if (this.timeline) {
-        this.timeline.off('frame', this.update);
-      }
-
-      vendor.removeEventListener(window, 'gamepaddisconnected', this._disconnectGamepad);
-    },
-
-    /**
-     * Control's update. Should be invoked every frame.
+     * When user begins to interact with connected gamepad:
      *
-     * @param {number} frameTime Frame time.
+     * @see https://w3c.github.io/gamepad/#dom-gamepadevent
      */
-    update: function (frameTime) {
-      if (!this._standardGamepadAvailable) {
-        return;
-      }
+    addEvent(window, 'gamepadconnected', this._checkGamepadCompatibility);
 
-      this._scanPressedGamepadButtons();
-      this._scanInclinedGamepadAxes();
+    if (this.timeline) {
+      this.timeline.on('frame', this.update);
+    }
 
-      // Update target depending on user input.
+    addEvent(window, 'gamepaddisconnected', this._disconnectGamepad);
+  }
 
-      const target = this.target;
+  /**
+   * Dispose control.
+   */
+  dispose() {
+    removeEvent(window, 'gamepadconnected', this._checkGamepadCompatibility);
 
-      const position = this.target.position;
-      let xAxis = target.localTransform.x.normalize();
-      const zAxis = target.localTransform.z.normalize();
+    if (this.timeline) {
+      this.timeline.off('frame', this.update);
+    }
 
-      const moveSpeed = (this.moveSpeed * frameTime) / 20;
+    removeEvent(window, 'gamepaddisconnected', this._disconnectGamepad);
+  }
 
-      if (this._moveForward) {
-        // Opposite direction of z.
-        position.scaleAndAdd(zAxis, -moveSpeed);
-      }
-      if (this._moveBackward) {
-        position.scaleAndAdd(zAxis, moveSpeed);
-      }
-      if (this._moveLeft) {
-        position.scaleAndAdd(xAxis, -moveSpeed);
-      }
-      if (this._moveRight) {
-        position.scaleAndAdd(xAxis, moveSpeed);
-      }
+  /**
+   * Control's update. Should be invoked every frame.
+   *
+   * @param {number} frameTime Frame time.
+   */
+  update(frameTime: number) {
+    if (!this._standardGamepadAvailable) {
+      return;
+    }
 
-      target.rotateAround(
-        target.position,
-        this.up,
-        (-this._offsetPitch * frameTime * Math.PI) / 360
-      );
-      xAxis = target.localTransform.x;
-      target.rotateAround(target.position, xAxis, (-this._offsetRoll * frameTime * Math.PI) / 360);
+    this._scanPressedGamepadButtons();
+    this._scanInclinedGamepadAxes();
 
-      /*
-       * If necessary: trigger `update` event.
-       * XXX This can economize rendering OPs.
-       */
-      if (
-        this._moveForward === true ||
-        this._moveBackward === true ||
-        this._moveLeft === true ||
-        this._moveRight === true ||
-        this._offsetPitch !== 0 ||
-        this._offsetRoll !== 0
-      ) {
-        this.trigger('update');
-      }
+    // Update target depending on user input.
 
-      // Reset values to avoid lost of control.
+    const target = this.target;
+    if (!target) {
+      return;
+    }
 
-      this._moveForward = this._moveBackward = this._moveLeft = this._moveRight = false;
-      this._offsetPitch = this._offsetRoll = 0;
-    },
+    const position = target.position;
+    let xAxis = target.localTransform.x.normalize();
+    const zAxis = target.localTransform.z.normalize();
 
-    // Private methods:
+    const moveSpeed = (this.moveSpeed * frameTime) / 20;
 
-    _checkGamepadCompatibility: function (event) {
-      /**
-       * If connected gamepad has a **standard** layout:
-       *
-       * @see https://w3c.github.io/gamepad/#remapping about standard.
-       */
-      if (event.gamepad.mapping === 'standard') {
-        this._standardGamepadIndex = event.gamepad.index;
-        this._standardGamepadAvailable = true;
+    if (this._moveForward) {
+      // Opposite direction of z.
+      position.scaleAndAdd(zAxis, -moveSpeed);
+    }
+    if (this._moveBackward) {
+      position.scaleAndAdd(zAxis, moveSpeed);
+    }
+    if (this._moveLeft) {
+      position.scaleAndAdd(xAxis, -moveSpeed);
+    }
+    if (this._moveRight) {
+      position.scaleAndAdd(xAxis, moveSpeed);
+    }
 
-        this.onStandardGamepadReady(event.gamepad);
-      }
-    },
+    target.rotateAround(target.position, this.up, (-this._offsetPitch * frameTime * Math.PI) / 360);
+    xAxis = target.localTransform.x;
+    target.rotateAround(target.position, xAxis, (-this._offsetRoll * frameTime * Math.PI) / 360);
 
-    _disconnectGamepad: function (event) {
-      this._standardGamepadAvailable = false;
+    /*
+     * If necessary: trigger `update` event.
+     * XXX This can economize rendering OPs.
+     */
+    if (
+      this._moveForward === true ||
+      this._moveBackward === true ||
+      this._moveLeft === true ||
+      this._moveRight === true ||
+      this._offsetPitch !== 0 ||
+      this._offsetRoll !== 0
+    ) {
+      this.trigger('update');
+    }
 
-      this.onGamepadDisconnected(event.gamepad);
-    },
+    // Reset values to avoid lost of control.
 
-    _getStandardGamepad: function () {
-      return navigator.getGamepads()[this._standardGamepadIndex];
-    },
+    this._moveForward = this._moveBackward = this._moveLeft = this._moveRight = false;
+    this._offsetPitch = this._offsetRoll = 0;
+  }
 
-    _scanPressedGamepadButtons: function () {
-      const gamepadButtons = this._getStandardGamepad().buttons;
+  // Private methods:
 
-      // For each gamepad button:
-      for (let gamepadButtonId = 0; gamepadButtonId < gamepadButtons.length; gamepadButtonId++) {
-        // Get user input.
-        const gamepadButton = gamepadButtons[gamepadButtonId];
+  _checkGamepadCompatibility(event: GamepadEvent) {
+    /**
+     * If connected gamepad has a **standard** layout:
+     *
+     * @see https://w3c.github.io/gamepad/#remapping about standard.
+     */
+    if (event.gamepad.mapping === 'standard') {
+      this._standardGamepadIndex = event.gamepad.index;
+      this._standardGamepadAvailable = true;
 
-        if (gamepadButton.pressed) {
-          switch (gamepadButtonId) {
-            // D-pad Up
-            case 12:
-              this._moveForward = true;
-              break;
+      this.onStandardGamepadReady && this.onStandardGamepadReady(event.gamepad);
+    }
+  }
 
-            // D-pad Down
-            case 13:
-              this._moveBackward = true;
-              break;
+  _disconnectGamepad(event: GamepadEvent) {
+    this._standardGamepadAvailable = false;
 
-            // D-pad Left
-            case 14:
-              this._moveLeft = true;
-              break;
+    this.onGamepadDisconnected && this.onGamepadDisconnected(event.gamepad);
+  }
 
-            // D-pad Right
-            case 15:
-              this._moveRight = true;
-              break;
-          }
-        }
-      }
-    },
+  _getStandardGamepad() {
+    return navigator.getGamepads()[this._standardGamepadIndex];
+  }
 
-    _scanInclinedGamepadAxes: function () {
-      const gamepadAxes = this._getStandardGamepad().axes;
+  _scanPressedGamepadButtons() {
+    const gamepad = this._getStandardGamepad();
+    const gamepadButtons = gamepad && gamepad.buttons;
+    if (!gamepadButtons) {
+      return;
+    }
 
-      // For each gamepad axis:
-      for (let gamepadAxisId = 0; gamepadAxisId < gamepadAxes.length; gamepadAxisId++) {
-        // Get user input.
-        const gamepadAxis = gamepadAxes[gamepadAxisId];
+    // For each gamepad button:
+    for (let gamepadButtonId = 0; gamepadButtonId < gamepadButtons.length; gamepadButtonId++) {
+      // Get user input.
+      const gamepadButton = gamepadButtons[gamepadButtonId];
 
-        // XXX We use a threshold because axes are never neutral.
-        if (Math.abs(gamepadAxis) > this._gamepadAxisThreshold) {
-          switch (gamepadAxisId) {
-            // Left stick X±
-            case 0:
-              this._moveLeft = gamepadAxis < 0;
-              this._moveRight = gamepadAxis > 0;
-              break;
+      if (gamepadButton.pressed) {
+        switch (gamepadButtonId) {
+          // D-pad Up
+          case 12:
+            this._moveForward = true;
+            break;
 
-            // Left stick Y±
-            case 1:
-              this._moveForward = gamepadAxis < 0;
-              this._moveBackward = gamepadAxis > 0;
-              break;
+          // D-pad Down
+          case 13:
+            this._moveBackward = true;
+            break;
 
-            // Right stick X±
-            case 2:
-              this._offsetPitch += gamepadAxis * this.lookAroundSpeed;
-              break;
+          // D-pad Left
+          case 14:
+            this._moveLeft = true;
+            break;
 
-            // Right stick Y±
-            case 3:
-              this._offsetRoll += gamepadAxis * this.lookAroundSpeed;
-              break;
-          }
+          // D-pad Right
+          case 15:
+            this._moveRight = true;
+            break;
         }
       }
     }
   }
-);
 
+  _scanInclinedGamepadAxes() {
+    const gamepad = this._getStandardGamepad();
+    const gamepadAxes = gamepad && gamepad.axes;
+    if (!gamepadAxes) {
+      return;
+    }
+
+    // For each gamepad axis:
+    for (let gamepadAxisId = 0; gamepadAxisId < gamepadAxes.length; gamepadAxisId++) {
+      // Get user input.
+      const gamepadAxis = gamepadAxes[gamepadAxisId];
+
+      // XXX We use a threshold because axes are never neutral.
+      if (Math.abs(gamepadAxis) > this._gamepadAxisThreshold) {
+        switch (gamepadAxisId) {
+          // Left stick X±
+          case 0:
+            this._moveLeft = gamepadAxis < 0;
+            this._moveRight = gamepadAxis > 0;
+            break;
+
+          // Left stick Y±
+          case 1:
+            this._moveForward = gamepadAxis < 0;
+            this._moveBackward = gamepadAxis > 0;
+            break;
+
+          // Right stick X±
+          case 2:
+            this._offsetPitch += gamepadAxis * this.lookAroundSpeed;
+            break;
+
+          // Right stick Y±
+          case 3:
+            this._offsetRoll += gamepadAxis * this.lookAroundSpeed;
+            break;
+        }
+      }
+    }
+  }
+}
 export default GamepadControl;

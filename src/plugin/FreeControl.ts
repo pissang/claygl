@@ -1,12 +1,55 @@
-// @ts-nocheck
-import Base from '../core/Base';
 import Vector3 from '../math/Vector3';
 import vendor from '../core/vendor';
+import ClayNode from '../Node';
+import Timeline from '../Timeline';
+import Notifier from '../core/Notifier';
 
-const doc = typeof document === 'undefined' ? {} : document;
+const addEvent = vendor.addEventListener;
+const removeEvent = vendor.removeEventListener;
 
+const doc = document;
+interface FreeControlOpts {
+  /**
+   * Scene node to control, mostly it is a camera
+   */
+  target?: ClayNode;
+  /**
+   * Target dom to bind with mouse events
+   */
+  domElement: HTMLElement;
+
+  /**
+   * Mouse move sensitivity
+   * @type {number}
+   */
+  sensitivity: number;
+
+  /**
+   * Target move speed
+   * @type {number}
+   */
+  speed: number;
+
+  /**
+   * Up axis
+   * @type {clay.Vector3}
+   */
+  up: Vector3;
+
+  /**
+   * If lock vertical movement
+   * @type {boolean}
+   */
+  verticalMoveLock: boolean;
+
+  /**
+   * @type {clay.Timeline}
+   */
+  timeline?: Timeline;
+}
+
+interface FreeControl extends FreeControlOpts {}
 /**
- * @constructor clay.plugin.FreeControl
  * @example
  *     const control = new clay.plugin.FreeControl({
  *         target: camera,
@@ -18,60 +61,28 @@ const doc = typeof document === 'undefined' ? {} : document;
  *         renderer.render(scene, camera);
  *     });
  */
-const FreeControl = Base.extend(
-  function () {
-    return /** @lends clay.plugin.FreeControl# */ {
-      /**
-       * Scene node to control, mostly it is a camera
-       * @type {clay.Node}
-       */
-      target: null,
+class FreeControl extends Notifier {
+  private _moveForward = false;
+  private _moveBackward = false;
+  private _moveLeft = false;
+  private _moveRight = false;
 
-      /**
-       * Target dom to bind with mouse events
-       * @type {HTMLElement}
-       */
-      domElement: null,
+  private _offsetPitch = 0;
+  private _offsetRoll = 0;
 
-      /**
-       * Mouse move sensitivity
-       * @type {number}
-       */
-      sensitivity: 1,
+  constructor(opts?: Partial<FreeControlOpts>) {
+    super();
+    Object.assign(
+      this,
+      {
+        sensitivity: 1,
+        speed: 0.4,
+        up: new Vector3(0, 1, 0),
+        verticalMoveLock: false
+      },
+      opts
+    );
 
-      /**
-       * Target move speed
-       * @type {number}
-       */
-      speed: 0.4,
-
-      /**
-       * Up axis
-       * @type {clay.Vector3}
-       */
-      up: new Vector3(0, 1, 0),
-
-      /**
-       * If lock vertical movement
-       * @type {boolean}
-       */
-      verticalMoveLock: false,
-
-      /**
-       * @type {clay.Timeline}
-       */
-      timeline: null,
-
-      _moveForward: false,
-      _moveBackward: false,
-      _moveLeft: false,
-      _moveRight: false,
-
-      _offsetPitch: 0,
-      _offsetRoll: 0
-    };
-  },
-  function () {
     this._lockChange = this._lockChange.bind(this);
     this._keyDown = this._keyDown.bind(this);
     this._keyUp = this._keyUp.bind(this);
@@ -80,184 +91,178 @@ const FreeControl = Base.extend(
     if (this.domElement) {
       this.init();
     }
-  },
-  /** @lends clay.plugin.FreeControl.prototype */
-  {
-    /**
-     * init control
-     */
-    init: function () {
-      // Use pointer lock
-      // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
-      const el = this.domElement;
+  }
+  /**
+   * init control
+   */
+  init() {
+    // Use pointer lock
+    // http://www.html5rocks.com/en/tutorials/pointerlock/intro/
+    const el = this.domElement;
 
-      //Must request pointer lock after click event, can't not do it directly
-      //Why ? ?
-      vendor.addEventListener(el, 'click', this._requestPointerLock);
+    //Must request pointer lock after click event, can't not do it directly
+    //Why ? ?
+    addEvent(el, 'click', this._requestPointerLock);
 
-      vendor.addEventListener(doc, 'pointerlockchange', this._lockChange);
-      vendor.addEventListener(doc, 'mozpointerlockchange', this._lockChange);
-      vendor.addEventListener(doc, 'webkitpointerlockchange', this._lockChange);
+    addEvent(doc, 'pointerlockchange', this._lockChange);
+    addEvent(doc, 'mozpointerlockchange', this._lockChange);
+    addEvent(doc, 'webkitpointerlockchange', this._lockChange);
 
-      vendor.addEventListener(doc, 'keydown', this._keyDown);
-      vendor.addEventListener(doc, 'keyup', this._keyUp);
+    addEvent(doc, 'keydown', this._keyDown);
+    addEvent(doc, 'keyup', this._keyUp);
 
-      if (this.timeline) {
-        this.timeline.on('frame', this._detectMovementChange, this);
-      }
-    },
-
-    /**
-     * Dispose control
-     */
-    dispose: function () {
-      const el = this.domElement;
-
-      el.exitPointerLock = el.exitPointerLock || el.mozExitPointerLock || el.webkitExitPointerLock;
-
-      if (el.exitPointerLock) {
-        el.exitPointerLock();
-      }
-
-      vendor.removeEventListener(el, 'click', this._requestPointerLock);
-
-      vendor.removeEventListener(doc, 'pointerlockchange', this._lockChange);
-      vendor.removeEventListener(doc, 'mozpointerlockchange', this._lockChange);
-      vendor.removeEventListener(doc, 'webkitpointerlockchange', this._lockChange);
-
-      vendor.removeEventListener(doc, 'keydown', this._keyDown);
-      vendor.removeEventListener(doc, 'keyup', this._keyUp);
-
-      if (this.timeline) {
-        this.timeline.off('frame', this._detectMovementChange);
-      }
-    },
-
-    _requestPointerLock: function () {
-      const el = this;
-      el.requestPointerLock =
-        el.requestPointerLock || el.mozRequestPointerLock || el.webkitRequestPointerLock;
-
-      el.requestPointerLock();
-    },
-
-    /**
-     * Control update. Should be invoked every frame
-     * @param {number} frameTime Frame time
-     */
-    update: function (frameTime) {
-      const target = this.target;
-
-      const position = this.target.position;
-      let xAxis = target.localTransform.x.normalize();
-      const zAxis = target.localTransform.z.normalize();
-
-      if (this.verticalMoveLock) {
-        zAxis.y = 0;
-        zAxis.normalize();
-      }
-
-      const speed = (this.speed * frameTime) / 20;
-
-      if (this._moveForward) {
-        // Opposite direction of z
-        position.scaleAndAdd(zAxis, -speed);
-      }
-      if (this._moveBackward) {
-        position.scaleAndAdd(zAxis, speed);
-      }
-      if (this._moveLeft) {
-        position.scaleAndAdd(xAxis, -speed / 2);
-      }
-      if (this._moveRight) {
-        position.scaleAndAdd(xAxis, speed / 2);
-      }
-
-      target.rotateAround(
-        target.position,
-        this.up,
-        (-this._offsetPitch * frameTime * Math.PI) / 360
-      );
-      xAxis = target.localTransform.x;
-      target.rotateAround(target.position, xAxis, (-this._offsetRoll * frameTime * Math.PI) / 360);
-
-      this._offsetRoll = this._offsetPitch = 0;
-    },
-
-    _lockChange: function () {
-      if (
-        doc.pointerLockElement === this.domElement ||
-        doc.mozPointerLockElement === this.domElement ||
-        doc.webkitPointerLockElement === this.domElement
-      ) {
-        vendor.addEventListener(doc, 'mousemove', this._mouseMove, false);
-      } else {
-        vendor.removeEventListener(doc, 'mousemove', this._mouseMove);
-      }
-    },
-
-    _mouseMove: function (e) {
-      const dx = e.movementX || e.mozMovementX || e.webkitMovementX || 0;
-      const dy = e.movementY || e.mozMovementY || e.webkitMovementY || 0;
-
-      this._offsetPitch += (dx * this.sensitivity) / 200;
-      this._offsetRoll += (dy * this.sensitivity) / 200;
-
-      // Trigger change event to remind renderer do render
-      this.trigger('change');
-    },
-
-    _detectMovementChange: function (frameTime) {
-      if (this._moveForward || this._moveBackward || this._moveLeft || this._moveRight) {
-        this.trigger('change');
-      }
-      this.update(frameTime);
-    },
-
-    _keyDown: function (e) {
-      switch (e.keyCode) {
-        case 87: //w
-        case 38: //up arrow
-          this._moveForward = true;
-          break;
-        case 83: //s
-        case 40: //down arrow
-          this._moveBackward = true;
-          break;
-        case 65: //a
-        case 37: //left arrow
-          this._moveLeft = true;
-          break;
-        case 68: //d
-        case 39: //right arrow
-          this._moveRight = true;
-          break;
-      }
-      // Trigger change event to remind renderer do render
-      this.trigger('change');
-    },
-
-    _keyUp: function (e) {
-      switch (e.keyCode) {
-        case 87: //w
-        case 38: //up arrow
-          this._moveForward = false;
-          break;
-        case 83: //s
-        case 40: //down arrow
-          this._moveBackward = false;
-          break;
-        case 65: //a
-        case 37: //left arrow
-          this._moveLeft = false;
-          break;
-        case 68: //d
-        case 39: //right arrow
-          this._moveRight = false;
-          break;
-      }
+    if (this.timeline) {
+      this.timeline.on('frame', this._detectMovementChange, this);
     }
   }
-);
+
+  /**
+   * Dispose control
+   */
+  dispose() {
+    const el = this.domElement;
+
+    doc.exitPointerLock = doc.exitPointerLock || (doc as any).mozExitPointerLock;
+
+    if (doc.exitPointerLock) {
+      doc.exitPointerLock();
+    }
+
+    removeEvent(el, 'click', this._requestPointerLock);
+
+    removeEvent(doc, 'pointerlockchange', this._lockChange);
+    removeEvent(doc, 'mozpointerlockchange', this._lockChange);
+    removeEvent(doc, 'webkitpointerlockchange', this._lockChange);
+
+    removeEvent(doc, 'keydown', this._keyDown);
+    removeEvent(doc, 'keyup', this._keyUp);
+
+    if (this.timeline) {
+      this.timeline.off('frame', this._detectMovementChange);
+    }
+  }
+
+  _requestPointerLock() {
+    const el = this.domElement;
+    el.requestPointerLock = el.requestPointerLock || (el as any).mozRequestPointerLock;
+
+    el.requestPointerLock();
+  }
+
+  /**
+   * Control update. Should be invoked every frame
+   * @param {number} frameTime Frame time
+   */
+  update(frameTime: number) {
+    const target = this.target;
+    if (!target) {
+      return;
+    }
+
+    const position = target.position;
+    let xAxis = target.localTransform.x.normalize();
+    const zAxis = target.localTransform.z.normalize();
+
+    if (this.verticalMoveLock) {
+      zAxis.y = 0;
+      zAxis.normalize();
+    }
+
+    const speed = (this.speed * frameTime) / 20;
+
+    if (this._moveForward) {
+      // Opposite direction of z
+      position.scaleAndAdd(zAxis, -speed);
+    }
+    if (this._moveBackward) {
+      position.scaleAndAdd(zAxis, speed);
+    }
+    if (this._moveLeft) {
+      position.scaleAndAdd(xAxis, -speed / 2);
+    }
+    if (this._moveRight) {
+      position.scaleAndAdd(xAxis, speed / 2);
+    }
+
+    target.rotateAround(target.position, this.up, (-this._offsetPitch * frameTime * Math.PI) / 360);
+    xAxis = target.localTransform.x;
+    target.rotateAround(target.position, xAxis, (-this._offsetRoll * frameTime * Math.PI) / 360);
+
+    this._offsetRoll = this._offsetPitch = 0;
+  }
+
+  _lockChange() {
+    if (
+      doc.pointerLockElement === this.domElement ||
+      (doc as any).mozPointerLockElement === this.domElement
+    ) {
+      addEvent(doc, 'mousemove', this._mouseMove, false);
+    } else {
+      removeEvent(doc, 'mousemove', this._mouseMove);
+    }
+  }
+
+  _mouseMove(e: MouseEvent) {
+    const dx = e.movementX || (e as any).mozMovementX || 0;
+    const dy = e.movementY || (e as any).mozMovementY || 0;
+
+    this._offsetPitch += (dx * this.sensitivity) / 200;
+    this._offsetRoll += (dy * this.sensitivity) / 200;
+
+    // Trigger change event to remind renderer do render
+    this.trigger('change');
+  }
+
+  _detectMovementChange(frameTime: number) {
+    if (this._moveForward || this._moveBackward || this._moveLeft || this._moveRight) {
+      this.trigger('change');
+    }
+    this.update(frameTime);
+  }
+
+  _keyDown(e: KeyboardEvent) {
+    switch (e.keyCode) {
+      case 87: //w
+      case 38: //up arrow
+        this._moveForward = true;
+        break;
+      case 83: //s
+      case 40: //down arrow
+        this._moveBackward = true;
+        break;
+      case 65: //a
+      case 37: //left arrow
+        this._moveLeft = true;
+        break;
+      case 68: //d
+      case 39: //right arrow
+        this._moveRight = true;
+        break;
+    }
+    // Trigger change event to remind renderer do render
+    this.trigger('change');
+  }
+
+  _keyUp(e: KeyboardEvent) {
+    switch (e.keyCode) {
+      case 87: //w
+      case 38: //up arrow
+        this._moveForward = false;
+        break;
+      case 83: //s
+      case 40: //down arrow
+        this._moveBackward = false;
+        break;
+      case 65: //a
+      case 37: //left arrow
+        this._moveLeft = false;
+        break;
+      case 68: //d
+      case 39: //right arrow
+        this._moveRight = false;
+        break;
+    }
+  }
+}
 
 export default FreeControl;

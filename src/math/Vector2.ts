@@ -332,7 +332,7 @@ class Vector2 {
   }
 
   toArray() {
-    return Array.prototype.slice.call(this.array);
+    return this.array.slice() as vec2.Vec2Array;
   }
 
   // Supply methods that are not in place
