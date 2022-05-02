@@ -121,9 +121,7 @@
       var renderer = new clay.Renderer({
         canvas: document.getElementById('main')
       });
-      var shadowMapPass = new clay.prePass.ShadowMap({
-        // softShadow: clay.prePass.VSM
-      });
+      var shadowMapPass = new clay.prePass.ShadowMap();
 
       renderer.resize(window.innerWidth, window.innerHeight);
       var scene = new clay.Scene();

@@ -3,7 +3,7 @@ function get(options: {
   responseType?: XMLHttpRequest['responseType'];
   onprogress?: (percent: number, loaded: number, total: number) => void;
   onload?: (data: any) => void;
-  onerror?: () => void;
+  onerror?: (e: any) => void;
 }) {
   const xhr = new XMLHttpRequest();
 
@@ -28,7 +28,7 @@ function get(options: {
   }
   xhr.onload = function () {
     if (xhr.status >= 400) {
-      options.onerror && options.onerror();
+      options.onerror && options.onerror('Failed to load');
     } else {
       options.onload && options.onload(xhr.response);
     }

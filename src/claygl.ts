@@ -53,3 +53,5 @@ export {
   StandardShader,
   StandardMRShader
 } from './shader/index';
+
+export { load as loadGLTF } from './loader/GLTF';

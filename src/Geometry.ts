@@ -83,7 +83,7 @@ class Geometry extends GeometryBase {
    */
   boundingBox?: BoundingBox;
 
-  attributes: {
+  attributes!: {
     position: GeometryAttribute<3>;
     texcoord0: GeometryAttribute<2>;
     texcoord1: GeometryAttribute<2>;

@@ -278,6 +278,7 @@ export class IndicesBuffer {
 }
 
 export interface GeometryBaseOpts {
+  name: string;
   /**
    * Indices of geometry.
    */
@@ -339,6 +340,7 @@ class GeometryBase {
 
   constructor(opts?: Partial<GeometryBaseOpts>) {
     opts = opts || {};
+    this.name = opts.name || '';
     this.indices = opts.indices;
     this.dynamic = opts.dynamic || false;
 

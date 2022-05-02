@@ -201,6 +201,14 @@ class TrackAnimator {
     animator._life = this._life;
     return animator;
   }
+
+  getLife() {
+    return this._life;
+  }
+
+  setLife(life: number) {
+    this._life = life;
+  }
 }
 
 export default TrackAnimator;

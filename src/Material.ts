@@ -51,7 +51,8 @@ interface TextureStatus {
   enabled?: boolean;
 }
 
-interface MaterialOpts {
+export interface MaterialOpts {
+  name: string;
   depthTest: boolean;
   depthMask: boolean;
   transparent: boolean;
@@ -78,6 +79,8 @@ const material = new clay.Material({
  */
 class Material {
   readonly __uid__: number = util.genGUID();
+
+  name: string;
 
   /**
    * @type {clay.Shader}
@@ -122,6 +125,7 @@ class Material {
 
   constructor(opts?: Partial<MaterialOpts>) {
     opts = opts || {};
+    this.name = opts.name || '';
     this.shader = opts.shader;
     this.depthTest = util.optional(opts.depthTest, true);
     this.depthMask = util.optional(opts.depthMask, true);
