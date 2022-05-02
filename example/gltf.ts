@@ -1,7 +1,7 @@
 import {
   AmbientLight,
   EnvironmentMapPass,
-  loadGLTFAsync,
+  loadGLTF,
   Mesh,
   OrbitControl,
   PerspectiveCamera,
@@ -12,7 +12,7 @@ import {
   Timeline
 } from 'claygl';
 
-loadGLTFAsync('assets/models/basic_scene/scene.gltf').then((res) => {
+loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
   const renderer = new Renderer({
     canvas: document.getElementById('main') as HTMLCanvasElement
   });

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Texture2D from '../Texture2D';
 import TextureCube from '../TextureCube';
 import vendor from '../core/vendor';
@@ -10,70 +9,66 @@ import dds from './dds';
 import hdr from './hdr';
 
 /**
- * @alias clay.util.texture
+ * @param  {string|object} path
+ * @param  {object} [option]
+ * @param  {Function} [onsuccess]
+ * @param  {Function} [onerror]
+ * @return {clay.Texture}
  */
-const textureUtil = {
-  /**
-   * @param  {string|object} path
-   * @param  {object} [option]
-   * @param  {Function} [onsuccess]
-   * @param  {Function} [onerror]
-   * @return {clay.Texture}
-   */
-  loadTexture: function (path, option, onsuccess, onerror) {
-    let texture;
-    if (typeof option === 'function') {
-      onsuccess = option;
-      onerror = onsuccess;
-      option = {};
+export function loadTexture(path, option, onsuccess, onerror) {
+  let texture;
+  if (typeof option === 'function') {
+    onsuccess = option;
+    onerror = onsuccess;
+    option = {};
+  } else {
+    option = option || {};
+  }
+  if (typeof path === 'string') {
+    if (path.match(/.hdr$/) || option.fileType === 'hdr') {
+      texture = new Texture2D({
+        width: 0,
+        height: 0,
+        sRGB: false
+      });
+      textureUtil._fetchTexture(
+        path,
+        function (data) {
+          hdr.parseRGBE(data, texture, option.exposure);
+          texture.dirty();
+          onsuccess && onsuccess(texture);
+        },
+        onerror
+      );
+      return texture;
+    } else if (path.match(/.dds$/) || option.fileType === 'dds') {
+      texture = new Texture2D({
+        width: 0,
+        height: 0
+      });
+      textureUtil._fetchTexture(
+        path,
+        function (data) {
+          dds.parse(data, texture);
+          texture.dirty();
+          onsuccess && onsuccess(texture);
+        },
+        onerror
+      );
     } else {
-      option = option || {};
-    }
-    if (typeof path === 'string') {
-      if (path.match(/.hdr$/) || option.fileType === 'hdr') {
-        texture = new Texture2D({
-          width: 0,
-          height: 0,
-          sRGB: false
-        });
-        textureUtil._fetchTexture(
-          path,
-          function (data) {
-            hdr.parseRGBE(data, texture, option.exposure);
-            texture.dirty();
-            onsuccess && onsuccess(texture);
-          },
-          onerror
-        );
-        return texture;
-      } else if (path.match(/.dds$/) || option.fileType === 'dds') {
-        texture = new Texture2D({
-          width: 0,
-          height: 0
-        });
-        textureUtil._fetchTexture(
-          path,
-          function (data) {
-            dds.parse(data, texture);
-            texture.dirty();
-            onsuccess && onsuccess(texture);
-          },
-          onerror
-        );
-      } else {
-        texture = new Texture2D();
-        texture.load(path);
-        texture.success(onsuccess);
-        texture.error(onerror);
-      }
-    } else if (typeof path === 'object' && typeof path.px !== 'undefined') {
-      texture = new TextureCube();
+      texture = new Texture2D();
       texture.load(path);
       texture.success(onsuccess);
       texture.error(onerror);
     }
-    return texture;
-  },
+  } else if (typeof path === 'object' && typeof path.px !== 'undefined') {
+    texture = new TextureCube();
+    texture.load(path);
+    texture.success(onsuccess);
+    texture.error(onerror);
+  }
+  return texture;
+}
 
   /**
    * Load a panorama texture and render it to a cube map

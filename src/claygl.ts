@@ -55,12 +55,7 @@ export {
   StandardMRShader
 } from './shader/index';
 
-export {
-  load as loadGLTF,
-  loadAsync as loadGLTFAsync,
-  parse as parseGLTF,
-  parseBinary as parseGLB
-} from './loader/GLTF';
+export { load as loadGLTF, parse as parseGLTF, parseBinary as parseGLB } from './loader/GLTF';
 
 export { default as ShadowMapPass } from './prePass/ShadowMap';
 export { default as EnvironmentMapPass } from './prePass/EnvironmentMap';

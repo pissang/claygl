@@ -244,13 +244,12 @@ interface GLTFLoadOpts {
   onprogress?: (percent: number, loaded: number, total: number) => void;
 }
 
-// Load with promise
-export function loadAsync(
+export function load(
   url: string,
   opts?: Omit<GLTFLoadOpts, 'onload' | 'onerror'>
 ): Promise<GLTFLoadResult> {
   return new Promise((resolve, reject) => {
-    load(
+    doLoadGLTF(
       url,
       Object.assign({}, opts, {
         onload(res: GLTFLoadResult) {
@@ -264,7 +263,7 @@ export function loadAsync(
   });
 }
 
-export function load(url: string, opts?: GLTFLoadOpts) {
+function doLoadGLTF(url: string, opts?: GLTFLoadOpts) {
   opts = Object.assign(
     {
       useStandardMaterial: false,
