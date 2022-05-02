@@ -2,6 +2,7 @@ import { genGUID } from '../core/util';
 import type Renderer from '../Renderer';
 import Shader, { ParsedUniformSemantic } from '../Shader';
 import type Texture from '../Texture';
+import * as glenum from '../core/glenum';
 
 const SHADER_STATE_TO_ENABLE = 1;
 const SHADER_STATE_KEEP_ENABLE = 2;
@@ -31,7 +32,7 @@ function checkShaderErrorMsg(
   shader: WebGLShader,
   shaderString: string
 ) {
-  if (!_gl.getShaderParameter(shader, _gl.COMPILE_STATUS)) {
+  if (!_gl.getShaderParameter(shader, glenum.COMPILE_STATUS)) {
     return [_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join('\n');
   }
 }
@@ -76,7 +77,7 @@ class GLProgram {
 
   useTextureSlot(renderer: Renderer, texture: Texture | undefined, slot: number) {
     if (texture) {
-      renderer.gl.activeTexture(renderer.gl.TEXTURE0 + slot);
+      renderer.gl.activeTexture(glenum.TEXTURE0 + slot);
       // Maybe texture is not loaded yet;
       if (texture.isRenderable()) {
         texture.bind(renderer);
@@ -217,7 +218,7 @@ class GLProgram {
     renderer: Renderer,
     attribList: string[],
     vao: {
-      __enabledAttributeList: ShaderState[];
+      __enabledAttrList: ShaderState[];
     }
   ) {
     const _gl = renderer.gl;
@@ -230,7 +231,7 @@ class GLProgram {
 
     let enabledAttributeListInContext;
     if (vao) {
-      enabledAttributeListInContext = vao.__enabledAttributeList;
+      enabledAttributeListInContext = vao.__enabledAttrList;
     } else {
       enabledAttributeListInContext = enabledAttributeList[renderer.__uid__];
     }
@@ -238,7 +239,7 @@ class GLProgram {
       // In vertex array object context
       // PENDING Each vao object needs to enable attributes again?
       if (vao) {
-        enabledAttributeListInContext = vao.__enabledAttributeList = [];
+        enabledAttributeListInContext = vao.__enabledAttrList = [];
       } else {
         enabledAttributeListInContext = enabledAttributeList[renderer.__uid__] = [];
       }
@@ -291,10 +292,11 @@ class GLProgram {
 
   getAttribLocation(_gl: WebGLRenderingContext, symbol: string) {
     const locationMap = this._attrLocations;
+    const program = this._program;
 
     let location = locationMap[symbol];
-    if (location == null && this._program) {
-      location = _gl.getAttribLocation(this._program, symbol);
+    if (location == null && program) {
+      location = _gl.getAttribLocation(program, symbol);
       locationMap[symbol] = location;
     }
 
@@ -313,13 +315,14 @@ class GLProgram {
     vertexShaderCode: string,
     fragmentShaderCode: string
   ) {
-    const vertexShader = _gl.createShader(_gl.VERTEX_SHADER)!;
+    const vertexShader = _gl.createShader(glenum.VERTEX_SHADER)!;
     const program = _gl.createProgram()!;
+    const attributeSemantics = shader.attributeSemantics;
 
     _gl.shaderSource(vertexShader, vertexShaderCode);
     _gl.compileShader(vertexShader);
 
-    const fragmentShader = _gl.createShader(_gl.FRAGMENT_SHADER)!;
+    const fragmentShader = _gl.createShader(glenum.FRAGMENT_SHADER)!;
     _gl.shaderSource(fragmentShader, fragmentShaderCode);
     _gl.compileShader(fragmentShader);
 
@@ -335,7 +338,7 @@ class GLProgram {
     _gl.attachShader(program, vertexShader);
     _gl.attachShader(program, fragmentShader);
     // Force the position bind to location 0;
-    if (shader.attributeSemantics.POSITION) {
+    if (attributeSemantics.POSITION) {
       _gl.bindAttribLocation(program, 0, shader.attributeSemantics.POSITION.symbol);
     } else {
       // Else choose an attribute and bind to location 0;
@@ -354,7 +357,7 @@ class GLProgram {
     this.vertexCode = vertexShaderCode;
     this.fragmentCode = fragmentShaderCode;
 
-    if (!_gl.getProgramParameter(program, _gl.LINK_STATUS)) {
+    if (!_gl.getProgramParameter(program, glenum.LINK_STATUS)) {
       return 'Could not link program\n' + _gl.getProgramInfoLog(program);
     }
 

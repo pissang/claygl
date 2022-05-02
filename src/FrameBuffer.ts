@@ -94,8 +94,9 @@ class FrameBuffer {
     let hasTextureAttached = false;
     let width: number | undefined;
     let height: number | undefined;
-    for (const attachment in this._textures) {
-      const obj = this._textures[attachment];
+    const textures = this._textures;
+    for (const attachment in textures) {
+      const obj = textures[attachment];
       if (obj) {
         hasTextureAttached = true;
         // TODO Do width, height checking, make sure size are same

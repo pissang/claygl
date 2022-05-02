@@ -107,7 +107,10 @@ class CompositorFullscreenQuadPass extends Notifier {
       if (ext && this.outputs) {
         const bufs = [];
         for (const attachment in this.outputs) {
-          if (+attachment >= _gl.COLOR_ATTACHMENT0 && +attachment <= _gl.COLOR_ATTACHMENT0 + 8) {
+          if (
+            +attachment >= glenum.COLOR_ATTACHMENT0 &&
+            +attachment <= glenum.COLOR_ATTACHMENT0 + 8
+          ) {
             bufs.push(attachment);
           }
         }
@@ -119,10 +122,10 @@ class CompositorFullscreenQuadPass extends Notifier {
 
     // FIXME Don't clear in each pass in default, let the color overwrite the buffer
     // FIXME pixels may be discard
-    let clearBit = this.clearDepth ? _gl.DEPTH_BUFFER_BIT : 0;
+    let clearBit = this.clearDepth ? glenum.DEPTH_BUFFER_BIT : 0;
     _gl.depthMask(true);
     if (this.clearColor) {
-      clearBit = clearBit | _gl.COLOR_BUFFER_BIT;
+      clearBit = clearBit | glenum.COLOR_BUFFER_BIT;
       _gl.colorMask(true, true, true, true);
       const cc = this.clearColor;
       if (Array.isArray(cc)) {
@@ -135,10 +138,10 @@ class CompositorFullscreenQuadPass extends Notifier {
       // Blend with previous rendered scene in the final output
       // FIXME Configure blend.
       // FIXME It will cause screen blink？
-      _gl.enable(_gl.BLEND);
+      _gl.enable(glenum.BLEND);
       this.material.transparent = true;
     } else {
-      _gl.disable(_gl.BLEND);
+      _gl.disable(glenum.BLEND);
       this.material.transparent = false;
     }
 

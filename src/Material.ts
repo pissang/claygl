@@ -152,7 +152,8 @@ class Material {
    */
   setUniform(symbol: string, value: number | string | ArrayLike<number>) {
     if (value === undefined) {
-      console.warn('Uniform value "' + symbol + '" is undefined');
+      return;
+      // console.warn('Uniform value "' + symbol + '" is undefined');
     }
     const uniform = this.uniforms[symbol];
     if (uniform) {

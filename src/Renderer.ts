@@ -104,13 +104,20 @@ function createPlaceHolderTexture() {
       if (firstBind) {
         webglTexture = gl.createTexture()!;
       }
-      gl.bindTexture(gl.TEXTURE_2D, webglTexture);
+      gl.bindTexture(glenum.TEXTURE_2D, webglTexture);
       if (firstBind) {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, blankCanvas);
+        gl.texImage2D(
+          glenum.TEXTURE_2D,
+          0,
+          glenum.RGBA,
+          glenum.RGBA,
+          glenum.UNSIGNED_BYTE,
+          blankCanvas
+        );
       }
     },
     unbind(renderer: Renderer) {
-      renderer.gl.bindTexture(renderer.gl.TEXTURE_2D, null);
+      renderer.gl.bindTexture(glenum.TEXTURE_2D, null);
     },
     isRenderable() {
       return true;
@@ -583,7 +590,7 @@ class Renderer extends Notifier {
         needsScissor = true;
         // http://stackoverflow.com/questions/11544608/how-to-clear-a-rectangle-area-in-webgl
         // Only clear the viewport
-        _gl.enable(_gl.SCISSOR_TEST);
+        _gl.enable(glenum.SCISSOR_TEST);
         _gl.scissor(
           viewport.x * viewportDpr,
           viewport.y * viewportDpr,
@@ -594,7 +601,7 @@ class Renderer extends Notifier {
       _gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
       _gl.clear(this.clearBit);
       if (needsScissor) {
-        _gl.disable(_gl.SCISSOR_TEST);
+        _gl.disable(glenum.SCISSOR_TEST);
       }
     }
 
@@ -624,9 +631,9 @@ class Renderer extends Notifier {
     // Render pre z
     if (preZ) {
       this.renderPreZ(opaqueList, scene, camera);
-      _gl.depthFunc(_gl.LEQUAL);
+      _gl.depthFunc(glenum.LEQUAL);
     } else {
-      _gl.depthFunc(_gl.LESS);
+      _gl.depthFunc(glenum.LESS);
     }
 
     // Update the depth of transparent list.
@@ -899,7 +906,7 @@ class Renderer extends Notifier {
         passConfig.isMaterialChanged(renderable, prevRenderable!, material, prevMaterial!)
       ) {
         if (material.depthTest !== depthTest) {
-          material.depthTest ? _gl.enable(_gl.DEPTH_TEST) : _gl.disable(_gl.DEPTH_TEST);
+          material.depthTest ? _gl.enable(glenum.DEPTH_TEST) : _gl.disable(glenum.DEPTH_TEST);
           depthTest = material.depthTest;
         }
         if (material.depthMask !== depthMask) {
@@ -907,7 +914,7 @@ class Renderer extends Notifier {
           depthMask = material.depthMask;
         }
         if (material.transparent !== transparent) {
-          material.transparent ? _gl.enable(_gl.BLEND) : _gl.disable(_gl.BLEND);
+          material.transparent ? _gl.enable(glenum.BLEND) : _gl.disable(glenum.BLEND);
           transparent = material.transparent;
         }
         // TODO cache blending
@@ -916,12 +923,12 @@ class Renderer extends Notifier {
             material.blend(_gl);
           } else {
             // Default blend function
-            _gl.blendEquationSeparate(_gl.FUNC_ADD, _gl.FUNC_ADD);
+            _gl.blendEquationSeparate(glenum.FUNC_ADD, glenum.FUNC_ADD);
             _gl.blendFuncSeparate(
-              _gl.SRC_ALPHA,
-              _gl.ONE_MINUS_SRC_ALPHA,
-              _gl.ONE,
-              _gl.ONE_MINUS_SRC_ALPHA
+              glenum.SRC_ALPHA,
+              glenum.ONE_MINUS_SRC_ALPHA,
+              glenum.ONE,
+              glenum.ONE_MINUS_SRC_ALPHA
             );
           }
         }
@@ -963,7 +970,7 @@ class Renderer extends Notifier {
       }
       if (renderable.culling !== culling) {
         culling = renderable.culling;
-        culling ? _gl.enable(_gl.CULL_FACE) : _gl.disable(_gl.CULL_FACE);
+        culling ? _gl.enable(glenum.CULL_FACE) : _gl.disable(glenum.CULL_FACE);
       }
       // TODO Not update skeleton in each renderable.
       this._updateSkeleton(renderable as Mesh, program, materialTakesTextureSlot!);
@@ -1044,7 +1051,7 @@ class Renderer extends Notifier {
     if (vao.indicesBuffer) {
       const uintExt = this.getGLExtension('OES_element_index_uint');
       const useUintExt = uintExt && geometry.indices instanceof Uint32Array;
-      const indicesType = useUintExt ? _gl.UNSIGNED_INT : _gl.UNSIGNED_SHORT;
+      const indicesType = useUintExt ? glenum.UNSIGNED_INT : glenum.UNSIGNED_SHORT;
 
       if (isInstanced) {
         ext.drawElementsInstancedANGLE(
@@ -1097,7 +1104,7 @@ class Renderer extends Notifier {
         continue;
       }
 
-      const glType = attributeBufferTypeMap[bufferObj.type] || _gl.FLOAT;
+      const glType = attributeBufferTypeMap[bufferObj.type] || glenum.FLOAT;
       const isEnabled = program.isAttribEnabled(this, location);
       if (!program.isAttribEnabled(this, location)) {
         _gl.enableVertexAttribArray(location);
@@ -1106,7 +1113,7 @@ class Renderer extends Notifier {
         location: location,
         enabled: isEnabled
       });
-      _gl.bindBuffer(_gl.ARRAY_BUFFER, bufferObj.buffer);
+      _gl.bindBuffer(glenum.ARRAY_BUFFER, bufferObj.buffer);
       _gl.vertexAttribPointer(location, bufferObj.size, glType, false, 0, 0);
       ext.vertexAttribDivisorANGLE(location, bufferObj.divisor);
     }
@@ -1330,14 +1337,14 @@ class Renderer extends Notifier {
         const attributeBufferInfo = availableAttributes[a];
         const buffer = attributeBufferInfo.buffer;
         const size = attributeBufferInfo.size;
-        const glType = attributeBufferTypeMap[attributeBufferInfo.type] || _gl.FLOAT;
+        const glType = attributeBufferTypeMap[attributeBufferInfo.type] || glenum.FLOAT;
 
-        _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
+        _gl.bindBuffer(glenum.ARRAY_BUFFER, buffer);
         _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
       }
 
       if (geometry.isUseIndices()) {
-        _gl.bindBuffer(_gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
+        _gl.bindBuffer(glenum.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
       }
     }
 

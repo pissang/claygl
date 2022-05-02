@@ -113,8 +113,8 @@ class Texture2D extends Texture {
   }
 
   update(renderer: Renderer) {
-    const _gl = renderer.gl;
-    _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
+    const gl = renderer.gl;
+    gl.bindTexture(glenum.TEXTURE_2D, this._cache.get('webgl_texture'));
 
     this.updateCommon(renderer);
 
@@ -131,32 +131,32 @@ class Texture2D extends Texture {
       this.NPOT
     );
 
-    _gl.texParameteri(
-      _gl.TEXTURE_2D,
-      _gl.TEXTURE_WRAP_S,
+    gl.texParameteri(
+      glenum.TEXTURE_2D,
+      glenum.TEXTURE_WRAP_S,
       convertToPOT ? this.wrapS : this.getAvailableWrapS()
     );
-    _gl.texParameteri(
-      _gl.TEXTURE_2D,
-      _gl.TEXTURE_WRAP_T,
+    gl.texParameteri(
+      glenum.TEXTURE_2D,
+      glenum.TEXTURE_WRAP_T,
       convertToPOT ? this.wrapT : this.getAvailableWrapT()
     );
 
-    _gl.texParameteri(
-      _gl.TEXTURE_2D,
-      _gl.TEXTURE_MAG_FILTER,
+    gl.texParameteri(
+      glenum.TEXTURE_2D,
+      glenum.TEXTURE_MAG_FILTER,
       convertToPOT ? this.magFilter : this.getAvailableMagFilter()
     );
-    _gl.texParameteri(
-      _gl.TEXTURE_2D,
-      _gl.TEXTURE_MIN_FILTER,
+    gl.texParameteri(
+      glenum.TEXTURE_2D,
+      glenum.TEXTURE_MIN_FILTER,
       convertToPOT ? this.minFilter : this.getAvailableMinFilter()
     );
 
     const anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
     if (anisotropicExt && this.anisotropic > 1) {
-      _gl.texParameterf(
-        _gl.TEXTURE_2D,
+      gl.texParameterf(
+        glenum.TEXTURE_2D,
         anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT,
         this.anisotropic
       );
@@ -175,32 +175,23 @@ class Texture2D extends Texture {
       let height = this.height;
       for (let i = 0; i < mipmaps.length; i++) {
         const mipmap = mipmaps[i];
-        this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType, false);
+        this._updateTextureData(gl, mipmap, i, width, height, glFormat, glType, false);
         width = Math.max(width / 2, 1);
         height = Math.max(height / 2, 1);
       }
     } else {
-      this._updateTextureData(
-        _gl,
-        this,
-        0,
-        this.width,
-        this.height,
-        glFormat,
-        glType,
-        convertToPOT
-      );
+      this._updateTextureData(gl, this, 0, this.width, this.height, glFormat, glType, convertToPOT);
 
       if (this.useMipmap && (!this.NPOT || convertToPOT)) {
-        _gl.generateMipmap(_gl.TEXTURE_2D);
+        gl.generateMipmap(glenum.TEXTURE_2D);
       }
     }
 
-    _gl.bindTexture(_gl.TEXTURE_2D, null);
+    gl.bindTexture(glenum.TEXTURE_2D, null);
   }
 
   _updateTextureData(
-    _gl: WebGLRenderingContext,
+    gl: WebGLRenderingContext,
     data: Texture2DData,
     level: number,
     width: number,
@@ -215,7 +206,7 @@ class Texture2D extends Texture {
         this._potCanvas = convertTextureToPowerOfTwo(this, this._potCanvas);
         imgData = this._potCanvas;
       }
-      _gl.texImage2D(_gl.TEXTURE_2D, level, glFormat, glFormat, glType, imgData);
+      gl.texImage2D(glenum.TEXTURE_2D, level, glFormat, glFormat, glType, imgData);
     } else if (data.pixels) {
       // Can be used as a blank texture when writing render to texture(RTT)
       if (
@@ -232,11 +223,11 @@ class Texture2D extends Texture {
           glFormat === Texture.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL &&
           glFormat === Texture.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL)
       ) {
-        _gl.compressedTexImage2D(_gl.TEXTURE_2D, level, glFormat, width, height, 0, data.pixels);
+        gl.compressedTexImage2D(glenum.TEXTURE_2D, level, glFormat, width, height, 0, data.pixels);
       } else {
         // Is a render target if pixels is null
-        _gl.texImage2D(
-          _gl.TEXTURE_2D,
+        gl.texImage2D(
+          glenum.TEXTURE_2D,
           level,
           glFormat,
           width,
@@ -255,10 +246,10 @@ class Texture2D extends Texture {
    * @memberOf clay.Texture2D.prototype
    */
   generateMipmap(renderer: Renderer) {
-    const _gl = renderer.gl;
+    const gl = renderer.gl;
     if (this.useMipmap && !this.NPOT) {
-      _gl.bindTexture(_gl.TEXTURE_2D, this._cache.get('webgl_texture'));
-      _gl.generateMipmap(_gl.TEXTURE_2D);
+      gl.bindTexture(glenum.TEXTURE_2D, this._cache.get('webgl_texture'));
+      gl.generateMipmap(glenum.TEXTURE_2D);
     }
   }
 
@@ -271,11 +262,11 @@ class Texture2D extends Texture {
   }
 
   bind(renderer: Renderer) {
-    renderer.gl.bindTexture(renderer.gl.TEXTURE_2D, this.getWebGLTexture(renderer));
+    renderer.gl.bindTexture(glenum.TEXTURE_2D, this.getWebGLTexture(renderer));
   }
 
   unbind(renderer: Renderer) {
-    renderer.gl.bindTexture(renderer.gl.TEXTURE_2D, null);
+    renderer.gl.bindTexture(glenum.TEXTURE_2D, null);
   }
 
   load(src: string, crossOrigin?: string) {

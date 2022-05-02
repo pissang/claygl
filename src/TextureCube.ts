@@ -94,7 +94,7 @@ class TextureCube extends Texture {
 
   update(renderer: Renderer) {
     const _gl = renderer.gl;
-    _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
+    _gl.bindTexture(glenum.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
 
     this.updateCommon(renderer);
 
@@ -102,16 +102,24 @@ class TextureCube extends Texture {
     const mipmaps = this.mipmaps;
     let glType = this.type;
 
-    _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_S, this.getAvailableWrapS());
-    _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_WRAP_T, this.getAvailableWrapT());
+    _gl.texParameteri(glenum.TEXTURE_CUBE_MAP, glenum.TEXTURE_WRAP_S, this.getAvailableWrapS());
+    _gl.texParameteri(glenum.TEXTURE_CUBE_MAP, glenum.TEXTURE_WRAP_T, this.getAvailableWrapT());
 
-    _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MAG_FILTER, this.getAvailableMagFilter());
-    _gl.texParameteri(_gl.TEXTURE_CUBE_MAP, _gl.TEXTURE_MIN_FILTER, this.getAvailableMinFilter());
+    _gl.texParameteri(
+      glenum.TEXTURE_CUBE_MAP,
+      glenum.TEXTURE_MAG_FILTER,
+      this.getAvailableMagFilter()
+    );
+    _gl.texParameteri(
+      glenum.TEXTURE_CUBE_MAP,
+      glenum.TEXTURE_MIN_FILTER,
+      this.getAvailableMinFilter()
+    );
 
     const anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
     if (anisotropicExt && this.anisotropic > 1) {
       _gl.texParameterf(
-        _gl.TEXTURE_CUBE_MAP,
+        glenum.TEXTURE_CUBE_MAP,
         anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT,
         this.anisotropic
       );
@@ -138,11 +146,11 @@ class TextureCube extends Texture {
       this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType);
 
       if (!this.NPOT && this.useMipmap) {
-        _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
+        _gl.generateMipmap(glenum.TEXTURE_CUBE_MAP);
       }
     }
 
-    _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, null);
+    _gl.bindTexture(glenum.TEXTURE_CUBE_MAP, null);
   }
 
   _updateTextureData(
@@ -159,10 +167,17 @@ class TextureCube extends Texture {
       const img = data.image && data.image[target];
       const pixels = data.pixels && data.pixels[target];
       if (img) {
-        _gl.texImage2D(_gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, level, glFormat, glFormat, glType, img);
+        _gl.texImage2D(
+          glenum.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+          level,
+          glFormat,
+          glFormat,
+          glType,
+          img
+        );
       } else if (pixels) {
         _gl.texImage2D(
-          _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+          glenum.TEXTURE_CUBE_MAP_POSITIVE_X + i,
           level,
           glFormat,
           width,
@@ -183,8 +198,8 @@ class TextureCube extends Texture {
   generateMipmap(renderer: Renderer) {
     const _gl = renderer.gl;
     if (this.useMipmap && !this.NPOT) {
-      _gl.bindTexture(_gl.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
-      _gl.generateMipmap(_gl.TEXTURE_CUBE_MAP);
+      _gl.bindTexture(glenum.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
+      _gl.generateMipmap(glenum.TEXTURE_CUBE_MAP);
     }
   }
 

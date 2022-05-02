@@ -2,6 +2,7 @@ import Vector3 from '../math/Vector3';
 import PerspectiveCamera from '../camera/Perspective';
 import FrameBuffer from '../FrameBuffer';
 import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
+import * as glenum from '../core/glenum';
 
 import type ShadowMapPass from './ShadowMap';
 import type Renderer from '../Renderer';
@@ -133,7 +134,11 @@ class EnvironmentMapPass {
 
         this.shadowMapPass.render(renderer, scene, camera, true);
       }
-      this._frameBuffer.attach(texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i);
+      this._frameBuffer.attach(
+        texture,
+        glenum.COLOR_ATTACHMENT0,
+        glenum.TEXTURE_CUBE_MAP_POSITIVE_X + i
+      );
       this._frameBuffer.bind(renderer);
       renderer.render(scene, camera, true);
       this._frameBuffer.unbind(renderer);

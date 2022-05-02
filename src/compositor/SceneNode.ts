@@ -65,7 +65,10 @@ const SceneNode = CompositorNode.extend(
           const bufs = [];
           for (let attachment in this.outputs) {
             attachment = parseInt(attachment);
-            if (attachment >= _gl.COLOR_ATTACHMENT0 && attachment <= _gl.COLOR_ATTACHMENT0 + 8) {
+            if (
+              attachment >= glenum.COLOR_ATTACHMENT0 &&
+              attachment <= glenum.COLOR_ATTACHMENT0 + 8
+            ) {
               bufs.push(attachment);
             }
           }

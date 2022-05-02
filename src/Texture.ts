@@ -171,9 +171,9 @@ abstract class Texture extends Notifier {
   // Update the common parameters of texture
   updateCommon(renderer: Renderer) {
     const _gl = renderer.gl;
-    _gl.pixelStorei(_gl.UNPACK_FLIP_Y_WEBGL, this.flipY);
-    _gl.pixelStorei(_gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
-    _gl.pixelStorei(_gl.UNPACK_ALIGNMENT, this.unpackAlignment);
+    _gl.pixelStorei(glenum.UNPACK_FLIP_Y_WEBGL, this.flipY);
+    _gl.pixelStorei(glenum.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
+    _gl.pixelStorei(glenum.UNPACK_ALIGNMENT, this.unpackAlignment);
 
     // Use of none-power of two texture
     // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences

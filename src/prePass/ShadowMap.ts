@@ -242,9 +242,9 @@ class ShadowMapPass extends Notifier {
       return;
     }
 
-    _gl.enable(_gl.DEPTH_TEST);
+    _gl.enable(glenum.DEPTH_TEST);
     _gl.depthMask(true);
-    _gl.disable(_gl.BLEND);
+    _gl.disable(glenum.BLEND);
 
     // Clear with high-z, so the part not rendered will not been shadowed
     // TODO
@@ -422,9 +422,10 @@ class ShadowMapPass extends Notifier {
     const viewport = renderer.viewport;
 
     const _gl = renderer.gl;
-    this._frameBuffer.attach(texture);
-    this._frameBuffer.bind(renderer);
-    _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
+    const framebuffer = this._frameBuffer;
+    framebuffer.attach(texture);
+    framebuffer.bind(renderer);
+    _gl.clear(glenum.COLOR_BUFFER_BIT | glenum.DEPTH_BUFFER_BIT);
 
     for (let i = 0; i < light.shadowCascade; i++) {
       // Get the splitted frustum
@@ -483,7 +484,7 @@ class ShadowMapPass extends Notifier {
       lightCamera.projectionMatrix.copy(lightProjMatrix);
     }
 
-    this._frameBuffer.unbind(renderer);
+    framebuffer.unbind(renderer);
 
     renderer.setViewport(viewport);
   }
@@ -502,7 +503,7 @@ class ShadowMapPass extends Notifier {
     this._frameBuffer.attach(texture);
     this._frameBuffer.bind(renderer);
 
-    _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
+    _gl.clear(glenum.COLOR_BUFFER_BIT | glenum.DEPTH_BUFFER_BIT);
 
     const defaultShadowMaterial = this._getDepthMaterial(light);
     const passConfig: RenderPassConfig = {
@@ -619,9 +620,13 @@ class ShadowMapPass extends Notifier {
       const target = cubeTargets[i];
       const camera = this._getPointLightCamera(light, target);
 
-      this._frameBuffer.attach(texture, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i);
+      this._frameBuffer.attach(
+        texture,
+        glenum.COLOR_ATTACHMENT0,
+        glenum.TEXTURE_CUBE_MAP_POSITIVE_X + i
+      );
       this._frameBuffer.bind(renderer);
-      _gl.clear(_gl.COLOR_BUFFER_BIT | _gl.DEPTH_BUFFER_BIT);
+      _gl.clear(glenum.COLOR_BUFFER_BIT | glenum.DEPTH_BUFFER_BIT);
 
       renderer.renderPass(renderListEachSide[target], camera, passConfig);
     }
