@@ -1,4 +1,4 @@
-import glenum from './core/glenum';
+import * as glenum from './core/glenum';
 import ClayCache from './core/Cache';
 import Ray from './math/Ray';
 import { genGUID } from './core/util';

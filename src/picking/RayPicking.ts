@@ -5,7 +5,7 @@ import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
 import Matrix4 from '../math/Matrix4';
 import Renderable from '../Renderable';
-import glenum from '../core/glenum';
+import * as glenum from '../core/glenum';
 import vec3 from '../glmatrix/vec3';
 
 /**

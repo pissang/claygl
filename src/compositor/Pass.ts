@@ -3,7 +3,7 @@ import Plane from '../geometry/Plane';
 import Shader from '../Shader';
 import Material from '../Material';
 import Mesh from '../Mesh';
-import glenum from '../core/glenum';
+import * as glenum from '../core/glenum';
 import vertexGlsl from '../shader/source/compositor/vertex.glsl.js';
 import { GLEnum } from '../core/type';
 import { optional } from '../core/util';

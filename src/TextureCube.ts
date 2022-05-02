@@ -1,5 +1,5 @@
 import Texture, { TextureImageSource, TextureOpts, TexturePixelSource } from './Texture';
-import glenum from './core/glenum';
+import * as glenum from './core/glenum';
 import * as mathUtil from './math/util';
 import vendor from './core/vendor';
 import Renderer from './Renderer';

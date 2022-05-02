@@ -1,6 +1,6 @@
 // @ts-nocheck
 import CompositorNode from './CompositorNode';
-import glenum from '../core/glenum';
+import * as glenum from '../core/glenum';
 import FrameBuffer from '../FrameBuffer';
 
 /**

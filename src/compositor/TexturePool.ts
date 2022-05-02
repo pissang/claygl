@@ -1,5 +1,5 @@
 import Texture2D from '../Texture2D';
-import glenum from '../core/glenum';
+import * as glenum from '../core/glenum';
 import * as util from '../core/util';
 import Texture, { TextureOpts } from '../Texture';
 import Renderer from '../Renderer';

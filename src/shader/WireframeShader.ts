@@ -1,7 +1,8 @@
-import './shared';
+import { importShared } from './shared';
 import Shader from '../Shader.js';
 import wireframeEssl from './source/wireframe.glsl.js';
 
+importShared();
 Shader.import(wireframeEssl);
 
 class WireframeShader extends Shader {

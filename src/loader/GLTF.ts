@@ -19,7 +19,7 @@ import Skeleton from '../Skeleton';
 import Joint from '../Joint';
 import PerspectiveCamera from '../camera/Perspective';
 import OrthographicCamera from '../camera/Orthographic';
-import glenum from '../core/glenum';
+import * as glenum from '../core/glenum';
 
 import BoundingBox from '../math/BoundingBox';
 

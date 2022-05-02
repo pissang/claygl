@@ -1,7 +1,8 @@
-import './shared';
+import { importShared } from './shared';
 import Shader from '../Shader.js';
 import lambertEssl from './source/lambert.glsl.js';
 
+importShared();
 Shader.import(lambertEssl);
 
 class LambertShader extends Shader {

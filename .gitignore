@@ -3,6 +3,7 @@ gh-pages
 .DS_Store
 .idea
 example/unit
+example/bundle
 /coverage
 /doc
 /lib

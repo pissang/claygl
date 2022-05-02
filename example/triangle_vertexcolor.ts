@@ -6,7 +6,7 @@ import {
   Renderer,
   Scene,
   StaticGeometry
-} from './claygl';
+} from 'claygl';
 
 var TRIANGLE_POSITIONS = [
   [-0.5, -0.5, 0],

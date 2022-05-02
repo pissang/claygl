@@ -1,5 +1,5 @@
 import ClayNode, { ClayNodeOpts, GetBoundingBoxFilter } from './Node';
-import glenum from './core/glenum';
+import * as glenum from './core/glenum';
 import BoundingBox from './math/BoundingBox';
 import type Renderer from './Renderer';
 import type Material from './Material';

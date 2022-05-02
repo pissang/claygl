@@ -2,6 +2,11 @@
   "compilerOptions": {
     "target": "ES5",
     "strict": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+
+    "paths": {
+      "claygl": ["../src/claygl"]
+    }
   }
 }

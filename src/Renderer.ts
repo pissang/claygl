@@ -2,7 +2,7 @@
 // Trace and find out which shader, texture, geometry can be destroyed
 import Notifier from './core/Notifier';
 import GLInfo from './core/GLInfo';
-import glenum from './core/glenum';
+import * as glenum from './core/glenum';
 import vendor from './core/vendor';
 
 import Material from './Material';
@@ -134,11 +134,11 @@ export interface RenderableObject {
   culling?: boolean;
   ignorePreZ?: boolean;
 
-  isSkinnedMesh(): this is Mesh & { skeleton: Skeleton };
-  isInstancedMesh(): this is InstancedMesh;
+  isSkinnedMesh?(): this is Mesh & { skeleton: Skeleton };
+  isInstancedMesh?(): this is InstancedMesh;
 
-  beforeRender(renderer: Renderer): void;
-  afterRender(renderer: Renderer): void;
+  beforeRender?(renderer: Renderer): void;
+  afterRender?(renderer: Renderer): void;
 }
 
 interface ExtendedRenderableObject extends RenderableObject {
@@ -728,7 +728,7 @@ class Renderer extends Notifier {
    * @param {Function} [passConfig.sortCompare] Sort compare function.
    * @return {IRenderInfo}
    */
-  renderPass(list: RenderableObject[], camera: Camera, passConfig?: RenderPassConfig) {
+  renderPass(list: RenderableObject[], camera?: Camera, passConfig?: RenderPassConfig) {
     this.trigger('beforerenderpass', this, list, camera, passConfig);
 
     passConfig = passConfig || {};

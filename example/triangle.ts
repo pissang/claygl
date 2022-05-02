@@ -1,5 +1,4 @@
-import Geometry from '../src/Geometry';
-import { BasicShader, Material, Mesh, OrthographicCamera, Renderer, Scene } from './claygl';
+import { BasicShader, Material, Mesh, OrthographicCamera, Renderer, Scene, Geometry } from 'claygl';
 
 const TRIANGLE_POSITIONS = [
   [-0.5, -0.5, 0],

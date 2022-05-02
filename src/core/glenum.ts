@@ -2,419 +2,418 @@
  * @namespace clay.core.glenum
  * @see http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14
  */
-export default {
-  /* ClearBufferMask */
-  DEPTH_BUFFER_BIT: 0x00000100,
-  STENCIL_BUFFER_BIT: 0x00000400,
-  COLOR_BUFFER_BIT: 0x00004000,
 
-  /* BeginMode */
-  POINTS: 0x0000,
-  LINES: 0x0001,
-  LINE_LOOP: 0x0002,
-  LINE_STRIP: 0x0003,
-  TRIANGLES: 0x0004,
-  TRIANGLE_STRIP: 0x0005,
-  TRIANGLE_FAN: 0x0006,
+/* ClearBufferMask */
+export const DEPTH_BUFFER_BIT = 0x00000100;
+export const STENCIL_BUFFER_BIT = 0x00000400;
+export const COLOR_BUFFER_BIT = 0x00004000;
 
-  /* AlphaFunction (not supported in ES20) */
-  /*      NEVER */
-  /*      LESS */
-  /*      EQUAL */
-  /*      LEQUAL */
-  /*      GREATER */
-  /*      NOTEQUAL */
-  /*      GEQUAL */
-  /*      ALWAYS */
+/* BeginMode */
+export const POINTS = 0x0000;
+export const LINES = 0x0001;
+export const LINE_LOOP = 0x0002;
+export const LINE_STRIP = 0x0003;
+export const TRIANGLES = 0x0004;
+export const TRIANGLE_STRIP = 0x0005;
+export const TRIANGLE_FAN = 0x0006;
 
-  /* BlendingFactorDest */
-  ZERO: 0,
-  ONE: 1,
-  SRC_COLOR: 0x0300,
-  ONE_MINUS_SRC_COLOR: 0x0301,
-  SRC_ALPHA: 0x0302,
-  ONE_MINUS_SRC_ALPHA: 0x0303,
-  DST_ALPHA: 0x0304,
-  ONE_MINUS_DST_ALPHA: 0x0305,
+/* AlphaFunction (not supported in ES20) */
+/*      NEVER */
+/*      LESS */
+/*      EQUAL */
+/*      LEQUAL */
+/*      GREATER */
+/*      NOTEQUAL */
+/*      GEQUAL */
+/*      ALWAYS */
 
-  /* BlendingFactorSrc */
-  /*      ZERO */
-  /*      ONE */
-  DST_COLOR: 0x0306,
-  ONE_MINUS_DST_COLOR: 0x0307,
-  SRC_ALPHA_SATURATE: 0x0308,
-  /*      SRC_ALPHA */
-  /*      ONE_MINUS_SRC_ALPHA */
-  /*      DST_ALPHA */
-  /*      ONE_MINUS_DST_ALPHA */
+/* BlendingFactorDest */
+export const ZERO = 0;
+export const ONE = 1;
+export const SRC_COLOR = 0x0300;
+export const ONE_MINUS_SRC_COLOR = 0x0301;
+export const SRC_ALPHA = 0x0302;
+export const ONE_MINUS_SRC_ALPHA = 0x0303;
+export const DST_ALPHA = 0x0304;
+export const ONE_MINUS_DST_ALPHA = 0x0305;
 
-  /* BlendEquationSeparate */
-  FUNC_ADD: 0x8006,
-  BLEND_EQUATION: 0x8009,
-  BLEND_EQUATION_RGB: 0x8009 /* same as BLEND_EQUATION */,
-  BLEND_EQUATION_ALPHA: 0x883d,
+/* BlendingFactorSrc */
+/*      ZERO */
+/*      ONE */
+export const DST_COLOR = 0x0306;
+export const ONE_MINUS_DST_COLOR = 0x0307;
+export const SRC_ALPHA_SATURATE = 0x0308;
+/*      SRC_ALPHA */
+/*      ONE_MINUS_SRC_ALPHA */
+/*      DST_ALPHA */
+/*      ONE_MINUS_DST_ALPHA */
 
-  /* BlendSubtract */
-  FUNC_SUBTRACT: 0x800a,
-  FUNC_REVERSE_SUBTRACT: 0x800b,
+/* BlendEquationSeparate */
+export const FUNC_ADD = 0x8006;
+export const BLEND_EQUATION = 0x8009;
+export const BLEND_EQUATION_RGB = 0x8009; /* same as BLEND_EQUATION */
+export const BLEND_EQUATION_ALPHA = 0x883d;
 
-  /* Separate Blend Functions */
-  BLEND_DST_RGB: 0x80c8,
-  BLEND_SRC_RGB: 0x80c9,
-  BLEND_DST_ALPHA: 0x80ca,
-  BLEND_SRC_ALPHA: 0x80cb,
-  CONSTANT_COLOR: 0x8001,
-  ONE_MINUS_CONSTANT_COLOR: 0x8002,
-  CONSTANT_ALPHA: 0x8003,
-  ONE_MINUS_CONSTANT_ALPHA: 0x8004,
-  BLEND_COLOR: 0x8005,
+/* BlendSubtract */
+export const FUNC_SUBTRACT = 0x800a;
+export const FUNC_REVERSE_SUBTRACT = 0x800b;
 
-  /* Buffer Objects */
-  ARRAY_BUFFER: 0x8892,
-  ELEMENT_ARRAY_BUFFER: 0x8893,
-  ARRAY_BUFFER_BINDING: 0x8894,
-  ELEMENT_ARRAY_BUFFER_BINDING: 0x8895,
+/* Separate Blend Functions */
+export const BLEND_DST_RGB = 0x80c8;
+export const BLEND_SRC_RGB = 0x80c9;
+export const BLEND_DST_ALPHA = 0x80ca;
+export const BLEND_SRC_ALPHA = 0x80cb;
+export const CONSTANT_COLOR = 0x8001;
+export const ONE_MINUS_CONSTANT_COLOR = 0x8002;
+export const CONSTANT_ALPHA = 0x8003;
+export const ONE_MINUS_CONSTANT_ALPHA = 0x8004;
+export const BLEND_COLOR = 0x8005;
 
-  STREAM_DRAW: 0x88e0,
-  STATIC_DRAW: 0x88e4,
-  DYNAMIC_DRAW: 0x88e8,
+/* Buffer Objects */
+export const ARRAY_BUFFER = 0x8892;
+export const ELEMENT_ARRAY_BUFFER = 0x8893;
+export const ARRAY_BUFFER_BINDING = 0x8894;
+export const ELEMENT_ARRAY_BUFFER_BINDING = 0x8895;
 
-  BUFFER_SIZE: 0x8764,
-  BUFFER_USAGE: 0x8765,
+export const STREAM_DRAW = 0x88e0;
+export const STATIC_DRAW = 0x88e4;
+export const DYNAMIC_DRAW = 0x88e8;
 
-  CURRENT_VERTEX_ATTRIB: 0x8626,
+export const BUFFER_SIZE = 0x8764;
+export const BUFFER_USAGE = 0x8765;
 
-  /* CullFaceMode */
-  FRONT: 0x0404,
-  BACK: 0x0405,
-  FRONT_AND_BACK: 0x0408,
+export const CURRENT_VERTEX_ATTRIB = 0x8626;
 
-  /* DepthFunction */
-  /*      NEVER */
-  /*      LESS */
-  /*      EQUAL */
-  /*      LEQUAL */
-  /*      GREATER */
-  /*      NOTEQUAL */
-  /*      GEQUAL */
-  /*      ALWAYS */
+/* CullFaceMode */
+export const FRONT = 0x0404;
+export const BACK = 0x0405;
+export const FRONT_AND_BACK = 0x0408;
 
-  /* EnableCap */
-  /* TEXTURE_2D */
-  CULL_FACE: 0x0b44,
-  BLEND: 0x0be2,
-  DITHER: 0x0bd0,
-  STENCIL_TEST: 0x0b90,
-  DEPTH_TEST: 0x0b71,
-  SCISSOR_TEST: 0x0c11,
-  POLYGON_OFFSET_FILL: 0x8037,
-  SAMPLE_ALPHA_TO_COVERAGE: 0x809e,
-  SAMPLE_COVERAGE: 0x80a0,
+/* DepthFunction */
+/*      NEVER */
+/*      LESS */
+/*      EQUAL */
+/*      LEQUAL */
+/*      GREATER */
+/*      NOTEQUAL */
+/*      GEQUAL */
+/*      ALWAYS */
 
-  /* ErrorCode */
-  NO_ERROR: 0,
-  INVALID_ENUM: 0x0500,
-  INVALID_VALUE: 0x0501,
-  INVALID_OPERATION: 0x0502,
-  OUT_OF_MEMORY: 0x0505,
+/* EnableCap */
+/* TEXTURE_2D */
+export const CULL_FACE = 0x0b44;
+export const BLEND = 0x0be2;
+export const DITHER = 0x0bd0;
+export const STENCIL_TEST = 0x0b90;
+export const DEPTH_TEST = 0x0b71;
+export const SCISSOR_TEST = 0x0c11;
+export const POLYGON_OFFSET_FILL = 0x8037;
+export const SAMPLE_ALPHA_TO_COVERAGE = 0x809e;
+export const SAMPLE_COVERAGE = 0x80a0;
 
-  /* FrontFaceDirection */
-  CW: 0x0900,
-  CCW: 0x0901,
+/* ErrorCode */
+export const NO_ERROR = 0;
+export const INVALID_ENUM = 0x0500;
+export const INVALID_VALUE = 0x0501;
+export const INVALID_OPERATION = 0x0502;
+export const OUT_OF_MEMORY = 0x0505;
 
-  /* GetPName */
-  LINE_WIDTH: 0x0b21,
-  ALIASED_POINT_SIZE_RANGE: 0x846d,
-  ALIASED_LINE_WIDTH_RANGE: 0x846e,
-  CULL_FACE_MODE: 0x0b45,
-  FRONT_FACE: 0x0b46,
-  DEPTH_RANGE: 0x0b70,
-  DEPTH_WRITEMASK: 0x0b72,
-  DEPTH_CLEAR_VALUE: 0x0b73,
-  DEPTH_FUNC: 0x0b74,
-  STENCIL_CLEAR_VALUE: 0x0b91,
-  STENCIL_FUNC: 0x0b92,
-  STENCIL_FAIL: 0x0b94,
-  STENCIL_PASS_DEPTH_FAIL: 0x0b95,
-  STENCIL_PASS_DEPTH_PASS: 0x0b96,
-  STENCIL_REF: 0x0b97,
-  STENCIL_VALUE_MASK: 0x0b93,
-  STENCIL_WRITEMASK: 0x0b98,
-  STENCIL_BACK_FUNC: 0x8800,
-  STENCIL_BACK_FAIL: 0x8801,
-  STENCIL_BACK_PASS_DEPTH_FAIL: 0x8802,
-  STENCIL_BACK_PASS_DEPTH_PASS: 0x8803,
-  STENCIL_BACK_REF: 0x8ca3,
-  STENCIL_BACK_VALUE_MASK: 0x8ca4,
-  STENCIL_BACK_WRITEMASK: 0x8ca5,
-  VIEWPORT: 0x0ba2,
-  SCISSOR_BOX: 0x0c10,
-  /*      SCISSOR_TEST */
-  COLOR_CLEAR_VALUE: 0x0c22,
-  COLOR_WRITEMASK: 0x0c23,
-  UNPACK_ALIGNMENT: 0x0cf5,
-  PACK_ALIGNMENT: 0x0d05,
-  MAX_TEXTURE_SIZE: 0x0d33,
-  MAX_VIEWPORT_DIMS: 0x0d3a,
-  SUBPIXEL_BITS: 0x0d50,
-  RED_BITS: 0x0d52,
-  GREEN_BITS: 0x0d53,
-  BLUE_BITS: 0x0d54,
-  ALPHA_BITS: 0x0d55,
-  DEPTH_BITS: 0x0d56,
-  STENCIL_BITS: 0x0d57,
-  POLYGON_OFFSET_UNITS: 0x2a00,
-  /*      POLYGON_OFFSET_FILL */
-  POLYGON_OFFSET_FACTOR: 0x8038,
-  TEXTURE_BINDING_2D: 0x8069,
-  SAMPLE_BUFFERS: 0x80a8,
-  SAMPLES: 0x80a9,
-  SAMPLE_COVERAGE_VALUE: 0x80aa,
-  SAMPLE_COVERAGE_INVERT: 0x80ab,
+/* FrontFaceDirection */
+export const CW = 0x0900;
+export const CCW = 0x0901;
 
-  /* GetTextureParameter */
-  /*      TEXTURE_MAG_FILTER */
-  /*      TEXTURE_MIN_FILTER */
-  /*      TEXTURE_WRAP_S */
-  /*      TEXTURE_WRAP_T */
+/* GetPName */
+export const LINE_WIDTH = 0x0b21;
+export const ALIASED_POINT_SIZE_RANGE = 0x846d;
+export const ALIASED_LINE_WIDTH_RANGE = 0x846e;
+export const CULL_FACE_MODE = 0x0b45;
+export const FRONT_FACE = 0x0b46;
+export const DEPTH_RANGE = 0x0b70;
+export const DEPTH_WRITEMASK = 0x0b72;
+export const DEPTH_CLEAR_VALUE = 0x0b73;
+export const DEPTH_FUNC = 0x0b74;
+export const STENCIL_CLEAR_VALUE = 0x0b91;
+export const STENCIL_FUNC = 0x0b92;
+export const STENCIL_FAIL = 0x0b94;
+export const STENCIL_PASS_DEPTH_FAIL = 0x0b95;
+export const STENCIL_PASS_DEPTH_PASS = 0x0b96;
+export const STENCIL_REF = 0x0b97;
+export const STENCIL_VALUE_MASK = 0x0b93;
+export const STENCIL_WRITEMASK = 0x0b98;
+export const STENCIL_BACK_FUNC = 0x8800;
+export const STENCIL_BACK_FAIL = 0x8801;
+export const STENCIL_BACK_PASS_DEPTH_FAIL = 0x8802;
+export const STENCIL_BACK_PASS_DEPTH_PASS = 0x8803;
+export const STENCIL_BACK_REF = 0x8ca3;
+export const STENCIL_BACK_VALUE_MASK = 0x8ca4;
+export const STENCIL_BACK_WRITEMASK = 0x8ca5;
+export const VIEWPORT = 0x0ba2;
+export const SCISSOR_BOX = 0x0c10;
+/*      SCISSOR_TEST */
+export const COLOR_CLEAR_VALUE = 0x0c22;
+export const COLOR_WRITEMASK = 0x0c23;
+export const UNPACK_ALIGNMENT = 0x0cf5;
+export const PACK_ALIGNMENT = 0x0d05;
+export const MAX_TEXTURE_SIZE = 0x0d33;
+export const MAX_VIEWPORT_DIMS = 0x0d3a;
+export const SUBPIXEL_BITS = 0x0d50;
+export const RED_BITS = 0x0d52;
+export const GREEN_BITS = 0x0d53;
+export const BLUE_BITS = 0x0d54;
+export const ALPHA_BITS = 0x0d55;
+export const DEPTH_BITS = 0x0d56;
+export const STENCIL_BITS = 0x0d57;
+export const POLYGON_OFFSET_UNITS = 0x2a00;
+/*      POLYGON_OFFSET_FILL */
+export const POLYGON_OFFSET_FACTOR = 0x8038;
+export const TEXTURE_BINDING_2D = 0x8069;
+export const SAMPLE_BUFFERS = 0x80a8;
+export const SAMPLES = 0x80a9;
+export const SAMPLE_COVERAGE_VALUE = 0x80aa;
+export const SAMPLE_COVERAGE_INVERT = 0x80ab;
 
-  COMPRESSED_TEXTURE_FORMATS: 0x86a3,
+/* GetTextureParameter */
+/*      TEXTURE_MAG_FILTER */
+/*      TEXTURE_MIN_FILTER */
+/*      TEXTURE_WRAP_S */
+/*      TEXTURE_WRAP_T */
 
-  /* HintMode */
-  DONT_CARE: 0x1100,
-  FASTEST: 0x1101,
-  NICEST: 0x1102,
+export const COMPRESSED_TEXTURE_FORMATS = 0x86a3;
 
-  /* HintTarget */
-  GENERATE_MIPMAP_HINT: 0x8192,
+/* HintMode */
+export const DONT_CARE = 0x1100;
+export const FASTEST = 0x1101;
+export const NICEST = 0x1102;
 
-  /* DataType */
-  BYTE: 0x1400,
-  UNSIGNED_BYTE: 0x1401,
-  SHORT: 0x1402,
-  UNSIGNED_SHORT: 0x1403,
-  INT: 0x1404,
-  UNSIGNED_INT: 0x1405,
-  FLOAT: 0x1406,
+/* HintTarget */
+export const GENERATE_MIPMAP_HINT = 0x8192;
 
-  /* PixelFormat */
-  DEPTH_COMPONENT: 0x1902,
-  ALPHA: 0x1906,
-  RGB: 0x1907,
-  RGBA: 0x1908,
-  LUMINANCE: 0x1909,
-  LUMINANCE_ALPHA: 0x190a,
+/* DataType */
+export const BYTE = 0x1400;
+export const UNSIGNED_BYTE = 0x1401;
+export const SHORT = 0x1402;
+export const UNSIGNED_SHORT = 0x1403;
+export const INT = 0x1404;
+export const UNSIGNED_INT = 0x1405;
+export const FLOAT = 0x1406;
 
-  /* PixelType */
-  /*      UNSIGNED_BYTE */
-  UNSIGNED_SHORT_4_4_4_4: 0x8033,
-  UNSIGNED_SHORT_5_5_5_1: 0x8034,
-  UNSIGNED_SHORT_5_6_5: 0x8363,
+/* PixelFormat */
+export const DEPTH_COMPONENT = 0x1902;
+export const ALPHA = 0x1906;
+export const RGB = 0x1907;
+export const RGBA = 0x1908;
+export const LUMINANCE = 0x1909;
+export const LUMINANCE_ALPHA = 0x190a;
 
-  /* Shaders */
-  FRAGMENT_SHADER: 0x8b30,
-  VERTEX_SHADER: 0x8b31,
-  MAX_VERTEX_ATTRIBS: 0x8869,
-  MAX_VERTEX_UNIFORM_VECTORS: 0x8dfb,
-  MAX_VARYING_VECTORS: 0x8dfc,
-  MAX_COMBINED_TEXTURE_IMAGE_UNITS: 0x8b4d,
-  MAX_VERTEX_TEXTURE_IMAGE_UNITS: 0x8b4c,
-  MAX_TEXTURE_IMAGE_UNITS: 0x8872,
-  MAX_FRAGMENT_UNIFORM_VECTORS: 0x8dfd,
-  SHADER_TYPE: 0x8b4f,
-  DELETE_STATUS: 0x8b80,
-  LINK_STATUS: 0x8b82,
-  VALIDATE_STATUS: 0x8b83,
-  ATTACHED_SHADERS: 0x8b85,
-  ACTIVE_UNIFORMS: 0x8b86,
-  ACTIVE_ATTRIBUTES: 0x8b89,
-  SHADING_LANGUAGE_VERSION: 0x8b8c,
-  CURRENT_PROGRAM: 0x8b8d,
+/* PixelType */
+/*      UNSIGNED_BYTE */
+export const UNSIGNED_SHORT_4_4_4_4 = 0x8033;
+export const UNSIGNED_SHORT_5_5_5_1 = 0x8034;
+export const UNSIGNED_SHORT_5_6_5 = 0x8363;
 
-  /* StencilFunction */
-  NEVER: 0x0200,
-  LESS: 0x0201,
-  EQUAL: 0x0202,
-  LEQUAL: 0x0203,
-  GREATER: 0x0204,
-  NOTEQUAL: 0x0205,
-  GEQUAL: 0x0206,
-  ALWAYS: 0x0207,
+/* Shaders */
+export const FRAGMENT_SHADER = 0x8b30;
+export const VERTEX_SHADER = 0x8b31;
+export const MAX_VERTEX_ATTRIBS = 0x8869;
+export const MAX_VERTEX_UNIFORM_VECTORS = 0x8dfb;
+export const MAX_VARYING_VECTORS = 0x8dfc;
+export const MAX_COMBINED_TEXTURE_IMAGE_UNITS = 0x8b4d;
+export const MAX_VERTEX_TEXTURE_IMAGE_UNITS = 0x8b4c;
+export const MAX_TEXTURE_IMAGE_UNITS = 0x8872;
+export const MAX_FRAGMENT_UNIFORM_VECTORS = 0x8dfd;
+export const SHADER_TYPE = 0x8b4f;
+export const DELETE_STATUS = 0x8b80;
+export const LINK_STATUS = 0x8b82;
+export const VALIDATE_STATUS = 0x8b83;
+export const ATTACHED_SHADERS = 0x8b85;
+export const ACTIVE_UNIFORMS = 0x8b86;
+export const ACTIVE_ATTRIBUTES = 0x8b89;
+export const SHADING_LANGUAGE_VERSION = 0x8b8c;
+export const CURRENT_PROGRAM = 0x8b8d;
 
-  /* StencilOp */
-  /*      ZERO */
-  KEEP: 0x1e00,
-  REPLACE: 0x1e01,
-  INCR: 0x1e02,
-  DECR: 0x1e03,
-  INVERT: 0x150a,
-  INCR_WRAP: 0x8507,
-  DECR_WRAP: 0x8508,
+/* StencilFunction */
+export const NEVER = 0x0200;
+export const LESS = 0x0201;
+export const EQUAL = 0x0202;
+export const LEQUAL = 0x0203;
+export const GREATER = 0x0204;
+export const NOTEQUAL = 0x0205;
+export const GEQUAL = 0x0206;
+export const ALWAYS = 0x0207;
 
-  /* StringName */
-  VENDOR: 0x1f00,
-  RENDERER: 0x1f01,
-  VERSION: 0x1f02,
+/* StencilOp */
+/*      ZERO */
+export const KEEP = 0x1e00;
+export const REPLACE = 0x1e01;
+export const INCR = 0x1e02;
+export const DECR = 0x1e03;
+export const INVERT = 0x150a;
+export const INCR_WRAP = 0x8507;
+export const DECR_WRAP = 0x8508;
 
-  /* TextureMagFilter */
-  NEAREST: 0x2600,
-  LINEAR: 0x2601,
+/* StringName */
+export const VENDOR = 0x1f00;
+export const RENDERER = 0x1f01;
+export const VERSION = 0x1f02;
 
-  /* TextureMinFilter */
-  /*      NEAREST */
-  /*      LINEAR */
-  NEAREST_MIPMAP_NEAREST: 0x2700,
-  LINEAR_MIPMAP_NEAREST: 0x2701,
-  NEAREST_MIPMAP_LINEAR: 0x2702,
-  LINEAR_MIPMAP_LINEAR: 0x2703,
+/* TextureMagFilter */
+export const NEAREST = 0x2600;
+export const LINEAR = 0x2601;
 
-  /* TextureParameterName */
-  TEXTURE_MAG_FILTER: 0x2800,
-  TEXTURE_MIN_FILTER: 0x2801,
-  TEXTURE_WRAP_S: 0x2802,
-  TEXTURE_WRAP_T: 0x2803,
+/* TextureMinFilter */
+/*      NEAREST */
+/*      LINEAR */
+export const NEAREST_MIPMAP_NEAREST = 0x2700;
+export const LINEAR_MIPMAP_NEAREST = 0x2701;
+export const NEAREST_MIPMAP_LINEAR = 0x2702;
+export const LINEAR_MIPMAP_LINEAR = 0x2703;
 
-  /* TextureTarget */
-  TEXTURE_2D: 0x0de1,
-  TEXTURE: 0x1702,
+/* TextureParameterName */
+export const TEXTURE_MAG_FILTER = 0x2800;
+export const TEXTURE_MIN_FILTER = 0x2801;
+export const TEXTURE_WRAP_S = 0x2802;
+export const TEXTURE_WRAP_T = 0x2803;
 
-  TEXTURE_CUBE_MAP: 0x8513,
-  TEXTURE_BINDING_CUBE_MAP: 0x8514,
-  TEXTURE_CUBE_MAP_POSITIVE_X: 0x8515,
-  TEXTURE_CUBE_MAP_NEGATIVE_X: 0x8516,
-  TEXTURE_CUBE_MAP_POSITIVE_Y: 0x8517,
-  TEXTURE_CUBE_MAP_NEGATIVE_Y: 0x8518,
-  TEXTURE_CUBE_MAP_POSITIVE_Z: 0x8519,
-  TEXTURE_CUBE_MAP_NEGATIVE_Z: 0x851a,
-  MAX_CUBE_MAP_TEXTURE_SIZE: 0x851c,
+/* TextureTarget */
+export const TEXTURE_2D = 0x0de1;
+export const TEXTURE = 0x1702;
 
-  /* TextureUnit */
-  TEXTURE0: 0x84c0,
-  TEXTURE1: 0x84c1,
-  TEXTURE2: 0x84c2,
-  TEXTURE3: 0x84c3,
-  TEXTURE4: 0x84c4,
-  TEXTURE5: 0x84c5,
-  TEXTURE6: 0x84c6,
-  TEXTURE7: 0x84c7,
-  TEXTURE8: 0x84c8,
-  TEXTURE9: 0x84c9,
-  TEXTURE10: 0x84ca,
-  TEXTURE11: 0x84cb,
-  TEXTURE12: 0x84cc,
-  TEXTURE13: 0x84cd,
-  TEXTURE14: 0x84ce,
-  TEXTURE15: 0x84cf,
-  TEXTURE16: 0x84d0,
-  TEXTURE17: 0x84d1,
-  TEXTURE18: 0x84d2,
-  TEXTURE19: 0x84d3,
-  TEXTURE20: 0x84d4,
-  TEXTURE21: 0x84d5,
-  TEXTURE22: 0x84d6,
-  TEXTURE23: 0x84d7,
-  TEXTURE24: 0x84d8,
-  TEXTURE25: 0x84d9,
-  TEXTURE26: 0x84da,
-  TEXTURE27: 0x84db,
-  TEXTURE28: 0x84dc,
-  TEXTURE29: 0x84dd,
-  TEXTURE30: 0x84de,
-  TEXTURE31: 0x84df,
-  ACTIVE_TEXTURE: 0x84e0,
+export const TEXTURE_CUBE_MAP = 0x8513;
+export const TEXTURE_BINDING_CUBE_MAP = 0x8514;
+export const TEXTURE_CUBE_MAP_POSITIVE_X = 0x8515;
+export const TEXTURE_CUBE_MAP_NEGATIVE_X = 0x8516;
+export const TEXTURE_CUBE_MAP_POSITIVE_Y = 0x8517;
+export const TEXTURE_CUBE_MAP_NEGATIVE_Y = 0x8518;
+export const TEXTURE_CUBE_MAP_POSITIVE_Z = 0x8519;
+export const TEXTURE_CUBE_MAP_NEGATIVE_Z = 0x851a;
+export const MAX_CUBE_MAP_TEXTURE_SIZE = 0x851c;
 
-  /* TextureWrapMode */
-  REPEAT: 0x2901,
-  CLAMP_TO_EDGE: 0x812f,
-  MIRRORED_REPEAT: 0x8370,
+/* TextureUnit */
+export const TEXTURE0 = 0x84c0;
+export const TEXTURE1 = 0x84c1;
+export const TEXTURE2 = 0x84c2;
+export const TEXTURE3 = 0x84c3;
+export const TEXTURE4 = 0x84c4;
+export const TEXTURE5 = 0x84c5;
+export const TEXTURE6 = 0x84c6;
+export const TEXTURE7 = 0x84c7;
+export const TEXTURE8 = 0x84c8;
+export const TEXTURE9 = 0x84c9;
+export const TEXTURE10 = 0x84ca;
+export const TEXTURE11 = 0x84cb;
+export const TEXTURE12 = 0x84cc;
+export const TEXTURE13 = 0x84cd;
+export const TEXTURE14 = 0x84ce;
+export const TEXTURE15 = 0x84cf;
+export const TEXTURE16 = 0x84d0;
+export const TEXTURE17 = 0x84d1;
+export const TEXTURE18 = 0x84d2;
+export const TEXTURE19 = 0x84d3;
+export const TEXTURE20 = 0x84d4;
+export const TEXTURE21 = 0x84d5;
+export const TEXTURE22 = 0x84d6;
+export const TEXTURE23 = 0x84d7;
+export const TEXTURE24 = 0x84d8;
+export const TEXTURE25 = 0x84d9;
+export const TEXTURE26 = 0x84da;
+export const TEXTURE27 = 0x84db;
+export const TEXTURE28 = 0x84dc;
+export const TEXTURE29 = 0x84dd;
+export const TEXTURE30 = 0x84de;
+export const TEXTURE31 = 0x84df;
+export const ACTIVE_TEXTURE = 0x84e0;
 
-  /* Uniform Types */
-  FLOAT_VEC2: 0x8b50,
-  FLOAT_VEC3: 0x8b51,
-  FLOAT_VEC4: 0x8b52,
-  INT_VEC2: 0x8b53,
-  INT_VEC3: 0x8b54,
-  INT_VEC4: 0x8b55,
-  BOOL: 0x8b56,
-  BOOL_VEC2: 0x8b57,
-  BOOL_VEC3: 0x8b58,
-  BOOL_VEC4: 0x8b59,
-  FLOAT_MAT2: 0x8b5a,
-  FLOAT_MAT3: 0x8b5b,
-  FLOAT_MAT4: 0x8b5c,
-  SAMPLER_2D: 0x8b5e,
-  SAMPLER_CUBE: 0x8b60,
+/* TextureWrapMode */
+export const REPEAT = 0x2901;
+export const CLAMP_TO_EDGE = 0x812f;
+export const MIRRORED_REPEAT = 0x8370;
 
-  /* Vertex Arrays */
-  VERTEX_ATTRIB_ARRAY_ENABLED: 0x8622,
-  VERTEX_ATTRIB_ARRAY_SIZE: 0x8623,
-  VERTEX_ATTRIB_ARRAY_STRIDE: 0x8624,
-  VERTEX_ATTRIB_ARRAY_TYPE: 0x8625,
-  VERTEX_ATTRIB_ARRAY_NORMALIZED: 0x886a,
-  VERTEX_ATTRIB_ARRAY_POINTER: 0x8645,
-  VERTEX_ATTRIB_ARRAY_BUFFER_BINDING: 0x889f,
+/* Uniform Types */
+export const FLOAT_VEC2 = 0x8b50;
+export const FLOAT_VEC3 = 0x8b51;
+export const FLOAT_VEC4 = 0x8b52;
+export const INT_VEC2 = 0x8b53;
+export const INT_VEC3 = 0x8b54;
+export const INT_VEC4 = 0x8b55;
+export const BOOL = 0x8b56;
+export const BOOL_VEC2 = 0x8b57;
+export const BOOL_VEC3 = 0x8b58;
+export const BOOL_VEC4 = 0x8b59;
+export const FLOAT_MAT2 = 0x8b5a;
+export const FLOAT_MAT3 = 0x8b5b;
+export const FLOAT_MAT4 = 0x8b5c;
+export const SAMPLER_2D = 0x8b5e;
+export const SAMPLER_CUBE = 0x8b60;
 
-  /* Shader Source */
-  COMPILE_STATUS: 0x8b81,
+/* Vertex Arrays */
+export const VERTEX_ATTRIB_ARRAY_ENABLED = 0x8622;
+export const VERTEX_ATTRIB_ARRAY_SIZE = 0x8623;
+export const VERTEX_ATTRIB_ARRAY_STRIDE = 0x8624;
+export const VERTEX_ATTRIB_ARRAY_TYPE = 0x8625;
+export const VERTEX_ATTRIB_ARRAY_NORMALIZED = 0x886a;
+export const VERTEX_ATTRIB_ARRAY_POINTER = 0x8645;
+export const VERTEX_ATTRIB_ARRAY_BUFFER_BINDING = 0x889f;
 
-  /* Shader Precision-Specified Types */
-  LOW_FLOAT: 0x8df0,
-  MEDIUM_FLOAT: 0x8df1,
-  HIGH_FLOAT: 0x8df2,
-  LOW_INT: 0x8df3,
-  MEDIUM_INT: 0x8df4,
-  HIGH_INT: 0x8df5,
+/* Shader Source */
+export const COMPILE_STATUS = 0x8b81;
 
-  /* Framebuffer Object. */
-  FRAMEBUFFER: 0x8d40,
-  RENDERBUFFER: 0x8d41,
+/* Shader Precision-Specified Types */
+export const LOW_FLOAT = 0x8df0;
+export const MEDIUM_FLOAT = 0x8df1;
+export const HIGH_FLOAT = 0x8df2;
+export const LOW_INT = 0x8df3;
+export const MEDIUM_INT = 0x8df4;
+export const HIGH_INT = 0x8df5;
 
-  RGBA4: 0x8056,
-  RGB5_A1: 0x8057,
-  RGB565: 0x8d62,
-  DEPTH_COMPONENT16: 0x81a5,
-  STENCIL_INDEX: 0x1901,
-  STENCIL_INDEX8: 0x8d48,
-  DEPTH_STENCIL: 0x84f9,
+/* Framebuffer Object. */
+export const FRAMEBUFFER = 0x8d40;
+export const RENDERBUFFER = 0x8d41;
 
-  RENDERBUFFER_WIDTH: 0x8d42,
-  RENDERBUFFER_HEIGHT: 0x8d43,
-  RENDERBUFFER_INTERNAL_FORMAT: 0x8d44,
-  RENDERBUFFER_RED_SIZE: 0x8d50,
-  RENDERBUFFER_GREEN_SIZE: 0x8d51,
-  RENDERBUFFER_BLUE_SIZE: 0x8d52,
-  RENDERBUFFER_ALPHA_SIZE: 0x8d53,
-  RENDERBUFFER_DEPTH_SIZE: 0x8d54,
-  RENDERBUFFER_STENCIL_SIZE: 0x8d55,
+export const RGBA4 = 0x8056;
+export const RGB5_A1 = 0x8057;
+export const RGB565 = 0x8d62;
+export const DEPTH_COMPONENT16 = 0x81a5;
+export const STENCIL_INDEX = 0x1901;
+export const STENCIL_INDEX8 = 0x8d48;
+export const DEPTH_STENCIL = 0x84f9;
 
-  FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE: 0x8cd0,
-  FRAMEBUFFER_ATTACHMENT_OBJECT_NAME: 0x8cd1,
-  FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL: 0x8cd2,
-  FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE: 0x8cd3,
+export const RENDERBUFFER_WIDTH = 0x8d42;
+export const RENDERBUFFER_HEIGHT = 0x8d43;
+export const RENDERBUFFER_INTERNAL_FORMAT = 0x8d44;
+export const RENDERBUFFER_RED_SIZE = 0x8d50;
+export const RENDERBUFFER_GREEN_SIZE = 0x8d51;
+export const RENDERBUFFER_BLUE_SIZE = 0x8d52;
+export const RENDERBUFFER_ALPHA_SIZE = 0x8d53;
+export const RENDERBUFFER_DEPTH_SIZE = 0x8d54;
+export const RENDERBUFFER_STENCIL_SIZE = 0x8d55;
 
-  COLOR_ATTACHMENT0: 0x8ce0,
-  DEPTH_ATTACHMENT: 0x8d00,
-  STENCIL_ATTACHMENT: 0x8d20,
-  DEPTH_STENCIL_ATTACHMENT: 0x821a,
+export const FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE = 0x8cd0;
+export const FRAMEBUFFER_ATTACHMENT_OBJECT_NAME = 0x8cd1;
+export const FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL = 0x8cd2;
+export const FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE = 0x8cd3;
 
-  NONE: 0,
+export const COLOR_ATTACHMENT0 = 0x8ce0;
+export const DEPTH_ATTACHMENT = 0x8d00;
+export const STENCIL_ATTACHMENT = 0x8d20;
+export const DEPTH_STENCIL_ATTACHMENT = 0x821a;
 
-  FRAMEBUFFER_COMPLETE: 0x8cd5,
-  FRAMEBUFFER_INCOMPLETE_ATTACHMENT: 0x8cd6,
-  FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT: 0x8cd7,
-  FRAMEBUFFER_INCOMPLETE_DIMENSIONS: 0x8cd9,
-  FRAMEBUFFER_UNSUPPORTED: 0x8cdd,
+export const NONE = 0;
 
-  FRAMEBUFFER_BINDING: 0x8ca6,
-  RENDERBUFFER_BINDING: 0x8ca7,
-  MAX_RENDERBUFFER_SIZE: 0x84e8,
+export const FRAMEBUFFER_COMPLETE = 0x8cd5;
+export const FRAMEBUFFER_INCOMPLETE_ATTACHMENT = 0x8cd6;
+export const FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT = 0x8cd7;
+export const FRAMEBUFFER_INCOMPLETE_DIMENSIONS = 0x8cd9;
+export const FRAMEBUFFER_UNSUPPORTED = 0x8cdd;
 
-  INVALID_FRAMEBUFFER_OPERATION: 0x0506,
+export const FRAMEBUFFER_BINDING = 0x8ca6;
+export const RENDERBUFFER_BINDING = 0x8ca7;
+export const MAX_RENDERBUFFER_SIZE = 0x84e8;
 
-  /* WebGL-specific enums */
-  UNPACK_FLIP_Y_WEBGL: 0x9240,
-  UNPACK_PREMULTIPLY_ALPHA_WEBGL: 0x9241,
-  CONTEXT_LOST_WEBGL: 0x9242,
-  UNPACK_COLORSPACE_CONVERSION_WEBGL: 0x9243,
-  BROWSER_DEFAULT_WEBGL: 0x9244
-} as const;
+export const INVALID_FRAMEBUFFER_OPERATION = 0x0506;
+
+/* WebGL-specific enums */
+export const UNPACK_FLIP_Y_WEBGL = 0x9240;
+export const UNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241;
+export const CONTEXT_LOST_WEBGL = 0x9242;
+export const UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
+export const BROWSER_DEFAULT_WEBGL = 0x9244;

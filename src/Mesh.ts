@@ -1,5 +1,5 @@
 import Renderable, { RenderableOpts } from './Renderable';
-import glenum from './core/glenum';
+import * as glenum from './core/glenum';
 import { optional } from './core/util';
 import type Skeleton from './Skeleton';
 import type Matrix4 from './math/Matrix4';

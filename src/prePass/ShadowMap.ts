@@ -1,4 +1,4 @@
-import glenum from '../core/glenum';
+import * as glenum from '../core/glenum';
 import Vector3 from '../math/Vector3';
 import BoundingBox from '../math/BoundingBox';
 import Frustum from '../math/Frustum';

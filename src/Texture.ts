@@ -2,7 +2,7 @@
  * Base class for all textures like compressed texture, texture2d, texturecube
  * TODO mapping
  */
-import glenum from './core/glenum';
+import * as glenum from './core/glenum';
 import ClayCache from './core/Cache';
 import Notifier from './core/Notifier';
 import Renderer from './Renderer';

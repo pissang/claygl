@@ -11,9 +11,9 @@ import {
   Mesh,
   PointLight,
   AmbientLight
-} from './claygl';
+} from 'claygl';
 
-import * as Stats from 'stats.js';
+import Stats from 'stats.js';
 
 const timeline = new Timeline();
 timeline.start();
