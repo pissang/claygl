@@ -61,20 +61,17 @@ class Notifier {
    * Register event handler
    */
   on(name: string, action: Function, context?: any) {
-    if (!name || !action) {
-      return;
-    }
-    const handlers = this._handlers || (this._handlers = {});
-    if (!handlers[name]) {
-      handlers[name] = [];
-    } else {
-      if (this.has(name, action)) {
-        return;
+    if (name && action) {
+      const handlers = this._handlers || (this._handlers = {});
+      if (!handlers[name]) {
+        handlers[name] = [];
+      }
+
+      if (!this.has(name, action)) {
+        const handler = new Handler(action, context || this);
+        handlers[name].push(handler);
       }
     }
-    const handler = new Handler(action, context || this);
-    handlers[name].push(handler);
-
     return this;
   }
 
@@ -85,16 +82,16 @@ class Notifier {
    * @param  {Object} [context]
    * @chainable
    */
-  once(name: string, action: Function, context: any) {
-    if (!name || !action) {
-      return;
-    }
+  once(name: string, action: Function, context?: any) {
     const self = this;
     function wrapper() {
       self.off(name, wrapper);
       action.apply(self, arguments);
     }
-    return this.on(name, wrapper, context);
+    if (name && action) {
+      this.on(name, wrapper, context);
+    }
+    return this;
   }
 
   /**
@@ -104,12 +101,11 @@ class Notifier {
    * @param  {Object} [context]
    * @chainable
    */
-  before(name: string, action: Function, context: any) {
-    if (!name || !action) {
-      return;
+  before(name: string, action: Function, context?: any) {
+    if (name && action) {
+      this.on('before' + name, action, context);
     }
-    name = 'before' + name;
-    return this.on(name, action, context);
+    return this;
   }
 
   /**
@@ -119,12 +115,11 @@ class Notifier {
    * @param  {Object} [context]
    * @chainable
    */
-  after(name: string, action: Function, context: any) {
-    if (!name || !action) {
-      return;
+  after(name: string, action: Function, context?: any) {
+    if (name && action) {
+      this.on('after' + name, action, context);
     }
-    name = 'after' + name;
-    return this.on(name, action, context);
+    return this;
   }
 
   /**
@@ -133,7 +128,7 @@ class Notifier {
    * @param  {Object} [context]
    * @chainable
    */
-  success(action: Function, context: any) {
+  success(action: Function, context?: any) {
     return this.once('success', action, context);
   }
 
@@ -143,7 +138,7 @@ class Notifier {
    * @param  {Object} [context]
    * @chainable
    */
-  error(action: Function, context: any) {
+  error(action: Function, context?: any) {
     return this.once('error', action, context);
   }
 

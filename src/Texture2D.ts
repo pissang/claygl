@@ -70,6 +70,10 @@ class Texture2D extends Texture {
   private _image?: TextureImageSource;
   private _potCanvas?: HTMLCanvasElement;
 
+  constructor(opts?: Partial<Texture2DOpts>) {
+    super(opts);
+  }
+
   get image(): TextureImageSource | undefined {
     return this._image;
   }

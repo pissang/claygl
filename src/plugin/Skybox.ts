@@ -81,6 +81,10 @@ class Skybox extends Mesh {
     this._targetScene = undefined;
   }
 
+  getScene() {
+    return this._targetScene;
+  }
+
   /**
    * Dispose skybox
    * @param  {clay.Renderer} renderer

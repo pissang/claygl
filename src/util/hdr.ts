@@ -1,11 +1,10 @@
-// @ts-nocheck
 import Texture from '../Texture';
 import Texture2D from '../Texture2D';
 const toChar = String.fromCharCode;
 
 const MINELEN = 8;
 const MAXELEN = 0x7fff;
-function rgbe2float(rgbe, buffer, offset, exposure) {
+function rgbe2float(rgbe: number[], buffer: Float32Array, offset: number, exposure: number) {
   if (rgbe[3] > 0) {
     const f = Math.pow(2.0, rgbe[3] - 128 - 8 + exposure);
     buffer[offset + 0] = rgbe[0] * f;
@@ -20,7 +19,7 @@ function rgbe2float(rgbe, buffer, offset, exposure) {
   return buffer;
 }
 
-function uint82string(array, offset, size) {
+function uint82string(array: Uint8Array, offset: number, size: number) {
   let str = '';
   for (let i = offset; i < size; i++) {
     str += toChar(array[i]);
@@ -28,7 +27,7 @@ function uint82string(array, offset, size) {
   return str;
 }
 
-function copyrgbe(s, t) {
+function copyrgbe(s: number[], t: number[]) {
   t[0] = s[0];
   t[1] = s[1];
   t[2] = s[2];
@@ -36,7 +35,7 @@ function copyrgbe(s, t) {
 }
 
 // TODO : check
-function oldReadColors(scan, buffer, offset, xmax) {
+function oldReadColors(scan: number[][], buffer: Uint8Array, offset: number, xmax: number) {
   let rshift = 0,
     x = 0,
     len = xmax;
@@ -62,8 +61,8 @@ function oldReadColors(scan, buffer, offset, xmax) {
   return offset;
 }
 
-function readColors(scan, buffer, offset, xmax) {
-  if ((xmax < MINELEN) | (xmax > MAXELEN)) {
+function readColors(scan: number[][], buffer: Uint8Array, offset: number, xmax: number) {
+  if (xmax < MINELEN || xmax > MAXELEN) {
     return oldReadColors(scan, buffer, offset, xmax);
   }
   let i = buffer[offset++];
@@ -96,82 +95,77 @@ function readColors(scan, buffer, offset, xmax) {
   return offset;
 }
 
-const ret = {
-  // http://www.graphics.cornell.edu/~bjw/rgbe.html
-  // Blender source
-  // http://radsite.lbl.gov/radiance/refer/Notes/picture_format.html
-  parseRGBE: function (arrayBuffer, texture, exposure) {
-    if (exposure == null) {
-      exposure = 0;
+// http://www.graphics.cornell.edu/~bjw/rgbe.html
+// Blender source
+// http://radsite.lbl.gov/radiance/refer/Notes/picture_format.html
+export function parseRGBE(arrayBuffer: ArrayBuffer, texture?: Texture2D, exposure?: number) {
+  if (exposure == null) {
+    exposure = 0;
+  }
+  const data = new Uint8Array(arrayBuffer);
+  const size = data.length;
+  if (uint82string(data, 0, 2) !== '#?') {
+    return;
+  }
+  let i;
+  // find empty line, next line is resolution info
+  for (i = 2; i < size; i++) {
+    if (toChar(data[i]) === '\n' && toChar(data[i + 1]) === '\n') {
+      break;
     }
-    const data = new Uint8Array(arrayBuffer);
-    const size = data.length;
-    if (uint82string(data, 0, 2) !== '#?') {
-      return;
+  }
+  if (i >= size) {
+    // not found
+    return;
+  }
+  // find resolution info line
+  i += 2;
+  let str = '';
+  for (; i < size; i++) {
+    const _char = toChar(data[i]);
+    if (_char === '\n') {
+      break;
     }
-    let i;
-    // find empty line, next line is resolution info
-    for (i = 2; i < size; i++) {
-      if (toChar(data[i]) === '\n' && toChar(data[i + 1]) === '\n') {
-        break;
-      }
-    }
-    if (i >= size) {
-      // not found
-      return;
-    }
-    // find resolution info line
-    i += 2;
-    let str = '';
-    for (; i < size; i++) {
-      const _char = toChar(data[i]);
-      if (_char === '\n') {
-        break;
-      }
-      str += _char;
-    }
-    // -Y M +X N
-    const tmp = str.split(' ');
-    const height = parseInt(tmp[1]);
-    const width = parseInt(tmp[3]);
-    if (!width || !height) {
-      return;
-    }
+    str += _char;
+  }
+  // -Y M +X N
+  const tmp = str.split(' ');
+  const height = parseInt(tmp[1]);
+  const width = parseInt(tmp[3]);
+  if (!width || !height) {
+    return;
+  }
 
-    // read and decode actual data
-    const scanline = [];
-    // memzero
+  // read and decode actual data
+  let offset: number | null = i + 1;
+  const scanline: number[][] = [];
+  // memzero
+  for (let x = 0; x < width; x++) {
+    scanline[x] = [];
+    for (let j = 0; j < 4; j++) {
+      scanline[x][j] = 0;
+    }
+  }
+  const pixels = new Float32Array(width * height * 4);
+  let offset2 = 0;
+  for (let y = 0; y < height; y++) {
+    offset = readColors(scanline, data, offset, width);
+    if (!offset) {
+      return null;
+    }
     for (let x = 0; x < width; x++) {
-      scanline[x] = [];
-      for (let j = 0; j < 4; j++) {
-        scanline[x][j] = 0;
-      }
+      rgbe2float(scanline[x], pixels, offset2, exposure);
+      offset2 += 4;
     }
-    const pixels = new Float32Array(width * height * 4);
-    let offset2 = 0;
-    for (let y = 0; y < height; y++) {
-      const offset = readColors(scanline, data, offset, width);
-      if (!offset) {
-        return null;
-      }
-      for (let x = 0; x < width; x++) {
-        rgbe2float(scanline[x], pixels, offset2, exposure);
-        offset2 += 4;
-      }
-    }
+  }
 
-    if (!texture) {
-      texture = new Texture2D();
-    }
-    texture.width = width;
-    texture.height = height;
-    texture.pixels = pixels;
-    // HALF_FLOAT can't use Float32Array
-    texture.type = Texture.FLOAT;
-    return texture;
-  },
-
-  parseRGBEFromPNG: function (png) {}
-};
-
-export default ret;
+  if (!texture) {
+    texture = new Texture2D();
+  }
+  texture.width = width;
+  texture.height = height;
+  texture.pixels = pixels;
+  // HALF_FLOAT can't use Float32Array
+  texture.type = Texture.FLOAT;
+  return texture;
+}
