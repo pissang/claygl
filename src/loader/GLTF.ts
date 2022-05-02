@@ -244,6 +244,26 @@ interface GLTFLoadOpts {
   onprogress?: (percent: number, loaded: number, total: number) => void;
 }
 
+// Load with promise
+export function loadAsync(
+  url: string,
+  opts?: Omit<GLTFLoadOpts, 'onload' | 'onerror'>
+): Promise<GLTFLoadResult> {
+  return new Promise((resolve, reject) => {
+    load(
+      url,
+      Object.assign({}, opts, {
+        onload(res: GLTFLoadResult) {
+          resolve(res);
+        },
+        onerror(err: any) {
+          reject(err);
+        }
+      })
+    );
+  });
+}
+
 export function load(url: string, opts?: GLTFLoadOpts) {
   opts = Object.assign(
     {
@@ -382,7 +402,7 @@ export function parse(json: GLTFFormat, buffers: ArrayBuffer[] | undefined, opts
     afterLoadBuffer(true);
   } else {
     // Load buffers
-    json.buffers.forEach((bufferInfo: GLTFBuffer, idx: number) => {
+    (json.buffers || []).forEach((bufferInfo: GLTFBuffer, idx: number) => {
       loading++;
       const path = bufferInfo.uri;
 
@@ -422,7 +442,7 @@ export function parse(json: GLTFFormat, buffers: ArrayBuffer[] | undefined, opts
       return;
     }
 
-    json.bufferViews.forEach((bufferViewInfo: GLTFBufferView, idx: number) => {
+    (json.bufferViews || []).forEach((bufferViewInfo: GLTFBufferView, idx: number) => {
       // PENDING Performance
       lib.bufferViews[idx] = lib.buffers[bufferViewInfo.buffer].slice(
         bufferViewInfo.byteOffset || 0,
@@ -523,7 +543,7 @@ function loadBuffers(
 // https://github.com/KhronosGroup/glTF/issues/193
 function parseSkins(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
   // Create skeletons and joints
-  json.skins.forEach((skinInfo: GLTFSkin, idx: number) => {
+  (json.skins || []).forEach((skinInfo: GLTFSkin, idx: number) => {
     const skeleton = new Skeleton(skinInfo.name);
     for (let i = 0; i < skinInfo.joints.length; i++) {
       const nodeIdx = skinInfo.joints[i];
@@ -561,7 +581,7 @@ function parseSkins(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
     return joint.index;
   }
 
-  json.nodes.forEach((nodeInfo: GLTFNode, nodeIdx: number) => {
+  (json.nodes || []).forEach((nodeInfo: GLTFNode, nodeIdx: number) => {
     if (nodeInfo.skin != null) {
       const skinIdx = nodeInfo.skin;
       const skeleton = lib.skeletons[skinIdx];
@@ -582,7 +602,7 @@ function parseSkins(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
 }
 
 function parseTextures(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
-  json.textures.forEach((textureInfo: GLTFTexture, idx: number) => {
+  (json.textures || []).forEach((textureInfo: GLTFTexture, idx: number) => {
     // samplers is optional
     const samplerInfo = (json.samplers && json.samplers[textureInfo.sampler]) || {};
     const parameters: Partial<TextureOpts> = {};
@@ -945,7 +965,7 @@ function pbrSpecularGlossinessToStandard(
 }
 
 function parseMaterials(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
-  json.materials.forEach((materialInfo: GLTFMaterial, idx: number) => {
+  (json.materials || []).forEach((materialInfo: GLTFMaterial, idx: number) => {
     /* eslint-disable-next-line */
     if (materialInfo.extensions && materialInfo.extensions['KHR_materials_common']) {
       lib.materials[idx] = KHRCommonMaterialToStandard(materialInfo, lib, opts);
@@ -973,7 +993,7 @@ function parseMaterials(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
 }
 
 function parseMeshes(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
-  json.meshes.forEach((meshInfo: GLTFMesh, idx: number) => {
+  (json.meshes || []).forEach((meshInfo: GLTFMesh, idx: number) => {
     lib.meshes[idx] = [];
     // Geometry
     for (let pp = 0; pp < meshInfo.primitives.length; pp++) {
@@ -1154,7 +1174,7 @@ function parseNodes(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
     });
   }
 
-  json.nodes.forEach((nodeInfo: GLTFNode, idx: number) => {
+  (json.nodes || []).forEach((nodeInfo: GLTFNode, idx: number) => {
     let node: ClayNode;
     if (nodeInfo.camera != null && opts.includeCamera) {
       node = instanceCamera(json, nodeInfo);
@@ -1201,7 +1221,7 @@ function parseNodes(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
   });
 
   // Build hierarchy
-  json.nodes.forEach((nodeInfo: GLTFNode, idx: number) => {
+  (json.nodes || []).forEach((nodeInfo: GLTFNode, idx: number) => {
     const node = lib.nodes[idx];
     if (nodeInfo.children) {
       for (let i = 0; i < nodeInfo.children.length; i++) {
@@ -1227,7 +1247,7 @@ function parseAnimations(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
   }
 
   const timeAccessorMultiplied: Record<string, boolean> = {};
-  json.animations.forEach((animationInfo: GLTFAnimation, idx: number) => {
+  (json.animations || []).forEach((animationInfo: GLTFAnimation, idx: number) => {
     const channels = animationInfo.channels.filter(checkChannelPath);
 
     if (!channels.length) {
@@ -1289,7 +1309,7 @@ function parseAnimations(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
   const maxLife = lib.animators.reduce(function (maxTime, animator) {
     return Math.max(maxTime, animator.getLife());
   }, 0);
-  lib.animators.forEach(function (animator) {
+  (lib.animators || []).forEach(function (animator) {
     animator.setLife(maxLife);
   });
 

@@ -597,7 +597,7 @@ class ClayNode extends Notifier {
    * @see http://www.opengl.org/sdk/docs/man2/xhtml/gluLookAt.xml
    * @function
    */
-  lookAt(target: Vector3, up: Vector3) {
+  lookAt(target: Vector3, up?: Vector3) {
     tmpMat4.lookAt(this.position, target, up || this.localTransform.y).invert();
     this.setLocalTransform(tmpMat4);
 

@@ -3,7 +3,7 @@ import Texture2D from '../Texture2D';
 import TextureCube from '../TextureCube';
 import vendor from '../core/vendor';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
-import Skydome from '../plugin/Skydome';
+import Skybox from '../plugin/Skybox';
 import Scene from '../Scene';
 
 import dds from './dds';
@@ -121,7 +121,7 @@ const textureUtil = {
    */
   panoramaToCubeMap: function (renderer, panoramaMap, cubeMap, option) {
     const environmentMapPass = new EnvironmentMapPass();
-    const skydome = new Skydome({
+    const skydome = new Skybox({
       scene: new Scene()
     });
     skydome.setEnvironmentMap(panoramaMap);

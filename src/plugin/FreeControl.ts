@@ -70,8 +70,13 @@ class FreeControl extends Notifier {
   private _offsetPitch = 0;
   private _offsetRoll = 0;
 
-  constructor(opts?: Partial<FreeControlOpts>) {
+  constructor(
+    opts: Omit<Partial<FreeControlOpts>, 'domElement'> & {
+      domElement: HTMLElement;
+    }
+  ) {
     super();
+
     Object.assign(
       this,
       {

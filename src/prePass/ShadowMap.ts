@@ -142,7 +142,7 @@ class ShadowMapPass extends Notifier {
   /**
    * Render scene to shadow textures
    */
-  render(renderer: Renderer, scene: Scene, sceneCamera: Camera, notUpdateScene?: boolean) {
+  render(renderer: Renderer, scene: Scene, sceneCamera?: Camera, notUpdateScene?: boolean) {
     if (!sceneCamera) {
       sceneCamera = scene.getMainCamera();
     }

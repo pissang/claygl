@@ -37,12 +37,12 @@ interface GamepadControlOpts {
   /**
    * Function to be called when a standard gamepad is ready to use.
    */
-  onStandardGamepadReady?: (gamepad) => void;
+  onStandardGamepadReady?: (gamepad: Gamepad) => void;
 
   /**
    * Function to be called when a gamepad is disconnected.
    */
-  onGamepadDisconnected?: (gamepad) => void;
+  onGamepadDisconnected?: (gamepad: Gamepad) => void;
 }
 
 interface GamepadControl extends GamepadControlOpts {}
@@ -75,7 +75,11 @@ class GamepadControl extends Notifier {
   private _standardGamepadAvailable = false;
   private _gamepadAxisThreshold = 0.3;
 
-  constructor(opts?: Partial<GamepadControlOpts>) {
+  constructor(
+    opts: Omit<Partial<GamepadControlOpts>, 'domElement'> & {
+      domElement: HTMLElement;
+    }
+  ) {
     super();
     Object.assign(
       this,

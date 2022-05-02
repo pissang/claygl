@@ -170,8 +170,14 @@ class OrbitControl extends Notifier {
 
   private _gestureMgr = new GestureMgr();
 
-  constructor(opts?: Partial<OrbitControlOpts>) {
+  constructor(
+    opts: Omit<Partial<OrbitControlOpts>, 'domElement'> & {
+      domElement: HTMLElement;
+    }
+  ) {
     super();
+
+    this.domElement = opts.domElement;
 
     this.setOption(
       Object.assign(
@@ -200,6 +206,8 @@ class OrbitControl extends Notifier {
         opts
       )
     );
+    // Set target after option updated.
+    this._target = opts.target;
 
     // Each OrbitControl has it's own handler
     this._mouseDownHandler = this._mouseDownHandler.bind(this);

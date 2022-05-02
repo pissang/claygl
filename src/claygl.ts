@@ -54,4 +54,18 @@ export {
   StandardMRShader
 } from './shader/index';
 
-export { load as loadGLTF } from './loader/GLTF';
+export {
+  load as loadGLTF,
+  loadAsync as loadGLTFAsync,
+  parse as parseGLTF,
+  parseBinary as parseGLB
+} from './loader/GLTF';
+
+export { default as ShadowMapPass } from './prePass/ShadowMap';
+export { default as EnvironmentMapPass } from './prePass/EnvironmentMap';
+
+export { default as OrbitControl } from './plugin/OrbitControl';
+export { default as FreeControl } from './plugin/FreeControl';
+export { default as GamepadControl } from './plugin/GamepadControl';
+
+export { default as Skybox } from './plugin/Skybox';
