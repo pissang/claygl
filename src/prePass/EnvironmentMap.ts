@@ -101,7 +101,6 @@ class EnvironmentMapPass {
     return this._cameras[target];
   }
   render(renderer: Renderer, scene: Scene, notUpdateScene?: boolean) {
-    const _gl = renderer.gl;
     const texture = this.texture;
     if (!notUpdateScene) {
       scene.update();

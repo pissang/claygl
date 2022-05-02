@@ -1,31 +1,26 @@
-// @ts-nocheck
 // Spherical Harmonic Helpers
 import Texture from '../Texture';
 import FrameBuffer from '../FrameBuffer';
 import Texture2D from '../Texture2D';
-import Pass from '../compositor/Pass';
-import vendor from '../core/vendor';
 import Skybox from '../plugin/Skybox';
-import Skydome from '../plugin/Skydome';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
 import Scene from '../Scene';
-import vec3 from '../glmatrix/vec3';
+import * as vec3 from '../glmatrix/vec3';
 const sh = {};
 
 import projectEnvMapShaderCode from './shader/projectEnvMap.glsl.js';
-
-const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'];
+import CompositorFullscreenQuadPass from '../compositor/Pass';
+import type Renderer from '../Renderer';
+import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
 
 // Project on gpu, but needs browser to support readPixels as Float32Array.
-function projectEnvironmentMapGPU(renderer, envMap) {
+function projectEnvironmentMapGPU(renderer: Renderer, envMap: TextureCube) {
   const shTexture = new Texture2D({
     width: 9,
     height: 1,
     type: Texture.FLOAT
   });
-  const pass = new Pass({
-    fragment: projectEnvMapShaderCode
-  });
+  const pass = new CompositorFullscreenQuadPass(projectEnvMapShaderCode);
   pass.material.define('fragment', 'TEXTURE_SIZE', envMap.width);
   pass.setUniform('environmentMap', envMap);
 
@@ -51,29 +46,30 @@ function projectEnvironmentMapGPU(renderer, envMap) {
   return coeff;
 }
 
-function harmonics(normal, index) {
+function harmonics(normal: vec3.Vec3Array, index: number) {
   const x = normal[0];
   const y = normal[1];
   const z = normal[2];
 
-  if (index === 0) {
-    return 1.0;
-  } else if (index === 1) {
-    return x;
-  } else if (index === 2) {
-    return y;
-  } else if (index === 3) {
-    return z;
-  } else if (index === 4) {
-    return x * z;
-  } else if (index === 5) {
-    return y * z;
-  } else if (index === 6) {
-    return x * y;
-  } else if (index === 7) {
-    return 3.0 * z * z - 1.0;
-  } else {
-    return x * x - y * y;
+  switch (index) {
+    case 0:
+      return 1.0;
+    case 1:
+      return x;
+    case 2:
+      return y;
+    case 3:
+      return z;
+    case 4:
+      return x * z;
+    case 5:
+      return y * z;
+    case 6:
+      return x * y;
+    case 7:
+      return 3.0 * z * z - 1.0;
+    default:
+      return x * x - y * y;
   }
 }
 
@@ -87,20 +83,25 @@ const normalTransform = {
 };
 
 // Project on cpu.
-function projectEnvironmentMapCPU(renderer, cubePixels, width, height) {
+function projectEnvironmentMapCPU(
+  renderer: Renderer,
+  cubePixels: Record<CubeTarget, Uint8Array>,
+  width: number,
+  height: number
+) {
   const coeff = new Float32Array(9 * 3);
   const normal = vec3.create();
   const texel = vec3.create();
   const fetchNormal = vec3.create();
   for (let m = 0; m < 9; m++) {
     const result = vec3.create();
-    for (let k = 0; k < targets.length; k++) {
-      const pixels = cubePixels[targets[k]];
+    for (let k = 0; k < cubeTargets.length; k++) {
+      const pixels = cubePixels[cubeTargets[k]];
 
       const sideResult = vec3.create();
       let divider = 0;
       let i = 0;
-      const transform = normalTransform[targets[k]];
+      const transform = normalTransform[cubeTargets[k]];
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           normal[0] = (x / (width - 1.0)) * 2.0 - 1.0;
@@ -137,14 +138,14 @@ function projectEnvironmentMapCPU(renderer, cubePixels, width, height) {
   return coeff;
 }
 
-/**
- * @param  {clay.Renderer} renderer
- * @param  {clay.Texture} envMap
- * @param  {Object} [textureOpts]
- * @param  {Object} [textureOpts.lod]
- * @param  {boolean} [textureOpts.decodeRGBM]
- */
-sh.projectEnvironmentMap = function (renderer, envMap, opts) {
+export function projectEnvironmentMap(
+  renderer: Renderer,
+  envMap: Texture2D | TextureCube,
+  opts?: {
+    decodeRGBM?: boolean;
+    lod?: number;
+  }
+) {
   // TODO sRGB
 
   opts = opts || {};
@@ -154,7 +155,7 @@ sh.projectEnvironmentMap = function (renderer, envMap, opts) {
   const dummyScene = new Scene();
   let size = 64;
   if (envMap.textureType === 'texture2D') {
-    skybox = new Skydome({
+    skybox = new Skybox({
       scene: dummyScene,
       environmentMap: envMap
     });
@@ -178,13 +179,11 @@ sh.projectEnvironmentMap = function (renderer, envMap, opts) {
     skybox.material.define('fragment', 'RGBM_DECODE');
   }
   skybox.material.set('lod', opts.lod);
-  const envMapPass = new EnvironmentMapPass({
-    texture: rgbmTexture
-  });
-  const cubePixels = {};
-  for (let i = 0; i < targets.length; i++) {
-    cubePixels[targets[i]] = new Uint8Array(width * height * 4);
-    const camera = envMapPass.getCamera(targets[i]);
+  const envMapPass = new EnvironmentMapPass();
+  const cubePixels = {} as Record<CubeTarget, Uint8Array>;
+  for (let i = 0; i < cubeTargets.length; i++) {
+    cubePixels[cubeTargets[i]] = new Uint8Array(width * height * 4);
+    const camera = envMapPass.getCamera(cubeTargets[i]);
     camera.fov = 90;
     framebuffer.attach(rgbmTexture);
     framebuffer.bind(renderer);
@@ -196,7 +195,7 @@ sh.projectEnvironmentMap = function (renderer, envMap, opts) {
       height,
       Texture.RGBA,
       Texture.UNSIGNED_BYTE,
-      cubePixels[targets[i]]
+      cubePixels[cubeTargets[i]]
     );
     framebuffer.unbind(renderer);
   }
@@ -206,6 +205,4 @@ sh.projectEnvironmentMap = function (renderer, envMap, opts) {
   rgbmTexture.dispose(renderer);
 
   return projectEnvironmentMapCPU(renderer, cubePixels, width, height);
-};
-
-export default sh;
+}

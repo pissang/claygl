@@ -11,7 +11,7 @@ import Shader from '../Shader';
 import Skybox from '../plugin/Skybox';
 import Scene from '../Scene';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
-import textureUtil from './texture';
+import { panoramaToCubeMap } from './texture';
 
 import integrateBRDFShaderCode from './shader/integrateBRDF.glsl.js';
 import prefilterFragCode from './shader/prefilter.glsl.js';
@@ -81,7 +81,7 @@ export function prefilterEnvironmentMap(
       // FIXME FLOAT type will cause GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT error on iOS
       type: textureType === Texture.FLOAT ? Texture.HALF_FLOAT : textureType
     });
-    textureUtil.panoramaToCubeMap(renderer, envMap, envCubemap, {
+    panoramaToCubeMap(renderer, envMap, envCubemap, {
       // PENDING encodeRGBM so it can be decoded as RGBM
       encodeRGBM: textureOpts.decodeRGBM
     });

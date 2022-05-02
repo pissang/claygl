@@ -8,6 +8,7 @@ import type Renderer from './Renderer';
 import type Camera from './Camera';
 import type Renderable from './Renderable';
 import type Vector2 from './math/Vector2';
+import type BoundingBox from './math/BoundingBox';
 
 export type AttributeType = 'byte' | 'ubyte' | 'short' | 'ushort' | 'float';
 export type AttributeSize = 1 | 2 | 3 | 4;
@@ -295,6 +296,8 @@ interface GeometryBase extends GeometryBaseOpts {}
 class GeometryBase {
   readonly __uid__ = genGUID();
 
+  // TODO put in GeometryBase?
+  boundingBox?: BoundingBox;
   /**
    * Attributes of geometry.
    */

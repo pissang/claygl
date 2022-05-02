@@ -4,13 +4,12 @@
 const EPSILON = 1.0 / 1048576.0;
 
 function supertriangle(vertices) {
-  let xmin = Number.POSITIVE_INFINITY;
-  let ymin = Number.POSITIVE_INFINITY;
-  let xmax = Number.NEGATIVE_INFINITY;
-  let ymax = Number.NEGATIVE_INFINITY;
-  let i, dx, dy, dmax, xmid, ymid;
+  let xmin = Infinity;
+  let ymin = Infinity;
+  let xmax = -Infinity;
+  let ymax = -Infinity;
 
-  for (i = vertices.length; i--; ) {
+  for (let i = vertices.length; i--; ) {
     if (vertices[i][0] < xmin) {
       xmin = vertices[i][0];
     }
@@ -25,11 +24,11 @@ function supertriangle(vertices) {
     }
   }
 
-  dx = xmax - xmin;
-  dy = ymax - ymin;
-  dmax = Math.max(dx, dy);
-  xmid = xmin + dx * 0.5;
-  ymid = ymin + dy * 0.5;
+  const dx = xmax - xmin;
+  const dy = ymax - ymin;
+  const dmax = Math.max(dx, dy);
+  const xmid = xmin + dx * 0.5;
+  const ymid = ymin + dy * 0.5;
 
   return [
     [xmid - 20 * dmax, ymid - dmax],
@@ -126,7 +125,7 @@ const delaunay = {
     /* Make an array of indices into the vertex array, sorted by the
      * vertices' x-position. Force stable sorting by comparing indices if
      * the x-positions are equal. */
-    indices = new Array(n);
+    indices = [];
 
     for (i = n; i--; ) {
       indices[i] = i;
@@ -222,7 +221,7 @@ const delaunay = {
     const b = tri[2][0] - tri[0][0];
     const c = tri[1][1] - tri[0][1];
     const d = tri[2][1] - tri[0][1];
-    let i = a * d - b * c;
+    const i = a * d - b * c;
 
     /* Degenerate tri. */
     if (i === 0.0) {

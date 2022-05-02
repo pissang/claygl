@@ -3,7 +3,6 @@ import * as mat4 from './glmatrix/mat4';
 import BoundingBox from './math/BoundingBox';
 import GeometryBase, { AttributeValue, GeometryAttribute, GeometryBaseOpts } from './GeometryBase';
 import type Matrix4 from './math/Matrix4';
-import type Renderer from './Renderer';
 
 export interface GeometryOpts extends GeometryBaseOpts {}
 
@@ -81,7 +80,6 @@ class Geometry extends GeometryBase {
   /**
    * Calculated bounding box of geometry.
    */
-  boundingBox?: BoundingBox;
 
   attributes!: {
     position: GeometryAttribute<3>;
