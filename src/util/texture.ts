@@ -5,7 +5,7 @@ import EnvironmentMapPass from '../prePass/EnvironmentMap';
 import Skybox from '../plugin/Skybox';
 import Scene from '../Scene';
 
-import dds from './dds';
+import * as dds from './dds';
 import * as hdr from './hdr';
 import type Renderer from '../Renderer';
 

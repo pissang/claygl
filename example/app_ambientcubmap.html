@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script src="../dist/claygl.js"></script>
     <title>Ambient Cubemap Light</title>
   </head>
   <body>
@@ -17,60 +16,6 @@
       }
     </style>
     <div id="main"></div>
-    <script>
-      var app = clay.application.create('#main', {
-        graphic: {
-          linear: true,
-          tonemapping: true
-        },
-
-        init: function (app) {
-          // Create camera
-          this._camera = app.createCamera([0, 10, 25], [0, 0, 0]);
-
-          // Use orbit control
-          this._control = new clay.plugin.OrbitControl({
-            target: this._camera,
-            domElement: app.container
-          });
-
-          app.createAmbientCubemapLight('./assets/textures/hdr/pisa.hdr', 1, 0.5, 2);
-
-          for (var i = 0; i < 10; i++) {
-            app
-              .createSphere({
-                metalness: 1,
-                roughness: i / 10
-              })
-              .position.set((i - 5) * 3, -2, 0);
-
-            app
-              .createSphere({
-                metalness: 0,
-                roughness: i / 10
-              })
-              .position.set((i - 5) * 3, -5, 0);
-          }
-
-          // Load boombox model. return a load promise to make sure the look will be start after model loaded.
-          return app
-            .loadModel('./assets/models/BoomBox/BoomBox.gltf', {
-              waitTextureLoaded: true
-            })
-            .then(function (result) {
-              result.rootNode.position.y = 5;
-              result.rootNode.scale.set(300, 300, 300);
-            });
-        },
-
-        loop: function (app) {
-          this._control.update(app.frameTime);
-        }
-      });
-
-      window.onresize = function () {
-        app.resize();
-      };
-    </script>
+    <script type="module" src="./app_ambientcubmap.ts"></script>
   </body>
 </html>

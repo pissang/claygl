@@ -43,6 +43,7 @@ import Shader from './Shader';
 import StandardShader from './shader/StandardShader';
 import Geometry from './Geometry';
 import { Color } from './core/type';
+import { OrbitControl } from './claygl';
 
 interface App3DGraphicOpts {
   /**
@@ -290,6 +291,7 @@ class App3D extends Notifier {
    */
   init(prepare?: () => Promise<any>) {
     if (this._inited) {
+      console.error('Already inited. Set lazyInit: true.');
       return;
     }
 
@@ -598,9 +600,9 @@ class App3D extends Notifier {
         return texture;
       };
     }
-    Object.keys(uniforms).forEach((uniformName) => {
-      if (uniforms[uniformName]) {
-        const val = matConfig[uniformName];
+    Object.keys(matConfig).forEach((uniformName) => {
+      const val = matConfig[uniformName];
+      if (uniforms[uniformName] && val != null) {
         if (
           (uniforms[uniformName].type === 't' || isImageLikeElement(val)) &&
           !(val instanceof Texture)
@@ -833,17 +835,21 @@ class App3D extends Notifier {
    */
   createCamera(
     position: Vector3 | Vector3['array'],
-    target?: Vector3,
-    type?: 'ortho' | 'orthographic',
+    target: Vector3 | Vector3['array'],
+    type: 'ortho' | 'orthographic',
     extent?: Vector3 | Vector3['array']
-  ): void;
-  createCamera(position: Vector3 | Vector3['array'], target?: Vector3, type?: 'perspective'): void;
+  ): OrthographicCamera;
   createCamera(
     position: Vector3 | Vector3['array'],
-    target?: Vector3,
+    target?: Vector3 | Vector3['array'],
+    type?: 'perspective'
+  ): PerspectiveCamera;
+  createCamera(
+    position: Vector3 | Vector3['array'],
+    target?: Vector3 | Vector3['array'],
     type?: 'ortho' | 'orthographic' | 'perspective',
     extent?: Vector3 | Vector3['array']
-  ) {
+  ): PerspectiveCamera | OrthographicCamera {
     let CameraCtor;
     let isOrtho = false;
     if (type === 'ortho' || type === 'orthographic') {
@@ -1102,7 +1108,7 @@ class App3D extends Notifier {
       textureRootPath?: string;
     },
     parentNode?: ClayNode
-  ) {
+  ): Promise<GLTFLoadResult> {
     if (typeof url !== 'string') {
       throw new Error('Invalid URL.');
     }
@@ -1197,7 +1203,7 @@ class App3D extends Notifier {
   /**
    * Resize the application. Will use the container clientWidth/clientHeight if width/height in parameters are not given.
    */
-  resize(width: number, height: number) {
+  resize(width?: number, height?: number) {
     const container = this._container;
     this._renderer.resize(width || container.clientWidth, height || container.clientHeight);
   }
