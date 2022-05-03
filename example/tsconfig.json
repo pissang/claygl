@@ -6,7 +6,7 @@
     "esModuleInterop": true,
 
     "paths": {
-      "claygl": ["../src/claygl"]
+      "claygl": ["../src/claygl.ts"]
     }
   }
 }

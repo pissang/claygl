@@ -76,8 +76,6 @@ export class EventManager {
     this._container = container;
     this._renderer = renderer;
     this._scene = scene;
-
-    this.init();
   }
 
   init() {

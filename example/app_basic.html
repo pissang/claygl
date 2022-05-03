@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script src="../dist/claygl.js"></script>
     <title>Basic Cube</title>
   </head>
   <body>
@@ -17,29 +16,6 @@
       }
     </style>
     <div id="main"></div>
-    <script>
-      var app = clay.application.create('#main', {
-        init: function (app) {
-          // Create camera
-          this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
-
-          // Create cube
-          this._cube = app.createCube({
-            color: '#f00'
-          });
-
-          // Create light
-          this._mainLight = app.createDirectionalLight([-1, -1, -1]);
-        },
-
-        loop: function (app) {
-          this._cube.rotation.rotateY(app.frameTime / 1000);
-        }
-      });
-
-      window.onresize = function () {
-        app.resize();
-      };
-    </script>
+    <script type="module" src="./app_basic.ts"></script>
   </body>
 </html>

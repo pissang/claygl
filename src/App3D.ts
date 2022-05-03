@@ -175,7 +175,7 @@ class App3D extends Notifier {
     opts = Object.assign({}, opts);
 
     this._autoRender = util.optional(opts.autoRender, true);
-    const graphic = (this._graphicOpts = opts.graphic || {});
+    const graphicOpts = (this._graphicOpts = opts.graphic || {});
     const glAttributes = opts.glAttributes || {};
 
     if (typeof container === 'string') {
@@ -221,12 +221,13 @@ class App3D extends Notifier {
 
     this._gpuResourceManager = new GPUResourceManager(renderer);
 
-    if (graphic.shadow) {
+    if (graphicOpts.shadow) {
       this._shadowPass = new ShadowMapPass();
     }
 
     if (opts.event) {
       this._eventManager = new EventManager(container, renderer, this._scene);
+      this._eventManager.init();
     }
     !isDomCanvas && container.appendChild(renderer.canvas);
 
@@ -244,7 +245,7 @@ class App3D extends Notifier {
         if (this._inRender) {
           // Only update graphic options when using #render function.
           (['opaque', 'transparent'] as const).forEach((type) => {
-            this._updateGraphicOptions(opts!.graphic!, renderList[type], false);
+            this._updateGraphicOptions(graphicOpts, renderList[type], false);
           });
         }
       }
@@ -581,7 +582,7 @@ class App3D extends Notifier {
    * @param {Function} [texturesReady] Callback when all texture loaded.
    * @return {clay.Material}
    */
-  createMaterial(matConfig: CreateMaterialConfig) {
+  createMaterial(matConfig?: CreateMaterialConfig) {
     matConfig = matConfig || {};
     const shader = matConfig.shader || this._defaultShader;
     const material = new Material({
@@ -596,12 +597,12 @@ class App3D extends Notifier {
     function makeTextureSetter(key: string) {
       return function (texture: Texture) {
         material.setUniform(key, texture);
-        matConfig.textureLoaded && matConfig.textureLoaded(key, texture);
+        matConfig!.textureLoaded && matConfig!.textureLoaded(key, texture);
         return texture;
       };
     }
     Object.keys(matConfig).forEach((uniformName) => {
-      const val = matConfig[uniformName];
+      const val = matConfig![uniformName];
       if (uniforms[uniformName] && val != null) {
         if (
           (uniforms[uniformName].type === 't' || isImageLikeElement(val)) &&
@@ -610,8 +611,8 @@ class App3D extends Notifier {
           // Try to load a texture.
           texturesLoading.push(
             this.loadTexture(val, {
-              convertToPOT: matConfig.textureConvertToPOT || false,
-              flipY: util.optional(matConfig.textureFlipY, true)
+              convertToPOT: matConfig!.textureConvertToPOT || false,
+              flipY: util.optional(matConfig!.textureFlipY, true)
             }).then(makeTextureSetter(uniformName))
           );
         } else {
@@ -645,7 +646,7 @@ class App3D extends Notifier {
    *  app.createCube()
    */
   createCube(
-    material: CreateMaterialConfig | Material,
+    material?: CreateMaterialConfig | Material,
     parentNode?: ClayNode,
     subdiv?: number | number[]
   ) {
@@ -681,7 +682,7 @@ class App3D extends Notifier {
    *  app.createCubeInside()
    */
   createCubeInside(
-    material: CreateMaterialConfig | Material,
+    material?: CreateMaterialConfig | Material,
     parentNode?: ClayNode,
     subdiv?: number | number[]
   ) {
@@ -720,7 +721,7 @@ class App3D extends Notifier {
    *      alpha: 0.5
    *  })
    */
-  createSphere(material: CreateMaterialConfig | Material, parentNode?: ClayNode, subdiv?: number) {
+  createSphere(material?: CreateMaterialConfig | Material, parentNode?: ClayNode, subdiv?: number) {
     if (subdiv == null) {
       subdiv = 20;
     }
@@ -753,7 +754,7 @@ class App3D extends Notifier {
    *  })
    */
   createPlane(
-    material: CreateMaterialConfig | Material,
+    material?: CreateMaterialConfig | Material,
     parentNode?: ClayNode,
     subdiv?: number | number[]
   ) {
@@ -789,7 +790,7 @@ class App3D extends Notifier {
    * @return {clay.Mesh}
    */
   createParametricSurface(
-    material: CreateMaterialConfig | Material,
+    material?: CreateMaterialConfig | Material,
     parentNode?: ClayNode,
     generator?: ParametricSurfaceGeometryOpts['generator']
   ) {
@@ -804,7 +805,7 @@ class App3D extends Notifier {
    * Create a general mesh with given geometry instance and material config.
    * @param geometry
    */
-  createMesh(geometry: Geometry, mat: CreateMaterialConfig | Material, parentNode?: ClayNode) {
+  createMesh(geometry: Geometry, mat?: CreateMaterialConfig | Material, parentNode?: ClayNode) {
     const mesh = new Mesh({
       geometry: geometry,
       material: mat instanceof Material ? mat : this.createMaterial(mat)
@@ -819,7 +820,7 @@ class App3D extends Notifier {
    * @param {clay.Node} parentNode
    * @return {clay.Node}
    */
-  createNode(parentNode: ClayNode) {
+  createNode(parentNode?: ClayNode) {
     const node = new ClayNode();
     parentNode = parentNode || this._scene;
     parentNode.add(node);
