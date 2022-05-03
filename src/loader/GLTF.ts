@@ -246,7 +246,7 @@ interface GLTFLoadOpts {
 
 export function load(
   url: string,
-  opts?: Omit<GLTFLoadOpts, 'onload' | 'onerror'>
+  opts?: Partial<Omit<GLTFLoadOpts, 'onload' | 'onerror'>>
 ): Promise<GLTFLoadResult> {
   return new Promise((resolve, reject) => {
     doLoadGLTF(
@@ -263,7 +263,7 @@ export function load(
   });
 }
 
-function doLoadGLTF(url: string, opts?: GLTFLoadOpts) {
+function doLoadGLTF(url: string, opts?: Partial<GLTFLoadOpts>) {
   opts = Object.assign(
     {
       useStandardMaterial: false,
@@ -316,7 +316,7 @@ function doLoadGLTF(url: string, opts?: GLTFLoadOpts) {
  * @param {ArrayBuffer} buffer
  * @return {clay.loader.GLTF.Result}
  */
-export function parseBinary(buffer: ArrayBuffer, opts: GLTFLoadOpts) {
+export function parseBinary(buffer: ArrayBuffer, opts: Partial<GLTFLoadOpts>) {
   const header = new Uint32Array(buffer, 0, 4);
   const onerror = opts.onerror;
   if (header[0] !== 0x46546c67) {
@@ -370,7 +370,11 @@ export function parseBinary(buffer: ArrayBuffer, opts: GLTFLoadOpts) {
  * @param {ArrayBuffer[]} [buffer]
  * @return {clay.loader.GLTF.Result}
  */
-export function parse(json: GLTFFormat, buffers: ArrayBuffer[] | undefined, opts: GLTFLoadOpts) {
+export function parse(
+  json: GLTFFormat,
+  buffers: ArrayBuffer[] | undefined,
+  opts: Partial<GLTFLoadOpts>
+) {
   const lib: ParsedLib = {
     json: json,
     buffers: [],
@@ -494,7 +498,7 @@ export function parse(json: GLTFFormat, buffers: ArrayBuffer[] | undefined, opts
  * Binary file path resolver. User can override it
  * @param {string} path
  */
-function resolveBufferPath(path: string, opts: GLTFLoadOpts) {
+function resolveBufferPath(path: string, opts: Partial<GLTFLoadOpts>) {
   if (path && path.match(/^data:(.*?)base64,/)) {
     return path;
   }
@@ -506,7 +510,7 @@ function resolveBufferPath(path: string, opts: GLTFLoadOpts) {
  * Texture file path resolver. User can override it
  * @param {string} path
  */
-function resolveTexturePath(path: string, opts: GLTFLoadOpts) {
+function resolveTexturePath(path: string, opts: Partial<GLTFLoadOpts>) {
   if (path && path.match(/^data:(.*?)base64,/)) {
     return path;
   }
@@ -518,7 +522,7 @@ function loadBuffers(
   path: string,
   onsuccess: (buffer: ArrayBuffer) => void,
   onerror: (err: any) => void,
-  opts: GLTFLoadOpts
+  opts: Partial<GLTFLoadOpts>
 ) {
   const base64Prefix = 'data:application/octet-stream;base64,';
   const strStart = path.substr(0, base64Prefix.length);
@@ -540,7 +544,7 @@ function loadBuffers(
 
 // https://github.com/KhronosGroup/glTF/issues/100
 // https://github.com/KhronosGroup/glTF/issues/193
-function parseSkins(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
+function parseSkins(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpts>) {
   // Create skeletons and joints
   (json.skins || []).forEach((skinInfo: GLTFSkin, idx: number) => {
     const skeleton = new Skeleton(skinInfo.name);
@@ -600,7 +604,7 @@ function parseSkins(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
   });
 }
 
-function parseTextures(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
+function parseTextures(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpts>) {
   (json.textures || []).forEach((textureInfo: GLTFTexture, idx: number) => {
     // samplers is optional
     const samplerInfo = (json.samplers && json.samplers[textureInfo.sampler]) || {};
@@ -648,7 +652,7 @@ function parseTextures(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
 function KHRCommonMaterialToStandard(
   materialInfo: GLTFMaterial,
   lib: ParsedLib,
-  opts: GLTFLoadOpts
+  opts: Partial<GLTFLoadOpts>
 ) {
   /* eslint-disable-next-line */
   const commonMaterialInfo = materialInfo.extensions['KHR_materials_common'];
@@ -760,7 +764,7 @@ function pbrMetallicRoughnessToStandard(
   materialInfo: GLTFMaterial,
   metallicRoughnessMatInfo: any,
   lib: ParsedLib,
-  opts: GLTFLoadOpts
+  opts: Partial<GLTFLoadOpts>
 ) {
   const alphaTest = materialInfo.alphaMode === 'MASK';
 
@@ -879,7 +883,7 @@ function pbrSpecularGlossinessToStandard(
   materialInfo: GLTFMaterial,
   specularGlossinessMatInfo: any,
   lib: ParsedLib,
-  opts: GLTFLoadOpts
+  opts: Partial<GLTFLoadOpts>
 ) {
   const alphaTest = materialInfo.alphaMode === 'MASK';
 
@@ -963,7 +967,7 @@ function pbrSpecularGlossinessToStandard(
   return material;
 }
 
-function parseMaterials(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
+function parseMaterials(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpts>) {
   (json.materials || []).forEach((materialInfo: GLTFMaterial, idx: number) => {
     /* eslint-disable-next-line */
     if (materialInfo.extensions && materialInfo.extensions['KHR_materials_common']) {
@@ -991,7 +995,7 @@ function parseMaterials(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
   });
 }
 
-function parseMeshes(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
+function parseMeshes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpts>) {
   (json.meshes || []).forEach((meshInfo: GLTFMesh, idx: number) => {
     lib.meshes[idx] = [];
     // Geometry
@@ -1162,7 +1166,7 @@ function instanceCamera(json: GLTFFormat, nodeInfo: GLTFNode) {
   }
 }
 
-function parseNodes(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
+function parseNodes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpts>) {
   function instanceMesh(mesh: Mesh): Mesh {
     return new Mesh({
       name: mesh.name,
@@ -1232,7 +1236,7 @@ function parseNodes(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
   });
 }
 
-function parseAnimations(json: GLTFFormat, lib: ParsedLib, opts: GLTFLoadOpts) {
+function parseAnimations(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpts>) {
   function checkChannelPath(channelInfo: GLTFChannel) {
     if (channelInfo.path === 'weights') {
       console.warn('GLTFLoader not support morph targets yet.');

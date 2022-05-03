@@ -9,6 +9,7 @@ import type Camera from './Camera';
 import type Renderable from './Renderable';
 import type Vector2 from './math/Vector2';
 import type BoundingBox from './math/BoundingBox';
+import type { Intersection } from './picking/RayPicking';
 
 export type AttributeType = 'byte' | 'ubyte' | 'short' | 'ushort' | 'float';
 export type AttributeSize = 1 | 2 | 3 | 4;
@@ -324,7 +325,7 @@ class GeometryBase {
     renderer: Renderer,
     camera: Camera,
     renderable: Renderable,
-    out: Vector2
+    out: Intersection[]
   ) => boolean;
 
   /**
@@ -335,7 +336,7 @@ class GeometryBase {
    * ```
    * @type {?Function}
    */
-  pickByRay?: (ray: Ray, renderable: Renderable, out: Vector2) => boolean;
+  pickByRay?: (ray: Ray, renderable: Renderable, out: Intersection[]) => boolean;
 
   protected _cache = new ClayCache();
   private _attributeList: string[];

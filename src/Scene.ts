@@ -64,7 +64,7 @@ function setUniforms(
   }
 }
 
-class RenderList {
+export class RenderList {
   opaque: Renderable[] = [];
   transparent: Renderable[] = [];
 
@@ -112,6 +112,8 @@ class Scene extends ClayNode {
 
   // Uniforms for shadow map.
   shadowUniforms: Record<string, ShaderUniform> = {};
+
+  skybox?: Skybox;
 
   private _cameraList: Camera[] = [];
 
@@ -230,8 +232,6 @@ class Scene extends ClayNode {
    * Clone a node and it's children, including mesh, camera, light, etc.
    * Unlike using `Node#clone`. It will clone skeleton and remap the joints. Material will also be cloned.
    *
-   * @param {clay.Node} node
-   * @return {clay.Node}
    */
   cloneNode(node: ClayNode) {
     const newNode = node.clone();

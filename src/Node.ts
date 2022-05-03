@@ -55,6 +55,11 @@ export interface ClayNodeOpts {
    * If node and its chilren invisible
    */
   invisible?: boolean;
+
+  /**
+   * If not trigger event. Available in the App3D
+   */
+  silent?: boolean;
 }
 
 interface ClayNode extends ClayNodeOpts {

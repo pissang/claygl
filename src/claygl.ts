@@ -68,3 +68,5 @@ export { default as Skybox } from './plugin/Skybox';
 
 export * as meshUtil from './util/mesh';
 export * as textureUtil from './util/texture';
+
+export { default as App3D } from './App3D';

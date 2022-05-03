@@ -9,7 +9,7 @@ interface SurfaceGenerator {
   z: (u: number, v: number) => number;
 }
 
-interface ParametricSurfaceGeometryOpts extends GeometryOpts {
+export interface ParametricSurfaceGeometryOpts extends GeometryOpts {
   generator: SurfaceGenerator;
 }
 

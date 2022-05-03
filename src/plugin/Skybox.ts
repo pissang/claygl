@@ -141,6 +141,10 @@ class Skybox extends Mesh {
     }
     renderer.renderPass([this], dummyCamera);
   }
+
+  static getSceneSkybox(scene: Scene) {
+    return sceneSkyboxMap.get(scene);
+  }
 }
 
 export default Skybox;

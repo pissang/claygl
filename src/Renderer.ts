@@ -195,7 +195,7 @@ interface Viewport {
   height: number;
   devicePixelRatio: number;
 }
-interface RendererOpts {
+export interface RendererOpts {
   canvas: HTMLCanvasElement | null;
 
   /**

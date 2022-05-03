@@ -1,6 +1,10 @@
 import * as util from './core/util';
 import * as colorUtil from './core/color';
 import Shader, { ShaderDefineValue, ShaderPrecision, ShaderType, ShaderUniform } from './Shader';
+import Texture from './Texture';
+
+type MaterialUniformValue = number | string | ArrayLike<number> | Texture;
+
 const parseColor = colorUtil.parseToFloat;
 
 const programKeyCache: Record<string, string> = {};
@@ -150,7 +154,7 @@ class Material {
    * @param {string} symbol
    * @param {number|array|clay.Texture} value
    */
-  setUniform(symbol: string, value: number | string | ArrayLike<number>) {
+  setUniform(symbol: string, value: MaterialUniformValue) {
     if (value === undefined) {
       return;
       // console.warn('Uniform value "' + symbol + '" is undefined');

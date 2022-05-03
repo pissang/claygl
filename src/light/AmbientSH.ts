@@ -1,10 +1,10 @@
 import Light, { LightOpts } from '../Light';
 
 export interface AmbientSHLightOpts extends LightOpts {
-  coefficients: number[];
+  coefficients: ArrayLike<number>;
 }
 class AmbientSHLight extends Light {
-  coefficients: number[];
+  coefficients: ArrayLike<number>;
 
   readonly type = 'AMBIENT_SH_LIGHT';
 
