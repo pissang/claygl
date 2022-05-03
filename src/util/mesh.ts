@@ -1,11 +1,10 @@
-// @ts-nocheck
 // TODO test
 import Geometry from '../Geometry';
 import Mesh from '../Mesh';
 import ClayNode from '../Node';
 import BoundingBox from '../math/BoundingBox';
-import vec3 from '../glmatrix/vec3';
-import mat4 from '../glmatrix/mat4';
+import * as vec3 from '../glmatrix/vec3';
+import * as mat4 from '../glmatrix/mat4';
 
 /**
  * @namespace clay.util.mesh
@@ -13,13 +12,8 @@ import mat4 from '../glmatrix/mat4';
 /**
  * Merge multiple meshes to one.
  * Note that these meshes must have the same material
- *
- * @param {Array.<clay.Mesh>} meshes
- * @param {boolean} applyWorldTransform
- * @return {clay.Mesh}
- * @memberOf clay.util.mesh
  */
-export function merge(meshes, applyWorldTransform) {
+export function merge(meshes: Mesh[], applyWorldTransform?: boolean) {
   if (!meshes.length) {
     return;
   }
@@ -88,23 +82,25 @@ export function merge(meshes, applyWorldTransform) {
       const name = attributeNames[nn];
       const currentAttr = currentGeo.attributes[name];
       const targetAttr = geometry.attributes[name];
+      const attrValue = currentAttr.value!;
+      const targetAttrValue = targetAttr.value!;
       // Skip the unused attributes;
-      if (!currentAttr.value.length) {
+      if (!attrValue.length) {
         continue;
       }
-      const len = currentAttr.value.length;
+      const len = attrValue.length;
       const size = currentAttr.size;
       const offset = vertexOffset * size;
       const count = len / size;
       for (let i = 0; i < len; i++) {
-        targetAttr.value[offset + i] = currentAttr.value[i];
+        targetAttrValue[offset + i] = attrValue[i];
       }
       // Transform position, normal and tangent
       if (name === 'position') {
-        vec3.forEach(targetAttr.value, size, offset, count, vec3.transformMat4, matrix);
+        vec3.forEach(targetAttrValue, size, offset, count, vec3.transformMat4, matrix);
       } else if (name === 'normal' || name === 'tangent') {
         vec3.forEach(
-          targetAttr.value,
+          targetAttrValue,
           size,
           offset,
           count,
@@ -115,9 +111,9 @@ export function merge(meshes, applyWorldTransform) {
     }
 
     if (useIndices) {
-      const len = currentGeo.indices.length;
+      const len = currentGeo.indices!.length;
       for (let i = 0; i < len; i++) {
-        geometry.indices[i + indicesOffset] = currentGeo.indices[i] + vertexOffset;
+        geometry.indices[i + indicesOffset] = currentGeo.indices![i] + vertexOffset;
       }
       indicesOffset += len;
     }
@@ -142,7 +138,7 @@ export function merge(meshes, applyWorldTransform) {
  */
 
 // FIXME, Have issues on some models
-export function splitByJoints(mesh, maxJointNumber, inPlace) {
+export function splitByJoints(mesh: Mesh, maxJointNumber: number, inPlace?: boolean) {
   const geometry = mesh.geometry;
   const skeleton = mesh.skeleton;
   const material = mesh.material;
@@ -155,11 +151,16 @@ export function splitByJoints(mesh, maxJointNumber, inPlace) {
   }
 
   const indices = geometry.indices;
+  const jointValues = geometry.attributes.joint.value;
+  if (!indices || !jointValues) {
+    // TODO
+    console.error('Geometry must have indices and joint attribute');
+    return;
+  }
 
   const faceLen = geometry.triangleCount;
   let rest = faceLen;
   const isFaceAdded = [];
-  const jointValues = geometry.attributes.joint.value;
   for (let i = 0; i < faceLen; i++) {
     isFaceAdded[i] = false;
   }
@@ -167,7 +168,7 @@ export function splitByJoints(mesh, maxJointNumber, inPlace) {
 
   const buckets = [];
 
-  const getJointByIndex = function (idx) {
+  const getJointByIndex = function (idx: number) {
     return joints[idx];
   };
   while (rest > 0) {
@@ -295,11 +296,11 @@ export function splitByJoints(mesh, maxJointNumber, inPlace) {
             const size = attrib.size;
 
             for (let j = 0; j < size; j++) {
-              subAttrib.value[nVertex * size + j] = attrib.value[idx * size + j];
+              subAttrib.value![nVertex * size + j] = attrib.value![idx * size + j];
             }
           }
           for (let j = 0; j < 4; j++) {
-            const jointIdx = geometry.attributes.joint.value[idx * 4 + j];
+            const jointIdx = jointValues[idx * 4 + j];
             const offset = nVertex * 4 + j;
             if (jointIdx >= 0) {
               subGeo.attributes.joint.value[offset] = jointReverseMap[jointIdx];
@@ -325,8 +326,8 @@ export function splitByJoints(mesh, maxJointNumber, inPlace) {
   root.scale.copy(mesh.scale);
 
   if (inPlace) {
-    if (mesh.getParent()) {
-      const parent = mesh.getParent();
+    const parent = mesh.getParent();
+    if (parent) {
       parent.remove(mesh);
       parent.add(root);
     }

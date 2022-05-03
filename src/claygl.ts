@@ -65,3 +65,6 @@ export { default as FreeControl } from './plugin/FreeControl';
 export { default as GamepadControl } from './plugin/GamepadControl';
 
 export { default as Skybox } from './plugin/Skybox';
+
+export * as meshUtil from './util/mesh';
+export * as textureUtil from './util/texture';

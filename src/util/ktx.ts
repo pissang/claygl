@@ -1,10 +1,11 @@
-// @ts-nocheck
 // KTX loader
 // Modified from https://github.com/mrdoob/three.js/blob/dev/examples/js/loaders/KTXLoader.js
 
+import Texture2D from '../Texture2D';
+
 const HEADER_LEN = 12 + 13 * 4; // identifier + header elements (not including key value meta-data pairs)
 
-function getUint32(buffer, offset, littleEndian) {
+function getUint32(buffer: Uint8Array, offset: number, littleEndian?: boolean) {
   let a;
   let b;
   let c;
@@ -23,7 +24,7 @@ function getUint32(buffer, offset, littleEndian) {
   return ((d << 24) >>> 0) + ((c << 16) | (b << 8) | a);
 }
 
-function parse(arraybuffer, loadMipmaps) {
+export function parse(arraybuffer: ArrayBuffer, loadMipmaps?: boolean, out?: Texture2D) {
   const facesExpected = 1;
   // Test that it is a ktx formatted file, based on the first 12 bytes, character representation is:
   // '´', 'K', 'T', 'X', ' ', '1', '1', 'ª', '\r', '\n', '\x1A', '\n'
@@ -112,20 +113,19 @@ function parse(arraybuffer, loadMipmaps) {
     width = Math.max(1.0, width * 0.5);
     height = Math.max(1.0, height * 0.5);
   }
-  const res = {
-    width: pixelWidth,
-    height: pixelHeight,
-    format: glInternalFormat
-  };
-  if (loadMipmaps) {
-    res.mipmaps = mipmaps;
-    res.mipmapCount = numberOfMipmapLevels;
-  } else {
-    res.pixels = mipmaps[0].pixels;
-  }
-  return res;
-}
 
-export default {
-  parse: parse
-};
+  out =
+    out ||
+    new Texture2D({
+      width: pixelWidth,
+      height: pixelHeight,
+      format: glInternalFormat
+    });
+  if (loadMipmaps) {
+    out.mipmaps = mipmaps;
+    // res.mipmapCount = numberOfMipmapLevels;
+  } else {
+    out.pixels = mipmaps[0].pixels;
+  }
+  return out;
+}
