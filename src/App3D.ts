@@ -164,6 +164,9 @@ class App3D extends Notifier {
   private _autoRender;
   private _inited = false;
 
+  private _frameTime: number = 0;
+  private _elapsedTime: number = 0;
+
   private _defaultShader = new StandardShader();
 
   constructor(container: HTMLElement | string, opts?: App3DOpts) {
@@ -247,6 +250,38 @@ class App3D extends Notifier {
     );
   }
 
+  get scene() {
+    return this._scene;
+  }
+
+  get renderer() {
+    return this._renderer;
+  }
+
+  get container() {
+    return this._container;
+  }
+
+  get timeline() {
+    return this._timeline;
+  }
+
+  get frameTime() {
+    return this._frameTime;
+  }
+
+  get elapsedTime() {
+    return this._elapsedTime;
+  }
+
+  get width() {
+    return this._renderer.getWidth();
+  }
+
+  get height() {
+    return this._renderer.getHeight();
+  }
+
   /**
    * Init app3D
    *
@@ -273,11 +308,11 @@ class App3D extends Notifier {
   private _doInit() {
     this._inited = true;
 
-    let gFrameTime = 0;
-    let gElapsedTime = 0;
+    this._frameTime = 0;
+    this._elapsedTime = 0;
     this._timeline.on('frame', (frameTime: number) => {
-      gFrameTime = frameTime;
-      gElapsedTime += frameTime;
+      this._frameTime = frameTime;
+      this._elapsedTime += frameTime;
 
       const camera = this._scene.getMainCamera();
       if (camera instanceof PerspectiveCamera) {
@@ -992,13 +1027,8 @@ class App3D extends Notifier {
     exposure?: number,
     prefilteredCubemapSize?: number
   ) {
-    const self = this;
-    if (exposure == null) {
-      exposure = 0;
-    }
-    if (prefilteredCubemapSize == null) {
-      prefilteredCubemapSize = 32;
-    }
+    exposure = exposure || 0;
+    prefilteredCubemapSize = prefilteredCubemapSize || 32;
 
     const scene = this._scene;
 
@@ -1164,90 +1194,6 @@ class App3D extends Notifier {
 
     return newNode;
   }
-  // function App3D(dom, appNS) {
-  //   appNS = appNS || {};
-
-  //   Object.defineProperties(this, {
-  //     /**
-  //      * Container dom element
-  //      * @name clay.application.App3D#container
-  //      * @type {HTMLElement}
-  //      */
-  //     container: {
-  //       get: function () {
-  //         return dom;
-  //       }
-  //     },
-  //     /**
-  //      * @name clay.application.App3D#renderer
-  //      * @type {clay.Renderer}
-  //      */
-  //     renderer: {
-  //       get: function () {
-  //         return gRenderer;
-  //       }
-  //     },
-  //     /**
-  //      * @name clay.application.App3D#scene
-  //      * @type {clay.Renderer}
-  //      */
-  //     scene: {
-  //       get: function () {
-  //         return gScene;
-  //       }
-  //     },
-  //     /**
-  //      * @name clay.application.App3D#timeline
-  //      * @type {clay.Renderer}
-  //      */
-  //     timeline: {
-  //       get: function () {
-  //         return gTimeline;
-  //       }
-  //     },
-  //     /**
-  //      * Time elapsed since last frame. Can be used in loop to calculate the movement.
-  //      * @name clay.application.App3D#frameTime
-  //      * @type {number}
-  //      */
-  //     frameTime: {
-  //       get: function () {
-  //         return gFrameTime;
-  //       }
-  //     },
-  //     /**
-  //      * Time elapsed since application created.
-  //      * @name clay.application.App3D#elapsedTime
-  //      * @type {number}
-  //      */
-  //     elapsedTime: {
-  //       get: function () {
-  //         return gElapsedTime;
-  //       }
-  //     },
-
-  //     /**
-  //      * Width of viewport.
-  //      * @name clay.application.App3D#width
-  //      * @type {number}
-  //      */
-  //     width: {
-  //       get: function () {
-  //         return gRenderer.getWidth();
-  //       }
-  //     },
-  //     /**
-  //      * Height of viewport.
-  //      * @name clay.application.App3D#height
-  //      * @type {number}
-  //      */
-  //     height: {
-  //       get: function () {
-  //         return gRenderer.getHeight();
-  //       }
-  //     }
-  //   });
-
   /**
    * Resize the application. Will use the container clientWidth/clientHeight if width/height in parameters are not given.
    */
