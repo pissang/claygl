@@ -30,7 +30,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   const cubemap = textureUtil.loadTexture(
     'assets/textures/hdr/pisa.hdr',
     {
-      exposure: 3
+      exposure: 2
     },
     () => {
       cubemap.flipY = false;

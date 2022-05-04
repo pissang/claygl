@@ -16,6 +16,7 @@ import { panoramaToCubeMap } from './texture';
 import integrateBRDFShaderCode from './shader/integrateBRDF.glsl.js';
 import prefilterFragCode from './shader/prefilter.glsl.js';
 import Renderer from '../Renderer';
+import { CLAMP_TO_EDGE } from '../core/glenum';
 
 const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
 
@@ -48,6 +49,9 @@ export function prefilterEnvironmentMap(
   const prefilteredCubeMap = new TextureCube({
     width,
     height,
+    // Must use CLAMP_TO_EDGE
+    wrapS: CLAMP_TO_EDGE,
+    wrapT: CLAMP_TO_EDGE,
     type: textureType,
     flipY: false
   });
@@ -122,10 +126,11 @@ export function prefilterEnvironmentMap(
     };
     skyEnv.material.set('roughness', i / (mipmapNum - 1));
 
-    // Tweak fov
+    // Tweak fov.
     // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
     const n = renderTargetTmp.width;
     const fov = ((2 * Math.atan(n / (n - 0.5))) / Math.PI) * 180;
+    // const fov = 90;
 
     for (let j = 0; j < targets.length; j++) {
       const pixels = new ArrayCtor(renderTargetTmp.width * renderTargetTmp.height * 4);
@@ -150,8 +155,13 @@ export function prefilterEnvironmentMap(
       // canvas.width = renderTargetTmp.width;
       // canvas.height = renderTargetTmp.height;
       // const imageData = ctx.createImageData(renderTargetTmp.width, renderTargetTmp.height);
-      // for (let k = 0; k < pixels.length; k++) {
-      //   imageData.data[k] = pixels[k];
+      // for (let k = 0; k < pixels.length; k += 4) {
+      //   const a = pixels[k + 3] / 255;
+      //   const range = 8.12;
+      //   imageData.data[k] = pixels[k] * a * range;
+      //   imageData.data[k + 1] = pixels[k + 1] * a * range;
+      //   imageData.data[k + 2] = pixels[k + 2] * a * range;
+      //   imageData.data[k + 3] = 255;
       // }
       // ctx.putImageData(imageData, 0, 0);
       // container.appendChild(canvas);
