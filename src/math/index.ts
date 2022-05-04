@@ -10,6 +10,7 @@ import * as Value from './Value';
 import Vector2 from './Vector2';
 import Vector3 from './Vector3';
 import Vector4 from './Vector4';
+import BoundingBox from './BoundingBox';
 
 export {
   Frustum,
@@ -23,5 +24,6 @@ export {
   Value,
   Vector2,
   Vector3,
-  Vector4
+  Vector4,
+  BoundingBox
 };

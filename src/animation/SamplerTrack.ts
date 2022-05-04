@@ -118,6 +118,7 @@ class SamplerTrack {
   constructor(opts?: SamplerTrackOpts) {
     opts = opts || {};
     this.name = opts.name || '';
+    this.target = opts.target;
   }
 
   setTime(time: number) {
@@ -174,17 +175,21 @@ class SamplerTrack {
       const endTime = channels.time[end];
       const range = endTime - startTime;
       const percent = range === 0 ? 0 : (time - startTime) / range;
+      const positionChannel = channels.position;
+      const rotationChannel = channels.rotation;
+      const scaleChannel = channels.scale;
 
-      if (channels.rotation) {
-        quatSlerp(this.rotation, channels.rotation, channels.rotation, percent, start * 4, end * 4);
+      if (rotationChannel) {
+        quatSlerp(this.rotation, rotationChannel, rotationChannel, percent, start * 4, end * 4);
       }
-      if (channels.position) {
-        vec3lerp(this.position, channels.position, channels.position, percent, start * 3, end * 3);
+      if (positionChannel) {
+        vec3lerp(this.position, positionChannel, positionChannel, percent, start * 3, end * 3);
       }
-      if (channels.scale) {
-        vec3lerp(this.scale, channels.scale, channels.scale, percent, start * 3, end * 3);
+      if (scaleChannel) {
+        vec3lerp(this.scale, scaleChannel, scaleChannel, percent, start * 3, end * 3);
       }
     }
+
     // Loop handling
     if (key === len - 2) {
       this._cacheKey = 0;
@@ -198,16 +203,17 @@ class SamplerTrack {
    */
   updateTarget() {
     const channels = this.channels;
-    if (this.target) {
+    const target = this.target;
+    if (target) {
       // Only update target prop if have data.
       if (channels.position) {
-        this.target.position.setArray(this.position);
+        target.position.setArray(this.position);
       }
       if (channels.rotation) {
-        this.target.rotation.setArray(this.rotation);
+        target.rotation.setArray(this.rotation);
       }
       if (channels.scale) {
-        this.target.scale.setArray(this.scale);
+        target.scale.setArray(this.scale);
       }
     }
   }

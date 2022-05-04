@@ -1143,6 +1143,7 @@ class App3D extends Notifier {
         parentNode!.add(result.rootNode!);
         if (autoPlayAnimation) {
           result.animators.forEach(function (animator) {
+            animator.start();
             timeline.addAnimator(animator);
           });
         }

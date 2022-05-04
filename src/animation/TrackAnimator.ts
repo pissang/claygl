@@ -209,6 +209,10 @@ class TrackAnimator {
   setLife(life: number) {
     this._life = life;
   }
+
+  getClip() {
+    return this._clip;
+  }
 }
 
 export default TrackAnimator;
