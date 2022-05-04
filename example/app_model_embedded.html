@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script src="../dist/claygl.js"></script>
-    <title>Model loading</title>
+    <title>Embedded GLTF Model</title>
   </head>
   <body>
     <style>
@@ -17,33 +16,6 @@
       }
     </style>
     <div id="main"></div>
-    <script>
-      var app = clay.application.create('#main', {
-        init: function (app) {
-          // Create camera
-          this._camera = app.createCamera([0, 2, 4], [0, 0, 0]);
-
-          // Create light
-          app.createDirectionalLight([-1, -1, -1]);
-
-          // Use orbit control
-          this._control = new clay.plugin.OrbitControl({
-            target: this._camera,
-            domElement: app.container
-          });
-
-          // Load boombox model. return a load promise to make sure the look will be start after model loaded.
-          return app.loadModel('./assets/models/Duck_Embedded.gltf');
-        },
-
-        loop: function (app) {
-          this._control.update(app.frameTime);
-        }
-      });
-
-      window.onresize = function () {
-        app.resize();
-      };
-    </script>
+    <script type="module" src="./app_model_embedded.ts"></script>
   </body>
 </html>

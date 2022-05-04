@@ -3,7 +3,6 @@
 // TODO playbackRatio
 
 import { BlendAnimator, BlendAnimatorOpts, BlendAnimatorTarget } from './BlendAnimator';
-import Clip from './Clip';
 
 const clipSortFunc = function (a: { position: number }, b: { position: number }) {
   return a.position - b.position;

@@ -33,6 +33,7 @@ type AnimatableControlOpts = Pick<
 >;
 
 interface OrbitControlOpts {
+  target: ClayNode;
   timeline?: Timeline;
   domElement: HTMLElement;
 
@@ -126,7 +127,6 @@ interface OrbitControlOpts {
   panSensitivity: number;
 
   autoRotate: boolean;
-  target: ClayNode;
 }
 
 interface OrbitControl
@@ -178,6 +178,7 @@ class OrbitControl extends Notifier {
     super();
 
     this.domElement = opts.domElement;
+    this.timeline = opts.timeline;
 
     this.setOption(
       Object.assign(
@@ -207,7 +208,7 @@ class OrbitControl extends Notifier {
       )
     );
     // Set target after option updated.
-    this._target = opts.target;
+    this.target = opts.target;
 
     // Each OrbitControl has it's own handler
     this._mouseDownHandler = this._mouseDownHandler.bind(this);
@@ -256,7 +257,7 @@ class OrbitControl extends Notifier {
     addEvent(dom, 'wheel', this._mouseWheelHandler);
 
     if (this.timeline) {
-      this.timeline.on('frame', this.update, this);
+      this.timeline.on('frame', () => this.update());
     }
     if (this.target) {
       this.decomposeTransform();

@@ -1300,12 +1300,12 @@ function parseAnimations(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoa
     for (const hash in tracks) {
       tracksList.push(tracks[hash]);
     }
-    const clip = new TrackAnimator({
+    const animator = new TrackAnimator({
       name: animationInfo.name,
       loop: true,
       tracks: tracksList
     });
-    lib.animators.push(clip);
+    lib.animators.push(animator);
   });
 
   // PENDING

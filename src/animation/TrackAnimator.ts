@@ -42,6 +42,7 @@ class TrackAnimator {
   start() {
     this._clip = new Clip({
       life: this._life,
+      loop: this._loop,
       onframe: (percent, elapsedTime) => {
         const range = this._range;
         this.setTime(elapsedTime + (range ? range[0] : 0));

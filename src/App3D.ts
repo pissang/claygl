@@ -285,7 +285,7 @@ class App3D extends Notifier {
   }
 
   /**
-   * Init app3D
+   * Init app3D. Only available when lazyInit is set true.
    *
    * @param prepare Prepare before an intialization.
    *  Return a promise that should be resolved when app is ready

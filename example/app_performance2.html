@@ -7,11 +7,11 @@
         margin: 0;
       }
 
-      canvas {
+      #main {
         position: absolute;
         left: 0;
         top: 0;
-        left: 0;
+        bottom: 0;
         right: 0;
       }
 
@@ -20,53 +20,9 @@
         position: relative;
       }
     </style>
-    <script src="lib/stats.js"></script>
-    <script src="../dist/claygl.js"></script>
   </head>
-  <body onload="init()">
-    <canvas id="main"></canvas>
-    <script>
-      function init() {
-        var dom = document.getElementById('main');
-        var width = (dom.width = window.innerWidth);
-        var height = (dom.height = window.innerHeight);
-
-        stats = new Stats();
-        document.body.insertBefore(stats.domElement, dom);
-
-        var app = clay.application.create('#main', {
-          devicePixelRatio: 1,
-
-          init: function (app) {
-            // Create camera
-            this._camera = app.createCamera([500, 500, 500], [0, 0, 0], 'ortho', [
-              width,
-              height,
-              10000
-            ]);
-
-            var cnt = 100;
-            var distance = 20;
-            var size = 10 / 2;
-            var material = app.createMaterial({
-              color: 'red',
-              shader: 'clay.basic'
-            });
-            for (var i = 0; i < cnt; ++i) {
-              for (var j = 0; j < cnt; ++j) {
-                var cube = app.createCube(material);
-                cube.position.set((i - cnt / 2) * distance, (j - cnt / 2) * distance, 0);
-                cube.scale.set(size, size, size);
-              }
-            }
-          },
-
-          loop: function (app) {
-            stats.end();
-            stats.begin();
-          }
-        });
-      }
-    </script>
+  <body>
+    <div id="main"></div>
+    <script type="module" src="./app_performance2.ts"></script>
   </body>
 </html>

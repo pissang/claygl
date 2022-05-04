@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <script src="../dist/claygl.js"></script>
     <title>Model animation</title>
   </head>
   <body>
@@ -17,41 +16,6 @@
       }
     </style>
     <div id="main"></div>
-    <script>
-      var app = clay.application.create('#main', {
-        graphic: {
-          linear: true,
-          tonemapping: true
-        },
-        init: function (app) {
-          // Create camera
-          this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
-
-          app.createAmbientCubemapLight('./assets/textures/hdr/pisa.hdr', 1, 0.5, 2);
-
-          // Create light
-          app.createDirectionalLight([-1, -1, -1]);
-
-          // Use orbit control
-          this._control = new clay.plugin.OrbitControl({
-            target: this._camera,
-            domElement: app.container
-          });
-
-          // Load boombox model.
-          return app.loadModel('./assets/models/busterDrone/busterDrone.gltf', {
-            waitTextureLoaded: true
-          });
-        },
-
-        loop: function (app) {
-          this._control.update(app.frameTime);
-        }
-      });
-
-      window.onresize = function () {
-        app.resize();
-      };
-    </script>
+    <script type="module" src="./app_model_animation2.ts"></script>
   </body>
 </html>

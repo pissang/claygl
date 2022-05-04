@@ -64,20 +64,6 @@ void main(){
         }
     }
 
-#ifdef USE_VSM
-    depth = depth * 0.5 + 0.5;
-    float moment1 = depth;
-    float moment2 = depth * depth;
-
-    // Adjusting moments using partial derivative
-    #ifdef SUPPORT_STANDARD_DERIVATIVES
-    float dx = dFdx(depth);
-    float dy = dFdy(depth);
-    moment2 += 0.25*(dx*dx+dy*dy);
-    #endif
-
-    gl_FragColor = vec4(moment1, moment2, 0.0, 1.0);
-#else
     // Add slope scaled bias using partial derivative
     #ifdef SUPPORT_STANDARD_DERIVATIVES
     float dx = dFdx(depth);
@@ -88,7 +74,6 @@ void main(){
     #endif
 
     gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
-#endif
 }
 @end
 
@@ -101,12 +86,8 @@ varying vec2 v_Texcoord;
 
 void main() {
     vec4 tex = texture2D(depthMap, v_Texcoord);
-#ifdef USE_VSM
-    gl_FragColor = vec4(tex.rgb, 1.0);
-#else
     float depth = decodeFloat(tex);
     gl_FragColor = vec4(depth, depth, depth, 1.0);
-#endif
 }
 
 @end
@@ -156,12 +137,8 @@ varying vec3 v_WorldPosition;
 
 void main(){
     float dist = distance(lightPosition, v_WorldPosition);
-#ifdef USE_VSM
-    gl_FragColor = vec4(dist, dist * dist, 0.0, 0.0);
-#else
     dist = dist / range;
     gl_FragColor = encodeFloat(dist);
-#endif
 }
 @end
 
@@ -203,23 +180,6 @@ float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
     return pcf(map, uv, z, textureSize, vec2(1.0));
 }
 
-float chebyshevUpperBound(vec2 moments, float z){
-    float p = 0.0;
-    z = z * 0.5 + 0.5;
-    if (z <= moments.x) {
-        p = 1.0;
-    }
-    float variance = moments.y - moments.x * moments.x;
-    // http://fabiensanglard.net/shadowmappingVSM/
-    variance = max(variance, 0.0000001);
-    // Compute probabilistic upper bound.
-    float mD = moments.x - z;
-    float pMax = variance / (variance + mD * mD);
-    // Now reduce light-bleeding by removing the [0, x] tail and linearly rescaling (x, 1]
-    // TODO : bleedBias parameter ?
-    pMax = clamp((pMax-0.4)/(1.0-0.4), 0.0, 1.0);
-    return max(p, pMax);
-}
 float computeShadowContrib(
     sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset
 ) {
@@ -233,12 +193,7 @@ float computeShadowContrib(
         // To texture uv
         vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
 
-        #ifdef USE_VSM
-            vec2 moments = texture2D(map, uv * scale + offset).xy;
-            return chebyshevUpperBound(moments, z);
-        #else
-            return pcf(map, uv * scale + offset, z, textureSize, scale);
-        #endif
+        return pcf(map, uv * scale + offset, z, textureSize, scale);
     }
     return 1.0;
 }
@@ -252,19 +207,7 @@ float computeShadowContribOmni(samplerCube map, vec3 direction, float range)
     float dist = length(direction);
     vec4 shadowTex = textureCube(map, direction);
 
-#ifdef USE_VSM
-    vec2 moments = shadowTex.xy;
-    float variance = moments.y - moments.x * moments.x;
-    float mD = moments.x - dist;
-    float p = variance / (variance + mD * mD);
-    if(moments.x + 0.001 < dist){
-        return clamp(p, 0.0, 1.0);
-    }else{
-        return 1.0;
-    }
-#else
     return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);
-#endif
 }
 
 @end

@@ -184,11 +184,12 @@ class Scene extends ClayNode {
    * @param {claygl.Camera} camera
    */
   setMainCamera(camera: Camera) {
-    const idx = this._cameraList.indexOf(camera);
+    const cameraList = this._cameraList;
+    const idx = cameraList.indexOf(camera);
     if (idx >= 0) {
-      this._cameraList.splice(idx, 1);
+      cameraList.splice(idx, 1);
     }
-    this._cameraList.unshift(camera);
+    cameraList.unshift(camera);
   }
   /**
    * Get main camera of the scene.

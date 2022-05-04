@@ -29,7 +29,6 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 <img src="./asset/clay-viewer.jpg" width="500" />
 </a>
 
-
 [DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
 
 <a href="https://github.com/pissang/dota2hero" target="_blank">
@@ -42,13 +41,11 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 <img src="https://github.com/pissang/papercut-box-art/blob/master/screenshots/3.jpg" width="500" alt="">
 </a>
 
-
 [Little Big City](https://github.com/pissang/little-big-city)
 
 <a href="https://github.com/pissang/little-big-city" target="_blank">
 <img src="https://github.com/pissang/little-big-city/blob/gh-pages/asset/screenshot.png" width="500" alt="">
 </a>
-
 
 ## Quick Start
 
@@ -57,35 +54,32 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <script src="lib/claygl.js"></script>
-</head>
-<body>
-  <canvas id="main"></canvas>
-  <script>
-    clay.application.create('#main', {
+  <head>
+    <script src="lib/claygl.js"></script>
+  </head>
+  <body>
+    <canvas id="main"></canvas>
+    <script>
+      const app = new clay.App3D('#main', {
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
+      // Create camera
+      const camera = app.createCamera([0, 2, 5], [0, 0, 0]);
 
-      width: window.innerWidth,
-      height: window.innerHeight,
+      // Create a RED cube
+      const cube = app.createCube({
+        color: '#f00'
+      });
 
-      init(app) {
-        // Create camera
-        this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
+      // Create light
+      const mainLight = app.createDirectionalLight([-1, -1, -1]);
 
-        // Create a RED cube
-        this._cube = app.createCube({
-            color: '#f00'
-        });
-
-        // Create light
-        this._mainLight = app.createDirectionalLight([-1, -1, -1]);
-      },
-      loop(app) {
-        this._cube.rotation.rotateY(app.frameTime / 1000);
-      }
-    });
-  </script>
-</body>
+      app.loop((frameTime) => {
+        cube.rotation.rotateY(frameTime / 1000);
+      });
+    </script>
+  </body>
 </html>
 ```
 
@@ -109,54 +103,24 @@ void main() {
 `;
 
 const renderer = new Renderer({
-    canvas: document.getElementById('main')
+  canvas: document.getElementById('main')
 });
 renderer.resize(400, 400);
 
 const geometry = new GeometryBase();
-geometry.createAttribute('position', 'float', 3);
+const positionAttrib = geometry.createAttribute('position', 'float', 3);
 // Add triangle vertices to position attribute.
-geometry.attributes.position.fromArray([
-    [-0.5, -0.5, 0],
-    [0.5, -0.5, 0],
-    [0, 0.5, 0]
+positionAttrib.fromArray([
+  [-0.5, -0.5, 0],
+  [0.5, -0.5, 0],
+  [0, 0.5, 0]
 ]);
 
 const material = new Material({
-    shader: new Shader(vsCode, fsCode)
+  shader: new Shader(vsCode, fsCode)
 });
-renderer.renderPass([ { geometry, material } ]);
+renderer.renderPass([{ geometry, material }]);
 ```
-
-
-<!--
-## Current Features
-
-+ Scene graph based management of lights, meshes, cameras, materials and shaders
-+ Basic primitive geometry procedural generate
-  + Cube, sphere, cylinder, cone, plane
-+ Phong and lambert buildin shaders which support normal map and environment map
-+ Point, directional, spot light
-+ Orthographic, perspective camera
-+ Graph based post processing
-+ High quality shadow
-  + PCF or VSM soft shadow
-  + PSSM for sun light in large scene
-  + Omni light shadow support
-+ High performance geometry processing
-+ GPU based skinning
-  + Support 1D and 2D animation blending with blend tree
-+ First person camera control, orbit camera control
-+ Skybox, skydom
-+ Particle System
-+ Support both ray picking and GPU Picking
-+ Loader
-  + glTF loader
-+ Timeline based animation, support spline interpolation between keyframes.
-+ Full deferred pipeline.
-+ Physically based rendering, Full HDR pipeline.
-+ Stereo rendering, VR ready.
- -->
 
 ### FBX to glTF2.0 Converter
 
@@ -195,17 +159,15 @@ optional arguments:
 
 Input:
 
-+ FBX
-+ COLLADA
-+ OBJ
+- FBX
+- COLLADA
+- OBJ
 
 Output:
 
-+ Scene hierarchy
-+ Mesh and camera
-+ PBR material
-+ Texture
-+ Skin
-+ Animation
-
-
+- Scene hierarchy
+- Mesh and camera
+- PBR material
+- Texture
+- Skin
+- Animation
