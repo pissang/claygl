@@ -10,13 +10,11 @@ import {
   Node as ClayNode,
   Mesh,
   PointLight,
-  AmbientLight
+  AmbientLight,
+  startTimeline
 } from 'claygl';
 
 import Stats from 'stats.js';
-
-const timeline = new Timeline();
-timeline.start();
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
@@ -76,7 +74,7 @@ scene.add(
 
 camera.position.set(0, 0, 10);
 
-timeline.on('frame', (deltaTime: number) => {
+startTimeline((deltaTime: number) => {
   const start = new Date().getTime();
   renderer.render(scene, camera);
   const renderTime = new Date().getTime() - start;

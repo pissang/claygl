@@ -46,8 +46,8 @@ export function prefilterEnvironmentMap(
 
   // Use same type with given envMap
   const prefilteredCubeMap = new TextureCube({
-    width: width,
-    height: height,
+    width,
+    height,
     type: textureType,
     flipY: false
   });
@@ -76,8 +76,8 @@ export function prefilterEnvironmentMap(
   if (envMap.textureType === 'texture2D') {
     // Convert panorama to cubemap
     const envCubemap = new TextureCube({
-      width: width,
-      height: height,
+      width,
+      height,
       // FIXME FLOAT type will cause GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT error on iOS
       type: textureType === Texture.FLOAT ? Texture.HALF_FLOAT : textureType
     });
@@ -103,16 +103,20 @@ export function prefilterEnvironmentMap(
   }
 
   const renderTargetTmp = new Texture2D({
-    width: width,
-    height: height,
+    width,
+    height,
     type: textureType
   });
   const frameBuffer = new FrameBuffer({
     depthBuffer: false
   });
   const ArrayCtor = textureType === Texture.UNSIGNED_BYTE ? Uint8Array : Float32Array;
+
+  // const container = document.createElement('div');
+  // document.body.appendChild(container);
+  // container.style.cssText = 'position: absolute; left: 0; top: 0;';
+
   for (let i = 0; i < mipmapNum; i++) {
-    // console.time('prefilter');
     prefilteredCubeMap.mipmaps[i] = {
       pixels: {} as TextureCubeOpts['pixels']
     };
@@ -142,15 +146,15 @@ export function prefilterEnvironmentMap(
       );
 
       // const canvas = document.createElement('canvas');
-      // const ctx = canvas.getContext('2d');
+      // const ctx = canvas.getContext('2d')!;
       // canvas.width = renderTargetTmp.width;
       // canvas.height = renderTargetTmp.height;
-      // let imageData = ctx.createImageData(renderTargetTmp.width, renderTargetTmp.height);
+      // const imageData = ctx.createImageData(renderTargetTmp.width, renderTargetTmp.height);
       // for (let k = 0; k < pixels.length; k++) {
-      //     imageData.data[k] = pixels[k];
+      //   imageData.data[k] = pixels[k];
       // }
       // ctx.putImageData(imageData, 0, 0);
-      // document.body.appendChild(canvas);
+      // container.appendChild(canvas);
 
       frameBuffer.unbind(renderer);
       prefilteredCubeMap.mipmaps[i].pixels![targets[j]] = pixels;
@@ -159,7 +163,6 @@ export function prefilterEnvironmentMap(
     renderTargetTmp.width /= 2;
     renderTargetTmp.height /= 2;
     renderTargetTmp.dirty();
-    // console.timeEnd('prefilter');
   }
 
   frameBuffer.dispose(renderer);
@@ -168,12 +171,10 @@ export function prefilterEnvironmentMap(
   // Remove gpu resource allucated in renderer
   normalDistribution.dispose(renderer);
 
-  // renderer.dispose();
-
   return {
     environmentMap: prefilteredCubeMap,
-    brdfLookup: brdfLookup,
-    normalDistribution: normalDistribution,
+    brdfLookup,
+    normalDistribution,
     maxMipmapLevel: mipmapNum
   };
 }

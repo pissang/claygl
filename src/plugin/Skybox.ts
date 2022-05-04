@@ -17,6 +17,8 @@ const sceneSkyboxMap = new WeakMap<Scene, Skybox>();
 interface SkyboxOpts extends MeshOpts {
   scene?: Scene;
   environmentMap?: TextureCube | Texture2D;
+
+  material?: Material;
 }
 /**
  * @constructor clay.plugin.Skybox
@@ -46,10 +48,12 @@ class Skybox extends Mesh {
   constructor(opts?: Partial<SkyboxOpts>) {
     super(opts);
     this.geometry = new CubeGeometry();
-    this.material = new Material({
-      shader: new SkyboxShader(),
-      depthMask: false
-    });
+    this.material =
+      (opts && opts.material) ||
+      new Material({
+        shader: new SkyboxShader(),
+        depthMask: false
+      });
 
     opts = opts || {};
     if (opts.scene) {

@@ -9,9 +9,9 @@ import {
   prefilterEnvironmentMap
 } from '../util/cubemap';
 
-const cubemapPrefilteredMap = new WeakMap<TextureCube, boolean>();
+const cubemapPrefilteredMap = new WeakMap<TextureCube | Texture2D, boolean>();
 export interface AmbientCubemapLightOpts extends LightOpts {
-  cubemap: TextureCube;
+  cubemap: TextureCube | Texture2D;
 }
 
 /**
@@ -19,7 +19,7 @@ export interface AmbientCubemapLightOpts extends LightOpts {
  * Which is a basic requirement for Physically Based Rendering
  */
 class AmbientCubemapLight extends Light {
-  cubemap?: TextureCube;
+  cubemap?: TextureCube | Texture2D;
 
   _normalDistribution?: Texture2D;
   _brdfLookup?: Texture2D;

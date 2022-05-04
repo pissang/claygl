@@ -8,6 +8,8 @@ const ya = vec3.create();
 const yb = vec3.create();
 const za = vec3.create();
 const zb = vec3.create();
+const mathMin = Math.min;
+const mathMax = Math.max;
 
 /**
  * Axis aligned bounding box
@@ -221,13 +223,13 @@ class BoundingBox {
 
     min = this.min.array;
     max = this.max.array;
-    min[0] = Math.min(xa[0], xb[0]) + Math.min(ya[0], yb[0]) + Math.min(za[0], zb[0]) + m[12];
-    min[1] = Math.min(xa[1], xb[1]) + Math.min(ya[1], yb[1]) + Math.min(za[1], zb[1]) + m[13];
-    min[2] = Math.min(xa[2], xb[2]) + Math.min(ya[2], yb[2]) + Math.min(za[2], zb[2]) + m[14];
+    min[0] = mathMin(xa[0], xb[0]) + mathMin(ya[0], yb[0]) + mathMin(za[0], zb[0]) + m[12];
+    min[1] = mathMin(xa[1], xb[1]) + mathMin(ya[1], yb[1]) + mathMin(za[1], zb[1]) + m[13];
+    min[2] = mathMin(xa[2], xb[2]) + mathMin(ya[2], yb[2]) + mathMin(za[2], zb[2]) + m[14];
 
-    max[0] = Math.max(xa[0], xb[0]) + Math.max(ya[0], yb[0]) + Math.max(za[0], zb[0]) + m[12];
-    max[1] = Math.max(xa[1], xb[1]) + Math.max(ya[1], yb[1]) + Math.max(za[1], zb[1]) + m[13];
-    max[2] = Math.max(xa[2], xb[2]) + Math.max(ya[2], yb[2]) + Math.max(za[2], zb[2]) + m[14];
+    max[0] = mathMax(xa[0], xb[0]) + mathMax(ya[0], yb[0]) + mathMax(za[0], zb[0]) + m[12];
+    max[1] = mathMax(xa[1], xb[1]) + mathMax(ya[1], yb[1]) + mathMax(za[1], zb[1]) + m[13];
+    max[2] = mathMax(xa[2], xb[2]) + mathMax(ya[2], yb[2]) + mathMax(za[2], zb[2]) + m[14];
 
     return this;
   }

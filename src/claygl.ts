@@ -1,3 +1,5 @@
+import Timeline from './Timeline';
+
 export { default as Renderer } from './Renderer';
 export { default as Material } from './Material';
 export { default as Shader } from './Shader';
@@ -12,9 +14,22 @@ export { default as Skeleton } from './Skeleton';
 export { default as Joint } from './Joint';
 export { default as FrameBuffer } from './FrameBuffer';
 export { default as Scene } from './Scene';
-export { default as Timeline } from './Timeline';
+
+export { default as StandardMaterial } from './StandardMaterial';
+
+export { Timeline };
+
 export { default as Texture2D } from './Texture2D';
 export { default as TextureCube } from './TextureCube';
+
+export function startTimeline(onframe?: (deltaTime: number) => void) {
+  const timeline = new Timeline();
+  timeline.start();
+  if (onframe) {
+    timeline.on('frame', onframe);
+  }
+  return timeline;
+}
 
 export {
   Perspective as PerspectiveCamera,

@@ -6,13 +6,12 @@ uniform mat4 viewInverse : VIEWINVERSE;
 uniform samplerCube environmentMap;
 uniform sampler2D normalDistribution;
 
-uniform float roughness : 0.5;
+uniform float roughness = 0.5;
 
 varying vec2 v_Texcoord;
 varying vec3 v_WorldPosition;
 
 @import clay.util.rgbm
-
 
 vec3 importanceSampleNormal(float i, float roughness, vec3 N) {
     vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;

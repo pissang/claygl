@@ -101,6 +101,7 @@ class TextureCube extends Texture {
     const glFormat = this.format;
     const mipmaps = this.mipmaps;
     let glType = this.type;
+    const len = mipmaps && mipmaps.length;
 
     _gl.texParameteri(glenum.TEXTURE_CUBE_MAP, glenum.TEXTURE_WRAP_S, this.getAvailableWrapS());
     _gl.texParameteri(glenum.TEXTURE_CUBE_MAP, glenum.TEXTURE_WRAP_T, this.getAvailableWrapT());
@@ -133,10 +134,10 @@ class TextureCube extends Texture {
       }
     }
 
-    if (mipmaps && mipmaps.length) {
+    if (len) {
       let width = this.width;
       let height = this.height;
-      for (let i = 0; i < mipmaps.length; i++) {
+      for (let i = 0; i < len; i++) {
         const mipmap = mipmaps[i];
         this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType);
         width /= 2;
