@@ -40,10 +40,9 @@ import Camera from './Camera';
 import { EventManager } from './app/EventManager';
 import type Renderable from './Renderable';
 import Shader from './Shader';
-import StandardShader from './shader/StandardShader';
+import StandardMRShader from './shader/StandardMRShader';
 import Geometry from './Geometry';
 import { Color } from './core/type';
-import { OrbitControl } from './claygl';
 
 interface App3DGraphicOpts {
   /**
@@ -168,7 +167,7 @@ class App3D extends Notifier {
   private _frameTime: number = 0;
   private _elapsedTime: number = 0;
 
-  private _defaultShader = new StandardShader();
+  private _defaultShader = new StandardMRShader();
 
   constructor(container: HTMLElement | string, opts?: App3DOpts) {
     super();
@@ -915,7 +914,7 @@ class App3D extends Notifier {
     light.position.setArray(dir).negate();
     light.lookAt(Vector3.ZERO);
     if (util.isString(color)) {
-      color = colorUtil.parse(color)!;
+      color = colorUtil.parseToFloat(color)!;
     }
     color != null && (light.color = color);
     intensity != null && (light.intensity = intensity);
@@ -957,7 +956,7 @@ class App3D extends Notifier {
     }
 
     if (util.isString(color)) {
-      color = colorUtil.parse(color)!;
+      color = colorUtil.parseToFloat(color)!;
     }
     range != null && (light.range = range);
     color != null && (light.color = color);
@@ -987,7 +986,7 @@ class App3D extends Notifier {
     light.position.setArray(position instanceof Vector3 ? position.array : position);
 
     if (typeof color === 'string') {
-      color = colorUtil.parse(color);
+      color = colorUtil.parseToFloat(color);
     }
     range != null && (light.range = range);
     color != null && (light.color = color);
@@ -1007,7 +1006,7 @@ class App3D extends Notifier {
     const light = new AmbientLight();
 
     if (typeof color === 'string') {
-      color = colorUtil.parse(color)!;
+      color = colorUtil.parseToFloat(color)!;
     }
     color != null && (light.color = color);
     intensity != null && (light.intensity = intensity);

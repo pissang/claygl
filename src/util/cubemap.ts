@@ -126,11 +126,11 @@ export function prefilterEnvironmentMap(
     };
     skyEnv.material.set('roughness', i / (mipmapNum - 1));
 
-    // Tweak fov.
+    // Tweak fov. TODO It will cause leaking on the edge in the latest chrome
     // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
-    const n = renderTargetTmp.width;
-    const fov = ((2 * Math.atan(n / (n - 0.5))) / Math.PI) * 180;
-    // const fov = 90;
+    // const n = renderTargetTmp.width;
+    // const fov = ((2 * Math.atan(n / (n - 0.5))) / Math.PI) * 180;
+    const fov = 90;
 
     for (let j = 0; j < targets.length; j++) {
       const pixels = new ArrayCtor(renderTargetTmp.width * renderTargetTmp.height * 4);

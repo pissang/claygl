@@ -22,7 +22,7 @@ app.init(() => {
 
   app.createAmbientCubemapLight('./assets/textures/hdr/pisa.hdr', 1, 0.5, 2);
 
-  for (var i = 0; i < 10; i++) {
+  for (let i = 0; i < 10; i++) {
     app
       .createSphere({
         metalness: 1,

@@ -5,8 +5,6 @@ import Texture from './Texture';
 
 type MaterialUniformValue = number | string | ArrayLike<number> | Texture;
 
-const parseColor = colorUtil.parseToFloat;
-
 const programKeyCache: Record<string, string> = {};
 
 function getDefineCode(defines: Record<string, ShaderDefineValue>) {
@@ -163,7 +161,7 @@ class Material {
     if (uniform) {
       if (typeof value === 'string') {
         // Try to parse as a color. Invalid color string will return null.
-        value = parseColor(value) || value;
+        value = colorUtil.parseToFloat(value) || value;
       }
 
       uniform.value = value;
