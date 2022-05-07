@@ -9,7 +9,7 @@ import type Camera from './Camera';
 import type Renderable from './Renderable';
 import type Vector2 from './math/Vector2';
 import type BoundingBox from './math/BoundingBox';
-import type { Intersection } from './picking/RayPicking';
+import type { Intersection } from './picking/rayPicking';
 
 export type AttributeType = 'byte' | 'ubyte' | 'short' | 'ushort' | 'float';
 export type AttributeSize = 1 | 2 | 3 | 4;

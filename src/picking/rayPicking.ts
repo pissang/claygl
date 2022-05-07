@@ -220,15 +220,6 @@ function intersectionCompareFunc(a: Intersection, b: Intersection) {
   return a.distance - b.distance;
 }
 
-/**
- * @constructor clay.picking.RayPicking~Intersection
- * @param {clay.Vector3} point
- * @param {clay.Vector3} pointWorld
- * @param {clay.Node} target
- * @param {Array.<number>} triangle
- * @param {number} triangleIndex
- * @param {number} distance
- */
 export class Intersection {
   /**
    * Intersection point in local transform coordinates
