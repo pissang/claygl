@@ -13,7 +13,7 @@ import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
 import PerspectiveCamera from '../camera/Perspective';
 import OrthoCamera from '../camera/Orthographic';
 
-import TexturePool from '../compositor/TexturePool';
+import TexturePool from '../composite/TexturePool';
 
 import * as mat4 from '../glmatrix/mat4';
 
@@ -22,7 +22,7 @@ import type Renderable from '../Renderable';
 import { Notifier } from '../core';
 import Scene from '../Scene';
 import Camera from '../Camera';
-import CompositorFullscreenQuadPass from '../compositor/Pass';
+import CompositorFullscreenQuadPass from '../composite/Pass';
 import Light from '../Light';
 import DirectionalLight from '../light/Directional';
 import SpotLight from '../light/Spot';

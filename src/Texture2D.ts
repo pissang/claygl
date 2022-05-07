@@ -227,7 +227,19 @@ class Texture2D extends Texture {
           glFormat === Texture.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL &&
           glFormat === Texture.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL)
       ) {
-        gl.compressedTexImage2D(glenum.TEXTURE_2D, level, glFormat, width, height, 0, data.pixels);
+        if (data.pixels) {
+          gl.compressedTexImage2D(
+            glenum.TEXTURE_2D,
+            level,
+            glFormat,
+            width,
+            height,
+            0,
+            data.pixels
+          );
+        } else {
+          console.error(`Format ${glFormat} should have pixels data.`);
+        }
       } else {
         // Is a render target if pixels is null
         gl.texImage2D(

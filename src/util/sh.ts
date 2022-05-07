@@ -9,7 +9,7 @@ import * as vec3 from '../glmatrix/vec3';
 const sh = {};
 
 import projectEnvMapShaderCode from './shader/projectEnvMap.glsl.js';
-import CompositorFullscreenQuadPass from '../compositor/Pass';
+import CompositorFullscreenQuadPass from '../composite/Pass';
 import type Renderer from '../Renderer';
 import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
 

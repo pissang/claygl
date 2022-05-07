@@ -18,7 +18,7 @@ interface SkyboxOpts extends MeshOpts {
   scene?: Scene;
   environmentMap?: TextureCube | Texture2D;
 
-  material?: Material;
+  material: Material;
 }
 /**
  * @constructor clay.plugin.Skybox

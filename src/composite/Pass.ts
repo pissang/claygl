@@ -34,7 +34,7 @@ class CompositorFullscreenQuadPass extends Notifier {
   clearDepth?: boolean;
   blendWithPrevious?: boolean;
 
-  outputs: Record<string, Texture2D | undefined> = {};
+  outputs?: Record<string, Texture2D | undefined> = {};
 
   constructor(fragment: string, opts?: Partial<CompositorFullscreenQuadPassOpts>) {
     super();
@@ -96,7 +96,7 @@ class CompositorFullscreenQuadPass extends Notifier {
     frameBuffer.unbind(renderer);
   }
 
-  render(renderer: Renderer, frameBuffer: FrameBuffer) {
+  render(renderer: Renderer, frameBuffer?: FrameBuffer) {
     const _gl = renderer.gl;
 
     if (frameBuffer) {

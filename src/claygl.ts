@@ -1,5 +1,6 @@
 import Timeline from './Timeline';
 
+// Core
 export { default as Renderer } from './Renderer';
 export { default as Material } from './Material';
 export { default as Shader } from './Shader';
@@ -31,11 +32,13 @@ export function startTimeline(onframe?: (deltaTime: number) => void) {
   return timeline;
 }
 
+// Camera
 export {
   Perspective as PerspectiveCamera,
   Orthographic as OrthographicCamera
 } from './camera/index';
 
+// Light
 export {
   Ambient as AmbientLight,
   AmbientCubemap as AmbientCubemapLight,
@@ -47,6 +50,7 @@ export {
   Tube as TubeLight
 } from './light/index';
 
+// Procedural Geometry
 export {
   Cone as ConeGeometry,
   Cube as CubeGeometry,
@@ -56,12 +60,16 @@ export {
   Sphere as SphereGeometry
 } from './geometry/index';
 
+// Math
 export * from './math';
 
+// Utilities
 export { color } from './core';
 
+// Easing
 export * as easing from './animation/easing';
 
+// Bultin shader
 export {
   BasicShader,
   LambertShader,
@@ -70,18 +78,29 @@ export {
   StandardMRShader
 } from './shader/index';
 
+// Picking
+
+export { pick as pickByRay } from './picking/rayPicking';
+
+// GLTF Loader
 export { load as loadGLTF, parse as parseGLTF, parseBinary as parseGLB } from './loader/GLTF';
 
+// Rendering pass
 export { default as ShadowMapPass } from './prePass/ShadowMap';
 export { default as EnvironmentMapPass } from './prePass/EnvironmentMap';
 
+// Controls
 export { default as OrbitControl } from './plugin/OrbitControl';
 export { default as FreeControl } from './plugin/FreeControl';
 export { default as GamepadControl } from './plugin/GamepadControl';
 
 export { default as Skybox } from './plugin/Skybox';
 
+// Utilities
 export * as meshUtil from './util/mesh';
 export * as textureUtil from './util/texture';
 
 export { default as App3D } from './App3D';
+
+// Composite
+export { default as CompositorFullscreenQuadPass } from './composite/Pass';

@@ -1,14 +1,13 @@
-import Texture2D from '../Texture2D';
+import Texture2D, { Texture2DOpts } from '../Texture2D';
 import * as glenum from '../core/glenum';
 import * as util from '../core/util';
-import Texture, { TextureOpts } from '../Texture';
 import Renderer from '../Renderer';
 
 class TexturePool {
-  private _pool: Record<string, Texture[]> = {};
-  private _allocatedTextures: Texture[] = [];
+  private _pool: Record<string, Texture2D[]> = {};
+  private _allocatedTextures: Texture2D[] = [];
 
-  get(parameters: Partial<TextureOpts>) {
+  get(parameters: Partial<Texture2DOpts>): Texture2D {
     const key = generateKey(parameters);
     if (!util.hasOwn(this._pool, key)) {
       this._pool[key] = [];
@@ -19,10 +18,10 @@ class TexturePool {
       this._allocatedTextures.push(texture);
       return texture;
     }
-    return list.pop();
+    return list.pop() as Texture2D;
   }
 
-  put(texture: Texture) {
+  put(texture: Texture2D) {
     const key = generateKey(texture);
     if (!util.hasOwn(this._pool, key)) {
       this._pool[key] = [];
@@ -39,7 +38,7 @@ class TexturePool {
     this._allocatedTextures = [];
   }
 }
-const defaultParams: Partial<TextureOpts> = {
+const defaultParams: Partial<Texture2DOpts> = {
   width: 512,
   height: 512,
   type: glenum.UNSIGNED_BYTE,
@@ -57,7 +56,7 @@ const defaultParams: Partial<TextureOpts> = {
 
 const defaultParamPropList = Object.keys(defaultParams);
 
-function generateKey(parameters: Partial<TextureOpts>) {
+function generateKey(parameters: Partial<Texture2DOpts>) {
   util.defaults(parameters, defaultParams);
   fallBack(parameters);
 

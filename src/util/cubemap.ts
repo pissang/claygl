@@ -5,7 +5,7 @@ import Texture2D from '../Texture2D';
 import TextureCube, { TextureCubeOpts } from '../TextureCube';
 import Texture from '../Texture';
 import FrameBuffer from '../FrameBuffer';
-import CompositorFullscreenQuadPass from '../compositor/Pass';
+import CompositorFullscreenQuadPass from '../composite/Pass';
 import Material from '../Material';
 import Shader from '../Shader';
 import Skybox from '../plugin/Skybox';

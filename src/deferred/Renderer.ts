@@ -5,7 +5,7 @@ import Base from '../core/Base';
 import Shader from '../Shader';
 import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
-import FullQuadPass from '../compositor/Pass';
+import FullQuadPass from '../composite/Pass';
 import Texture2D from '../Texture2D';
 import Texture from '../Texture';
 import Mesh from '../Mesh';

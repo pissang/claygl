@@ -5,7 +5,7 @@ import Texture from '../Texture';
 import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
 import Shader from '../Shader';
-import Pass from '../compositor/Pass';
+import Pass from '../composite/Pass';
 import Matrix4 from '../math/Matrix4';
 import mat4 from '../glmatrix/mat4';
 

@@ -1,9 +1,9 @@
 // @ts-nocheck
 import * as util from './core/util';
-import Compositor from './compositor/Compositor';
-import CompoSceneNode from './compositor/SceneNode';
-import CompoTextureNode from './compositor/TextureNode';
-import CompoFilterNode from './compositor/FilterNode';
+import Compositor from './composite/Compositor';
+import CompoSceneNode from './composite/SceneNode';
+import CompoTextureNode from './composite/TextureNode';
+import CompoFilterNode from './composite/FilterNode';
 import Shader from './Shader';
 import Texture from './Texture';
 import Texture2D from './Texture2D';
