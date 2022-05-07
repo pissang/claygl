@@ -79,8 +79,8 @@ export {
 } from './shader/index';
 
 // Picking
-
 export { pick as pickByRay } from './picking/rayPicking';
+export { default as PixelPicking } from './picking/PixelPicking';
 
 // GLTF Loader
 export { load as loadGLTF, parse as parseGLTF, parseBinary as parseGLB } from './loader/GLTF';
@@ -106,5 +106,10 @@ export { default as App3D } from './App3D';
 export { default as CompositorFullscreenQuadPass } from './composite/Pass';
 
 // Deferred renderer
-
 export { default as DeferredGBuffer } from './deferred/GBuffer';
+export { default as DeferredRenderer } from './deferred/Renderer';
+
+// Particles
+export { default as ParticleEmitter } from './particle/Emitter';
+export { default as ParticleRenderable } from './particle/ParticleRenderable';
+export { default as ForceField } from './particle/ForceField';
