@@ -104,3 +104,7 @@ export { default as App3D } from './App3D';
 
 // Composite
 export { default as CompositorFullscreenQuadPass } from './composite/Pass';
+
+// Deferred renderer
+
+export { default as DeferredGBuffer } from './deferred/GBuffer';

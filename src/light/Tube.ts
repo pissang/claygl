@@ -10,7 +10,7 @@ class TubeLight extends Light {
   range = 100;
   length = 5;
 
-  readonly type = 'SPHERE_LIGHT';
+  readonly type = 'TUBE_LIGHT';
 
   constructor(opts?: Partial<TubeLightOpts>) {
     super(opts);

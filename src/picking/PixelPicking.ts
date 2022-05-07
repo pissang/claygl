@@ -87,25 +87,26 @@ const PixelPicking = Base.extend(
      */
     update: function (scene, camera) {
       const renderer = this.renderer;
+      const frameBuffer = this._frameBuffer;
       if (renderer.getWidth() !== this.width || renderer.getHeight() !== this.height) {
         this.resize(renderer.width, renderer.height);
       }
 
-      this._frameBuffer.attach(this._texture);
-      this._frameBuffer.bind(renderer);
+      frameBuffer.attach(this._texture);
+      frameBuffer.bind(renderer);
       this._idOffset = this.lookupOffset;
       this._setMaterial(scene);
       renderer.render(scene, camera);
       this._restoreMaterial();
-      this._frameBuffer.unbind(renderer);
+      frameBuffer.unbind(renderer);
     },
 
     _setMaterial: function (root) {
       for (let i = 0; i < root._children.length; i++) {
         const child = root._children[i];
         if (child.geometry && child.material && child.material.shader) {
-          let id = this._idOffset++;
-          let idx = id - this.lookupOffset;
+          const id = this._idOffset++;
+          const idx = id - this.lookupOffset;
           let material = this._idMaterials[idx];
           if (!material) {
             material = new Material({
@@ -151,7 +152,7 @@ const PixelPicking = Base.extend(
       this._frameBuffer.unbind(renderer);
       // Skip interpolated pixel because of anti alias
       if (pixel[3] === 255) {
-        let id = unpackID(pixel[0], pixel[1], pixel[2]);
+        const id = unpackID(pixel[0], pixel[1], pixel[2]);
         if (id) {
           const el = this._lookupTable[id - this.lookupOffset];
           return el;

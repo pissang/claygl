@@ -28,7 +28,7 @@ interface CompositorFullscreenQuadPassOpts {
 }
 
 class CompositorFullscreenQuadPass extends Notifier {
-  material: Material;
+  material?: Material;
 
   clearColor?: boolean;
   clearDepth?: boolean;
@@ -36,15 +36,17 @@ class CompositorFullscreenQuadPass extends Notifier {
 
   outputs?: Record<string, Texture2D | undefined> = {};
 
-  constructor(fragment: string, opts?: Partial<CompositorFullscreenQuadPassOpts>) {
+  constructor(fragment?: string, opts?: Partial<CompositorFullscreenQuadPassOpts>) {
     super();
 
-    const shader = new Shader(Shader.source('clay.compositor.vertex'), fragment);
-    const material = new Material({
-      shader: shader
-    });
-    material.enableTexturesAll();
-    this.material = material;
+    if (fragment) {
+      const shader = new Shader(Shader.source('clay.compositor.vertex'), fragment);
+      const material = new Material({
+        shader
+      });
+      material.enableTexturesAll();
+      this.material = material;
+    }
 
     opts = opts || {};
     this.clearColor = opts.clearColor || false;
@@ -53,10 +55,10 @@ class CompositorFullscreenQuadPass extends Notifier {
   }
 
   setUniform(name: string, value: any) {
-    this.material.setUniform(name, value);
+    this.material && this.material.setUniform(name, value);
   }
   getUniform(name: string) {
-    const uniform = this.material.uniforms[name];
+    const uniform = this.material && this.material.uniforms[name];
     if (uniform) {
       return uniform.value;
     }
@@ -123,6 +125,7 @@ class CompositorFullscreenQuadPass extends Notifier {
     // FIXME Don't clear in each pass in default, let the color overwrite the buffer
     // FIXME pixels may be discard
     let clearBit = this.clearDepth ? glenum.DEPTH_BUFFER_BIT : 0;
+    const blendWithPrevious = this.blendWithPrevious;
     _gl.depthMask(true);
     if (this.clearColor) {
       clearBit = clearBit | glenum.COLOR_BUFFER_BIT;
@@ -134,16 +137,11 @@ class CompositorFullscreenQuadPass extends Notifier {
     }
     _gl.clear(clearBit);
 
-    if (this.blendWithPrevious) {
-      // Blend with previous rendered scene in the final output
-      // FIXME Configure blend.
-      // FIXME It will cause screen blink？
-      _gl.enable(glenum.BLEND);
-      this.material.transparent = true;
-    } else {
-      _gl.disable(glenum.BLEND);
-      this.material.transparent = false;
-    }
+    // Blend with previous rendered scene in the final output
+    // FIXME Configure blend.
+    // FIXME It will cause screen blink？
+    _gl[blendWithPrevious ? 'enable' : 'disable'](glenum.BLEND);
+    this.material && (this.material.transparent = blendWithPrevious!);
 
     this.renderQuad(renderer);
 
@@ -158,8 +156,10 @@ class CompositorFullscreenQuadPass extends Notifier {
    * Simply do quad rendering
    */
   renderQuad(renderer: Renderer) {
-    mesh.material = this.material;
-    renderer.renderPass([mesh], camera);
+    if (this.material) {
+      mesh.material = this.material;
+      renderer.renderPass([mesh], camera);
+    }
   }
 
   /**

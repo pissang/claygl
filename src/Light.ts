@@ -1,4 +1,5 @@
 import { Color } from './core/type';
+import type Mesh from './Mesh';
 import ClayNode, { ClayNodeOpts } from './Node';
 import Shader from './Shader';
 
@@ -36,11 +37,14 @@ export interface LightOpts extends ClayNodeOpts {
 }
 interface Light extends LightOpts {}
 class Light extends ClayNode {
-  color = [1, 1, 1];
-  intensity = 1.0;
   castShadow = true;
   shadowResolution = 512;
   group = 0;
+
+  /**
+   * Volumn mesh for deferred rendering
+   */
+  volumeMesh?: Mesh;
 
   /**
    * Light type

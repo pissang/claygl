@@ -37,6 +37,14 @@ const mat4Create = mat4.create;
 
 const errorShader: Record<string, boolean> = {};
 
+const worldView = new Matrix4();
+const preZMaterial = new Material({
+  shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
+});
+function getPreZMaterial() {
+  return preZMaterial;
+}
+
 function defaultGetMaterial(renderable: Renderable) {
   return renderable.material;
 }
@@ -188,7 +196,7 @@ interface ExtendedWebGLRenderingContext extends WebGLRenderingContext {
   targetRenderer: Renderer;
 }
 
-interface Viewport {
+export interface RendererViewport {
   x: number;
   y: number;
   width: number;
@@ -307,7 +315,7 @@ class Renderer extends Notifier {
    * Renderer viewport, read-only, can be set by setViewport method
    * @type {Object}
    */
-  viewport = {} as Viewport;
+  viewport = {} as RendererViewport;
 
   /**
    * Max joint number
@@ -317,7 +325,7 @@ class Renderer extends Notifier {
   // Set by FrameBuffer#bind
   __currentFrameBuffer?: FrameBuffer;
 
-  private _viewportStack: Viewport[] = [];
+  private _viewportStack: RendererViewport[] = [];
   private _clearStack: {
     clearBit: GLEnum;
     clearColor: Color;
@@ -493,9 +501,15 @@ class Renderer extends Notifier {
    *      devicePixelRatio: 1
    *  })
    */
-  setViewport(x: Viewport): void;
+  setViewport(x: RendererViewport): void;
   setViewport(x: number, y: number, width: number, height: number, dpr?: number): void;
-  setViewport(x: number | Viewport, y?: number, width?: number, height?: number, dpr?: number) {
+  setViewport(
+    x: number | RendererViewport,
+    y?: number,
+    width?: number,
+    height?: number,
+    dpr?: number
+  ) {
     if (typeof x === 'object') {
       const obj = x;
 
@@ -556,7 +570,7 @@ class Renderer extends Notifier {
     }
   }
 
-  bindSceneRendering(scene: Scene) {
+  bindSceneRendering(scene?: Scene) {
     this._sceneRendering = scene;
   }
 

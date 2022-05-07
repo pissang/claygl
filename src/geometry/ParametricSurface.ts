@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Geometry, { GeometryOpts } from '../Geometry';
 
 interface SurfaceGenerator {
@@ -10,13 +9,11 @@ interface SurfaceGenerator {
 }
 
 export interface ParametricSurfaceGeometryOpts extends GeometryOpts {
-  generator: SurfaceGenerator;
+  generator?: SurfaceGenerator;
 }
 
 interface ParametricSurfaceGeometry extends ParametricSurfaceGeometryOpts {}
 class ParametricSurfaceGeometry extends Geometry {
-  generator: SurfaceGenerator;
-
   constructor(opts?: Partial<ParametricSurfaceGeometryOpts>) {
     super(opts);
     Object.assign(this, opts);

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import Light, { LightOpts } from '../Light';
 import Vector3 from '../math/Vector3';
 
@@ -51,9 +50,9 @@ DirectionalLight.prototype.uniformTemplates = {
   directionalLightDirection: {
     type: '3f',
     value(instance) {
-      instance.__dir = instance.__dir || new Vector3();
+      const dir = new Vector3();
       // Direction is target to eye
-      return instance.__dir.copy(instance.worldTransform.z).normalize().negate().array;
+      return dir.copy(instance.worldTransform.z).normalize().negate().array;
     }
   },
   directionalLightColor: {

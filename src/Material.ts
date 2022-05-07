@@ -3,7 +3,14 @@ import * as colorUtil from './core/color';
 import Shader, { ShaderDefineValue, ShaderPrecision, ShaderType, ShaderUniform } from './Shader';
 import Texture from './Texture';
 
-type MaterialUniformValue = number | string | ArrayLike<number> | Texture;
+type MaterialUniformValue =
+  | number
+  | string
+  | ArrayLike<number>
+  | Texture
+  | ArrayLike<number>[]
+  | Texture[]
+  | number[];
 
 const programKeyCache: Record<string, string> = {};
 
@@ -60,6 +67,24 @@ export interface MaterialOpts {
   transparent: boolean;
   shader: Shader;
   precision: ShaderPrecision;
+  /**
+   * Blend func is a callback function when the material
+   * have custom blending
+   * The gl context will be the only argument passed in tho the
+   * blend function
+   * Detail of blend function in WebGL:
+   * http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
+   *
+   * Example :
+   * function(_gl) {
+   *  _gl.blendEquation(_gl.FUNC_ADD);
+   *  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
+   * }
+   */
+  blend?: (gl: WebGLRenderingContext) => void;
+
+  vertexDefines: Record<string, ShaderDefineValue>;
+  fragmentDefines: Record<string, ShaderDefineValue>;
 }
 
 interface Material extends Omit<MaterialOpts, 'shader'> {}
@@ -83,26 +108,6 @@ class Material {
   readonly __uid__: number = util.genGUID();
 
   name: string;
-
-  /**
-   * @type {clay.Shader}
-   */
-
-  /**
-   * Blend func is a callback function when the material
-   * have custom blending
-   * The gl context will be the only argument passed in tho the
-   * blend function
-   * Detail of blend function in WebGL:
-   * http://www.khronos.org/registry/gles/specs/2.0/es_full_spec_2.0.25.pdf
-   *
-   * Example :
-   * function(_gl) {
-   *  _gl.blendEquation(_gl.FUNC_ADD);
-   *  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
-   * }
-   */
-  blend?: (gl: WebGLRenderingContext) => void;
 
   /**
    * If update texture status automatically.
@@ -131,6 +136,7 @@ class Material {
     this.shader = opts.shader;
     this.depthTest = util.optional(opts.depthTest, true);
     this.depthMask = util.optional(opts.depthMask, true);
+    this.blend = opts.blend;
     this.transparent = opts.transparent || false;
     this.precision = opts.precision || 'highp';
   }
