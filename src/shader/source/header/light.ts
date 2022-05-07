@@ -1,4 +1,3 @@
-// @ts-nocheck
 import calcAmbientSHLightEssl from './calcAmbientSHLight.glsl.js';
 
 const uniformVec3Prefix = 'uniform vec3 ';

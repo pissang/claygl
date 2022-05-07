@@ -6,7 +6,7 @@ import Vector4 from './Vector4';
  * Random or constant 1d, 2d, 3d vector generator
  */
 
-interface Value<T> {
+export interface Value<T> {
   get(out?: T): T;
 }
 

@@ -1,75 +1,45 @@
-// @ts-nocheck
 import Vector3 from '../math/Vector3';
-import vec3 from '../glmatrix/vec3';
+import * as vec3 from '../glmatrix/vec3';
+import ParticleEmitter from './Emitter';
 
-/**
- * @constructor
- * @alias clay.particle.Particle
- */
-const Particle = function () {
-  /**
-   * @type {clay.Vector3}
-   */
-  this.position = new Vector3();
+class Particle {
+  position = new Vector3();
 
   /**
    * Use euler angle to represent particle rotation
-   * @type {clay.Vector3}
    */
-  this.rotation = new Vector3();
+  rotation = new Vector3();
+
+  velocity?: Vector3;
+
+  angularVelocity?: Vector3;
+
+  life = 1;
+
+  age = 0;
+
+  spriteSize: = 1;
+
+  weight = 1;
+
+  emitter?: ParticleEmitter;
 
   /**
-   * @type {?clay.Vector3}
+   * Update particle position
    */
-  this.velocity = null;
-
-  /**
-   * @type {?clay.Vector3}
-   */
-  this.angularVelocity = null;
-
-  /**
-   * @type {number}
-   */
-  this.life = 1;
-
-  /**
-   * @type {number}
-   */
-  this.age = 0;
-
-  /**
-   * @type {number}
-   */
-  this.spriteSize = 1;
-
-  /**
-   * @type {number}
-   */
-  this.weight = 1;
-
-  /**
-   * @type {clay.particle.Emitter}
-   */
-  this.emitter = null;
-};
-
-/**
- * Update particle position
- * @param  {number} deltaTime
- */
-Particle.prototype.update = function (deltaTime) {
-  if (this.velocity) {
-    vec3.scaleAndAdd(this.position.array, this.position.array, this.velocity.array, deltaTime);
+  update(deltaTime: number) {
+    if (this.velocity) {
+      vec3.scaleAndAdd(this.position.array, this.position.array, this.velocity.array, deltaTime);
+    }
+    if (this.angularVelocity) {
+      vec3.scaleAndAdd(
+        this.rotation.array,
+        this.rotation.array,
+        this.angularVelocity.array,
+        deltaTime
+      );
+    }
   }
-  if (this.angularVelocity) {
-    vec3.scaleAndAdd(
-      this.rotation.array,
-      this.rotation.array,
-      this.angularVelocity.array,
-      deltaTime
-    );
-  }
-};
+}
 
 export default Particle;

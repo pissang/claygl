@@ -1,22 +1,13 @@
-// @ts-nocheck
-import Base from '../core/Base';
-/**
- * @constructor clay.particle.Field
- * @extends clay.core.Base
- */
-const Field = Base.extend(
-  {},
-  {
-    /**
-     * Apply a field to the particle and update the particle velocity
-     * @param  {clay.Vector3} velocity
-     * @param  {clay.Vector3} position
-     * @param  {number} weight
-     * @param  {number} deltaTime
-     * @memberOf clay.particle.Field.prototype
-     */
-    applyTo: function (velocity, position, weight, deltaTime) {}
-  }
-);
+import Vector3 from '../math/Vector3';
 
-export default Field;
+export default interface ParticleField {
+  /**
+   * Apply a field to the particle and update the particle velocity
+   */
+  applyTo(
+    velocity: Vector3 | undefined,
+    position: Vector3,
+    weight: number | undefined,
+    deltaTime: number
+  ): void;
+}
