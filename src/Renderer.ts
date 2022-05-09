@@ -37,14 +37,6 @@ const mat4Create = mat4.create;
 
 const errorShader: Record<string, boolean> = {};
 
-const worldView = new Matrix4();
-const preZMaterial = new Material({
-  shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
-});
-function getPreZMaterial() {
-  return preZMaterial;
-}
-
 function defaultGetMaterial(renderable: Renderable) {
   return renderable.material;
 }

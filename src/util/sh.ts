@@ -21,7 +21,7 @@ function projectEnvironmentMapGPU(renderer: Renderer, envMap: TextureCube) {
     type: Texture.FLOAT
   });
   const pass = new CompositorFullscreenQuadPass(projectEnvMapShaderCode);
-  pass.material.define('fragment', 'TEXTURE_SIZE', envMap.width);
+  pass.material!.define('fragment', 'TEXTURE_SIZE', envMap.width);
   pass.setUniform('environmentMap', envMap);
 
   const framebuffer = new FrameBuffer();

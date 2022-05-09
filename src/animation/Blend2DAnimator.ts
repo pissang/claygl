@@ -1,7 +1,7 @@
 // 2D Blend clip of blend tree
 // http://docs.unity3d.com/Documentation/Manual/2DBlending.html
 import Vector2 from '../math/Vector2';
-import delaunay from '../util/delaunay';
+import * as delaunay from '../util/delaunay';
 import { BlendAnimator, BlendAnimatorOpts, BlendAnimatorTarget } from './BlendAnimator';
 
 interface Blend2DAnimatorInput {

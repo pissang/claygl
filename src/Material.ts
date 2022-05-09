@@ -139,6 +139,9 @@ class Material {
     this.blend = opts.blend;
     this.transparent = opts.transparent || false;
     this.precision = opts.precision || 'highp';
+
+    Object.assign(this.vertexDefines, opts.vertexDefines);
+    Object.assign(this.fragmentDefines, opts.fragmentDefines);
   }
 
   get shader() {

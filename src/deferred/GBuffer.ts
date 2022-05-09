@@ -3,7 +3,7 @@ import Texture from '../Texture';
 import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
 import Shader from '../Shader';
-import Pass from '../composite/Pass';
+import CompositorFullscreenQuadPass from '../composite/Pass';
 import Matrix4 from '../math/Matrix4';
 import * as mat4 from '../glmatrix/mat4';
 import * as glenum from '../core/glenum';
@@ -13,6 +13,10 @@ import chunkEssl from '../shader/source/deferred/chunk.glsl.js';
 import Renderer, { RenderableObject, RendererViewport } from '../Renderer';
 import Camera from '../Camera';
 import Scene from '../Scene';
+import { optional } from '../core/util';
+import { importSharedShader } from '../shader/shared';
+
+importSharedShader();
 
 Shader.import(gbufferEssl);
 Shader.import(chunkEssl);
@@ -146,6 +150,7 @@ export interface DeferredGBufferOpts {
   renderTransparent: boolean;
 }
 
+interface DeferredGBuffer extends DeferredGBufferOpts {}
 /**
  * GBuffer is provided for deferred rendering and SSAO, SSR pass.
  * It will do three passes rendering to four target textures. See
@@ -158,16 +163,6 @@ export interface DeferredGBufferOpts {
  * @extends clay.core.Base
  */
 class DeferredGBuffer {
-  enableTargetTexture1 = true;
-
-  enableTargetTexture2 = true;
-
-  enableTargetTexture3 = true;
-
-  enableTargetTexture4 = false;
-
-  renderTransparent = false;
-
   private _gBufferRenderList: RenderableObject[] = [];
   // - R: normal.x
   // - G: normal.y
@@ -265,7 +260,18 @@ class DeferredGBuffer {
     }
   });
 
-  private _debugPass = new Pass(Shader.source('clay.deferred.gbuffer.debug'));
+  private _debugPass = new CompositorFullscreenQuadPass(
+    Shader.source('clay.deferred.gbuffer.debug')
+  );
+
+  constructor(opts?: Partial<DeferredGBufferOpts>) {
+    opts = opts || {};
+    this.enableTargetTexture1 = optional(opts.enableTargetTexture1, true);
+    this.enableTargetTexture2 = optional(opts.enableTargetTexture2, true);
+    this.enableTargetTexture3 = optional(opts.enableTargetTexture3, true);
+    this.enableTargetTexture4 = optional(opts.enableTargetTexture4, false);
+    this.renderTransparent = optional(opts.renderTransparent, false);
+  }
   /**
    * Set G Buffer size.
    * @param {number} width

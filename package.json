@@ -36,9 +36,11 @@
     "url": "https://github.com/pissang/claygl.git"
   },
   "devDependencies": {
+    "@types/dat.gui": "^0.7.7",
     "@types/stats.js": "^0.17.0",
     "@typescript-eslint/eslint-plugin": "^5.20.0",
     "@typescript-eslint/parser": "^5.20.0",
+    "dat.gui": "^0.7.9",
     "electron": "1.7.9",
     "electron-mocha": "^4.0.3",
     "esbuild": "^0.14.38",

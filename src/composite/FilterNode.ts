@@ -146,7 +146,7 @@ class CompositeFilterNode extends CompositeNode {
    * Proxy of pass.material.define('fragment', xxx);
    */
   define(symbol: string, val: any) {
-    this.pass.material.define('fragment', symbol, val);
+    this.pass.material!.define('fragment', symbol, val);
   }
 
   /**
@@ -154,23 +154,23 @@ class CompositeFilterNode extends CompositeNode {
    * @param  {string} symbol
    */
   undefine(symbol: string) {
-    this.pass.material.undefine('fragment', symbol);
+    this.pass.material!.undefine('fragment', symbol);
   }
 
   link(inputPinName: string, fromNode: CompositeNode, fromPinName: string): void {
     super.link(inputPinName, fromNode, fromPinName);
     // Enabled the pin texture in shader
-    this.pass.material.enableTexture(inputPinName);
+    this.pass.material!.enableTexture(inputPinName);
   }
 
   validateInput(inputName: string) {
-    return this.pass.material.isUniformEnabled(inputName);
+    return this.pass.material!.isUniformEnabled(inputName);
   }
   clear() {
     super.clear();
 
     // Default disable all texture
-    this.pass.material.disableTexturesAll();
+    this.pass.material!.disableTexturesAll();
   }
 }
 export default CompositeFilterNode;

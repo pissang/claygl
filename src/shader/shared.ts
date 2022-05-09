@@ -3,7 +3,7 @@ import utilEssl from './source/util.glsl.js';
 import shadowmapEssl from '../shader/source/shadowmap.glsl.js';
 import Shader from '../Shader';
 
-export function importShared() {
+export function importSharedShader() {
   Shader.import(lightEssl);
   Shader.import(utilEssl);
   Shader.import(shadowmapEssl);

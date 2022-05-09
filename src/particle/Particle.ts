@@ -18,7 +18,7 @@ class Particle {
 
   age = 0;
 
-  spriteSize: = 1;
+  spriteSize = 1;
 
   weight = 1;
 

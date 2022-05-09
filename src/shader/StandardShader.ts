@@ -1,8 +1,8 @@
-import { importShared } from './shared';
+import { importSharedShader } from './shared';
 import Shader from '../Shader.js';
 import standardEssl from './source/standard.glsl.js';
 
-importShared();
+importSharedShader();
 Shader.import(standardEssl);
 
 class StandardShader extends Shader {

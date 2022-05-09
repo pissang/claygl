@@ -1,8 +1,8 @@
-import { importShared } from './shared';
+import { importSharedShader } from './shared';
 import Shader from '../Shader.js';
 import basicEssl from './source/basic.glsl.js';
 
-importShared();
+importSharedShader();
 
 Shader.import(basicEssl);
 class BasicShader extends Shader {

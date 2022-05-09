@@ -2,9 +2,11 @@ lockfileVersion: 5.3
 
 specifiers:
   '@rollup/plugin-typescript': ^8.3.2
+  '@types/dat.gui': ^0.7.7
   '@types/stats.js': ^0.17.0
   '@typescript-eslint/eslint-plugin': ^5.20.0
   '@typescript-eslint/parser': ^5.20.0
+  dat.gui: ^0.7.9
   electron: 1.7.9
   electron-mocha: ^4.0.3
   esbuild: ^0.14.38
@@ -27,9 +29,11 @@ dependencies:
   tslib: 2.3.1
 
 devDependencies:
+  '@types/dat.gui': 0.7.7
   '@types/stats.js': 0.17.0
   '@typescript-eslint/eslint-plugin': 5.20.0_bd994e352ae473ad3e507fadfa78fd8c
   '@typescript-eslint/parser': 5.20.0_eslint@8.13.0+typescript@4.6.4
+  dat.gui: 0.7.9
   electron: 1.7.9
   electron-mocha: 4.0.3
   esbuild: 0.14.38
@@ -127,6 +131,10 @@ packages:
       picomatch: 2.3.1
       rollup: 2.70.2
     dev: false
+
+  /@types/dat.gui/0.7.7:
+    resolution: {integrity: sha512-CxLCme0He5Jk3uQwfO/fGZMyNhb/ypANzqX0yU9lviBQMlen5SOvQTBQ/Cd9x5mFlUAK5Tk8RgvTyLj1nYkz+w==}
+    dev: true
 
   /@types/estree/0.0.39:
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
@@ -661,6 +669,10 @@ packages:
     engines: {node: '>=0.10'}
     dependencies:
       assert-plus: 1.0.0
+    dev: true
+
+  /dat.gui/0.7.9:
+    resolution: {integrity: sha512-sCNc1OHobc+Erc1HqiswYgHdVNpSJUlk/Hz8vzOCsER7rl+oF/4+v8GXFUyCgtXpoCX6+bnmg07DedLvBLwYKQ==}
     dev: true
 
   /dateformat/1.0.12:
