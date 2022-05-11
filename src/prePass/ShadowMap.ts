@@ -1,4 +1,4 @@
-import * as glenum from '../core/glenum';
+import * as constants from '../core/constants';
 import Vector3 from '../math/Vector3';
 import BoundingBox from '../math/BoundingBox';
 import Frustum from '../math/Frustum';
@@ -22,7 +22,7 @@ import type Renderable from '../Renderable';
 import { Notifier } from '../core';
 import Scene from '../Scene';
 import Camera from '../Camera';
-import CompositorFullscreenQuadPass from '../composite/Pass';
+import FullscreenQuadPass from '../composite/Pass';
 import Light from '../Light';
 import DirectionalLight from '../light/Directional';
 import SpotLight from '../light/Spot';
@@ -132,7 +132,7 @@ class ShadowMapPass extends Notifier {
 
   private _texturePool = new TexturePool();
 
-  private _debugPass?: CompositorFullscreenQuadPass;
+  private _debugPass?: FullscreenQuadPass;
 
   constructor(opts?: Partial<ShadowMapPassOpts>) {
     super();
@@ -157,9 +157,7 @@ class ShadowMapPass extends Notifier {
   renderDebug(renderer: Renderer, size: number) {
     let debugPass = this._debugPass;
     if (!debugPass) {
-      debugPass = this._debugPass = new CompositorFullscreenQuadPass(
-        Shader.source('clay.sm.debug_depth')
-      );
+      debugPass = this._debugPass = new FullscreenQuadPass(Shader.source('clay.sm.debug_depth'));
     }
     renderer.saveClear();
     const viewport = renderer.viewport;
@@ -242,9 +240,9 @@ class ShadowMapPass extends Notifier {
       return;
     }
 
-    _gl.enable(glenum.DEPTH_TEST);
+    _gl.enable(constants.DEPTH_TEST);
     _gl.depthMask(true);
-    _gl.disable(glenum.BLEND);
+    _gl.disable(constants.BLEND);
 
     // Clear with high-z, so the part not rendered will not been shadowed
     // TODO
@@ -425,7 +423,7 @@ class ShadowMapPass extends Notifier {
     const framebuffer = this._frameBuffer;
     framebuffer.attach(texture);
     framebuffer.bind(renderer);
-    _gl.clear(glenum.COLOR_BUFFER_BIT | glenum.DEPTH_BUFFER_BIT);
+    _gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
 
     for (let i = 0; i < light.shadowCascade; i++) {
       // Get the splitted frustum
@@ -503,7 +501,7 @@ class ShadowMapPass extends Notifier {
     this._frameBuffer.attach(texture);
     this._frameBuffer.bind(renderer);
 
-    _gl.clear(glenum.COLOR_BUFFER_BIT | glenum.DEPTH_BUFFER_BIT);
+    _gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
 
     const defaultShadowMaterial = this._getDepthMaterial(light);
     const passConfig: RenderPassConfig = {
@@ -622,11 +620,11 @@ class ShadowMapPass extends Notifier {
 
       this._frameBuffer.attach(
         texture,
-        glenum.COLOR_ATTACHMENT0,
-        glenum.TEXTURE_CUBE_MAP_POSITIVE_X + i
+        constants.COLOR_ATTACHMENT0,
+        constants.TEXTURE_CUBE_MAP_POSITIVE_X + i
       );
       this._frameBuffer.bind(renderer);
-      _gl.clear(glenum.COLOR_BUFFER_BIT | glenum.DEPTH_BUFFER_BIT);
+      _gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
 
       renderer.renderPass(renderListEachSide[target], camera, passConfig);
     }
@@ -681,8 +679,8 @@ class ShadowMapPass extends Notifier {
       // TODO share with height ?
       texture.width = resolution * cascade;
       texture.height = resolution;
-      texture.minFilter = glenum.NEAREST;
-      texture.magFilter = glenum.NEAREST;
+      texture.minFilter = constants.NEAREST;
+      texture.magFilter = constants.NEAREST;
       texture.useMipmap = false;
       this._textures[key] = texture;
     }

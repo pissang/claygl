@@ -1,5 +1,5 @@
 import Texture, { TextureImageSource, TextureOpts, TexturePixelSource } from './Texture';
-import * as glenum from './core/glenum';
+import * as constants from './core/constants';
 import vendor from './core/vendor';
 import Renderer from './Renderer';
 import { GLEnum } from './core/type';
@@ -118,7 +118,7 @@ class Texture2D extends Texture {
 
   update(renderer: Renderer) {
     const gl = renderer.gl;
-    gl.bindTexture(glenum.TEXTURE_2D, this._cache.get('webgl_texture'));
+    gl.bindTexture(constants.TEXTURE_2D, this._cache.get('webgl_texture'));
 
     this.updateCommon(renderer);
 
@@ -131,36 +131,36 @@ class Texture2D extends Texture {
       this.convertToPOT &&
       !mipmaps.length &&
       this.image &&
-      (this.wrapS === Texture.REPEAT || this.wrapT === Texture.REPEAT) &&
+      (this.wrapS === constants.REPEAT || this.wrapT === constants.REPEAT) &&
       this.NPOT
     );
 
     gl.texParameteri(
-      glenum.TEXTURE_2D,
-      glenum.TEXTURE_WRAP_S,
+      constants.TEXTURE_2D,
+      constants.TEXTURE_WRAP_S,
       convertToPOT ? this.wrapS : this.getAvailableWrapS()
     );
     gl.texParameteri(
-      glenum.TEXTURE_2D,
-      glenum.TEXTURE_WRAP_T,
+      constants.TEXTURE_2D,
+      constants.TEXTURE_WRAP_T,
       convertToPOT ? this.wrapT : this.getAvailableWrapT()
     );
 
     gl.texParameteri(
-      glenum.TEXTURE_2D,
-      glenum.TEXTURE_MAG_FILTER,
+      constants.TEXTURE_2D,
+      constants.TEXTURE_MAG_FILTER,
       convertToPOT ? this.magFilter : this.getAvailableMagFilter()
     );
     gl.texParameteri(
-      glenum.TEXTURE_2D,
-      glenum.TEXTURE_MIN_FILTER,
+      constants.TEXTURE_2D,
+      constants.TEXTURE_MIN_FILTER,
       convertToPOT ? this.minFilter : this.getAvailableMinFilter()
     );
 
     const anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
     if (anisotropicExt && this.anisotropic > 1) {
       gl.texParameterf(
-        glenum.TEXTURE_2D,
+        constants.TEXTURE_2D,
         anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT,
         this.anisotropic
       );
@@ -170,7 +170,7 @@ class Texture2D extends Texture {
     if (glType === 36193) {
       const halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
       if (!halfFloatExt) {
-        glType = glenum.FLOAT;
+        glType = constants.FLOAT;
       }
     }
 
@@ -187,11 +187,11 @@ class Texture2D extends Texture {
       this._updateTextureData(gl, this, 0, this.width, this.height, glFormat, glType, convertToPOT);
 
       if (this.useMipmap && (!this.NPOT || convertToPOT)) {
-        gl.generateMipmap(glenum.TEXTURE_2D);
+        gl.generateMipmap(constants.TEXTURE_2D);
       }
     }
 
-    gl.bindTexture(glenum.TEXTURE_2D, null);
+    gl.bindTexture(constants.TEXTURE_2D, null);
   }
 
   _updateTextureData(
@@ -210,26 +210,26 @@ class Texture2D extends Texture {
         this._potCanvas = convertTextureToPowerOfTwo(this, this._potCanvas);
         imgData = this._potCanvas;
       }
-      gl.texImage2D(glenum.TEXTURE_2D, level, glFormat, glFormat, glType, imgData);
+      gl.texImage2D(constants.TEXTURE_2D, level, glFormat, glFormat, glType, imgData);
     } else {
       // Can be used as a blank texture when writing render to texture(RTT)
       if (
         // S3TC
-        (glFormat <= Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT &&
-          glFormat >= Texture.COMPRESSED_RGB_S3TC_DXT1_EXT) ||
+        (glFormat <= constants.COMPRESSED_RGBA_S3TC_DXT5_EXT &&
+          glFormat >= constants.COMPRESSED_RGB_S3TC_DXT1_EXT) ||
         // ETC
-        glFormat === Texture.COMPRESSED_RGB_ETC1_WEBGL ||
+        glFormat === constants.COMPRESSED_RGB_ETC1_WEBGL ||
         // PVRTC
-        (glFormat >= Texture.COMPRESSED_RGB_PVRTC_4BPPV1_IMG &&
-          glFormat <= Texture.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG) ||
+        (glFormat >= constants.COMPRESSED_RGB_PVRTC_4BPPV1_IMG &&
+          glFormat <= constants.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG) ||
         // ATC
-        (glFormat === Texture.COMPRESSED_RGB_ATC_WEBGL &&
-          glFormat === Texture.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL &&
-          glFormat === Texture.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL)
+        glFormat === constants.COMPRESSED_RGB_ATC_WEBGL ||
+        glFormat === constants.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL ||
+        glFormat === constants.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL
       ) {
         if (data.pixels) {
           gl.compressedTexImage2D(
-            glenum.TEXTURE_2D,
+            constants.TEXTURE_2D,
             level,
             glFormat,
             width,
@@ -243,7 +243,7 @@ class Texture2D extends Texture {
       } else {
         // Is a render target if pixels is null
         gl.texImage2D(
-          glenum.TEXTURE_2D,
+          constants.TEXTURE_2D,
           level,
           glFormat,
           width,
@@ -264,8 +264,8 @@ class Texture2D extends Texture {
   generateMipmap(renderer: Renderer) {
     const gl = renderer.gl;
     if (this.useMipmap && !this.NPOT) {
-      gl.bindTexture(glenum.TEXTURE_2D, this._cache.get('webgl_texture'));
-      gl.generateMipmap(glenum.TEXTURE_2D);
+      gl.bindTexture(constants.TEXTURE_2D, this._cache.get('webgl_texture'));
+      gl.generateMipmap(constants.TEXTURE_2D);
     }
   }
 
@@ -278,11 +278,11 @@ class Texture2D extends Texture {
   }
 
   bind(renderer: Renderer) {
-    renderer.gl.bindTexture(glenum.TEXTURE_2D, this.getWebGLTexture(renderer));
+    renderer.gl.bindTexture(constants.TEXTURE_2D, this.getWebGLTexture(renderer));
   }
 
   unbind(renderer: Renderer) {
-    renderer.gl.bindTexture(glenum.TEXTURE_2D, null);
+    renderer.gl.bindTexture(constants.TEXTURE_2D, null);
   }
 
   load(src: string, crossOrigin?: string) {

@@ -3,10 +3,10 @@ import Texture from '../Texture';
 import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
 import Shader from '../Shader';
-import CompositorFullscreenQuadPass from '../composite/Pass';
+import FullscreenQuadPass from '../composite/Pass';
 import Matrix4 from '../math/Matrix4';
 import * as mat4 from '../glmatrix/mat4';
-import * as glenum from '../core/glenum';
+import * as constants from '../core/constants';
 
 import gbufferEssl from '../shader/source/deferred/gbuffer.glsl.js';
 import chunkEssl from '../shader/source/deferred/chunk.glsl.js';
@@ -120,10 +120,10 @@ function getGetUniformHook2(defaultDiffuseMap: Texture2D, defaultMetalnessMap: T
 }
 
 const commonTextureOpts = {
-  minFilter: glenum.NEAREST,
-  magFilter: glenum.NEAREST,
-  wrapS: glenum.CLAMP_TO_EDGE,
-  wrapT: glenum.CLAMP_TO_EDGE
+  minFilter: constants.NEAREST,
+  magFilter: constants.NEAREST,
+  wrapS: constants.CLAMP_TO_EDGE,
+  wrapT: constants.CLAMP_TO_EDGE
 } as const;
 
 export interface DeferredGBufferOpts {
@@ -172,7 +172,7 @@ class DeferredGBuffer {
     Object.assign(
       {
         // PENDING
-        type: Texture.HALF_FLOAT
+        type: constants.HALF_FLOAT_OES
       },
       commonTextureOpts
     )
@@ -182,11 +182,11 @@ class DeferredGBuffer {
   private _gBufferTex2 = new Texture2D(
     Object.assign(
       {
-        // format: Texture.DEPTH_COMPONENT,
-        // type: Texture.UNSIGNED_INT
+        // format: constants.DEPTH_COMPONENT,
+        // type: constants.UNSIGNED_INT
 
-        format: Texture.DEPTH_STENCIL,
-        type: Texture.UNSIGNED_INT_24_8_WEBGL
+        format: constants.DEPTH_STENCIL,
+        type: constants.UNSIGNED_INT_24_8_WEBGL
       },
       commonTextureOpts
     )
@@ -202,7 +202,7 @@ class DeferredGBuffer {
     Object.assign(
       {
         // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
-        type: Texture.HALF_FLOAT
+        type: constants.HALF_FLOAT_OES
       },
       commonTextureOpts
     )
@@ -260,9 +260,7 @@ class DeferredGBuffer {
     }
   });
 
-  private _debugPass = new CompositorFullscreenQuadPass(
-    Shader.source('clay.deferred.gbuffer.debug')
-  );
+  private _debugPass = new FullscreenQuadPass(Shader.source('clay.deferred.gbuffer.debug'));
 
   constructor(opts?: Partial<DeferredGBufferOpts>) {
     opts = opts || {};
@@ -496,9 +494,9 @@ class DeferredGBuffer {
               let prevSkinMatricesTexture = gbufferData.prevSkinMatricesTexture;
               if (!prevSkinMatricesTexture) {
                 prevSkinMatricesTexture = gbufferData.prevSkinMatricesTexture = new Texture2D({
-                  type: Texture.FLOAT,
-                  minFilter: Texture.NEAREST,
-                  magFilter: Texture.NEAREST,
+                  type: constants.FLOAT,
+                  minFilter: constants.NEAREST,
+                  magFilter: constants.NEAREST,
                   useMipmap: false,
                   flipY: false
                 });

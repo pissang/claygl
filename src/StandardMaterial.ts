@@ -1,6 +1,5 @@
 import Material, { MaterialOpts } from './Material';
 
-import * as util from './core/util';
 import StandardMRShader from './shader/StandardMRShader';
 import { Color } from './core/type';
 import Texture2D from './Texture2D';
@@ -32,7 +31,7 @@ const SIMPLE_PROPERTIES = [
   'alphaCutoff',
   'normalScale'
 ] as const;
-const PROPERTIES_CHANGE_SHADER = [
+const PROPERTIES_NEEDS_INVALIDATE_SHADER = [
   'linear',
   'encodeRGBM',
   'decodeRGBM',
@@ -190,7 +189,7 @@ class StandardMaterial extends Material {
         (material as any)[propName] = this[propName];
       }
     });
-    [...SIMPLE_PROPERTIES, ...PROPERTIES_CHANGE_SHADER].forEach((propName) => {
+    [...SIMPLE_PROPERTIES, ...PROPERTIES_NEEDS_INVALIDATE_SHADER].forEach((propName) => {
       (material as any)[propName] = this[propName];
     });
     return material;
@@ -219,7 +218,7 @@ TEXTURE_PROPERTIES.forEach(function (propName) {
   });
 });
 
-PROPERTIES_CHANGE_SHADER.forEach(function (propName) {
+PROPERTIES_NEEDS_INVALIDATE_SHADER.forEach(function (propName) {
   const privateKey = '_' + propName;
   Object.defineProperty(StandardMaterial.prototype, propName, {
     get: function () {

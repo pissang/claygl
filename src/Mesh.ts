@@ -1,5 +1,5 @@
 import Renderable, { RenderableOpts } from './Renderable';
-import * as glenum from './core/glenum';
+import * as constants from './core/constants';
 import { optional } from './core/util';
 import type Skeleton from './Skeleton';
 import type Matrix4 from './math/Matrix4';
@@ -48,18 +48,18 @@ class Mesh extends Renderable {
     return mesh;
   }
 
-  static POINTS = glenum.POINTS;
-  static LINES = glenum.LINES;
-  static LINE_LOOP = glenum.LINE_LOOP;
-  static LINE_STRIP = glenum.LINE_STRIP;
-  static TRIANGLES = glenum.TRIANGLES;
-  static TRIANGLE_STRIP = glenum.TRIANGLE_STRIP;
-  static TRIANGLE_FAN = glenum.TRIANGLE_FAN;
+  static POINTS = constants.POINTS;
+  static LINES = constants.LINES;
+  static LINE_LOOP = constants.LINE_LOOP;
+  static LINE_STRIP = constants.LINE_STRIP;
+  static TRIANGLES = constants.TRIANGLES;
+  static TRIANGLE_STRIP = constants.TRIANGLE_STRIP;
+  static TRIANGLE_FAN = constants.TRIANGLE_FAN;
 
-  static BACK = glenum.BACK;
-  static FRONT = glenum.FRONT;
-  static FRONT_AND_BACK = glenum.FRONT_AND_BACK;
-  static CW = glenum.CW;
-  static CCW = glenum.CCW;
+  static BACK = constants.BACK;
+  static FRONT = constants.FRONT;
+  static FRONT_AND_BACK = constants.FRONT_AND_BACK;
+  static CW = constants.CW;
+  static CCW = constants.CCW;
 }
 export default Mesh;

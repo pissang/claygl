@@ -1,5 +1,5 @@
 import CompositeNode from './CompositeNode';
-import * as glenum from '../core/glenum';
+import * as constants from '../core/constants';
 import FrameBuffer from '../FrameBuffer';
 import type Scene from '../Scene';
 import type Camera from '../Camera';
@@ -56,10 +56,10 @@ export class CompositeSceneNode extends CompositeNode {
       if (ext) {
         const bufs: GLEnum[] = [];
         outputNames.forEach((outputName) => {
-          const attachment = outputs[outputName].attachment || glenum.COLOR_ATTACHMENT0;
+          const attachment = outputs[outputName].attachment || constants.COLOR_ATTACHMENT0;
           if (
-            attachment >= glenum.COLOR_ATTACHMENT0 &&
-            attachment <= glenum.COLOR_ATTACHMENT0 + 8
+            attachment >= constants.COLOR_ATTACHMENT0 &&
+            attachment <= constants.COLOR_ATTACHMENT0 + 8
           ) {
             bufs.push(attachment);
           }
@@ -70,7 +70,7 @@ export class CompositeSceneNode extends CompositeNode {
       // Always clear
       // PENDING
       renderer.saveClear();
-      renderer.clearBit = glenum.DEPTH_BUFFER_BIT | glenum.COLOR_BUFFER_BIT;
+      renderer.clearBit = constants.DEPTH_BUFFER_BIT | constants.COLOR_BUFFER_BIT;
       renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
       renderer.restoreClear();
 

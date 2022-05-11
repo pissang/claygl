@@ -43,7 +43,7 @@ export interface CompositeNodeOutput {
 /**
  * Node of graph based post processing.
  */
-class CompositeNode extends Notifier {
+abstract class CompositeNode extends Notifier {
   name: string = '';
 
   /**
@@ -119,29 +119,7 @@ class CompositeNode extends Notifier {
     return parametersCopy;
   }
 
-  /**
-   * Set parameter
-   * @param {string} name
-   * @param {} value
-   */
-  setParameter(name: string, value: any) {}
-  /**
-   * Get parameter value
-   * @param  {string} name
-   * @return {}
-   */
-  getParameter(name: string) {}
-  /**
-   * Set parameters
-   * @param {Object} obj
-   */
-  setParameters(obj: any) {
-    Object.keys(obj).forEach((key) => {
-      this.setParameter(key, obj[key]);
-    });
-  }
-
-  render(renderer: Renderer, frameBuffer?: FrameBuffer) {}
+  abstract render(renderer: Renderer, frameBuffer?: FrameBuffer): void;
 
   renderAndOutput(renderer: Renderer, name: string): Texture2D | undefined {
     const outputInfo = this.outputs![name];

@@ -1,5 +1,5 @@
 /**
- * @namespace clay.core.glenum
+ * @namespace clay.core.constants
  * @see http://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14
  */
 
@@ -417,3 +417,46 @@ export const UNPACK_PREMULTIPLY_ALPHA_WEBGL = 0x9241;
 export const CONTEXT_LOST_WEBGL = 0x9242;
 export const UNPACK_COLORSPACE_CONVERSION_WEBGL = 0x9243;
 export const BROWSER_DEFAULT_WEBGL = 0x9244;
+
+/* Extensions */
+
+/**
+ * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
+ */
+export const SRGB_EXT = 0x8c40;
+/**
+ * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
+ */
+export const SRGB_ALPHA_EXT = 0x8c42;
+
+/**
+ * OES_texture_half_float extension
+ */
+export const HALF_FLOAT_OES = 0x8d61;
+
+/**
+ * UNSIGNED_INT_24_8_WEBGL for WEBGL_depth_texture extension
+ */
+export const UNSIGNED_INT_24_8_WEBGL = 34042;
+
+/* Compressed Texture */
+// https://developer.mozilla.org/zh-CN/docs/Web/API/WebGL_API/Constants
+// s3tc
+export const COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83f0;
+export const COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83f1;
+export const COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83f2;
+export const COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83f3;
+
+// etc
+export const COMPRESSED_RGB_ETC1_WEBGL = 0x8d64;
+
+// pvrtc
+export const COMPRESSED_RGB_PVRTC_4BPPV1_IMG = 0x8c00;
+export const COMPRESSED_RGBA_PVRTC_4BPPV1_IMG = 0x8c02;
+export const COMPRESSED_RGB_PVRTC_2BPPV1_IMG = 0x8c01;
+export const COMPRESSED_RGBA_PVRTC_2BPPV1_IMG = 0x8c03;
+
+// atc
+export const COMPRESSED_RGB_ATC_WEBGL = 0x8c92;
+export const COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL = 0x8c93;
+export const COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL = 0x87ee;

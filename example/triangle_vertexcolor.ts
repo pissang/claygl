@@ -1,37 +1,29 @@
-import {
-  BasicShader,
-  Material,
-  Mesh,
-  OrthographicCamera,
-  Renderer,
-  Scene,
-  StaticGeometry
-} from 'claygl';
+import { BasicShader, Material, Mesh, OrthographicCamera, Renderer, Scene, Geometry } from 'claygl';
 
-var TRIANGLE_POSITIONS = [
+const TRIANGLE_POSITIONS = [
   [-0.5, -0.5, 0],
   [0.5, -0.5, 0],
   [0, 0.5, 0]
 ];
-var VERTEX_COLORS = [
+const VERTEX_COLORS = [
   [1, 0, 0, 1],
   [0, 1, 0, 1],
   [0, 0, 1, 1]
 ];
 
-var renderer = new Renderer({
+const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement
 });
 renderer.resize(400, 400);
-var scene = new Scene();
-var camera = new OrthographicCamera();
-var geometry = new StaticGeometry();
+const scene = new Scene();
+const camera = new OrthographicCamera();
+const geometry = new Geometry();
 
 // Add triangle vertices to position attribute.
 geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 geometry.attributes.color.fromArray(VERTEX_COLORS);
 
-var mesh = new Mesh({
+const mesh = new Mesh({
   geometry: geometry,
   material: new Material({
     shader: new BasicShader()

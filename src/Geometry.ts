@@ -47,7 +47,7 @@ const TRIANGLE_POSITIONS = [
     [0.5, -0.5, 0],
     [0, 0.5, 0]
 ];
-const geometry = new clay.StaticGeometryBase();
+const geometry = new clay.GeometryBase();
 // Add triangle vertices to position attribute.
 geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 ```
@@ -513,10 +513,6 @@ class Geometry extends GeometryBase {
       this.updateBoundingBox();
     }
   }
-
-  static STATIC_DRAW = GeometryBase.STATIC_DRAW;
-  static DYNAMIC_DRAW = GeometryBase.DYNAMIC_DRAW;
-  static STREAM_DRAW = GeometryBase.STREAM_DRAW;
 }
 
 export { GeometryAttribute };

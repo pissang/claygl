@@ -2,18 +2,18 @@ import Light, { LightOpts } from '../Light';
 import Vector3 from '../math/Vector3';
 
 export interface DirectionalLightOpts extends LightOpts {
-  shadowBias: 0.001;
-  shadowSlopeScale: 2.0;
+  shadowBias: number;
+  shadowSlopeScale: number;
   /**
    * Shadow cascade.
    * Use PSSM technique when it is larger than 1 and have a unique directional light in scene.
    */
-  shadowCascade: 1;
+  shadowCascade: number;
 
   /**
    * Available when shadowCascade is larger than 1 and have a unique directional light in scene.
    */
-  cascadeSplitLogFactor: 0.2;
+  cascadeSplitLogFactor: number;
 }
 /**
  * @example
@@ -33,7 +33,7 @@ class DirectionalLight extends Light {
 
   readonly type = 'DIRECTIONAL_LIGHT';
 
-  constructor(opts?: Partial<LightOpts>) {
+  constructor(opts?: Partial<DirectionalLightOpts>) {
     super(opts);
     Object.assign(this, opts);
   }

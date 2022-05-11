@@ -17,6 +17,7 @@ interface LoadTextureOpts {
 type TextureOnload = (texture: Texture2D) => void;
 type TextureOnerror = (err: any) => void;
 
+// TODO change to promise?
 export function loadTexture(
   path: string,
   onload?: TextureOnload,
@@ -87,8 +88,6 @@ interface LoadPanoramaOpts extends LoadTextureOpts {
   flipY?: boolean;
 }
 
-type PanoramaOnload = (texture: TextureCube) => void;
-
 /**
  * Load a panorama texture and render it to a cube map
  */
@@ -96,45 +95,22 @@ export function loadPanorama(
   renderer: Renderer,
   path: string,
   cubeMap: TextureCube,
-  onload?: PanoramaOnload,
-  onerror?: TextureOnerror
-): void;
-export function loadPanorama(
-  renderer: Renderer,
-  path: string,
-  cubeMap: TextureCube,
-  option?: LoadPanoramaOpts,
-  onload?: PanoramaOnload,
-  onerror?: TextureOnerror
-): void;
-export function loadPanorama(
-  renderer: Renderer,
-  path: string,
-  cubeMap: TextureCube,
-  option?: LoadPanoramaOpts | PanoramaOnload,
-  onload?: PanoramaOnload | TextureOnerror,
-  onerror?: TextureOnerror
+  option?: LoadPanoramaOpts
 ) {
-  if (typeof option === 'function') {
-    onload = option;
-    onerror = onload;
-    option = {};
-  } else {
-    option = option || {};
-  }
-
-  loadTexture(
-    path,
-    option,
-    (texture: Texture2D) => {
-      // PENDING
-      texture.flipY = (option as LoadPanoramaOpts).flipY || false;
-      panoramaToCubeMap(renderer, texture, cubeMap, option as LoadPanoramaOpts);
-      texture.dispose(renderer);
-      onload && onload(cubeMap);
-    },
-    onerror
-  );
+  return new Promise((resolve, reject) => {
+    loadTexture(
+      path,
+      option || {},
+      (texture: Texture2D) => {
+        // PENDING
+        texture.flipY = (option as LoadPanoramaOpts).flipY || false;
+        panoramaToCubeMap(renderer, texture, cubeMap, option as LoadPanoramaOpts);
+        texture.dispose(renderer);
+        resolve(cubeMap);
+      },
+      reject
+    );
+  });
 }
 
 /**

@@ -1,5 +1,5 @@
 import Texture, { TextureImageSource, TextureOpts, TexturePixelSource } from './Texture';
-import * as glenum from './core/glenum';
+import * as constants from './core/constants';
 import * as mathUtil from './math/util';
 import vendor from './core/vendor';
 import Renderer from './Renderer';
@@ -94,7 +94,7 @@ class TextureCube extends Texture {
 
   update(renderer: Renderer) {
     const _gl = renderer.gl;
-    _gl.bindTexture(glenum.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
+    _gl.bindTexture(constants.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
 
     this.updateCommon(renderer);
 
@@ -103,24 +103,32 @@ class TextureCube extends Texture {
     let glType = this.type;
     const len = mipmaps && mipmaps.length;
 
-    _gl.texParameteri(glenum.TEXTURE_CUBE_MAP, glenum.TEXTURE_WRAP_S, this.getAvailableWrapS());
-    _gl.texParameteri(glenum.TEXTURE_CUBE_MAP, glenum.TEXTURE_WRAP_T, this.getAvailableWrapT());
+    _gl.texParameteri(
+      constants.TEXTURE_CUBE_MAP,
+      constants.TEXTURE_WRAP_S,
+      this.getAvailableWrapS()
+    );
+    _gl.texParameteri(
+      constants.TEXTURE_CUBE_MAP,
+      constants.TEXTURE_WRAP_T,
+      this.getAvailableWrapT()
+    );
 
     _gl.texParameteri(
-      glenum.TEXTURE_CUBE_MAP,
-      glenum.TEXTURE_MAG_FILTER,
+      constants.TEXTURE_CUBE_MAP,
+      constants.TEXTURE_MAG_FILTER,
       this.getAvailableMagFilter()
     );
     _gl.texParameteri(
-      glenum.TEXTURE_CUBE_MAP,
-      glenum.TEXTURE_MIN_FILTER,
+      constants.TEXTURE_CUBE_MAP,
+      constants.TEXTURE_MIN_FILTER,
       this.getAvailableMinFilter()
     );
 
     const anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
     if (anisotropicExt && this.anisotropic > 1) {
       _gl.texParameterf(
-        glenum.TEXTURE_CUBE_MAP,
+        constants.TEXTURE_CUBE_MAP,
         anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT,
         this.anisotropic
       );
@@ -130,7 +138,7 @@ class TextureCube extends Texture {
     if (glType === 36193) {
       const halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
       if (!halfFloatExt) {
-        glType = glenum.FLOAT;
+        glType = constants.FLOAT;
       }
     }
 
@@ -147,11 +155,11 @@ class TextureCube extends Texture {
       this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType);
 
       if (!this.NPOT && this.useMipmap) {
-        _gl.generateMipmap(glenum.TEXTURE_CUBE_MAP);
+        _gl.generateMipmap(constants.TEXTURE_CUBE_MAP);
       }
     }
 
-    _gl.bindTexture(glenum.TEXTURE_CUBE_MAP, null);
+    _gl.bindTexture(constants.TEXTURE_CUBE_MAP, null);
   }
 
   _updateTextureData(
@@ -169,7 +177,7 @@ class TextureCube extends Texture {
       const pixels = data.pixels && data.pixels[target];
       if (img) {
         _gl.texImage2D(
-          glenum.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+          constants.TEXTURE_CUBE_MAP_POSITIVE_X + i,
           level,
           glFormat,
           glFormat,
@@ -178,7 +186,7 @@ class TextureCube extends Texture {
         );
       } else {
         _gl.texImage2D(
-          glenum.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+          constants.TEXTURE_CUBE_MAP_POSITIVE_X + i,
           level,
           glFormat,
           width,
@@ -199,8 +207,8 @@ class TextureCube extends Texture {
   generateMipmap(renderer: Renderer) {
     const _gl = renderer.gl;
     if (this.useMipmap && !this.NPOT) {
-      _gl.bindTexture(glenum.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
-      _gl.generateMipmap(glenum.TEXTURE_CUBE_MAP);
+      _gl.bindTexture(constants.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
+      _gl.generateMipmap(constants.TEXTURE_CUBE_MAP);
     }
   }
 

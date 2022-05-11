@@ -37,8 +37,12 @@ export interface LightOpts extends ClayNodeOpts {
 }
 interface Light extends LightOpts {}
 class Light extends ClayNode {
+  color = [1, 1, 1];
+  intensity = 1;
+
   castShadow = true;
   shadowResolution = 512;
+
   group = 0;
 
   /**
@@ -68,7 +72,7 @@ class Light extends ClayNode {
    * @memberOf clay.Light.prototype
    */
   clone() {
-    const light = super.clone.call(this);
+    const light = super.clone();
     light.color = Array.prototype.slice.call(this.color);
     light.intensity = this.intensity;
     light.castShadow = this.castShadow;

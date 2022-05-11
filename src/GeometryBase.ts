@@ -1,4 +1,3 @@
-import * as glenum from './core/glenum';
 import ClayCache from './core/Cache';
 import Ray from './math/Ray';
 import { genGUID } from './core/util';
@@ -675,10 +674,5 @@ class GeometryBase {
     renderer.__removeGeometryVaoCache(this);
     cache.deleteContext(renderer.__uid__);
   }
-
-  static STATIC_DRAW = glenum.STATIC_DRAW;
-
-  static DYNAMIC_DRAW = glenum.DYNAMIC_DRAW;
-  static STREAM_DRAW = glenum.STREAM_DRAW;
 }
 export default GeometryBase;

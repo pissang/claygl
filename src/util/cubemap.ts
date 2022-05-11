@@ -3,20 +3,20 @@
 // http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
 import Texture2D from '../Texture2D';
 import TextureCube, { TextureCubeOpts } from '../TextureCube';
-import Texture from '../Texture';
 import FrameBuffer from '../FrameBuffer';
-import CompositorFullscreenQuadPass from '../composite/Pass';
+import FullscreenQuadPass from '../composite/Pass';
 import Material from '../Material';
 import Shader from '../Shader';
 import Skybox from '../plugin/Skybox';
 import Scene from '../Scene';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
+import * as constants from '../core/constants';
 import { panoramaToCubeMap } from './texture';
 
 import integrateBRDFShaderCode from './shader/integrateBRDF.glsl.js';
 import prefilterFragCode from './shader/prefilter.glsl.js';
 import Renderer from '../Renderer';
-import { CLAMP_TO_EDGE } from '../core/glenum';
+import { CLAMP_TO_EDGE } from '../core/constants';
 
 const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
 
@@ -83,7 +83,7 @@ export function prefilterEnvironmentMap(
       width,
       height,
       // FIXME FLOAT type will cause GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT error on iOS
-      type: textureType === Texture.FLOAT ? Texture.HALF_FLOAT : textureType
+      type: textureType === constants.FLOAT ? constants.HALF_FLOAT_OES : textureType
     });
     panoramaToCubeMap(renderer, envMap, envCubemap, {
       // PENDING encodeRGBM so it can be decoded as RGBM
@@ -103,7 +103,7 @@ export function prefilterEnvironmentMap(
 
   // Force to be UNSIGNED_BYTE
   if (textureOpts.encodeRGBM) {
-    textureType = prefilteredCubeMap.type = Texture.UNSIGNED_BYTE;
+    textureType = prefilteredCubeMap.type = constants.UNSIGNED_BYTE;
   }
 
   const renderTargetTmp = new Texture2D({
@@ -114,7 +114,7 @@ export function prefilterEnvironmentMap(
   const frameBuffer = new FrameBuffer({
     depthBuffer: false
   });
-  const ArrayCtor = textureType === Texture.UNSIGNED_BYTE ? Uint8Array : Float32Array;
+  const ArrayCtor = textureType === constants.UNSIGNED_BYTE ? Uint8Array : Float32Array;
 
   // const container = document.createElement('div');
   // document.body.appendChild(container);
@@ -145,7 +145,7 @@ export function prefilterEnvironmentMap(
         0,
         renderTargetTmp.width,
         renderTargetTmp.height,
-        Texture.RGBA,
+        constants.RGBA,
         textureType,
         pixels
       );
@@ -194,16 +194,16 @@ export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D)
   const framebuffer = new FrameBuffer({
     depthBuffer: false
   });
-  const quadPass = new CompositorFullscreenQuadPass(integrateBRDFShaderCode);
+  const quadPass = new FullscreenQuadPass(integrateBRDFShaderCode);
 
   const texture = new Texture2D({
     width: 512,
     height: 256,
-    type: Texture.HALF_FLOAT,
-    wrapS: Texture.CLAMP_TO_EDGE,
-    wrapT: Texture.CLAMP_TO_EDGE,
-    minFilter: Texture.NEAREST,
-    magFilter: Texture.NEAREST,
+    type: constants.HALF_FLOAT_OES,
+    wrapS: constants.CLAMP_TO_EDGE,
+    wrapT: constants.CLAMP_TO_EDGE,
+    minFilter: constants.NEAREST,
+    magFilter: constants.NEAREST,
     useMipmap: false
   });
   quadPass.setUniform('normalDistribution', normalDistribution);
@@ -238,11 +238,11 @@ export function generateNormalDistribution(roughnessLevels?: number, sampleSize?
   const normalDistribution = new Texture2D({
     width: roughnessLevels,
     height: sampleSize,
-    type: Texture.FLOAT,
-    minFilter: Texture.NEAREST,
-    magFilter: Texture.NEAREST,
-    wrapS: Texture.CLAMP_TO_EDGE,
-    wrapT: Texture.CLAMP_TO_EDGE,
+    type: constants.FLOAT,
+    minFilter: constants.NEAREST,
+    magFilter: constants.NEAREST,
+    wrapS: constants.CLAMP_TO_EDGE,
+    wrapT: constants.CLAMP_TO_EDGE,
     useMipmap: false
   });
   const pixels = new Float32Array(sampleSize * roughnessLevels * 4);

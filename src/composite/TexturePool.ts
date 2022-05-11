@@ -1,5 +1,5 @@
 import Texture2D, { Texture2DOpts } from '../Texture2D';
-import * as glenum from '../core/glenum';
+import * as constants from '../core/constants';
 import * as util from '../core/util';
 import Renderer from '../Renderer';
 
@@ -41,12 +41,12 @@ class TexturePool {
 const defaultParams: Partial<Texture2DOpts> = {
   width: 512,
   height: 512,
-  type: glenum.UNSIGNED_BYTE,
-  format: glenum.RGBA,
-  wrapS: glenum.CLAMP_TO_EDGE,
-  wrapT: glenum.CLAMP_TO_EDGE,
-  minFilter: glenum.LINEAR_MIPMAP_LINEAR,
-  magFilter: glenum.LINEAR,
+  type: constants.UNSIGNED_BYTE,
+  format: constants.RGBA,
+  wrapS: constants.CLAMP_TO_EDGE,
+  wrapT: constants.CLAMP_TO_EDGE,
+  minFilter: constants.LINEAR_MIPMAP_LINEAR,
+  magFilter: constants.LINEAR,
   useMipmap: true,
   anisotropic: 1,
   flipY: true,
@@ -70,26 +70,26 @@ function generateKey(parameters: Partial<Texture2DOpts>) {
 function fallBack(target: any) {
   const IPOT = isPowerOfTwo(target.width, target.height);
 
-  if (target.format === glenum.DEPTH_COMPONENT) {
+  if (target.format === constants.DEPTH_COMPONENT) {
     target.useMipmap = false;
   }
 
   if (!IPOT || !target.useMipmap) {
     if (
-      target.minFilter == glenum.NEAREST_MIPMAP_NEAREST ||
-      target.minFilter == glenum.NEAREST_MIPMAP_LINEAR
+      target.minFilter == constants.NEAREST_MIPMAP_NEAREST ||
+      target.minFilter == constants.NEAREST_MIPMAP_LINEAR
     ) {
-      target.minFilter = glenum.NEAREST;
+      target.minFilter = constants.NEAREST;
     } else if (
-      target.minFilter == glenum.LINEAR_MIPMAP_LINEAR ||
-      target.minFilter == glenum.LINEAR_MIPMAP_NEAREST
+      target.minFilter == constants.LINEAR_MIPMAP_LINEAR ||
+      target.minFilter == constants.LINEAR_MIPMAP_NEAREST
     ) {
-      target.minFilter = glenum.LINEAR;
+      target.minFilter = constants.LINEAR;
     }
   }
   if (!IPOT) {
-    target.wrapS = glenum.CLAMP_TO_EDGE;
-    target.wrapT = glenum.CLAMP_TO_EDGE;
+    target.wrapS = constants.CLAMP_TO_EDGE;
+    target.wrapT = constants.CLAMP_TO_EDGE;
   }
 }
 

@@ -9,7 +9,8 @@ import {
   Vector3,
   PlaneGeometry,
   Mesh,
-  startTimeline
+  startTimeline,
+  constants
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -30,8 +31,8 @@ const image = new Image();
 image.src = 'assets/textures/ground_tile.jpg';
 const texture = new Texture2D({
   image: image,
-  wrapS: Texture2D.REPEAT,
-  wrapT: Texture2D.REPEAT,
+  wrapS: constants.REPEAT,
+  wrapT: constants.REPEAT,
   anisotropic: 16
 });
 image.onload = function () {

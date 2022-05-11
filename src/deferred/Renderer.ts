@@ -5,7 +5,6 @@ import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
 import FullQuadPass from '../composite/Pass';
 import Texture2D from '../Texture2D';
-import Texture from '../Texture';
 import Mesh from '../Mesh';
 import SphereGeo from '../geometry/Sphere';
 import ConeGeo from '../geometry/Cone';
@@ -27,6 +26,7 @@ import ambientcubemapGlsl from '../shader/source/deferred/ambientcubemap.glsl.js
 import pointGlsl from '../shader/source/deferred/point.glsl.js';
 import sphereGlsl from '../shader/source/deferred/sphere.glsl.js';
 import tubeGlsl from '../shader/source/deferred/tube.glsl.js';
+import outputGlsl from '../shader/source/compositor/output.glsl.js';
 import type ShadowMapPass from '../prePass/ShadowMap';
 import type Geometry from '../Geometry';
 import type Scene from '../Scene';
@@ -43,6 +43,7 @@ import type TextureCube from '../TextureCube';
 import type Light from '../Light';
 import PerspectiveCamera from '../camera/Perspective';
 import OrthographicCamera from '../camera/Orthographic';
+import * as constants from '../core/constants';
 
 Shader.import(prezGlsl);
 Shader.import(utilGlsl);
@@ -59,6 +60,7 @@ Shader.import(sphereGlsl);
 Shader.import(tubeGlsl);
 
 Shader.import(prezGlsl);
+Shader.import(outputGlsl);
 
 const worldView = new Matrix4();
 const preZMaterial = new Material({
@@ -97,9 +99,9 @@ class DeferredRenderer extends Notifier {
 
   private _lightAccumTex = new Texture2D({
     // FIXME Device not support float texture
-    type: Texture.HALF_FLOAT,
-    minFilter: Texture.NEAREST,
-    magFilter: Texture.NEAREST
+    type: constants.HALF_FLOAT_OES,
+    minFilter: constants.NEAREST,
+    magFilter: constants.NEAREST
   });
 
   private _fullQuadPass = new FullQuadPass('', {

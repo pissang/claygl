@@ -3,7 +3,7 @@ import Plane from '../geometry/Plane';
 import Shader from '../Shader';
 import Material from '../Material';
 import Mesh from '../Mesh';
-import * as glenum from '../core/glenum';
+import * as constants from '../core/constants';
 import vertexGlsl from '../shader/source/compositor/vertex.glsl.js';
 import { GLEnum } from '../core/type';
 import { optional } from '../core/util';
@@ -21,13 +21,13 @@ const mesh = new Mesh({
 });
 const camera = new OrthoCamera();
 
-interface CompositorFullscreenQuadPassOpts {
+interface FullscreenQuadPassOpts {
   clearColor?: boolean;
   clearDepth?: boolean;
   blendWithPrevious?: boolean;
 }
 
-class CompositorFullscreenQuadPass extends Notifier {
+class FullscreenQuadPass extends Notifier {
   material?: Material;
 
   clearColor?: boolean;
@@ -36,7 +36,7 @@ class CompositorFullscreenQuadPass extends Notifier {
 
   outputs?: Record<string, Texture2D | undefined> = {};
 
-  constructor(fragment?: string, opts?: Partial<CompositorFullscreenQuadPassOpts>) {
+  constructor(fragment?: string, opts?: Partial<FullscreenQuadPassOpts>) {
     super();
 
     if (fragment) {
@@ -67,7 +67,7 @@ class CompositorFullscreenQuadPass extends Notifier {
     if (!this.outputs) {
       this.outputs = {};
     }
-    attachment = attachment || glenum.COLOR_ATTACHMENT0;
+    attachment = attachment || constants.COLOR_ATTACHMENT0;
     this.outputs[attachment] = texture;
   }
   /**
@@ -110,8 +110,8 @@ class CompositorFullscreenQuadPass extends Notifier {
         const bufs = [];
         for (const attachment in this.outputs) {
           if (
-            +attachment >= glenum.COLOR_ATTACHMENT0 &&
-            +attachment <= glenum.COLOR_ATTACHMENT0 + 8
+            +attachment >= constants.COLOR_ATTACHMENT0 &&
+            +attachment <= constants.COLOR_ATTACHMENT0 + 8
           ) {
             bufs.push(attachment);
           }
@@ -124,11 +124,11 @@ class CompositorFullscreenQuadPass extends Notifier {
 
     // FIXME Don't clear in each pass in default, let the color overwrite the buffer
     // FIXME pixels may be discard
-    let clearBit = this.clearDepth ? glenum.DEPTH_BUFFER_BIT : 0;
+    let clearBit = this.clearDepth ? constants.DEPTH_BUFFER_BIT : 0;
     const blendWithPrevious = this.blendWithPrevious;
     _gl.depthMask(true);
     if (this.clearColor) {
-      clearBit = clearBit | glenum.COLOR_BUFFER_BIT;
+      clearBit = clearBit | constants.COLOR_BUFFER_BIT;
       _gl.colorMask(true, true, true, true);
       const cc = this.clearColor;
       if (Array.isArray(cc)) {
@@ -140,7 +140,7 @@ class CompositorFullscreenQuadPass extends Notifier {
     // Blend with previous rendered scene in the final output
     // FIXME Configure blend.
     // FIXME It will cause screen blink？
-    _gl[blendWithPrevious ? 'enable' : 'disable'](glenum.BLEND);
+    _gl[blendWithPrevious ? 'enable' : 'disable'](constants.BLEND);
     this.material && (this.material.transparent = blendWithPrevious!);
 
     this.renderQuad(renderer);
@@ -168,4 +168,4 @@ class CompositorFullscreenQuadPass extends Notifier {
   dispose(renderer: Renderer) {}
 }
 
-export default CompositorFullscreenQuadPass;
+export default FullscreenQuadPass;

@@ -1,5 +1,5 @@
 import Texture from './Texture';
-import * as glenum from './core/glenum';
+import * as constants from './core/constants';
 import ClayCache from './core/Cache';
 import type Renderer from './Renderer';
 import { GLEnum } from './core/type';
@@ -11,10 +11,10 @@ const KEY_RENDERBUFFER_HEIGHT = KEY_RENDERBUFFER + '_height';
 const KEY_RENDERBUFFER_ATTACHED = KEY_RENDERBUFFER + '_attached';
 const KEY_DEPTHTEXTURE_ATTACHED = 'depthtexture_attached';
 
-const GL_FRAMEBUFFER = glenum.FRAMEBUFFER;
-const GL_RENDERBUFFER = glenum.RENDERBUFFER;
-const GL_DEPTH_ATTACHMENT = glenum.DEPTH_ATTACHMENT;
-const GL_COLOR_ATTACHMENT0 = glenum.COLOR_ATTACHMENT0;
+const GL_FRAMEBUFFER = constants.FRAMEBUFFER;
+const GL_RENDERBUFFER = constants.RENDERBUFFER;
+const GL_DEPTH_ATTACHMENT = constants.DEPTH_ATTACHMENT;
+const GL_COLOR_ATTACHMENT0 = constants.COLOR_ATTACHMENT0;
 
 interface FrameBufferOpts {
   /**
@@ -200,10 +200,12 @@ class FrameBuffer {
         if (
           !texture.NPOT &&
           texture.useMipmap &&
-          texture.minFilter === Texture.LINEAR_MIPMAP_LINEAR
+          texture.minFilter === constants.LINEAR_MIPMAP_LINEAR
         ) {
           const target =
-            texture.textureType === 'textureCube' ? glenum.TEXTURE_CUBE_MAP : glenum.TEXTURE_2D;
+            texture.textureType === 'textureCube'
+              ? constants.TEXTURE_CUBE_MAP
+              : constants.TEXTURE_2D;
           _gl.bindTexture(target, texture.getWebGLTexture(renderer));
           _gl.generateMipmap(target);
           _gl.bindTexture(target, null);
@@ -248,7 +250,7 @@ class FrameBuffer {
     // Can attach a depth texture to the depth buffer
     // http://blog.tojicode.com/2012/07/using-webgldepthtexture.html
     attachment = attachment || GL_COLOR_ATTACHMENT0;
-    target = target || glenum.TEXTURE_2D;
+    target = target || constants.TEXTURE_2D;
 
     const boundRenderer = this._boundRenderer;
     const _gl = boundRenderer && boundRenderer.gl;
@@ -308,7 +310,7 @@ class FrameBuffer {
     attachment = +attachment;
 
     let canAttach = true;
-    if (attachment === GL_DEPTH_ATTACHMENT || attachment === glenum.DEPTH_STENCIL_ATTACHMENT) {
+    if (attachment === GL_DEPTH_ATTACHMENT || attachment === constants.DEPTH_STENCIL_ATTACHMENT) {
       const extension = renderer.getGLExtension('WEBGL_depth_texture');
 
       if (!extension) {
@@ -316,7 +318,10 @@ class FrameBuffer {
         // Still trying to use the depth texture extension.
         // canAttach = false;
       }
-      if (texture.format !== glenum.DEPTH_COMPONENT && texture.format !== glenum.DEPTH_STENCIL) {
+      if (
+        texture.format !== constants.DEPTH_COMPONENT &&
+        texture.format !== constants.DEPTH_STENCIL
+      ) {
         console.error('The texture attached to depth buffer is not a valid.');
         canAttach = false;
       }
@@ -361,7 +366,7 @@ class FrameBuffer {
       attachedTextures[attachment] = null;
     }
 
-    if (attachment === GL_DEPTH_ATTACHMENT || attachment === glenum.DEPTH_STENCIL_ATTACHMENT) {
+    if (attachment === GL_DEPTH_ATTACHMENT || attachment === constants.DEPTH_STENCIL_ATTACHMENT) {
       cache.put(KEY_DEPTHTEXTURE_ATTACHED, false);
     }
   }
@@ -404,11 +409,6 @@ class FrameBuffer {
     // Clear cache for reusing
     this._textures = {};
   }
-
-  static DEPTH_ATTACHMENT = GL_DEPTH_ATTACHMENT;
-  static COLOR_ATTACHMENT0 = GL_COLOR_ATTACHMENT0;
-  static STENCIL_ATTACHMENT = glenum.STENCIL_ATTACHMENT;
-  static DEPTH_STENCIL_ATTACHMENT = glenum.DEPTH_STENCIL_ATTACHMENT;
 }
 
 export default FrameBuffer;

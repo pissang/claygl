@@ -19,7 +19,7 @@ import Skeleton from '../Skeleton';
 import Joint from '../Joint';
 import PerspectiveCamera from '../camera/Perspective';
 import OrthographicCamera from '../camera/Orthographic';
-import * as glenum from '../core/glenum';
+import * as constants from '../core/constants';
 
 import BoundingBox from '../math/BoundingBox';
 
@@ -616,19 +616,19 @@ function parseTextures(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadO
       }
     });
     util.defaults(parameters, {
-      wrapS: Texture.REPEAT,
-      wrapT: Texture.REPEAT,
+      wrapS: constants.REPEAT,
+      wrapT: constants.REPEAT,
       flipY: opts.textureFlipY,
       convertToPOT: opts.textureConvertToPOT
     });
 
-    const target = textureInfo.target || glenum.TEXTURE_2D;
+    const target = textureInfo.target || constants.TEXTURE_2D;
     const format = textureInfo.format;
     if (format != null) {
       parameters.format = format;
     }
 
-    if (target === glenum.TEXTURE_2D) {
+    if (target === constants.TEXTURE_2D) {
       const texture = new Texture2D(parameters);
       const imageInfo = json.images[textureInfo.source];
       let uri;

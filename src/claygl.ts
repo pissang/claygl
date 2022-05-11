@@ -10,7 +10,6 @@ export { default as Mesh } from './Mesh';
 export { default as InstancedMesh } from './InstancedMesh';
 export { default as GeometryBase } from './GeometryBase';
 export { default as Geometry } from './Geometry';
-export { default as StaticGeometry } from './StaticGeometry';
 export { default as Skeleton } from './Skeleton';
 export { default as Joint } from './Joint';
 export { default as FrameBuffer } from './FrameBuffer';
@@ -31,6 +30,8 @@ export function startTimeline(onframe?: (deltaTime: number) => void) {
   }
   return timeline;
 }
+
+export * as constants from './core/constants';
 
 // Camera
 export {
@@ -103,7 +104,12 @@ export * as textureUtil from './util/texture';
 export { default as App3D } from './App3D';
 
 // Composite
-export { default as CompositorFullscreenQuadPass } from './composite/Pass';
+export { default as FullscreenQuadPass } from './composite/Pass';
+export { default as Compositor } from './composite/Compositor';
+export { default as CompositeNode } from './composite/CompositeNode';
+export { default as FilterCompositeNode } from './composite/FilterNode';
+export { default as SceneCompositeNode } from './composite/SceneNode';
+export { default as TextureCompositeNode } from './composite/TextureNode';
 
 // Deferred renderer
 export { default as DeferredGBuffer } from './deferred/GBuffer';

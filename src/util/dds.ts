@@ -1,6 +1,5 @@
-import Texture from '../Texture';
 import Texture2D from '../Texture2D';
-import TextureCube from '../TextureCube';
+import * as constants from '../core/constants';
 
 // http://msdn.microsoft.com/en-us/library/windows/desktop/bb943991(v=vs.85).aspx
 // https://github.com/toji/webgl-texture-utils/blob/master/texture-util/dds.js
@@ -94,15 +93,15 @@ export function parse(arraybuffer: ArrayBuffer, out?: Texture2D) {
   switch (fourCC) {
     case FOURCC_DXT1:
       blockBytes = 8;
-      internalFormat = Texture.COMPRESSED_RGB_S3TC_DXT1_EXT;
+      internalFormat = constants.COMPRESSED_RGB_S3TC_DXT1_EXT;
       break;
     case FOURCC_DXT3:
       blockBytes = 16;
-      internalFormat = Texture.COMPRESSED_RGBA_S3TC_DXT3_EXT;
+      internalFormat = constants.COMPRESSED_RGBA_S3TC_DXT3_EXT;
       break;
     case FOURCC_DXT5:
       blockBytes = 16;
-      internalFormat = Texture.COMPRESSED_RGBA_S3TC_DXT5_EXT;
+      internalFormat = constants.COMPRESSED_RGBA_S3TC_DXT5_EXT;
       break;
     default:
       return;

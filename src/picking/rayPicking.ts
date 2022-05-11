@@ -3,7 +3,7 @@ import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
 import Matrix4 from '../math/Matrix4';
 import { mat4, vec3, vec4 } from '../glmatrix';
-import * as glenum from '../core/glenum';
+import * as constants from '../core/constants';
 import type Renderable from '../Renderable';
 import type Renderer from '../Renderer';
 import type Scene from '../Scene';
@@ -72,7 +72,7 @@ function intersectNode(
     if (
       (!node.ignorePicking || forcePickAll) &&
       // Only triangle mesh support ray picking
-      ((node.mode === glenum.TRIANGLES && node.geometry.isUseIndices()) ||
+      ((node.mode === constants.TRIANGLES && node.geometry.isUseIndices()) ||
         // Or if geometry has it's own pickByRay, pick, implementation
         node.geometry.pickByRay ||
         node.geometry.pick)
@@ -128,8 +128,8 @@ function intersectRenderable(
   }
 
   const cullBack =
-    (renderable.cullFace === glenum.BACK && renderable.frontFace === glenum.CCW) ||
-    (renderable.cullFace === glenum.FRONT && renderable.frontFace === glenum.CW);
+    (renderable.cullFace === constants.BACK && renderable.frontFace === constants.CCW) ||
+    (renderable.cullFace === constants.FRONT && renderable.frontFace === constants.CW);
 
   let point;
   const indices = geometry.indices;

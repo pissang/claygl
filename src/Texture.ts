@@ -2,7 +2,7 @@
  * Base class for all textures like compressed texture, texture2d, texturecube
  * TODO mapping
  */
-import * as glenum from './core/glenum';
+import * as constants from './core/constants';
 import ClayCache from './core/Cache';
 import Notifier from './core/Notifier';
 import Renderer from './Renderer';
@@ -171,23 +171,23 @@ abstract class Texture extends Notifier {
   // Update the common parameters of texture
   updateCommon(renderer: Renderer) {
     const _gl = renderer.gl;
-    _gl.pixelStorei(glenum.UNPACK_FLIP_Y_WEBGL, this.flipY);
-    _gl.pixelStorei(glenum.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
-    _gl.pixelStorei(glenum.UNPACK_ALIGNMENT, this.unpackAlignment);
+    _gl.pixelStorei(constants.UNPACK_FLIP_Y_WEBGL, this.flipY);
+    _gl.pixelStorei(constants.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
+    _gl.pixelStorei(constants.UNPACK_ALIGNMENT, this.unpackAlignment);
 
     // Use of none-power of two texture
     // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
-    if (this.format === glenum.DEPTH_COMPONENT) {
+    if (this.format === constants.DEPTH_COMPONENT) {
       this.useMipmap = false;
     }
 
     const sRGBExt = renderer.getGLExtension('EXT_sRGB');
     // Fallback
-    if (this.format === Texture.SRGB && !sRGBExt) {
-      this.format = Texture.RGB;
+    if (this.format === constants.SRGB_EXT && !sRGBExt) {
+      this.format = constants.RGB;
     }
-    if (this.format === Texture.SRGB_ALPHA && !sRGBExt) {
-      this.format = Texture.RGBA;
+    if (this.format === constants.SRGB_ALPHA_EXT && !sRGBExt) {
+      this.format = constants.RGBA;
     }
 
     this.NPOT = !this.isPowerOfTwo();
@@ -195,13 +195,13 @@ abstract class Texture extends Notifier {
 
   getAvailableWrapS() {
     if (this.NPOT) {
-      return glenum.CLAMP_TO_EDGE;
+      return constants.CLAMP_TO_EDGE;
     }
     return this.wrapS;
   }
   getAvailableWrapT() {
     if (this.NPOT) {
-      return glenum.CLAMP_TO_EDGE;
+      return constants.CLAMP_TO_EDGE;
     }
     return this.wrapT;
   }
@@ -209,15 +209,15 @@ abstract class Texture extends Notifier {
     const minFilter = this.minFilter;
     if (this.NPOT || !this.useMipmap) {
       if (
-        minFilter === glenum.NEAREST_MIPMAP_NEAREST ||
-        minFilter === glenum.NEAREST_MIPMAP_LINEAR
+        minFilter === constants.NEAREST_MIPMAP_NEAREST ||
+        minFilter === constants.NEAREST_MIPMAP_LINEAR
       ) {
-        return glenum.NEAREST;
+        return constants.NEAREST;
       } else if (
-        minFilter === glenum.LINEAR_MIPMAP_LINEAR ||
-        minFilter === glenum.LINEAR_MIPMAP_NEAREST
+        minFilter === constants.LINEAR_MIPMAP_LINEAR ||
+        minFilter === constants.LINEAR_MIPMAP_NEAREST
       ) {
-        return glenum.LINEAR;
+        return constants.LINEAR;
       } else {
         return minFilter;
       }
@@ -262,84 +262,15 @@ abstract class Texture extends Notifier {
   isPowerOfTwo() {
     return isPowerOfTwo(this.width) && isPowerOfTwo(this.height);
   }
-
-  static BYTE = glenum.BYTE;
-  static UNSIGNED_BYTE = glenum.UNSIGNED_BYTE;
-  static SHORT = glenum.SHORT;
-  static UNSIGNED_SHORT = glenum.UNSIGNED_SHORT;
-  static INT = glenum.INT;
-  static UNSIGNED_INT = glenum.UNSIGNED_INT;
-  static FLOAT = glenum.FLOAT;
-  static HALF_FLOAT = 0x8d61;
-
-  /**
-   * UNSIGNED_INT_24_8_WEBGL for WEBGL_depth_texture extension
-   */
-  static UNSIGNED_INT_24_8_WEBGL = 34042;
-
-  /* PixelFormat */
-  static DEPTH_COMPONENT = glenum.DEPTH_COMPONENT;
-  static DEPTH_STENCIL = glenum.DEPTH_STENCIL;
-  static ALPHA = glenum.ALPHA;
-  static RGB = glenum.RGB;
-  static RGBA = glenum.RGBA;
-  static LUMINANCE = glenum.LUMINANCE;
-  static LUMINANCE_ALPHA = glenum.LUMINANCE_ALPHA;
-
-  /**
-   * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
-   */
-  static SRGB = 0x8c40;
-  /**
-   * @see https://www.khronos.org/registry/webgl/extensions/EXT_sRGB/
-   */
-  static SRGB_ALPHA = 0x8c42;
-
-  /* Compressed Texture */
-  // https://developer.mozilla.org/zh-CN/docs/Web/API/WebGL_API/Constants
-  // s3tc
-  static COMPRESSED_RGB_S3TC_DXT1_EXT = 0x83f0;
-  static COMPRESSED_RGBA_S3TC_DXT1_EXT = 0x83f1;
-  static COMPRESSED_RGBA_S3TC_DXT3_EXT = 0x83f2;
-  static COMPRESSED_RGBA_S3TC_DXT5_EXT = 0x83f3;
-
-  // etc
-  static COMPRESSED_RGB_ETC1_WEBGL = 0x8d64;
-
-  // pvrtc
-  static COMPRESSED_RGB_PVRTC_4BPPV1_IMG = 0x8c00;
-  static COMPRESSED_RGBA_PVRTC_4BPPV1_IMG = 0x8c02;
-  static COMPRESSED_RGB_PVRTC_2BPPV1_IMG = 0x8c01;
-  static COMPRESSED_RGBA_PVRTC_2BPPV1_IMG = 0x8c03;
-
-  // atc
-  static COMPRESSED_RGB_ATC_WEBGL = 0x8c92;
-  static COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL = 0x8c93;
-  static COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL = 0x87ee;
-
-  /* TextureMagFilter */
-  static NEAREST = glenum.NEAREST;
-  static LINEAR = glenum.LINEAR;
-
-  /* TextureMinFilter */
-  static NEAREST_MIPMAP_NEAREST = glenum.NEAREST_MIPMAP_NEAREST;
-  static LINEAR_MIPMAP_NEAREST = glenum.LINEAR_MIPMAP_NEAREST;
-  static NEAREST_MIPMAP_LINEAR = glenum.NEAREST_MIPMAP_LINEAR;
-  static LINEAR_MIPMAP_LINEAR = glenum.LINEAR_MIPMAP_LINEAR;
-
-  /* TextureWrapMode */
-  static REPEAT = glenum.REPEAT;
-  static CLAMP_TO_EDGE = glenum.CLAMP_TO_EDGE;
-  static MIRRORED_REPEAT = glenum.MIRRORED_REPEAT;
 }
 
 // Default values.
-Texture.prototype.type = glenum.UNSIGNED_BYTE;
-Texture.prototype.format = glenum.RGBA;
-Texture.prototype.wrapS = glenum.REPEAT;
-Texture.prototype.wrapT = glenum.REPEAT;
-Texture.prototype.minFilter = glenum.LINEAR_MIPMAP_LINEAR;
-Texture.prototype.magFilter = glenum.LINEAR;
+Texture.prototype.type = constants.UNSIGNED_BYTE;
+Texture.prototype.format = constants.RGBA;
+Texture.prototype.wrapS = constants.REPEAT;
+Texture.prototype.wrapT = constants.REPEAT;
+Texture.prototype.minFilter = constants.LINEAR_MIPMAP_LINEAR;
+Texture.prototype.magFilter = constants.LINEAR;
 Texture.prototype.useMipmap = true;
 Texture.prototype.anisotropic = 1;
 Texture.prototype.flipY = true;

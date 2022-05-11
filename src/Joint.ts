@@ -19,6 +19,7 @@ export class Joint {
    * Scene node attached to
    */
   node?: ClayNode;
+
   constructor(name?: string, index?: number, node?: ClayNode) {
     this.name = name || '';
     this.index = optional(index, -1);

@@ -25,6 +25,7 @@ class TextureNode extends CompositeNode {
 
   // Do nothing
   beforeFrame() {}
+  render() {}
   afterFrame() {}
 }
 

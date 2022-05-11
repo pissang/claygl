@@ -2,7 +2,7 @@ import { genGUID } from '../core/util';
 import type Renderer from '../Renderer';
 import Shader, { ParsedUniformSemantic } from '../Shader';
 import type Texture from '../Texture';
-import * as glenum from '../core/glenum';
+import * as constants from '../core/constants';
 
 const SHADER_STATE_TO_ENABLE = 1;
 const SHADER_STATE_KEEP_ENABLE = 2;
@@ -32,7 +32,7 @@ function checkShaderErrorMsg(
   shader: WebGLShader,
   shaderString: string
 ) {
-  if (!_gl.getShaderParameter(shader, glenum.COMPILE_STATUS)) {
+  if (!_gl.getShaderParameter(shader, constants.COMPILE_STATUS)) {
     return [_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join('\n');
   }
 }
@@ -77,7 +77,7 @@ class GLProgram {
 
   useTextureSlot(renderer: Renderer, texture: Texture | undefined, slot: number) {
     if (texture) {
-      renderer.gl.activeTexture(glenum.TEXTURE0 + slot);
+      renderer.gl.activeTexture(constants.TEXTURE0 + slot);
       // Maybe texture is not loaded yet;
       if (texture.isRenderable()) {
         texture.bind(renderer);
@@ -315,14 +315,14 @@ class GLProgram {
     vertexShaderCode: string,
     fragmentShaderCode: string
   ) {
-    const vertexShader = _gl.createShader(glenum.VERTEX_SHADER)!;
+    const vertexShader = _gl.createShader(constants.VERTEX_SHADER)!;
     const program = _gl.createProgram()!;
     const attributeSemantics = shader.attributeSemantics;
 
     _gl.shaderSource(vertexShader, vertexShaderCode);
     _gl.compileShader(vertexShader);
 
-    const fragmentShader = _gl.createShader(glenum.FRAGMENT_SHADER)!;
+    const fragmentShader = _gl.createShader(constants.FRAGMENT_SHADER)!;
     _gl.shaderSource(fragmentShader, fragmentShaderCode);
     _gl.compileShader(fragmentShader);
 
@@ -357,7 +357,7 @@ class GLProgram {
     this.vertexCode = vertexShaderCode;
     this.fragmentCode = fragmentShaderCode;
 
-    if (!_gl.getProgramParameter(program, glenum.LINK_STATUS)) {
+    if (!_gl.getProgramParameter(program, constants.LINK_STATUS)) {
       return 'Could not link program\n' + _gl.getProgramInfoLog(program);
     }
 

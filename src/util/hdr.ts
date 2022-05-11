@@ -1,5 +1,6 @@
-import Texture from '../Texture';
 import Texture2D from '../Texture2D';
+import * as constants from '../core/constants';
+
 const toChar = String.fromCharCode;
 
 const MINELEN = 8;
@@ -166,6 +167,6 @@ export function parseRGBE(arrayBuffer: ArrayBuffer, texture?: Texture2D, exposur
   texture.height = height;
   texture.pixels = pixels;
   // HALF_FLOAT can't use Float32Array
-  texture.type = Texture.FLOAT;
+  texture.type = constants.FLOAT;
   return texture;
 }

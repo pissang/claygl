@@ -1,6 +1,6 @@
 // TODO Shader library
 import CompositeNode from './CompositeNode';
-import CompositorFullscreenQuadPass from './Pass';
+import FullscreenQuadPass from './Pass';
 import Renderer from '../Renderer';
 import FrameBuffer from '../FrameBuffer';
 import { GLEnum } from '../core/type';
@@ -40,13 +40,13 @@ import type Texture2D from '../Texture2D';
  */
 
 class CompositeFilterNode extends CompositeNode {
-  pass: CompositorFullscreenQuadPass;
+  pass: FullscreenQuadPass;
 
   // Example: { name: 2 }
 
   constructor(shader: string) {
     super();
-    const pass = new CompositorFullscreenQuadPass(shader);
+    const pass = new FullscreenQuadPass(shader);
     this.pass = pass;
   }
 

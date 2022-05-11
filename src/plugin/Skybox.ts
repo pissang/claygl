@@ -12,6 +12,7 @@ import type Renderer from '../Renderer';
 import type Texture2D from '../Texture2D';
 import type Camera from '../Camera';
 import SkyboxShader from '../shader/SkyboxShader';
+import * as constants from '../core/constants';
 
 const sceneSkyboxMap = new WeakMap<Scene, Skybox>();
 interface SkyboxOpts extends MeshOpts {
@@ -105,7 +106,7 @@ class Skybox extends Mesh {
     if (envMap.textureType === 'texture2D') {
       this.material.define('EQUIRECTANGULAR');
       // LINEAR filter can remove the artifacts in pole
-      envMap.minFilter = Texture.LINEAR;
+      envMap.minFilter = constants.LINEAR;
     } else {
       this.material.undefine('EQUIRECTANGULAR');
     }

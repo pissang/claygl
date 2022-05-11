@@ -3,6 +3,7 @@ import Texture2D from './Texture2D';
 import Texture from './Texture';
 import BoundingBox from './math/BoundingBox';
 import Matrix4 from './math/Matrix4';
+import * as constants from './core/constants';
 
 import * as mat4 from './glmatrix/mat4';
 import * as vec3 from './glmatrix/vec3';
@@ -315,9 +316,9 @@ class Skeleton {
     const texture = (this._skinMatricesTexture =
       this._skinMatricesTexture ||
       new Texture2D({
-        type: Texture.FLOAT,
-        minFilter: Texture.NEAREST,
-        magFilter: Texture.NEAREST,
+        type: constants.FLOAT,
+        minFilter: constants.NEAREST,
+        magFilter: constants.NEAREST,
         useMipmap: false,
         flipY: false
       }));
