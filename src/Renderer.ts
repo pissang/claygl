@@ -364,8 +364,8 @@ class Renderer extends Notifier {
       }
       this.gl.targetRenderer = this;
 
-      this._width = opts.width || 100;
-      this._height = opts.height || 100;
+      this._width = opts.width || canvas.width || 100;
+      this._height = opts.height || canvas.height || 100;
       this._devicePixelRatio =
         opts.devicePixelRatio || (typeof window !== 'undefined' ? window.devicePixelRatio : 1.0);
       this.resize(this._width, this._height);
@@ -1527,7 +1527,7 @@ class Renderer extends Notifier {
    * @param  {clay.Vector2} [out]
    * @return {clay.Vector2}
    */
-  screenToNDC(x: number, y: number, out: Vector2): Vector2 {
+  screenToNDC(x: number, y: number, out?: Vector2): Vector2 {
     if (!out) {
       out = new Vector2();
     }

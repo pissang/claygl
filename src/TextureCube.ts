@@ -55,6 +55,10 @@ interface TextureCube extends TextureCubeOpts {}
 class TextureCube extends Texture {
   readonly textureType = 'textureCube';
 
+  constructor(opts?: Partial<TextureCubeOpts>) {
+    super(opts);
+  }
+
   get width() {
     const images = this.image;
     if (images && images.px) {

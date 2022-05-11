@@ -76,7 +76,7 @@ class Camera extends ClayNode {
    * @param {clay.Ray} [out]
    * @return {clay.Ray}
    */
-  castRay(ndc: Vector2, out: Ray) {
+  castRay(ndc: Vector2, out?: Ray) {
     const ray = out !== undefined ? out : new Ray();
     const x = ndc.array[0];
     const y = ndc.array[1];

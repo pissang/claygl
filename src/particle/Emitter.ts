@@ -58,7 +58,9 @@ class ParticleEmitter {
   amount = 20;
 
   _particlePool: Particle[] = [];
-  constructor() {
+  constructor(opts?: Partial<ParticleEmitterOpts>) {
+    Object.assign(this, opts);
+
     // TODO Reduce heap memory
     for (let i = 0; i < this.max; i++) {
       const particle = new Particle();

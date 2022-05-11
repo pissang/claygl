@@ -77,8 +77,10 @@ class ParticleRenderable extends Renderable {
   private _fields: ParticleField[] = [];
   private _particles: Particle[] = [];
 
-  constructor(opts: Partial<ParticleRenderableOpts>) {
+  constructor(opts?: Partial<ParticleRenderableOpts>) {
     super(opts);
+    opts = opts || {};
+
     Object.assign(this, opts);
     this.geometry = new Geometry({
       dynamic: true

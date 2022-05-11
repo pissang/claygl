@@ -95,13 +95,13 @@ const worldInverse = new Matrix4();
 function intersectRenderable(
   renderer: Renderer,
   camera: Camera,
-  ray: Ray,
+  rawRay: Ray,
   ndc: Vector2,
   renderable: Renderable,
   out: Intersection[]
 ) {
   const isSkinnedMesh = renderable.isSkinnedMesh();
-  ray.copy(ray);
+  ray.copy(rawRay);
   Matrix4.invert(worldInverse, renderable.worldTransform);
 
   // Skinned mesh will ignore the world transform.

@@ -80,7 +80,7 @@ export {
 } from './shader/index';
 
 // Picking
-export { pick as pickByRay } from './picking/rayPicking';
+export { pick as pickByRay, pickAll as pickAllByRay } from './picking/rayPicking';
 export { default as PixelPicking } from './picking/PixelPicking';
 
 // GLTF Loader

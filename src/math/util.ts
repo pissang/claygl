@@ -32,7 +32,7 @@ export function matrixOrVectorClassToString(obj: { array: number[] }, cols: numb
   const Clz = obj.constructor;
   const className = (Clz && Clz.name) || '';
   for (let i = 0; i < Math.ceil(array.length / cols); i++) {
-    str += array.slice(i * cols, (i + 1) * cols).join('\t') + '\n';
+    str += array.slice(i * cols, (i + 1) * cols).join('\t');
   }
   return className + '[\n' + str + '\n]';
 }

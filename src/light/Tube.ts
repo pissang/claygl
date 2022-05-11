@@ -4,6 +4,7 @@ import Vector3 from '../math/Vector3';
 export interface TubeLightOpts extends LightOpts {
   range: number;
   radius: number;
+  length: number;
 }
 
 class TubeLight extends Light {
