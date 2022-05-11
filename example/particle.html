@@ -1,101 +1,11 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <script src="../dist/claygl.js"></script>
+    <title>Particle Effect</title>
   </head>
   <body style="margin: 0px">
     <canvas id="Main"></canvas>
 
-    <script type="text/javascript">
-      var Shader = clay.Shader;
-
-      var renderer = new clay.Renderer({
-        canvas: document.getElementById('Main')
-      });
-      var timeline = new clay.Timeline();
-      timeline.start();
-
-      renderer.resize(window.innerWidth, window.innerHeight);
-
-      var Value = clay.Value;
-      var Vector3 = clay.Vector3;
-      var particleRenderable = new clay.particle.ParticleRenderable();
-      var emitter = new clay.particle.Emitter({
-        max: 5000,
-        amount: 7,
-        life: Value.constant(2),
-        spriteSize: Value.constant(400),
-        position: Value.random3D(new Vector3(-100, -30, 50), new Vector3(100, -40, 90)),
-        velocity: Value.random3D(new Vector3(-20, 0, -10), new Vector3(20, 20, 10))
-      });
-      particleRenderable.addEmitter(emitter);
-      particleRenderable.material.set('color', [1, 1, 1]);
-      particleRenderable.material.set(
-        'sprite',
-        new clay.Texture2D({
-          image: generateSprite()
-        })
-      );
-
-      var scene = new clay.Scene();
-      var camera = new clay.camera.Perspective({
-        aspect: renderer.getViewportAspect(),
-        far: 1000,
-        near: 1
-      });
-      camera.position.set(0, 0, 120);
-      scene.add(particleRenderable);
-
-      var planeMesh = new clay.Mesh({
-        geometry: new clay.geometry.Plane(),
-        material: new clay.Material({
-          shader: clay.shader.library.get('clay.lambert')
-        })
-      });
-      planeMesh.material.set('color', [0.3, 0, 0]);
-      planeMesh.scale.set(10000, 10000, 1);
-      scene.add(planeMesh);
-
-      var light = new clay.light.Point({
-        range: 300
-      });
-      light.position.z = 50;
-      light.position.y = -40;
-      scene.add(light);
-      timeline.on('frame', function (deltaTime) {
-        particleRenderable.updateParticles(deltaTime);
-        renderer.render(scene, camera);
-      });
-
-      function generateSprite() {
-        var size = 128;
-
-        var canvas = document.createElement('canvas');
-        canvas.width = size;
-        canvas.height = size;
-
-        var ctx = canvas.getContext('2d');
-        ctx.beginPath();
-        ctx.arc(size / 2, size / 2, 60, 0, Math.PI * 2, false);
-        ctx.closePath();
-
-        var gradient = ctx.createRadialGradient(
-          size / 2,
-          size / 2,
-          0,
-          size / 2,
-          size / 2,
-          size / 2
-        );
-        gradient.addColorStop(0, 'rgba(255,239,179,1)');
-        gradient.addColorStop(0.34, 'rgba(255,212,157,1)');
-        gradient.addColorStop(0.7, 'rgba(130,55,55,0.51)');
-        gradient.addColorStop(1.0, 'rgba(130,55,55,0.0)');
-        ctx.fillStyle = gradient;
-        ctx.fill();
-
-        return canvas;
-      }
-    </script>
+    <script type="module" src="./particle.ts"></script>
   </body>
 </html>

@@ -1,0 +1,136 @@
+import {
+  startTimeline,
+  Shader,
+  Renderer,
+  Scene,
+  PerspectiveCamera,
+  Material,
+  Texture2D,
+  constants,
+  BasicShader,
+  TextureCube,
+  SphereGeometry,
+  PlaneGeometry,
+  StandardShader,
+  Mesh,
+  Vector3,
+  Node as ClayNode
+} from 'claygl';
+
+const renderer = new Renderer({
+  canvas: document.getElementById('main') as HTMLCanvasElement,
+  devicePixelRatio: 1.0
+});
+renderer.resize(window.innerWidth, window.innerHeight);
+
+const scene = new Scene();
+const camera = new PerspectiveCamera({
+  aspect: renderer.getViewportAspect(),
+  far: 500
+});
+
+const material = new Material({
+  shader: new BasicShader()
+});
+const texture = new Texture2D({
+  wrapS: constants.REPEAT,
+  wrapT: constants.REPEAT,
+  width: 32,
+  height: 32,
+  mipmaps: [
+    createMipMap(32, '#000'),
+    createMipMap(16, '#222'),
+    createMipMap(8, '#555'),
+    createMipMap(4, '#999'),
+    createMipMap(2, '#aaa'),
+    createMipMap(1, '#fff')
+  ]
+});
+const textureCube = new TextureCube({
+  wrapS: constants.REPEAT,
+  wrapT: constants.REPEAT,
+  width: 128,
+  height: 128,
+  mipmaps: [
+    createMipMapCube(128, '#02a'),
+    createMipMapCube(64, '#000'),
+    createMipMapCube(32, '#000'),
+    createMipMapCube(16, '#f00'),
+    createMipMapCube(8, '#f0f'),
+    createMipMapCube(4, '#00f'),
+    createMipMapCube(2, '#0f0'),
+    createMipMapCube(1, '#f00')
+  ]
+});
+
+material.set('diffuseMap', texture);
+material.set('uvRepeat', [100, 100]);
+
+function createMipMap(size: number, color: string) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, size, size);
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+  return {
+    pixels: new Uint8Array(imgData)
+  };
+}
+
+function createMipMapCube(size: number, color: string) {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, size, size);
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+  return {
+    pixels: (['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const).reduce((obj, target) => {
+      obj[target] = new Uint8Array(imgData);
+      return obj;
+    }, {} as Record<'px' | 'nx' | 'py' | 'ny' | 'pz' | 'nz', Uint8Array>)
+  };
+}
+
+const root = new ClayNode();
+
+camera.position.set(0, 4, 14);
+camera.lookAt(new Vector3(0, 1, 0));
+
+scene.add(root);
+// Add Plane
+const plane = new PlaneGeometry({
+  widthSegments: 1,
+  heightSegments: 1
+});
+const planeMesh = new Mesh({
+  geometry: plane,
+  material: material,
+  scale: new Vector3(60, 60, 60)
+});
+planeMesh.position.y = -0.8;
+planeMesh.rotation.rotateX(-Math.PI / 2);
+root.add(planeMesh);
+
+const sphereGeo = new SphereGeometry();
+const envMapMaterial = new Material({
+  shader: new StandardShader()
+});
+envMapMaterial.set('reflectivity', 1.0);
+envMapMaterial.set('environmentMap', textureCube);
+for (let i = 0; i < 10; i++) {
+  const sphere = new Mesh({
+    geometry: sphereGeo,
+    material: envMapMaterial
+  });
+  sphere.scale.set(5, 5, 5);
+  sphere.position.set(-10, 5, -i * 10);
+  root.add(sphere);
+}
+
+startTimeline(() => {
+  renderer.render(scene, camera);
+});

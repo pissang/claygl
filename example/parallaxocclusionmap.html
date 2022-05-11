@@ -1,69 +1,10 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <script src="../dist/claygl.js"></script>
-    <script type="text/javascript" src="lib/dat.gui.js"></script>
+    <title>Parallax Occlusion Map Map</title>
   </head>
   <body>
     <canvas width="1200" height="640" id="main"></canvas>
-    <script type="text/javascript">
-      var Shader = clay.Shader;
-
-      var renderer = new clay.Renderer({
-        canvas: document.getElementById('main')
-      });
-      var scene = new clay.Scene();
-      var camera = new clay.camera.Perspective({
-        aspect: renderer.getViewportAspect(),
-        far: 500
-      });
-      var cube = new clay.geometry.Cube({
-        widthSegments: 10,
-        heightSegments: 10
-      });
-      cube.generateUniqueVertex();
-      cube.generateTangents();
-
-      var shader = clay.shader.library.get('clay.standard');
-      var material = new clay.Material({
-        shader: shader
-      });
-      material.set('parallaxOcclusionMap', loadTexture('assets/textures/depth.png'));
-      material.set('diffuseMap', loadTexture('assets/textures/diffuse2.png'));
-      material.set('normalMap', loadTexture('assets/textures/normal.png'));
-
-      camera.position.set(0, 2, 4);
-      camera.lookAt(scene.position);
-
-      var mesh = new clay.Mesh({
-        geometry: cube,
-        material: material
-      });
-      scene.add(mesh);
-      var light = new clay.light.Directional({
-        position: new clay.Vector3(10, 10, 10)
-      });
-      light.lookAt(mesh.position);
-      scene.add(light);
-
-      setInterval(function () {
-        renderer.render(scene, camera);
-        mesh.rotation.rotateY(Math.PI / 500);
-      }, 20);
-
-      function loadTexture(src) {
-        var texture = new clay.Texture2D();
-        texture.load(src);
-        return texture;
-      }
-
-      var config = {
-        scale: 0.01
-      };
-      var gui = new dat.GUI();
-      gui.add(config, 'scale', 0, 0.1).onChange(function () {
-        material.set('parallaxOcclusionScale', config.scale);
-      });
-    </script>
+    <script type="module" src="./parallaxocclusionmap.ts"></script>
   </body>
 </html>

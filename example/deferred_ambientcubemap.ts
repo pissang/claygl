@@ -12,7 +12,8 @@ import {
   StandardMaterial,
   Mesh,
   OrbitControl,
-  startTimeline
+  startTimeline,
+  constants
 } from 'claygl';
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement
@@ -31,7 +32,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   const suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
 
   const cubemap = new TextureCube({
-    type: TextureCube.HALF_FLOAT,
+    type: constants.HALF_FLOAT_OES,
     width: 128,
     height: 128
   });
