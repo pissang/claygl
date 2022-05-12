@@ -1,5 +1,5 @@
 // https://github.com/pyalot/webgl-deferred-irradiance-volumes/blob/master/src/antialias/fxaa3_11_preprocessed.shaderlib
-@export clay.compositor.fxaa3
+@export clay.composite.fxaa3
 
 uniform sampler2D texture;
 uniform vec4 viewport : VIEWPORT;

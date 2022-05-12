@@ -1,4 +1,4 @@
-@export clay.compositor.coloradjust
+@export clay.composite.coloradjust
 
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
@@ -34,7 +34,7 @@ void main()
 @end
 
 // Seperate shader for float texture
-@export clay.compositor.brightness
+@export clay.composite.brightness
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -48,7 +48,7 @@ void main()
 }
 @end
 
-@export clay.compositor.contrast
+@export clay.composite.contrast
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -62,7 +62,7 @@ void main()
 }
 @end
 
-@export clay.compositor.exposure
+@export clay.composite.exposure
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -76,7 +76,7 @@ void main()
 }
 @end
 
-@export clay.compositor.gamma
+@export clay.composite.gamma
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 
@@ -90,7 +90,7 @@ void main()
 }
 @end
 
-@export clay.compositor.saturation
+@export clay.composite.saturation
 varying vec2 v_Texcoord;
 uniform sampler2D texture;
 

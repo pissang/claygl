@@ -1,5 +1,5 @@
 // john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html
-@export clay.compositor.lensflare
+@export clay.composite.lensflare
 
 #define SAMPLE_NUMBER 8
 

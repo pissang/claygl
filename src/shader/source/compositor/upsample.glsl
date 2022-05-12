@@ -1,6 +1,6 @@
 // https://github.com/keijiro/KinoBloom/blob/master/Assets/Kino/Bloom/Shader/Bloom.cginc#L96
 
-@export clay.compositor.upsample
+@export clay.composite.upsample
 
 #define HIGH_QUALITY
 

@@ -1,4 +1,4 @@
-@export clay.compositor.blend
+@export clay.composite.blend
 
 #define SHADER_NAME blend
 // Blend at most 6 textures

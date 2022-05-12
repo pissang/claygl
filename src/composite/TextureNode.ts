@@ -15,6 +15,8 @@ class TextureNode extends CompositeNode {
     this.texture = texture;
   }
 
+  prepare(renderer: Renderer): void {}
+
   renderAndOutputTexture(renderer: Renderer, name: string) {
     return this.texture;
   }

@@ -6,6 +6,7 @@ import Notifier from '../core/Notifier';
 import type FrameBuffer from '../FrameBuffer';
 import { GLEnum } from '../core/type';
 import type Texture from '../Texture';
+import { PoolParameters } from './TexturePool';
 
 export interface CompositeNodeInput {
   /**
@@ -22,7 +23,7 @@ export interface CompositeNodeOutput {
    *
    */
   parameters?:
-    | Partial<Texture2DOpts>
+    | Partial<PoolParameters>
     | {
         width?: (renderer: Renderer) => number;
         height?: (renderer: Renderer) => number;

@@ -1,5 +1,5 @@
 import vertexGlsl from '../shader/source/compositor/vertex.glsl.js';
-import coloradjustEssl from './source/compositor/coloradjust.glsl.js';
+import colorAdjustEssl from './source/compositor/coloradjust.glsl.js';
 import blurEssl from './source/compositor/blur.glsl.js';
 import lumEssl from './source/compositor/lum.glsl.js';
 import lutEssl from './source/compositor/lut.glsl.js';
@@ -18,7 +18,7 @@ import fxaaEssl from './source/compositor/fxaa.glsl.js';
 export default function register(Shader: { import(str: string): void }) {
   // Some build in shaders
   Shader.import(vertexGlsl);
-  Shader.import(coloradjustEssl);
+  Shader.import(colorAdjustEssl);
   Shader.import(blurEssl);
   Shader.import(lumEssl);
   Shader.import(lutEssl);

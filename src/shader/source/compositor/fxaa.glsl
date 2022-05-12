@@ -1,5 +1,5 @@
 // https://github.com/mitsuhiko/webgl-meincraft/blob/master/assets/shaders/fxaa.glsl
-@export clay.compositor.fxaa
+@export clay.composite.fxaa
 
 uniform sampler2D texture;
 uniform vec4 viewport : VIEWPORT;

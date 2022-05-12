@@ -1,7 +1,7 @@
 // Final composite of bloom, source, lensflare
 // with tonemapping, lut and vignette
 // http://filmicgames.com/archives/75
-@export clay.compositor.hdr.composite
+@export clay.composite.hdr.composite
 #define TONEMAPPING
 
 uniform sampler2D texture;

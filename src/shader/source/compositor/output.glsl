@@ -1,4 +1,4 @@
-@export clay.compositor.output
+@export clay.composite.output
 
 #define OUTPUT_ALPHA
 

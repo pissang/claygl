@@ -1,4 +1,4 @@
-@export clay.compositor.hdr.log_lum
+@export clay.composite.hdr.log_lum
 
 varying vec2 v_Texcoord;
 
@@ -19,7 +19,7 @@ void main()
 
 @end
 
-@export clay.compositor.hdr.lum_adaption
+@export clay.composite.hdr.lum_adaption
 varying vec2 v_Texcoord;
 
 uniform sampler2D adaptedLum;
@@ -39,7 +39,7 @@ void main()
 }
 @end
 
-@export clay.compositor.lum
+@export clay.composite.lum
 
 varying vec2 v_Texcoord;
 

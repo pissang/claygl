@@ -1,5 +1,5 @@
 
-@export clay.compositor.vertex
+@export clay.composite.vertex
 
 uniform mat4 worldViewProjection : WORLDVIEWPROJECTION;
 

@@ -1,5 +1,5 @@
 // HDR Pipeline
-@export clay.compositor.bright
+@export clay.composite.bright
 
 uniform sampler2D texture;
 

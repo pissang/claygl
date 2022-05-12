@@ -74,21 +74,21 @@ class GroupCompositeNode extends CompositeNode {
   removeNode(node: CompositeNode) {
     const nodes = this._nodes;
     const idx = nodes.indexOf(node);
-    // const inputLinks = this._inputLinks;
-    // const outputLinks = this._outputLinks;
+    const inputLinks = this._inputLinks;
+    const outputLinks = this._outputLinks;
     if (idx >= 0) {
       nodes.splice(idx, 1);
 
-      // Object.keys(inputLinks).forEach((groupInputName) => {
-      //   if (inputLinks[groupInputName].node === node) {
-      //     delete inputLinks[groupInputName];
-      //   }
-      // });
-      // Object.keys(outputLinks).forEach((groupOutputName) => {
-      //   if (outputLinks[groupOutputName].node === node) {
-      //     delete outputLinks[groupOutputName];
-      //   }
-      // });
+      Object.keys(inputLinks).forEach((groupInputName) => {
+        if (inputLinks[groupInputName].node === node) {
+          delete inputLinks[groupInputName];
+        }
+      });
+      Object.keys(outputLinks).forEach((groupOutputName) => {
+        if (outputLinks[groupOutputName].node === node) {
+          delete outputLinks[groupOutputName];
+        }
+      });
     }
   }
 

@@ -1,4 +1,4 @@
-@export clay.compositor.vignette
+@export clay.composite.vignette
 
 #define OUTPUT_ALPHA
 

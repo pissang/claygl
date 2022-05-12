@@ -40,7 +40,7 @@ class FullscreenQuadPass extends Notifier {
     super();
 
     if (fragment) {
-      const shader = new Shader(Shader.source('clay.compositor.vertex'), fragment);
+      const shader = new Shader(Shader.source('clay.composite.vertex'), fragment);
       const material = new Material({
         shader
       });

@@ -1,4 +1,4 @@
-@export clay.compositor.downsample
+@export clay.composite.downsample
 
 uniform sampler2D texture;
 uniform vec2 textureSize : [512, 512];

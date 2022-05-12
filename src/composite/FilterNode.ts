@@ -12,7 +12,7 @@ import Texture from '../Texture';
  * @example
  * const node = new clay.CompositeFilterNode({
  *   name: 'fxaa',
- *   shader: clay.Shader.source('clay.compositor.fxaa'),
+ *   shader: clay.Shader.source('clay.composite.fxaa'),
  *   inputs: {
  *     texture: {
          node: 'scene',
@@ -48,6 +48,8 @@ class CompositeFilterNode extends CompositeNode {
     const pass = new FullscreenQuadPass(shader);
     this.pass = pass;
   }
+
+  prepare(renderer: Renderer): void {}
 
   render(
     renderer: Renderer,

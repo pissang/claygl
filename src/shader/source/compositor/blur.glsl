@@ -1,4 +1,4 @@
-@export clay.compositor.kernel.gaussian_9
+@export clay.composite.kernel.gaussian_9
 // http://dev.theomader.com/gaussian-kernel-calculator/
 // array constructor supported in GLSL ES 3.00 only
 float gaussianKernel[9];
@@ -13,7 +13,7 @@ gaussianKernel[7] = 0.09;
 gaussianKernel[8] = 0.07;
 @end
 
-@export clay.compositor.kernel.gaussian_13
+@export clay.composite.kernel.gaussian_13
 
 float gaussianKernel[13];
 
@@ -34,7 +34,7 @@ gaussianKernel[12] = 0.02;
 @end
 
 
-@export clay.compositor.gaussian_blur
+@export clay.composite.gaussian_blur
 
 #define SHADER_NAME gaussian_blur
 
@@ -51,7 +51,7 @@ uniform float blurDir : 0.0;
 
 void main (void)
 {
-    @import clay.compositor.kernel.gaussian_9
+    @import clay.composite.kernel.gaussian_9
 
     vec2 off = blurSize / textureSize;
     off *= vec2(1.0 - blurDir, blurDir);

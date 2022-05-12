@@ -5,11 +5,25 @@ import * as constants from '../core/constants';
 import * as util from '../core/util';
 import Renderer from '../Renderer';
 
+export type PoolParameters = Pick<
+  Texture2DOpts,
+  | 'width'
+  | 'height'
+  | 'type'
+  | 'format'
+  | 'wrapS'
+  | 'wrapT'
+  | 'minFilter'
+  | 'magFilter'
+  | 'useMipmap'
+  | 'anisotropic'
+>;
+
 class TexturePool {
   private _pool: Record<string, Texture2D[]> = {};
   private _allocatedTextures: Texture2D[] = [];
 
-  get(parameters: Partial<Texture2DOpts>): Texture2D {
+  get(parameters: Partial<PoolParameters>): Texture2D {
     const key = generateKey(parameters);
     const list = (this._pool[key] = this._pool[key] || []);
     if (!list.length) {
@@ -37,7 +51,7 @@ class TexturePool {
     this._allocatedTextures = [];
   }
 }
-const defaultParams: Partial<Texture2DOpts> = {
+const defaultParams: Partial<PoolParameters> = {
   width: 512,
   height: 512,
   type: constants.UNSIGNED_BYTE,
@@ -47,15 +61,12 @@ const defaultParams: Partial<Texture2DOpts> = {
   minFilter: constants.LINEAR_MIPMAP_LINEAR,
   magFilter: constants.LINEAR,
   useMipmap: true,
-  anisotropic: 1,
-  flipY: true,
-  unpackAlignment: 4,
-  premultiplyAlpha: false
+  anisotropic: 1
 } as const;
 
 const defaultParamPropList = Object.keys(defaultParams);
 
-function generateKey(parameters: Partial<Texture2DOpts>) {
+function generateKey(parameters: Partial<PoolParameters>) {
   util.defaults(parameters, defaultParams);
   fallBack(parameters);
 

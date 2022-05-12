@@ -1,6 +1,6 @@
 
 // https://github.com/BradLarson/GPUImage?source=c
-@export clay.compositor.lut
+@export clay.composite.lut
 
 varying vec2 v_Texcoord;
 

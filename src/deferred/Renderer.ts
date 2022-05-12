@@ -129,12 +129,12 @@ class DeferredRenderer extends Notifier {
 
   private _lightCylinderGeo: Geometry;
 
-  private _outputPass = new FullQuadPass(Shader.source('clay.compositor.output'));
+  private _outputPass = new FullQuadPass(Shader.source('clay.composite.output'));
   private _createLightPassMat: (shader: Shader) => Material;
 
   constructor() {
     super();
-    const fullQuadVertex = Shader.source('clay.compositor.vertex');
+    const fullQuadVertex = Shader.source('clay.composite.vertex');
     const lightVolumeVertex = Shader.source('clay.deferred.light_volume.vertex');
 
     const directionalLightShader = new Shader(
