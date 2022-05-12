@@ -3,8 +3,7 @@ import CompositeNode from './CompositeNode';
 import FullscreenQuadPass from './Pass';
 import Renderer from '../Renderer';
 import FrameBuffer from '../FrameBuffer';
-import { GLEnum } from '../core/type';
-import type Texture2D from '../Texture2D';
+import Texture from '../Texture';
 
 /**
  * Filter node
@@ -50,63 +49,32 @@ class CompositeFilterNode extends CompositeNode {
     this.pass = pass;
   }
 
-  render(renderer: Renderer, frameBuffer: FrameBuffer) {
+  render(
+    renderer: Renderer,
+    inputTextures: Record<string, Texture>,
+    outputTextures?: Record<string, Texture>,
+    finalFrameBuffer?: FrameBuffer
+  ): void {
     this.trigger('beforerender', renderer);
 
-    this._rendering = true;
-
-    const _gl = renderer.gl;
-    const compositor = this._compositor!;
     const pass = this.pass;
-    const inputLinks = this.inputLinks;
-    const inputNames = Object.keys(inputLinks);
 
-    inputNames.forEach((inputName) => {
-      const link = inputLinks[inputName];
-      const inputTexture = link.node.renderAndOutput(renderer, link.pin);
-      pass.setUniform(inputName, inputTexture);
+    pass.material?.disableTexturesAll();
+    Object.keys(inputTextures).forEach((inputName) => {
+      // Enabled the pin texture in shader
+      this.pass.material!.enableTexture(inputName);
+      pass.setUniform(inputName, inputTextures[inputName]);
     });
+
     // Output
-    if (!this.outputs) {
+    if (!outputTextures) {
       pass.outputs = undefined;
-      compositor.getFrameBuffer().unbind(renderer);
-      pass.render(renderer, frameBuffer);
+      pass.render(renderer, finalFrameBuffer);
     } else {
       pass.outputs = {};
 
-      const attachedTextures: Record<GLEnum, Texture2D> = {};
-      for (const name in this.outputs) {
-        const parameters = this.updateParameter(name, renderer);
-        if (isNaN(parameters.width as number)) {
-          this.updateParameter(name, renderer);
-        }
-        const outputInfo = this.outputs[name];
-        const texture = compositor.allocateTexture(parameters);
-        const attachment = outputInfo.attachment || _gl.COLOR_ATTACHMENT0;
-        this._outputTextures[name] = texture;
-        attachedTextures[attachment] = texture;
-      }
-      compositor.getFrameBuffer().bind(renderer);
-
-      for (const attachment in attachedTextures) {
-        // FIXME attachment changes in different nodes
-        compositor.getFrameBuffer().attach(attachedTextures[attachment], +attachment);
-      }
-
       pass.render(renderer);
-
-      // Because the data of texture is changed over time,
-      // Here update the mipmaps of texture each time after rendered;
-      compositor.getFrameBuffer().updateMipmap(renderer);
     }
-
-    inputNames.forEach((inputName) => {
-      const link = inputLinks[inputName];
-      link.node.removeReference(link.pin);
-    });
-
-    this._rendering = false;
-    this._rendered = true;
 
     this.trigger('afterrender', renderer);
   }
@@ -157,20 +125,8 @@ class CompositeFilterNode extends CompositeNode {
     this.pass.material!.undefine('fragment', symbol);
   }
 
-  link(inputPinName: string, fromNode: CompositeNode, fromPinName: string): void {
-    super.link(inputPinName, fromNode, fromPinName);
-    // Enabled the pin texture in shader
-    this.pass.material!.enableTexture(inputPinName);
-  }
-
   validateInput(inputName: string) {
-    return this.pass.material!.isUniformEnabled(inputName);
-  }
-  clear() {
-    super.clear();
-
-    // Default disable all texture
-    this.pass.material!.disableTexturesAll();
+    return !!this.pass.material!.uniforms[inputName];
   }
 }
 export default CompositeFilterNode;

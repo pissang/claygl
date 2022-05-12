@@ -1,3 +1,5 @@
+// TODO dispose unused textures.
+
 import Texture2D, { Texture2DOpts } from '../Texture2D';
 import * as constants from '../core/constants';
 import * as util from '../core/util';
@@ -9,10 +11,7 @@ class TexturePool {
 
   get(parameters: Partial<Texture2DOpts>): Texture2D {
     const key = generateKey(parameters);
-    if (!util.hasOwn(this._pool, key)) {
-      this._pool[key] = [];
-    }
-    const list = this._pool[key];
+    const list = (this._pool[key] = this._pool[key] || []);
     if (!list.length) {
       const texture = new Texture2D(parameters);
       this._allocatedTextures.push(texture);

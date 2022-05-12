@@ -15,11 +15,11 @@ class TextureNode extends CompositeNode {
     this.texture = texture;
   }
 
-  renderAndOutput(renderer: Renderer, name: string) {
+  renderAndOutputTexture(renderer: Renderer, name: string) {
     return this.texture;
   }
 
-  getOutput(name: string) {
+  getOutputTexture(name: string) {
     return this.texture;
   }
 
