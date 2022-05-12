@@ -111,6 +111,8 @@ export { default as FilterCompositeNode } from './composite/FilterNode';
 export { default as SceneCompositeNode } from './composite/SceneNode';
 export { default as TextureCompositeNode } from './composite/TextureNode';
 
+export { default as registerBuiltinCompositeShaders } from './shader/registerBuiltinCompositeShaders';
+
 // Deferred renderer
 export { default as DeferredGBuffer } from './deferred/GBuffer';
 export { default as DeferredRenderer } from './deferred/Renderer';

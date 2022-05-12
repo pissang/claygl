@@ -123,22 +123,22 @@ class Notifier {
   }
 
   /**
-   * Alias of on('success')
+   * Alias of once('success')
    * @param  {Function} action
    * @param  {Object} [context]
    * @chainable
    */
-  success(action: Function, context?: any) {
+  onload(action: Function, context?: any) {
     return this.once('success', action, context);
   }
 
   /**
-   * Alias of on('error')
+   * Alias of once('error')
    * @param  {Function} action
    * @param  {Object} [context]
    * @chainable
    */
-  error(action: Function, context?: any) {
+  onerror(action: Function, context?: any) {
     return this.once('error', action, context);
   }
 

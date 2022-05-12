@@ -520,20 +520,20 @@ function resolveTexturePath(path: string, opts: Partial<GLTFLoadOpts>) {
 
 function loadBuffers(
   path: string,
-  onsuccess: (buffer: ArrayBuffer) => void,
+  onload: (buffer: ArrayBuffer) => void,
   onerror: (err: any) => void,
   opts: Partial<GLTFLoadOpts>
 ) {
   const base64Prefix = 'data:application/octet-stream;base64,';
   const strStart = path.substr(0, base64Prefix.length);
   if (strStart === base64Prefix) {
-    onsuccess(base64ToBinary(path, base64Prefix.length));
+    onload(base64ToBinary(path, base64Prefix.length));
   } else {
     vendor.request.get({
       url: resolveBufferPath(path, opts),
       responseType: 'arraybuffer',
       onload(buffer) {
-        onsuccess && onsuccess(buffer);
+        onload && onload(buffer);
       },
       onerror(err) {
         onerror && onerror(err);

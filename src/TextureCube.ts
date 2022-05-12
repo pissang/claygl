@@ -45,9 +45,9 @@ interface TextureCube extends TextureCubeOpts {}
  *     });
  *     mat.set('environmentMap', envMap);
  *     ...
- *     envMap.success(function () {
+ *     envMap.onload(() => {
  *         // Wait for the sky texture loaded
- *         animation.on('frame', function (frameTime) {
+ *         animation.on('frame', (frameTime) => {
  *             renderer.render(scene, camera);
  *         });
  *     });

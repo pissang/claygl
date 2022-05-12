@@ -77,8 +77,8 @@ export function loadTexture(
     texture = new Texture2D();
     texture
       .load(path)
-      .success(onload as TextureOnload)
-      .error(onerror as TextureOnerror);
+      .onload(onload as TextureOnload)
+      .onerror(onerror as TextureOnerror);
   }
   return texture;
 }

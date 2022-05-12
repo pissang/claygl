@@ -154,7 +154,7 @@ class ShadowMapPass extends Notifier {
   /**
    * Debug rendering of shadow textures
    */
-  renderDebug(renderer: Renderer, size: number) {
+  renderDebug(renderer: Renderer, size?: number) {
     let debugPass = this._debugPass;
     if (!debugPass) {
       debugPass = this._debugPass = new FullscreenQuadPass(Shader.source('clay.sm.debug_depth'));

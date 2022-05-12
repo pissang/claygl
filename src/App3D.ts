@@ -422,13 +422,13 @@ class App3D extends Notifier {
     const promise = new Promise((resolve, reject) => {
       const texture = this.loadTextureSync(urlOrImg, opts);
       if (!texture.isRenderable()) {
-        texture.success(() => {
+        texture.onload(() => {
           if (this._disposed) {
             return;
           }
           resolve(texture);
         });
-        texture.error(() => {
+        texture.onerror(() => {
           if (this._disposed) {
             return;
           }
@@ -481,7 +481,7 @@ class App3D extends Notifier {
           },
           function () {
             texture.dirty();
-            texture.trigger('success');
+            texture.trigger('load', texture);
           }
         );
 
@@ -520,10 +520,10 @@ class App3D extends Notifier {
         resolve(textureCube);
       } else {
         textureCube
-          .success(function () {
+          .onload(function () {
             resolve(textureCube);
           })
-          .error(function () {
+          .onerror(function () {
             reject();
           });
       }
@@ -1043,7 +1043,7 @@ class App3D extends Notifier {
       loadPromise = (envImage as TextureCube).isRenderable()
         ? Promise.resolve(envImage)
         : new Promise(function (resolve) {
-            (envImage as TextureCube).success(function () {
+            (envImage as TextureCube).onload(() => {
               resolve(envImage);
             });
           });
@@ -1164,8 +1164,8 @@ class App3D extends Notifier {
                   return Promise.resolve(texture);
                 }
                 return new Promise(function (resolve) {
-                  texture.success(resolve);
-                  texture.error(resolve);
+                  texture.onload(resolve);
+                  texture.onerror(resolve);
                 });
               })
             )

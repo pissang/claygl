@@ -55,7 +55,7 @@ export interface Texture2DOpts extends TextureOpts, Texture2DData {
  *     diffuseMap.load('assets/textures/diffuse.jpg');
  *     mat.set('diffuseMap', diffuseMap);
  *     ...
- *     diffuseMap.success(function () {
+ *     diffuseMap.onload(function () {
  *         // Wait for the diffuse texture loaded
  *         animation.on('frame', function (frameTime) {
  *             renderer.render(scene, camera);
@@ -292,7 +292,7 @@ class Texture2D extends Texture {
     }
     image.onload = () => {
       this.dirty();
-      this.trigger('success', this);
+      this.trigger('load', this);
     };
     image.onerror = () => {
       this.trigger('error', this);
