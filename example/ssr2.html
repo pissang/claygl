@@ -161,7 +161,7 @@
                 });
                 tex
                   .load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
-                  .success(function () {
+                  .onload(function () {
                     tex.wrapS = clay.Texture.REPEAT;
                     tex.wrapT = clay.Texture.REPEAT;
                   });
