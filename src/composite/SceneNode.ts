@@ -21,6 +21,8 @@ export class CompositeSceneNode extends CompositeNode {
     this.camera = camera;
   }
 
+  prepare() {}
+
   render(
     renderer: Renderer,
     inputTextures: Record<string, Texture>,

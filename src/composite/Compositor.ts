@@ -1,70 +1,126 @@
 import FrameBuffer from '../FrameBuffer';
 import Renderer from '../Renderer';
 import CompositeNode, { CompositeNodeInput } from './CompositeNode';
+import GroupCompositeNode from './GroupNode';
 import RenderGraph from './renderGraph/RenderGraph';
 import RenderGraphNode from './renderGraph/RenderGraphNode';
 
 const renderGraphNodeMap = new WeakMap<CompositeNode, RenderGraphNode>();
+function createRenderGraphNode(renderGraph: RenderGraph, compositeNode: CompositeNode) {
+  const renderGraphNode = new RenderGraphNode(compositeNode, renderGraph);
+  renderGraph.addNode(renderGraphNode);
+  renderGraphNodeMap.set(compositeNode, renderGraphNode);
+}
 
+function removeRenderGraphNode(renderGraph: RenderGraph, compositeNode: CompositeNode) {
+  const renderGraphNode = renderGraphNodeMap.get(compositeNode)!;
+  renderGraph.removeNode(renderGraphNode);
+}
 /**
  * Compositor provide graph based post processing
  */
 class Compositor {
-  // Output node
-
   private _nodes: CompositeNode[] = [];
 
   private _renderGraph = new RenderGraph();
 
+  /**
+   * Add a new node
+   */
   addNode(node: CompositeNode) {
     const nodes = this._nodes;
+    const renderGraph = this._renderGraph;
     if (nodes.indexOf(node) < 0) {
       nodes.push(node);
-      const renderGraphNode = new RenderGraphNode(node, this._renderGraph);
-      this._renderGraph.addNode(renderGraphNode);
-      renderGraphNodeMap.set(node, renderGraphNode);
+      if (node instanceof GroupCompositeNode) {
+        node.eachNode((node) => createRenderGraphNode(renderGraph, node));
+      } else {
+        createRenderGraphNode(renderGraph, node);
+      }
     }
   }
 
   /**
-   * @param node
+   * Remove node
    */
-  removeNode(node: CompositeNode | string) {
-    if (typeof node === 'string') {
-      node = this.getNodeByName(node)!;
-    }
+  removeNode(node: CompositeNode) {
     const nodes = this._nodes;
     const idx = nodes.indexOf(node);
+    const renderGraph = this._renderGraph;
     if (idx >= 0) {
       nodes.splice(idx, 1);
-      const renderGraphNode = renderGraphNodeMap.get(node)!;
-      this._renderGraph.removeNode(renderGraphNode);
+      if (node instanceof GroupCompositeNode) {
+        node.eachNode((node) => removeRenderGraphNode(renderGraph, node));
+      } else {
+        removeRenderGraphNode(renderGraph, node);
+      }
     }
   }
 
   /**
-   * @param name
-   * @return
+   * Get node by name.
    */
   getNodeByName(name: string): CompositeNode | undefined {
     return this._nodes.find((node) => node.name === name);
   }
+
   /**
-   * @param  {clay.Renderer} renderer
+   * Render
    */
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {
-    this._buildRenderGraphLinks();
+    this._nodes.forEach((node) => {
+      node.prepare && node.prepare(renderer);
+      renderGraphNodeMap.get(node)!.beforeUpdate();
+    });
+
+    this._buildRenderGraphLinks(renderer);
+
     this._renderGraph.render(renderer, frameBuffer);
   }
 
   /**
    * Update links of graph
    */
-  private _buildRenderGraphLinks() {
-    const nodes = this._nodes;
-    nodes.forEach((node) => renderGraphNodeMap.get(node)!.beforeUpdate());
-    // Traverse all the nodes and build the graph
-    nodes.forEach((node) => {
+  private _buildRenderGraphLinks(renderer: Renderer) {
+    function logMissingLink(input: CompositeNodeInput) {
+      console.warn(
+        'Pin of ' + input.node + (input.output ? '.' + input.output : '') + ' not exist'
+      );
+    }
+    function findLink(input: CompositeNodeInput) {
+      // Try to take input as a directly a node
+      const node = input.node;
+      const outputs = node.outputs;
+      let inputPin = input.output;
+      if (!inputPin && outputs) {
+        // Use first pin defaultly
+        inputPin = Object.keys(outputs)[0];
+      }
+      if (!inputPin) {
+        return;
+      }
+
+      if (node instanceof GroupCompositeNode) {
+        const innerLink = node.getOutputInnerLink(inputPin);
+        return (
+          innerLink && {
+            node: innerLink.node,
+            pin: innerLink.output
+          }
+        );
+      }
+      if (outputs && outputs[inputPin!]) {
+        return {
+          node: node,
+          pin: inputPin!
+        };
+      }
+    }
+
+    function eachNodeInput(
+      node: CompositeNode,
+      cb: (inputInfo: CompositeNodeInput, inputName: string) => void
+    ) {
       Object.keys(node.inputs || {}).forEach((inputName) => {
         let inputInfo = node.inputs![inputName];
         if (!inputInfo) {
@@ -74,68 +130,58 @@ class Compositor {
           console.warn('Pin ' + node.name + '.' + inputName + ' not used.');
           return;
         }
-        if (typeof inputInfo === 'string' || inputInfo instanceof CompositeNode) {
+        if (inputInfo instanceof CompositeNode) {
           inputInfo = {
             node: inputInfo
           };
         }
 
-        const fromPin = this._findLink(inputInfo);
-        if (fromPin) {
+        inputInfo && cb(inputInfo, inputName);
+      });
+    }
+
+    function buildLinksOfNode(node: CompositeNode) {
+      if (node instanceof GroupCompositeNode) {
+        buildLinksOfGroupNode(node);
+      } else {
+        eachNodeInput(node, (inputInfo, inputName) => {
+          const fromPin = findLink(inputInfo);
+          if (!fromPin) {
+            logMissingLink(inputInfo);
+            return;
+          }
           renderGraphNodeMap
             .get(node)!
             .updateLinkFrom(inputName, renderGraphNodeMap.get(fromPin.node)!, fromPin.pin);
-        } else {
-          console.warn(
-            'Pin of ' +
-              inputInfo.node +
-              (inputInfo.output ? '.' + inputInfo.output : '') +
-              ' not exist'
-          );
+        });
+      }
+    }
+
+    function buildLinksOfGroupNode(groupNode: GroupCompositeNode) {
+      groupNode.eachNode(buildLinksOfNode);
+      eachNodeInput(groupNode, (groupInputInfo, groupInputName) => {
+        const fromPin = findLink(groupInputInfo);
+        if (!fromPin) {
+          logMissingLink(groupInputInfo);
+          return;
+        }
+        const inputInnerLink = groupNode.getInputInnerLink(groupInputName);
+        if (inputInnerLink) {
+          renderGraphNodeMap
+            .get(inputInnerLink.node)!
+            .updateLinkFrom(groupInputName, renderGraphNodeMap.get(fromPin.node)!, fromPin.pin);
+          // TODO Error info when can't find inner link
         }
       });
-    });
-  }
-
-  private _findLink(input: CompositeNodeInput) {
-    let node;
-    // Try to take input as a directly a node
-    if (typeof input === 'string' || input instanceof CompositeNode) {
-      input = {
-        node: input
-      };
     }
 
-    if (typeof input.node === 'string') {
-      for (let i = 0; i < this._nodes.length; i++) {
-        const tmp = this._nodes[i];
-        if (tmp.name === input.node) {
-          node = tmp;
-        }
-      }
-    } else {
-      node = input.node;
-    }
-    if (node) {
-      let inputPin = input.output;
-      if (!inputPin) {
-        // Use first pin defaultly
-        if (node.outputs) {
-          inputPin = Object.keys(node.outputs)[0];
-        }
-      }
-      if (node.outputs && node.outputs[inputPin!]) {
-        return {
-          node: node,
-          pin: inputPin!
-        };
-      }
-    }
+    // Traverse all the nodes and build the graph
+    this._nodes.forEach(buildLinksOfNode);
   }
 
   /**
    * Dispose compositor
-   * @param {clay.Renderer} renderer
+   * @param renderer
    */
   dispose(renderer: Renderer) {
     this._renderGraph.dispose(renderer);

@@ -45,7 +45,7 @@ const mesh = new Mesh({
 
 scene.add(mesh);
 
-camera.position.set(0, 2, 2);
+camera.position.set(0, 2, 5);
 camera.lookAt(new Vector3());
 
 var light = new DirectionalLight({
