@@ -1,3 +1,4 @@
+import vertexGlsl from '../shader/source/compositor/vertex.glsl.js';
 import coloradjustEssl from './source/compositor/coloradjust.glsl.js';
 import blurEssl from './source/compositor/blur.glsl.js';
 import lumEssl from './source/compositor/lum.glsl.js';
@@ -16,6 +17,7 @@ import fxaaEssl from './source/compositor/fxaa.glsl.js';
 // TODO Must export a module and be used in the other modules. Or it will be tree shaked
 export default function register(Shader: { import(str: string): void }) {
   // Some build in shaders
+  Shader.import(vertexGlsl);
   Shader.import(coloradjustEssl);
   Shader.import(blurEssl);
   Shader.import(lumEssl);
