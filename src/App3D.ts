@@ -473,7 +473,7 @@ class App3D extends Notifier {
     let texture = new Texture2D(opts);
     if (typeof urlOrImg === 'string') {
       if (urlOrImg.match(/.hdr$|^data:application\/octet-stream/)) {
-        texture = textureUtil.loadTexture(
+        texture = textureUtil.loadTextureSync(
           urlOrImg,
           {
             exposure: opts && opts.exposure,

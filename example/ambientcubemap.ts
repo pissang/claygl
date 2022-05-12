@@ -27,7 +27,7 @@ let suzanneGeometry: Geometry;
 loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
 
-  const cubemap = textureUtil.loadTexture(
+  const cubemap = textureUtil.loadTextureSync(
     'assets/textures/hdr/pisa.hdr',
     {
       exposure: 2
