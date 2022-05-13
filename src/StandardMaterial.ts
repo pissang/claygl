@@ -172,11 +172,10 @@ const defaultStandardMaterialOpts = {
  */
 class StandardMaterial extends Material {
   constructor(opts?: Partial<StandardMaterialOpts>) {
-    super(opts);
     if (!standardShader) {
       standardShader = new StandardMRShader();
     }
-    this.shader = standardShader;
+    super(standardShader, opts);
 
     assign(this, defaultStandardMaterialOpts, opts);
   }

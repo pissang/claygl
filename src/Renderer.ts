@@ -10,10 +10,10 @@ import Vector2 from './math/Vector2';
 import ProgramManager from './gpu/ProgramManager';
 
 // Light header
-import Shader from './Shader';
+import Shader, { AttributeSemantic } from './Shader';
 
-import prezEssl from './shader/source/prez.glsl.js';
-Shader.import(prezEssl);
+// import prezEssl from './shader/source/prez.glsl.js';
+// Shader.import(prezEssl);
 
 import * as mat4 from './glmatrix/mat4';
 import * as vec3 from './glmatrix/vec3';
@@ -851,18 +851,15 @@ class Renderer extends Notifier {
         mat4.copy(matrices.WORLD, worldM!);
         mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION, worldM!);
         mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW, worldM!);
-        if (shader.matrixSemantics.WORLDINVERSE || shader.matrixSemantics.WORLDINVERSETRANSPOSE) {
+        if (shader.semanticsMap.WORLDINVERSE || shader.semanticsMap.WORLDINVERSETRANSPOSE) {
           mat4.invert(matrices.WORLDINVERSE, worldM!);
         }
-        if (
-          shader.matrixSemantics.WORLDVIEWINVERSE ||
-          shader.matrixSemantics.WORLDVIEWINVERSETRANSPOSE
-        ) {
+        if (shader.semanticsMap.WORLDVIEWINVERSE || shader.semanticsMap.WORLDVIEWINVERSETRANSPOSE) {
           mat4.invert(matrices.WORLDVIEWINVERSE, matrices.WORLDVIEW);
         }
         if (
-          shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSE ||
-          shader.matrixSemantics.WORLDVIEWPROJECTIONINVERSETRANSPOSE
+          shader.semanticsMap.WORLDVIEWPROJECTIONINVERSE ||
+          shader.semanticsMap.WORLDVIEWPROJECTIONINVERSETRANSPOSE
         ) {
           mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
         }
@@ -956,10 +953,10 @@ class Renderer extends Notifier {
       if (isSceneNode) {
         for (let k = 0; k < matrixSemanticKeys.length; k++) {
           const semantic = matrixSemanticKeys[k];
-          const semanticInfo = shader.matrixSemantics[semantic];
+          const semanticInfo = shader.semanticsMap[semantic]!;
           const matrix = matrices[semantic];
           if (semanticInfo.isTranspose) {
-            const matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose];
+            const matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose!];
             mat4.transpose(matrix, matrixNoTranspose);
           }
           program.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
@@ -1290,7 +1287,7 @@ class Renderer extends Notifier {
         const semantic = attributeBufferInfo.semantic;
         let symbol;
         if (semantic) {
-          const semanticInfo = shader.attributeSemantics[semantic];
+          const semanticInfo = shader.semanticsMap[semantic as AttributeSemantic];
           symbol = semanticInfo && semanticInfo.symbol;
         } else {
           symbol = name;
@@ -1449,7 +1446,7 @@ class Renderer extends Notifier {
         const textureUniforms = material.getTextureUniforms();
         for (let u = 0; u < textureUniforms.length; u++) {
           const uniformName = textureUniforms[u];
-          const val = material.uniforms[uniformName].value;
+          const val = material.uniforms[uniformName].value as any;
           const uniformType = material.uniforms[uniformName].type;
           if (!val) {
             continue;

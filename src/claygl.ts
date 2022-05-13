@@ -3,7 +3,7 @@ import Timeline from './Timeline';
 // Core
 export { default as Renderer } from './Renderer';
 export { default as Material } from './Material';
-export { default as Shader } from './Shader';
+export { default as Shader, glsl, createShaderChunk } from './Shader';
 export { default as Node } from './Node';
 export { default as Renderable } from './Renderable';
 export { default as Mesh } from './Mesh';
@@ -32,9 +32,6 @@ export function startTimeline(onframe?: (deltaTime: number) => void) {
 }
 
 export * as constants from './core/constants';
-
-// Shader
-export { glsl } from './Shader_';
 
 // Camera
 export {

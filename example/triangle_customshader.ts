@@ -1,4 +1,9 @@
-import { Renderer, GeometryBase, Material, Shader } from 'claygl';
+// import { Renderer, GeometryBase, Material, Shader, glsl } from 'claygl';
+
+import GeometryBase from '../src/GeometryBase';
+import Material from '../src/Material';
+import Renderer from '../src/Renderer';
+import Shader, { glsl } from '../src/Shader';
 
 const TRIANGLE_POSITIONS = [
   [-0.5, -0.5, 0],
@@ -12,19 +17,31 @@ const geometry = new GeometryBase();
 geometry.createAttribute('position', 'float', 3, 'POSITION');
 geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 
-const vs = `attribute vec3 position: POSITION;
+const vs = new Shader.Vertex({
+  attributes: {
+    position: Shader.attribute('vec3', 'POSITION')
+  },
+  code: glsl`
 void main() {
   gl_Position = vec4(position, 1.0);
-}`;
-const fs = `void main() {
-  gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
-}`;
+}`
+});
+const fs = new Shader.Fragment({
+  uniforms: {
+    color: Shader.uniform('rgb', 'red')
+  },
+  code: glsl`
+void main() {
+  gl_FragColor = vec4(color, 1.0);
+}
+`
+});
+
+const material = new Material(new Shader(vs, fs));
 
 renderer.renderPass([
   {
     geometry,
-    material: new Material({
-      shader: new Shader(vs, fs)
-    })
+    material
   }
 ]);

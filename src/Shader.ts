@@ -3,13 +3,15 @@
 // TODO Shader slot
 // TODO struct uniform
 
-import { assign, isNumber, isString, keys } from './core/util';
+import { parseToFloat } from './core/color';
+import { assign, isString, keys } from './core/util';
 import { mat2, mat3, mat4, vec2, vec3, vec4 } from './glmatrix';
 import Texture2D from './Texture2D';
 import TextureCube from './TextureCube';
 
 export type ShaderDefineValue = boolean | string | number | undefined | null;
 export type ShaderPrecision = 'highp' | 'lowp' | 'mediump';
+export type ShaderType = 'vertex' | 'fragment';
 
 const uniformTypeMap = {
   bool: '1i',
@@ -25,7 +27,10 @@ const uniformTypeMap = {
   ivec4: '4i',
   mat2: 'm2',
   mat3: 'm3',
-  mat4: 'm4'
+  mat4: 'm4',
+  // It's not builtin glsl type. But a special type that support string and will be parsed in material
+  rgb: '3f',
+  rgba: '4f'
 } as const;
 
 const attributeSizeMap = {
@@ -52,6 +57,9 @@ type NativeUniformValueMap = {
   mat2: mat2.Mat2Array;
   mat3: mat3.Mat3Array;
   mat4: mat4.Mat4Array;
+  // Special type color that support string
+  rgb: vec3.Vec3Array | string;
+  rgba: vec4.Vec4Array | string;
 };
 
 type NativeAttributeType = 'float' | 'vec2' | 'vec3' | 'vec4';
@@ -78,7 +86,7 @@ export type MaterialUniformType =
   | 'm3v'
   | 'm4v';
 
-type AttributeSemantic =
+export type AttributeSemantic =
   | 'POSITION'
   | 'NORMAL'
   | 'BINORMAL'
@@ -92,7 +100,7 @@ type AttributeSemantic =
   | 'JOINT'
   | 'WEIGHT';
 
-type UniformSemantic =
+export type UniformSemantic =
   | 'SKIN_MATRIX'
   // Information about viewport
   | 'VIEWPORT_SIZE'
@@ -109,7 +117,7 @@ type UniformSemantic =
   // Log depth buffer
   | 'LOG_DEPTH_BUFFER_FC';
 
-const BASIC_MATRIX_SEMANTICS = [
+export const BASIC_MATRIX_SEMANTICS = [
   'WORLD',
   'VIEW',
   'PROJECTION',
@@ -181,6 +189,10 @@ type ShaderAttributeLoose = {
   semantic?: AttributeSemantic;
 };
 
+type ShaderVaringLoose = {
+  type: NativeUniformType;
+};
+
 export function createUniform<
   T extends NativeUniformType,
   S extends MatrixSemantic | UniformSemantic
@@ -219,17 +231,17 @@ export function createVarying<T extends NativeUniformType>(type: T) {
   return { type };
 }
 
-function createShaderChunk<
+export function createShaderChunk<
   TDefines extends Record<string, ShaderDefineValue>,
-  TUniforms,
-  TAttributes,
-  TVarings,
+  TUniforms extends Record<string, ShaderUniformLoose>,
+  TAttributes extends Record<string, ShaderAttributeLoose>,
+  TVaryings extends Record<string, ShaderVaringLoose>,
   TCode extends Record<string, string> | string
 >(options: {
   defines?: TDefines;
   uniforms?: TUniforms;
   attributes?: TAttributes;
-  varyings?: TVarings;
+  varyings?: TVaryings;
   code: TCode;
 }) {
   // Each part of shader chunk needs to be injected separately
@@ -245,34 +257,34 @@ function createShaderChunk<
     defines: TDefines;
     uniforms: TUniforms;
     attributes: TAttributes;
-    varyings: TVarings;
+    varyings: TVaryings;
     code: TCode;
   };
 }
 
 class StageShader<
   TDefines extends Record<string, ShaderDefineValue>,
-  TUniforms,
-  TAttributes,
-  TVarings
+  TUniforms extends Record<string, ShaderUniformLoose>,
+  TAttributes extends Record<string, ShaderAttributeLoose>,
+  TVaryings extends Record<string, ShaderVaringLoose>
 > {
   readonly defines: TDefines;
   readonly uniforms: TUniforms;
   readonly attributes: TAttributes;
-  readonly varyings: TVarings;
+  readonly varyings: TVaryings;
   readonly code: string;
 
   constructor(options: {
     defines?: TDefines;
     uniforms?: TUniforms;
     attributes?: TAttributes;
-    varyings?: TVarings;
+    varyings?: TVaryings;
     code: string;
   }) {
     this.defines = options.defines || ({} as TDefines);
     this.uniforms = options.uniforms || ({} as TUniforms);
     this.attributes = options.attributes || ({} as TAttributes);
-    this.varyings = options.varyings || ({} as TVarings);
+    this.varyings = options.varyings || ({} as TVaryings);
     this.code = options.code;
   }
 
@@ -282,15 +294,21 @@ class StageShader<
   compose() {
     // TODO If compose based on #ifdef condition.
 
+    function normalizeUniformType(type: string) {
+      return type === 'rgb' ? 'vec3' : type === 'rgba' ? 'vec4' : type;
+    }
+
     // Only compose the uniform, attributes, varying, and codes.
     // Defines will be composed dynamically in GLProgram based on the material
-
     function composePart(
-      type: 'uniform' | 'attribute' | 'varying',
+      varType: 'uniform' | 'attribute' | 'varying',
       obj: Record<string, ShaderUniformLoose>
     ) {
       return keys(obj)
-        .map((uniformName) => `${obj[uniformName].type} ${type} ${uniformName}`)
+        .map(
+          (uniformName) =>
+            `${varType} ${normalizeUniformType(obj[uniformName].type)} ${uniformName};`
+        )
         .join('\n');
     }
 
@@ -304,10 +322,10 @@ ${this.code}
 }
 
 export class VertexShader<
-  TDefines extends Record<string, ShaderDefineValue>,
-  TUniforms,
-  TAttributes,
-  TVaryings
+  TDefines extends Record<string, ShaderDefineValue> = Record<string, ShaderDefineValue>,
+  TUniforms extends Record<string, ShaderUniformLoose> = Record<string, ShaderUniformLoose>,
+  TAttributes extends Record<string, ShaderAttributeLoose> = Record<string, ShaderAttributeLoose>,
+  TVaryings extends Record<string, ShaderVaringLoose> = Record<string, ShaderVaringLoose>
 > extends StageShader<TDefines, TUniforms, TAttributes, TVaryings> {
   constructor(options: {
     defines?: TDefines;
@@ -321,9 +339,9 @@ export class VertexShader<
 }
 
 export class FragmentShader<
-  TDefines extends Record<string, ShaderDefineValue>,
-  TUniforms,
-  TVaryings
+  TDefines extends Record<string, ShaderDefineValue> = Record<string, ShaderDefineValue>,
+  TUniforms extends Record<string, ShaderUniformLoose> = Record<string, ShaderUniformLoose>,
+  TVaryings extends Record<string, ShaderVaringLoose> = Record<string, ShaderVaringLoose>
 > extends StageShader<TDefines, TUniforms, never, TVaryings> {
   constructor(options: {
     defines?: TDefines;
@@ -354,12 +372,14 @@ function cloneUniformVal(type: MaterialUniformType, val: any) {
 }
 
 export class Shader<
-  V extends VertexShader<any, any, any, any> = VertexShader<any, any, any, any>,
-  F extends FragmentShader<any, any, any> = FragmentShader<any, any, any>
+  V extends VertexShader = VertexShader,
+  F extends FragmentShader = FragmentShader
 > {
   // Default defines
-  readonly vertexDefines: Record<string, string>;
-  readonly fragmentDefines: Record<string, string>;
+  readonly vertexDefines: Record<string, ShaderDefineValue>;
+  readonly fragmentDefines: Record<string, ShaderDefineValue>;
+
+  readonly uniforms: (keyof ConvertShaderUniformToMaterialUniform<V['uniforms'] | F['uniforms']>)[];
 
   readonly textures: Record<
     string,
@@ -432,18 +452,18 @@ export class Shader<
 
     const textures: Shader['textures'] = {};
 
+    const uniformsList: Shader['uniforms'] = [];
     const uniformsTpls: Shader['uniformTpls'] = {};
     const semanticsMap: Shader['semanticsMap'] = {};
     const attributes: Shader['attributes'] = {};
     const matrixSemantics: MatrixSemantic[] = [];
     // TODO remove any
-    function processUniforms(
-      uniforms: Record<string, ShaderUniformLoose>,
-      shaderType: 'vertex' | 'fragment'
-    ) {
+    function processUniforms(uniforms: Record<string, ShaderUniformLoose>, shaderType: ShaderType) {
       keys(uniforms).forEach((uniformName) => {
+        uniformsList.push(uniformName);
         const uniform = uniforms[uniformName];
         const uniformType = uniform.type as NativeUniformType;
+        const uniformValue = uniform.value as NativeUniformType;
         const uniformSemantic = uniform.semantic;
         if (uniformType === 'sampler2D' || uniformType === 'samplerCube') {
           textures[uniformName] = {
@@ -453,7 +473,7 @@ export class Shader<
         }
         const materialUniformObj = {
           symbol: uniformName,
-          type: (uniformTypeMap[uniformType] + uniform.array ? 'v' : '') as MaterialUniformType
+          type: (uniformTypeMap[uniformType] + (uniform.array ? 'v' : '')) as MaterialUniformType
         };
 
         if (uniformSemantic) {
@@ -474,6 +494,11 @@ export class Shader<
             matrixSemantics.push(uniformSemantic as MatrixSemantic);
           }
         }
+        // TODO
+        (materialUniformObj as any).value =
+          (uniformType === 'rgb' || uniformType === 'rgba') && isString(uniformValue)
+            ? parseToFloat(uniformValue)
+            : uniformValue;
 
         (uniformsTpls as any)[uniformName] = materialUniformObj;
       });
@@ -499,6 +524,7 @@ export class Shader<
     });
 
     this.textures = textures;
+    this.uniforms = uniformsList;
     this.uniformTpls = uniformsTpls;
     this.semanticsMap = semanticsMap;
     this.matrixSemantics = matrixSemantics;
@@ -512,39 +538,9 @@ export class Shader<
   static arrayUniform = createArrayUniform;
   static attribute = createAttribute;
   static varying = createVarying;
+
+  static Vertex = VertexShader;
+  static Fragment = FragmentShader;
 }
 
 export default Shader;
-
-/////////////// Test
-const chunk1 = createShaderChunk({
-  uniforms: {
-    foo: createUniform('vec3', [2, 2, 2]),
-    bar: createArrayUniform('vec3', [[2, 2, 2]])
-  },
-  attributes: {
-    bar: createAttribute('vec3')
-  },
-  varyings: {},
-  code: glsl`
-vec4 sRGBToLinear(in vec4 value) {
-  return vec4(mix(pow(value.rgb * 0.9478672986 + vec3(0.0521327014), vec3(2.4)), value.rgb * 0.0773993808, vec3(lessThanEqual(value.rgb, vec3(0.04045)))), value.w);
-}
-vec4 linearTosRGB(in vec4 value) {
-  return vec4(mix(pow(value.rgb, vec3(0.41666)) * 1.055 - vec3(0.055), value.rgb * 12.92, vec3(lessThanEqual(value.rgb, vec3(0.0031308)))), value.w);
-}`
-});
-
-const shader = new StageShader({
-  uniforms: {
-    ...chunk1.uniforms,
-    bar: createUniform('bool', 0)
-  },
-  code: glsl`
-void main() {
-
-}
-`
-});
-
-shader.uniforms.foo.value;

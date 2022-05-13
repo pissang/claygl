@@ -1,6 +1,6 @@
 import * as util from './core/util';
 import * as colorUtil from './core/color';
-import Shader, { ShaderDefineValue, ShaderPrecision, ShaderType, ShaderUniform } from './Shader';
+import Shader, { ShaderDefineValue, ShaderPrecision, ShaderType, MaterialUniform } from './Shader';
 import Texture from './Texture';
 
 type MaterialUniformValue =
@@ -16,8 +16,8 @@ const programKeyCache: Record<string, string> = {};
 
 function getDefineCode(defines: Record<string, ShaderDefineValue>) {
   const defineKeys = util.keys(defines);
-  defineKeys.sort();
   const defineStr = [];
+  defineKeys.sort();
   // Custom Defines
   for (let i = 0; i < defineKeys.length; i++) {
     const key = defineKeys[i];
@@ -87,6 +87,13 @@ export interface MaterialOpts {
   fragmentDefines: Record<string, ShaderDefineValue>;
 }
 
+type UniformValueRecord<T extends Shader['uniformTpls']> = {
+  [key in keyof T]?: T[key]['value'];
+};
+type PickTextureUniforms<T extends Shader['uniformTpls']> = {
+  [key in keyof T]: T[key]['type'] extends 'sampler2D' | 'samplerCube' ? T[key] : never;
+};
+
 interface Material extends Omit<MaterialOpts, 'shader'> {}
 /**
  * Material defines the appearance of mesh surface, like `color`, `roughness`, `metalness`, etc.
@@ -104,7 +111,7 @@ const material = new clay.Material({
  * @constructor clay.Material
  * @extends clay.core.Base
  */
-class Material {
+class Material<T extends Shader = Shader> {
   readonly __uid__: number = util.genGUID();
 
   name: string;
@@ -114,13 +121,14 @@ class Material {
    */
   autoUpdateTextureStatus = true;
 
-  uniforms: Record<string, ShaderUniform> = {};
+  readonly uniforms!: T['uniformTpls'];
+
   vertexDefines: Record<string, ShaderDefineValue> = {};
   fragmentDefines: Record<string, ShaderDefineValue> = {};
 
-  private _shader?: Shader;
+  private readonly _shader?: Shader;
 
-  private _textureStatus: Record<string, TextureStatus> = {};
+  private _textureStatus = {} as Record<keyof PickTextureUniforms<T['uniformTpls']>, TextureStatus>;
 
   // shadowTransparentMap : null
 
@@ -130,10 +138,9 @@ class Material {
 
   private _programKey?: string;
 
-  constructor(opts?: Partial<MaterialOpts>) {
+  constructor(shader: T, opts?: Partial<MaterialOpts>) {
     opts = opts || {};
     this.name = opts.name || '';
-    this.shader = opts.shader;
     this.depthTest = util.optional(opts.depthTest, true);
     this.depthMask = util.optional(opts.depthMask, true);
     this.blend = opts.blend;
@@ -141,77 +148,76 @@ class Material {
     this.precision = opts.precision || 'highp';
 
     util.assign(this.vertexDefines, opts.vertexDefines);
-    assign(this.fragmentDefines, opts.fragmentDefines);
+    util.assign(this.fragmentDefines, opts.fragmentDefines);
+
+    this.uniforms = shader.createUniforms();
+    // Ignore if uniform can use in shader.
+    this._shader = shader;
+
+    this._init(shader);
   }
 
   get shader() {
     return this._shader;
   }
 
-  set shader(shader) {
-    if (this._shader !== shader && shader) {
-      this.attachShader(shader, true);
-    }
-  }
-
   /**
    * Set material uniform
    * @example
    *  mat.setUniform('color', [1, 1, 1, 1]);
-   * @param {string} symbol
-   * @param {number|array|clay.Texture} value
+   * @param symbol
+   * @param value
    */
-  setUniform(symbol: string, value: MaterialUniformValue) {
+  setUniform<K extends keyof T['uniformTpls']>(symbol: K, value: T['uniformTpls'][K]['value']) {
     if (value === undefined) {
       return;
       // console.warn('Uniform value "' + symbol + '" is undefined');
     }
     const uniform = this.uniforms[symbol];
     if (uniform) {
-      if (typeof value === 'string') {
+      if (util.isString(value)) {
         // Try to parse as a color. Invalid color string will return null.
+        // PENDING check rgb/rgba type?
         value = colorUtil.parseToFloat(value) || value;
       }
 
       uniform.value = value;
 
       if (this.autoUpdateTextureStatus && uniform.type === 't') {
-        value ? this.enableTexture(symbol) : this.disableTexture(symbol);
+        value ? this.enableTexture(symbol as any) : this.disableTexture(symbol as any);
       }
     }
   }
 
-  /**
-   * @param {Object} obj
-   */
-  setUniforms(obj: Record<string, any>) {
-    for (const key in obj) {
+  setUniforms(obj: UniformValueRecord<T['uniformTpls']>) {
+    util.keys(obj).forEach((key) => {
       const val = obj[key];
       this.setUniform(key, val);
-    }
+    });
   }
 
-  /**
-   * @param  {string}  symbol
-   * @return {boolean}
-   */
-  isUniformEnabled(symbol: string) {
-    return this._enabledUniforms.indexOf(symbol) >= 0;
+  isUniformEnabled(symbol: keyof T['uniformTpls']) {
+    return this._enabledUniforms.indexOf(symbol as any) >= 0;
   }
 
-  getEnabledUniforms() {
+  getEnabledUniforms(): (keyof T['uniformTpls'])[] {
     return this._enabledUniforms;
   }
-  getTextureUniforms() {
+
+  // TODO more precise type
+  getTextureUniforms(): (keyof PickTextureUniforms<T['uniformTpls']>)[] {
     return this._textureUniforms;
   }
 
   /**
    * Alias of setUniform and setUniforms
-   * @param {object|string} symbol
-   * @param {number|array|clay.Texture|ArrayBufferView} [value]
    */
-  set(symbol: string | Record<string, any>, value?: any) {
+  set(symbol: UniformValueRecord<T['uniformTpls']>): void;
+  set<K extends keyof T['uniformTpls']>(symbol: K, value: T['uniformTpls'][K]['value']): void;
+  set<K extends keyof T['uniformTpls']>(
+    symbol: K | UniformValueRecord<T['uniformTpls']>,
+    value?: T['uniformTpls'][K]['value']
+  ) {
     if (typeof symbol === 'object') {
       for (const key in symbol) {
         const val = symbol[key];
@@ -223,60 +229,31 @@ class Material {
   }
   /**
    * Get uniform value
-   * @param  {string} symbol
-   * @return {number|array|clay.Texture|ArrayBufferView}
+   *
    */
-  get(symbol: string) {
+  get<K extends keyof T['uniformTpls']>(symbol: K) {
     const uniform = this.uniforms[symbol];
     if (uniform) {
-      return uniform.value;
+      return uniform.value as T['uniformTpls'][K]['value'];
     }
   }
-  /**
-   * Attach a shader instance
-   * @param  {clay.Shader} shader
-   * @param  {boolean} keepStatus If try to keep uniform and texture
-   */
-  attachShader(shader: Shader, keepStatus?: boolean) {
-    const originalUniforms = this.uniforms;
 
-    // Ignore if uniform can use in shader.
-    this.uniforms = shader.createUniforms();
-    this._shader = shader;
-
+  private _init(shader: Shader) {
     const uniforms = this.uniforms;
-    this._enabledUniforms = util.keys(uniforms);
     // Make sure uniforms are set in same order to avoid texture slot wrong
-    this._enabledUniforms.sort();
-    this._textureUniforms = this._enabledUniforms.filter((uniformName) => {
-      const type = this.uniforms[uniformName].type;
+    const enabledUniforms = (this._enabledUniforms = util.keys(uniforms).sort());
+    this._textureUniforms = enabledUniforms.filter((uniformName) => {
+      const type = uniforms[uniformName].type;
       return type === 't' || type === 'tv';
     });
-
-    const originalVertexDefines = this.vertexDefines;
-    const originalFragmentDefines = this.fragmentDefines;
 
     this.vertexDefines = util.clone(shader.vertexDefines);
     this.fragmentDefines = util.clone(shader.fragmentDefines);
 
-    if (keepStatus) {
-      for (const symbol in originalUniforms) {
-        if (uniforms[symbol]) {
-          uniforms[symbol].value = originalUniforms[symbol].value;
-        }
-      }
-
-      util.defaults(this.vertexDefines, originalVertexDefines);
-      util.defaults(this.fragmentDefines, originalFragmentDefines);
-    }
-
-    const textureStatus: Record<string, TextureStatus> = {};
-    for (const key in shader.textures) {
-      textureStatus[key] = {
-        shaderType: shader.textures[key].shaderType,
-        type: shader.textures[key].type,
-        enabled: keepStatus && this._textureStatus[key] ? this._textureStatus[key].enabled : false
-      };
+    const textureStatus = {} as Material<T>['_textureStatus'];
+    const shaderTextures = shader.textures;
+    for (const key in shaderTextures) {
+      (textureStatus as any)[key] = util.assign({}, shaderTextures[key]);
     }
 
     this._textureStatus = textureStatus;
@@ -288,7 +265,7 @@ class Material {
    * Clone a new material and keep uniforms, shader will not be cloned
    * @return {clay.Material}
    */
-  clone() {
+  clone(): Material<T> {
     const material = new (this as any).constructor({
       shader: this.shader
     });
@@ -409,7 +386,7 @@ class Material {
    * For example, if texture symbol is diffuseMap, it will add a line `#define DIFFUSEMAP_ENABLED` in the shader code
    * @param  {string} symbol
    */
-  enableTexture(symbol: string) {
+  enableTexture<K extends keyof PickTextureUniforms<T['uniformTpls']>>(symbol: K) {
     if (Array.isArray(symbol)) {
       for (let i = 0; i < symbol.length; i++) {
         this.enableTexture(symbol[i]);
@@ -474,9 +451,9 @@ class Material {
    * @param  {string}  symbol
    * @return {boolean}
    */
-  isTextureEnabled(symbol: string) {
+  isTextureEnabled(symbol: keyof PickTextureUniforms<T['uniformTpls']>): boolean {
     const textureStatus = this._textureStatus;
-    return !!textureStatus[symbol] && textureStatus[symbol].enabled;
+    return !!(textureStatus[symbol] && textureStatus[symbol].enabled);
   }
 
   /**

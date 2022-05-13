@@ -2,10 +2,6 @@ import { Color } from './core/type';
 import { assign } from './core/util';
 import type Mesh from './Mesh';
 import ClayNode, { ClayNodeOpts } from './Node';
-import Shader from './Shader';
-
-import lightShader from './shader/source/header/light';
-Shader.import(lightShader);
 
 export interface LightOpts extends ClayNodeOpts {
   /**

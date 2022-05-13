@@ -1,8 +1,3 @@
-/**
- * @namespace clay.core.color
- */
-import LRU from '../core/LRU';
-
 const kCSSColorTable: Record<string, number[]> = {
   transparent: [0, 0, 0, 0],
   aliceblue: [240, 248, 255, 1],
@@ -225,17 +220,6 @@ function copyRgba(out: number[], a: number[]) {
   return out;
 }
 
-const colorCache = new LRU<number[]>(20);
-let lastRemovedArr: number[] | undefined;
-
-function putToCache(colorStr: string, rgbaArr: number[]) {
-  // Reuse removed array
-  if (lastRemovedArr) {
-    copyRgba(lastRemovedArr, rgbaArr);
-  }
-  lastRemovedArr = colorCache.put(colorStr, lastRemovedArr || rgbaArr.slice());
-}
-
 /**
  * @param colorStr
  * @param out
@@ -247,11 +231,6 @@ export function parse(colorStr: string, rgbaArr?: number[]) {
   }
   rgbaArr = rgbaArr || [];
 
-  const cached = colorCache.get(colorStr);
-  if (cached) {
-    return copyRgba(rgbaArr, cached);
-  }
-
   // colorStr may be not string
   colorStr = colorStr + '';
   // Remove all whitespace, not compliant, but should just be more accepting.
@@ -260,7 +239,6 @@ export function parse(colorStr: string, rgbaArr?: number[]) {
   // Color keywords (and transparent) lookup.
   if (str in kCSSColorTable) {
     copyRgba(rgbaArr, kCSSColorTable[str]);
-    putToCache(colorStr, rgbaArr);
     return rgbaArr;
   }
 
@@ -279,7 +257,6 @@ export function parse(colorStr: string, rgbaArr?: number[]) {
         (iv & 0xf) | ((iv & 0xf) << 4),
         1
       );
-      putToCache(colorStr, rgbaArr);
       return rgbaArr;
     } else if (str.length === 7) {
       const iv = parseInt(str.substr(1), 16); // TODO(deanm): Stricter parsing.
@@ -288,7 +265,6 @@ export function parse(colorStr: string, rgbaArr?: number[]) {
         return; // Covers NaN.
       }
       setRgba(rgbaArr, (iv & 0xff0000) >> 16, (iv & 0xff00) >> 8, iv & 0xff, 1);
-      putToCache(colorStr, rgbaArr);
       return rgbaArr;
     }
 
@@ -320,7 +296,6 @@ export function parse(colorStr: string, rgbaArr?: number[]) {
           parseCssInt(params[2]),
           alpha
         );
-        putToCache(colorStr, rgbaArr);
         return rgbaArr;
       case 'hsla':
         if (params.length !== 4) {
@@ -329,7 +304,6 @@ export function parse(colorStr: string, rgbaArr?: number[]) {
         }
         params[3] = parseCssFloat(params[3]) as any;
         hsla2rgba(params, rgbaArr);
-        putToCache(colorStr, rgbaArr);
         return rgbaArr;
       case 'hsl':
         if (params.length !== 3) {
@@ -337,7 +311,6 @@ export function parse(colorStr: string, rgbaArr?: number[]) {
           return;
         }
         hsla2rgba(params, rgbaArr);
-        putToCache(colorStr, rgbaArr);
         return rgbaArr;
       default:
         return;

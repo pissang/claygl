@@ -1,6 +1,6 @@
 import { genGUID, keys } from '../core/util';
 import type Renderer from '../Renderer';
-import Shader, { ParsedUniformSemantic } from '../Shader';
+import Shader, { UniformSemantic } from '../Shader';
 import type Texture from '../Texture';
 import * as constants from '../core/constants';
 
@@ -42,7 +42,7 @@ const tmpFloat32Array16 = new Float32Array(16);
 class GLProgram {
   readonly __uid__ = genGUID();
 
-  uniformSemantics: Record<string, ParsedUniformSemantic> = {};
+  semanticsMap: Shader['semanticsMap'] = {};
   attributes: Shader['attributes'] = {};
 
   vertexCode: string = '';
@@ -203,7 +203,7 @@ class GLProgram {
   }
 
   setUniformOfSemantic(_gl: WebGLRenderingContext, semantic: string, val: any) {
-    const semanticInfo = this.uniformSemantics[semantic];
+    const semanticInfo = this.semanticsMap[semantic as UniformSemantic];
     if (semanticInfo) {
       return this.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, val);
     }
@@ -317,7 +317,7 @@ class GLProgram {
   ) {
     const vertexShader = _gl.createShader(constants.VERTEX_SHADER)!;
     const program = _gl.createProgram()!;
-    const attributeSemantics = shader.attributeSemantics;
+    const semanticsMap = shader.semanticsMap;
 
     _gl.shaderSource(vertexShader, vertexShaderCode);
     _gl.compileShader(vertexShader);
@@ -338,13 +338,12 @@ class GLProgram {
     _gl.attachShader(program, vertexShader);
     _gl.attachShader(program, fragmentShader);
     // Force the position bind to location 0;
-    if (attributeSemantics.POSITION) {
-      _gl.bindAttribLocation(program, 0, shader.attributeSemantics.POSITION.symbol);
-    } else {
-      // Else choose an attribute and bind to location 0;
-      const keys = keys(this.attributes);
-      _gl.bindAttribLocation(program, 0, keys[0]);
-    }
+    // Else choose an attribute and bind to location 0;
+    _gl.bindAttribLocation(
+      program,
+      0,
+      semanticsMap.POSITION ? semanticsMap.POSITION.symbol : keys(this.attributes)[0]
+    );
 
     _gl.linkProgram(program);
 
