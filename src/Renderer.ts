@@ -12,9 +12,6 @@ import ProgramManager from './gpu/ProgramManager';
 // Light header
 import Shader, { AttributeSemantic, BASIC_MATRIX_SEMANTICS, MatrixSemantic } from './Shader';
 
-// import prezEssl from './shader/source/prez.glsl.js';
-// Shader.import(prezEssl);
-
 import * as mat4 from './glmatrix/mat4';
 import * as vec3 from './glmatrix/vec3';
 import type Renderable from './Renderable';
@@ -32,6 +29,7 @@ import type Mesh from './Mesh';
 import type Skeleton from './Skeleton';
 import Matrix4 from './math/Matrix4';
 import PerspectiveCamera from './camera/Perspective';
+import { preZFragment, preZVertex } from './shader/source/prez.glsl';
 
 const mat4Create = mat4.create;
 
@@ -1019,7 +1017,7 @@ class Renderer extends Notifier {
         program.setUniform(_gl, '1f', 'skinMatricesTextureSize', skinMatricesTexture.width);
       } else {
         const skinMatricesArray = skeleton.getSubSkinMatrices(object.__uid__, object.joints);
-        program.setUniformOfSemantic(_gl, 'SKIN_MATRIX', skinMatricesArray);
+        program.setUniform(_gl, 'm4v', 'skinMatrix', skinMatricesArray);
       }
     }
   }
@@ -1357,10 +1355,7 @@ class Renderer extends Notifier {
   renderPreZ(list: RenderableObject[], scene: Scene, camera: Camera) {
     const _gl = this.gl;
     const preZPassMaterial =
-      this._prezMaterial ||
-      new Material({
-        shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
-      });
+      this._prezMaterial || new Material(new Shader(preZVertex, preZFragment));
     this._prezMaterial = preZPassMaterial;
     if (this.logDepthBuffer) {
       this._prezMaterial.setUniform(

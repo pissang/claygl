@@ -1,1 +1,79 @@
-export default "@export clay.prez.vertex\n#define SHADER_NAME prez\nuniform mat4 WVP : WORLDVIEWPROJECTION;\nattribute vec3 pos : POSITION;\nattribute vec2 uv : TEXCOORD_0;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\n@import clay.chunk.skinning_header\n@import clay.chunk.instancing_header\n@import clay.util.logdepth_vertex_header\nvarying vec2 v_Texcoord;\nvoid main()\n{\n vec4 P = vec4(pos, 1.0);\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n P = skinMatrixWS * P;\n#endif\n#ifdef INSTANCING\n @import clay.chunk.instancing_matrix\n P = instanceMat * P;\n#endif\n gl_Position = WVP * P;\n v_Texcoord = uv * uvRepeat + uvOffset;\n @import clay.util.logdepth_vertex_main\n}\n@end\n@export clay.prez.fragment\nuniform sampler2D alphaMap;\nuniform float alphaCutoff: 0.0;\n@import clay.util.logdepth_fragment_header\nvarying vec2 v_Texcoord;\nvoid main()\n{\n if (alphaCutoff > 0.0) {\n if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {\n discard;\n }\n }\n gl_FragColor = vec4(0.0,0.0,0.0,1.0);\n @import clay.util.logdepth_fragment_main\n}\n@end";
+// Shader for prez pass
+
+import {
+  VertexShader,
+  glsl,
+  createVarying,
+  createUniform,
+  createSemanticUniform,
+  createAttribute,
+  FragmentShader
+} from '../../Shader';
+import { instancing, logDepthFragment, logDepthVertex, skinning } from './util.glsl';
+
+export const preZVertex = new VertexShader({
+  defines: {
+    SHADER_NAME: 'prez'
+  },
+  varyings: {
+    v_Texcoord: createVarying('vec2'),
+    ...logDepthVertex.varyings
+  },
+  uniforms: {
+    WVP: createSemanticUniform('mat4', 'WORLDVIEWPROJECTION'),
+    uvRepeat: createUniform('vec2', [1, 1]),
+    uvOffset: createUniform('vec2', [0, 0]),
+    ...skinning.uniforms,
+    ...logDepthFragment.uniforms
+  },
+  attributes: {
+    pos: createAttribute('vec3', 'POSITION'),
+    uv: createAttribute('vec2', 'TEXCOORD_0'),
+    ...skinning.attributes,
+    ...instancing.attributes
+  },
+  code: glsl`
+
+${skinning.code.header}
+${instancing.code}
+${logDepthVertex.code}
+
+void main() {
+  vec4 P = vec4(pos, 1.0);
+
+#ifdef SKINNING
+  skinm
+  @import clay.chunk.skin_matrix
+  P = skinMatrixWS * P;
+#endif
+
+#ifdef INSTANCING
+  @import clay.chunk.instancing_matrix
+  P = instanceMat * P;
+#endif
+  gl_Position = WVP * P;
+  v_Texcoord = uv * uvRepeat + uvOffset;
+
+  @import clay.util.logdepth_vertex_main
+}`
+});
+
+export const preZFragment = new FragmentShader({
+  uniforms: {
+    alphaMap: createUniform('sampler2D'),
+    alphaCutoff: createUniform('float', 0),
+    ...logDepthFragment.uniforms
+  },
+  // Varyings will be shared from vertex
+  code: glsl`
+void main() {
+  if (alphaCutoff > 0.0) {
+    if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {
+      discard;
+    }
+  }
+  gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+
+  ${logDepthFragment.code}
+}`
+});
