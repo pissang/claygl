@@ -10,7 +10,7 @@ import Vector2 from './math/Vector2';
 import ProgramManager from './gpu/ProgramManager';
 
 // Light header
-import Shader, { AttributeSemantic } from './Shader';
+import Shader, { AttributeSemantic, BASIC_MATRIX_SEMANTICS, MatrixSemantic } from './Shader';
 
 // import prezEssl from './shader/source/prez.glsl.js';
 // Shader.import(prezEssl);
@@ -825,7 +825,7 @@ class Renderer extends Notifier {
             ? // TODO
               renderable.offsetMatrix
               ? renderable.offsetMatrix.array
-              : matrices.IDENTITY
+              : IDENTITY_MATRIX
             : renderable.worldTransform!.array;
       }
       const geometry = renderable.geometry;
@@ -1599,36 +1599,13 @@ class Renderer extends Notifier {
   static DEPTH_BUFFER_BIT = constants.DEPTH_BUFFER_BIT;
   static STENCIL_BUFFER_BIT = constants.STENCIL_BUFFER_BIT;
 }
+const IDENTITY_MATRIX = mat4Create();
+const matrices = {} as Record<MatrixSemantic, mat4.Mat4Array>;
 // Temporary variables
-const matrices: Record<string, mat4.Mat4Array> = {
-  IDENTITY: mat4Create(),
-
-  WORLD: mat4Create(),
-  VIEW: mat4Create(),
-  PROJECTION: mat4Create(),
-  WORLDVIEW: mat4Create(),
-  VIEWPROJECTION: mat4Create(),
-  WORLDVIEWPROJECTION: mat4Create(),
-
-  WORLDINVERSE: mat4Create(),
-  VIEWINVERSE: mat4Create(),
-  PROJECTIONINVERSE: mat4Create(),
-  WORLDVIEWINVERSE: mat4Create(),
-  VIEWPROJECTIONINVERSE: mat4Create(),
-  WORLDVIEWPROJECTIONINVERSE: mat4Create(),
-
-  WORLDTRANSPOSE: mat4Create(),
-  VIEWTRANSPOSE: mat4Create(),
-  PROJECTIONTRANSPOSE: mat4Create(),
-  WORLDVIEWTRANSPOSE: mat4Create(),
-  VIEWPROJECTIONTRANSPOSE: mat4Create(),
-  WORLDVIEWPROJECTIONTRANSPOSE: mat4Create(),
-  WORLDINVERSETRANSPOSE: mat4Create(),
-  VIEWINVERSETRANSPOSE: mat4Create(),
-  PROJECTIONINVERSETRANSPOSE: mat4Create(),
-  WORLDVIEWINVERSETRANSPOSE: mat4Create(),
-  VIEWPROJECTIONINVERSETRANSPOSE: mat4Create(),
-  WORLDVIEWPROJECTIONINVERSETRANSPOSE: mat4Create()
-};
-
+BASIC_MATRIX_SEMANTICS.forEach((semantic) => {
+  matrices[semantic] = mat4Create();
+  matrices[`${semantic}INVERSE`] = mat4Create();
+  matrices[`${semantic}TRANSPOSE`] = mat4Create();
+  matrices[`${semantic}INVERSETRANSPOSE`] = mat4Create();
+});
 export default Renderer;

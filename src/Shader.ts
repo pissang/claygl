@@ -124,7 +124,7 @@ export const BASIC_MATRIX_SEMANTICS = [
   'WORLDVIEW',
   'VIEWPROJECTION',
   'WORLDVIEWPROJECTION'
-];
+] as const;
 
 type MatrixSemanticNoTranpose =
   | 'WORLD'
@@ -139,7 +139,7 @@ type MatrixSemanticNoTranpose =
   | 'WORLDVIEWINVERSE'
   | 'VIEWPROJECTIONINVERSE'
   | 'WORLDVIEWPROJECTIONINVERSE';
-type MatrixSemantic =
+export type MatrixSemantic =
   | MatrixSemanticNoTranpose
   | 'WORLDTRANSPOSE'
   | 'VIEWTRANSPOSE'

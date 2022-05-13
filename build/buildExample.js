@@ -2,7 +2,7 @@ const esbuild = require('esbuild');
 const glob = require('glob');
 const path = require('path');
 
-glob(path.resolve(__dirname, '../example/*.ts'), async (err, files) => {
+glob(path.resolve(__dirname, '../example/triangle_customshader.ts'), async (err, files) => {
   for (let file of files) {
     const basename = path.basename(file);
     esbuild.build({
