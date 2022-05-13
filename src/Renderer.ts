@@ -951,7 +951,7 @@ class Renderer extends Notifier {
         prevMaterial = material;
       }
 
-      const matrixSemanticKeys = shader.matrixSemanticKeys;
+      const matrixSemanticKeys = shader.matrixSemantics;
 
       if (isSceneNode) {
         for (let k = 0; k < matrixSemanticKeys.length; k++) {
