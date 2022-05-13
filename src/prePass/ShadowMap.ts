@@ -27,6 +27,7 @@ import Light from '../Light';
 import DirectionalLight from '../light/Directional';
 import SpotLight from '../light/Spot';
 import PointLight from '../light/Point';
+import { assign } from '../core/util';
 
 Shader.import(shadowmapEssl);
 
@@ -136,7 +137,7 @@ class ShadowMapPass extends Notifier {
 
   constructor(opts?: Partial<ShadowMapPassOpts>) {
     super();
-    Object.assign(this, opts);
+    assign(this, opts);
   }
 
   /**

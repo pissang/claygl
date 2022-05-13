@@ -4,6 +4,7 @@ import * as mathUtil from './math/util';
 import vendor from './core/vendor';
 import Renderer from './Renderer';
 import { GLEnum } from './core/type';
+import { keys } from './core/util';
 
 const isPowerOfTwo = mathUtil.isPowerOfTwo;
 
@@ -251,7 +252,7 @@ class TextureCube extends Texture {
   load(imageList: Record<CubeTarget, string>, crossOrigin?: string) {
     let loading = 0;
     this.image = {} as Record<CubeTarget, TextureImageSource>;
-    (Object.keys(imageList) as CubeTarget[]).forEach((target) => {
+    (keys(imageList) as CubeTarget[]).forEach((target) => {
       const src = imageList[target];
       const image = vendor.createImage();
       if (crossOrigin) {

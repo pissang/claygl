@@ -8,6 +8,7 @@ import Notifier from './core/Notifier';
 import Renderer from './Renderer';
 import { isPowerOfTwo } from './math/util';
 import { GLEnum } from './core/type';
+import { assign } from './core/util';
 
 export type TextureImageSource = HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
 export type TexturePixelSource = Uint8Array | Float32Array;
@@ -119,7 +120,7 @@ abstract class Texture extends Notifier {
   constructor(opts?: Partial<TextureOpts>) {
     super();
 
-    Object.assign(this, opts);
+    assign(this, opts);
   }
 
   get width() {

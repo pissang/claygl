@@ -1,4 +1,5 @@
 import Camera, { CameraOpts } from '../Camera';
+import { assign } from '../core/util';
 
 export interface OrthographicCameraOpts extends CameraOpts {
   left: number;
@@ -23,7 +24,7 @@ class OrthographicCamera extends Camera {
 
   constructor(opts?: Partial<OrthographicCameraOpts>) {
     super(opts);
-    Object.assign(this, opts || {});
+    assign(this, opts || {});
     this.update();
   }
 

@@ -251,7 +251,7 @@ export function load(
   return new Promise((resolve, reject) => {
     doLoadGLTF(
       url,
-      Object.assign({}, opts, {
+      util.assign({}, opts, {
         onload(res: GLTFLoadResult) {
           resolve(res);
         },
@@ -264,7 +264,7 @@ export function load(
 }
 
 function doLoadGLTF(url: string, opts?: Partial<GLTFLoadOpts>) {
-  opts = Object.assign(
+  opts = assign(
     {
       useStandardMaterial: false,
 
@@ -834,7 +834,7 @@ function pbrMetallicRoughnessToStandard(
   }
   if (isStandardMaterial) {
     material = new StandardMaterial(
-      Object.assign(
+      util.assign(
         {
           name: materialInfo.name,
           alphaTest: alphaTest,
@@ -1008,7 +1008,7 @@ function parseMeshes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpt
       });
       geometry.boundingBox = new BoundingBox();
       // Parse attributes
-      const semantics = Object.keys(primitiveInfo.attributes);
+      const semantics = util.keys(primitiveInfo.attributes);
       for (let ss = 0; ss < semantics.length; ss++) {
         const semantic = semantics[ss];
         const accessorIdx = primitiveInfo.attributes[semantic];

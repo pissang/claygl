@@ -7,6 +7,7 @@ import * as constants from '../core/constants';
 import type ShadowMapPass from './ShadowMap';
 import type Renderer from '../Renderer';
 import type Scene from '../Scene';
+import { assign } from '../core/util';
 
 interface EnvironmentMapPassOpts {
   /**
@@ -80,7 +81,7 @@ class EnvironmentMapPass {
   private _frameBuffer: FrameBuffer;
 
   constructor(opts?: Partial<EnvironmentMapPassOpts>) {
-    Object.assign(this, opts);
+    assign(this, opts);
 
     const cameras = (this._cameras = cubeTargets.reduce((obj, target) => {
       obj[target] = new PerspectiveCamera({ fov: 90 });

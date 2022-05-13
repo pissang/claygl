@@ -1,6 +1,6 @@
 import ClayCache from './core/Cache';
 import Ray from './math/Ray';
-import { genGUID } from './core/util';
+import { genGUID, keys } from './core/util';
 import { Vec3Array } from './glmatrix/common';
 
 import type Renderer from './Renderer';
@@ -347,7 +347,7 @@ class GeometryBase {
     this.indices = opts.indices;
     this.dynamic = opts.dynamic || false;
 
-    this._attributeList = Object.keys(this.attributes);
+    this._attributeList = keys(this.attributes);
   }
   get vertexCount() {
     let mainAttribute = this.attributes[this.mainAttribute];

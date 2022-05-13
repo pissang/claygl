@@ -1,4 +1,4 @@
-import { genGUID } from '../core/util';
+import { genGUID, keys } from '../core/util';
 import type Renderer from '../Renderer';
 import Shader, { ParsedUniformSemantic } from '../Shader';
 import type Texture from '../Texture';
@@ -342,7 +342,7 @@ class GLProgram {
       _gl.bindAttribLocation(program, 0, shader.attributeSemantics.POSITION.symbol);
     } else {
       // Else choose an attribute and bind to location 0;
-      const keys = Object.keys(this.attributes);
+      const keys = keys(this.attributes);
       _gl.bindAttribLocation(program, 0, keys[0]);
     }
 

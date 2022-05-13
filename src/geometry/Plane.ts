@@ -1,3 +1,4 @@
+import { assign } from '../core/util';
 import Geometry, { GeometryOpts } from '../Geometry';
 import BoundingBox from '../math/BoundingBox';
 
@@ -13,7 +14,7 @@ class PlaneGeometry extends Geometry {
 
   constructor(opts?: Partial<PlaneGeometryOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
     this.build();
   }
   /**

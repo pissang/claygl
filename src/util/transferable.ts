@@ -43,7 +43,7 @@ interface DataObject {
  */
 export function toObject(geometry: GeometryBase, shallow?: boolean) {
   const data = {
-    meta: Object.assign({}, META)
+    meta: util.assign({}, META)
   } as DataObject;
   //transferable buffers
   const buffers: ArrayBuffer[] = [];

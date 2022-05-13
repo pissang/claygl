@@ -33,6 +33,9 @@ export function startTimeline(onframe?: (deltaTime: number) => void) {
 
 export * as constants from './core/constants';
 
+// Shader
+export { glsl } from './Shader_';
+
 // Camera
 export {
   Perspective as PerspectiveCamera,

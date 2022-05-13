@@ -5,6 +5,7 @@ import { Color } from './core/type';
 import Texture2D from './Texture2D';
 import type TextureCube from './TextureCube';
 import type BoundingBox from './math/BoundingBox';
+import { assign } from './core/util';
 
 const TEXTURE_PROPERTIES = [
   'diffuseMap',
@@ -177,7 +178,7 @@ class StandardMaterial extends Material {
     }
     this.shader = standardShader;
 
-    Object.assign(this, defaultStandardMaterialOpts, opts);
+    assign(this, defaultStandardMaterialOpts, opts);
   }
 
   clone() {

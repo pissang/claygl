@@ -3,6 +3,7 @@ import PlaneGeometry from './Plane';
 import Matrix4 from '../math/Matrix4';
 import Vector3 from '../math/Vector3';
 import BoundingBox from '../math/BoundingBox';
+import { assign } from '../core/util';
 
 const planeMatrix = new Matrix4();
 export interface CubeGeometryOpts extends GeometryOpts {
@@ -24,7 +25,7 @@ class CubeGeometry extends Geometry {
 
   constructor(opts?: Partial<CubeGeometryOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
     this.build();
   }
 

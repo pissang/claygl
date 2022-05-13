@@ -1,3 +1,4 @@
+import { keys } from '../core/util';
 import FrameBuffer from '../FrameBuffer';
 import Renderer from '../Renderer';
 import CompositeNode, { CompositeNodeInput } from './CompositeNode';
@@ -94,7 +95,7 @@ class Compositor {
       let inputPin = input.output;
       if (!inputPin && outputs) {
         // Use first pin defaultly
-        inputPin = Object.keys(outputs)[0];
+        inputPin = keys(outputs)[0];
       }
       if (!inputPin) {
         return;
@@ -121,7 +122,7 @@ class Compositor {
       node: CompositeNode,
       cb: (inputInfo: CompositeNodeInput, inputName: string) => void
     ) {
-      Object.keys(node.inputs || {}).forEach((inputName) => {
+      keys(node.inputs || {}).forEach((inputName) => {
         let inputInfo = node.inputs![inputName];
         if (!inputInfo) {
           return;

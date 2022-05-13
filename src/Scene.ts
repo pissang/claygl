@@ -24,7 +24,7 @@ const cullingMatrix = new Matrix4();
 
 function getProgramKey(lightNumbers: Record<string, number>) {
   const defineStr = [];
-  const lightTypes = Object.keys(lightNumbers);
+  const lightTypes = util.keys(lightNumbers);
   lightTypes.sort();
   for (let i = 0; i < lightTypes.length; i++) {
     const lightType = lightTypes[i];

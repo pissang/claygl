@@ -64,7 +64,7 @@ const defaultParams: Partial<PoolParameters> = {
   anisotropic: 1
 } as const;
 
-const defaultParamPropList = Object.keys(defaultParams);
+const defaultParamPropList = util.keys(defaultParams);
 
 function generateKey(parameters: Partial<PoolParameters>) {
   util.defaults(parameters, defaultParams);

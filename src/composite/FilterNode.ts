@@ -4,6 +4,7 @@ import FullscreenQuadPass from './Pass';
 import Renderer from '../Renderer';
 import FrameBuffer from '../FrameBuffer';
 import Texture from '../Texture';
+import { keys } from '../core/util';
 
 /**
  * Filter node
@@ -62,7 +63,7 @@ class CompositeFilterNode extends CompositeNode {
     const pass = this.pass;
 
     pass.material?.disableTexturesAll();
-    Object.keys(inputTextures).forEach((inputName) => {
+    keys(inputTextures).forEach((inputName) => {
       // Enabled the pin texture in shader
       this.pass.material!.enableTexture(inputName);
       pass.setUniform(inputName, inputTextures[inputName]);
@@ -99,7 +100,7 @@ class CompositeFilterNode extends CompositeNode {
    * Set parameters
    */
   setParameters(obj: Record<string, any>) {
-    Object.keys(obj).forEach((key) => {
+    keys(obj).forEach((key) => {
       this.setParameter(key, obj[key]);
     });
   }

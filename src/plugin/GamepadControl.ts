@@ -3,6 +3,7 @@ import vendor from '../core/vendor';
 import Notifier from '../core/Notifier';
 import type ClayNode from '../Node';
 import type Timeline from '../Timeline';
+import { assign } from '../core/util';
 
 const addEvent = vendor.addEventListener;
 const removeEvent = vendor.removeEventListener;
@@ -81,7 +82,7 @@ class GamepadControl extends Notifier {
     }
   ) {
     super();
-    Object.assign(
+    assign(
       this,
       {
         moveSpeed: 0.1,

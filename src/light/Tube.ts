@@ -1,3 +1,4 @@
+import { assign } from '../core/util';
 import Light, { LightOpts } from '../Light';
 import Vector3 from '../math/Vector3';
 
@@ -15,7 +16,7 @@ class TubeLight extends Light {
 
   constructor(opts?: Partial<TubeLightOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
   }
 
   clone() {

@@ -3,6 +3,7 @@ import vendor from '../core/vendor';
 import ClayNode from '../Node';
 import Timeline from '../Timeline';
 import Notifier from '../core/Notifier';
+import { assign } from '../core/util';
 
 const addEvent = vendor.addEventListener;
 const removeEvent = vendor.removeEventListener;
@@ -77,7 +78,7 @@ class FreeControl extends Notifier {
   ) {
     super();
 
-    Object.assign(
+    assign(
       this,
       {
         sensitivity: 1,

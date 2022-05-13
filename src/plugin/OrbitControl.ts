@@ -10,6 +10,7 @@ import type { vec3 } from '../glmatrix';
 import type { AnimationEasing } from '../animation/easing';
 import type ProceduralKeyframeAnimator from '../animation/ProceduralKeyframeAnimator';
 import OrthographicCamera from '../camera/Orthographic';
+import { assign } from '../core/util';
 
 const addEvent = vendor.addEventListener;
 const removeEvent = vendor.removeEventListener;
@@ -181,7 +182,7 @@ class OrbitControl extends Notifier {
     this.timeline = opts.timeline;
 
     this.setOption(
-      Object.assign(
+      assign(
         {
           autoRotate: false,
           autoRotateAfterStill: 0,

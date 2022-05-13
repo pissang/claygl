@@ -1,3 +1,4 @@
+import { assign } from '../core/util';
 import Light, { LightOpts } from '../Light';
 import Vector3 from '../math/Vector3';
 
@@ -35,7 +36,7 @@ class DirectionalLight extends Light {
 
   constructor(opts?: Partial<DirectionalLightOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
   }
 
   clone() {

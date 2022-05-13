@@ -1,5 +1,5 @@
 import { parse } from '../core/color';
-import { isArrayLike, isFunction, isNumber, isString } from '../core/util';
+import { isArrayLike, isFunction, isNumber, isString, keys } from '../core/util';
 import Timeline from '../Timeline';
 import { Animator } from './Animator';
 import Clip from './Clip';
@@ -595,7 +595,7 @@ export default class ProceduralKeyframeAnimator<T = any> implements Animator {
    * @param easing
    */
   when(time: number, props: Record<string, any>, easing?: AnimationEasing) {
-    return this.whenWithKeys(time, props, Object.keys(props) as string[], easing);
+    return this.whenWithKeys(time, props, keys(props) as string[], easing);
   }
 
   // Fast path for add keyframes of aniamteTo

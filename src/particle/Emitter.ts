@@ -1,6 +1,7 @@
 import Vector3 from '../math/Vector3';
 import Particle from './Particle';
 import * as Value from '../math/Value';
+import { assign } from '../core/util';
 
 interface ParticleEmitterOpts {
   /**
@@ -59,7 +60,7 @@ class ParticleEmitter {
 
   _particlePool: Particle[] = [];
   constructor(opts?: Partial<ParticleEmitterOpts>) {
-    Object.assign(this, opts);
+    assign(this, opts);
 
     // TODO Reduce heap memory
     for (let i = 0; i < this.max; i++) {

@@ -1,3 +1,4 @@
+import { assign } from '../core/util';
 import Geometry, { GeometryOpts } from '../Geometry';
 import ConeGeometry from './Cone';
 
@@ -17,7 +18,7 @@ class CylinderGeometry extends Geometry {
 
   constructor(opts?: Partial<CylinderGeometryOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
     this.build();
   }
 

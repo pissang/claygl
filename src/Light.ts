@@ -1,4 +1,5 @@
 import { Color } from './core/type';
+import { assign } from './core/util';
 import type Mesh from './Mesh';
 import ClayNode, { ClayNodeOpts } from './Node';
 import Shader from './Shader';
@@ -65,7 +66,7 @@ class Light extends ClayNode {
 
   constructor(opts?: Partial<LightOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
   }
   /**
    * @return {clay.Light}

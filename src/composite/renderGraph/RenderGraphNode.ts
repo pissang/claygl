@@ -1,6 +1,6 @@
 import { COLOR_ATTACHMENT0 } from '../../core/constants';
 import { GLEnum } from '../../core/type';
-import { isFunction } from '../../core/util';
+import { isFunction, keys } from '../../core/util';
 import type FrameBuffer from '../../FrameBuffer';
 import type Renderer from '../../Renderer';
 import type Texture from '../../Texture';
@@ -64,7 +64,7 @@ class RenderGraphNode {
       parametersCopy = {};
       parametersCopyMap.set(outputInfo, parametersCopy);
     }
-    Object.keys(parameters).forEach((key) => {
+    keys(parameters).forEach((key) => {
       if (key !== 'width' && key !== 'height') {
         (parametersCopy as any)[key] = (parameters as any)[key];
       }
@@ -118,7 +118,7 @@ class RenderGraphNode {
   }
 
   hasOutput() {
-    return Object.keys(this._outputs).length > 0;
+    return keys(this._outputs).length > 0;
   }
 
   render(renderer: Renderer, finalFrameBuffer?: FrameBuffer) {
@@ -126,9 +126,9 @@ class RenderGraphNode {
 
     const renderGraph = this._renderGraph;
     const inputLinks = this._inputs || {};
-    const inputNames = Object.keys(inputLinks);
+    const inputNames = keys(inputLinks);
     const outputLinks = this._outputs || {};
-    const outputNames = Object.keys(outputLinks);
+    const outputNames = keys(outputLinks);
     const sharedFrameBuffer = renderGraph.getFrameBuffer();
 
     const inputTextures: Record<string, Texture> = {};

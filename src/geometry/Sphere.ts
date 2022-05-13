@@ -1,3 +1,4 @@
+import { assign } from '../core/util';
 import Geometry, { GeometryOpts } from '../Geometry';
 import { vec3 } from '../glmatrix';
 import BoundingBox from '../math/BoundingBox';
@@ -27,7 +28,7 @@ class SphereGeometry extends Geometry {
 
   constructor(opts?: Partial<SphereGeometryOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
     this.build();
   }
   build() {

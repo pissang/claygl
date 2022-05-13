@@ -1,3 +1,4 @@
+import { keys } from '../core/util';
 import type FrameBuffer from '../FrameBuffer';
 import type Renderer from '../Renderer';
 import type Texture from '../Texture';
@@ -49,7 +50,7 @@ class GroupCompositeNode extends CompositeNode {
       nodes.push(node);
 
       if (linksToInput) {
-        Object.keys(linksToInput).forEach((nodeInputName) => {
+        keys(linksToInput).forEach((nodeInputName) => {
           this._inputLinks[linksToInput[nodeInputName]] = {
             node,
             input: nodeInputName
@@ -58,7 +59,7 @@ class GroupCompositeNode extends CompositeNode {
       }
 
       if (linksToOutput) {
-        Object.keys(linksToOutput).forEach((nodeOutputName) => {
+        keys(linksToOutput).forEach((nodeOutputName) => {
           this._outputLinks[linksToOutput[nodeOutputName]] = {
             node,
             output: nodeOutputName
@@ -79,12 +80,12 @@ class GroupCompositeNode extends CompositeNode {
     if (idx >= 0) {
       nodes.splice(idx, 1);
 
-      Object.keys(inputLinks).forEach((groupInputName) => {
+      keys(inputLinks).forEach((groupInputName) => {
         if (inputLinks[groupInputName].node === node) {
           delete inputLinks[groupInputName];
         }
       });
-      Object.keys(outputLinks).forEach((groupOutputName) => {
+      keys(outputLinks).forEach((groupOutputName) => {
         if (outputLinks[groupOutputName].node === node) {
           delete outputLinks[groupOutputName];
         }

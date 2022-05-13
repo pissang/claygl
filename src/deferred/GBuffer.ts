@@ -13,7 +13,7 @@ import chunkEssl from '../shader/source/deferred/chunk.glsl.js';
 import Renderer, { RenderableObject, RendererViewport } from '../Renderer';
 import Camera from '../Camera';
 import Scene from '../Scene';
-import { optional } from '../core/util';
+import { assign, optional } from '../core/util';
 import { importSharedShader } from '../shader/shared';
 
 importSharedShader();
@@ -169,7 +169,7 @@ class DeferredGBuffer {
   // - B: normal.z
   // - A: glossiness
   private _gBufferTex1 = new Texture2D(
-    Object.assign(
+    assign(
       {
         // PENDING
         type: constants.HALF_FLOAT_OES
@@ -180,7 +180,7 @@ class DeferredGBuffer {
 
   // - R: depth
   private _gBufferTex2 = new Texture2D(
-    Object.assign(
+    assign(
       {
         // format: constants.DEPTH_COMPONENT,
         // type: constants.UNSIGNED_INT
@@ -199,7 +199,7 @@ class DeferredGBuffer {
   private _gBufferTex3 = new Texture2D(commonTextureOpts);
 
   private _gBufferTex4 = new Texture2D(
-    Object.assign(
+    assign(
       {
         // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
         type: constants.HALF_FLOAT_OES

@@ -171,7 +171,7 @@ class App3D extends Notifier {
 
   constructor(container: HTMLElement | string, opts?: App3DOpts) {
     super();
-    opts = Object.assign({}, opts);
+    opts = util.assign({}, opts);
 
     this._autoRender = util.optional(opts.autoRender, true);
     const graphicOpts = (this._graphicOpts = opts.graphic || {});
@@ -485,7 +485,7 @@ class App3D extends Notifier {
           }
         );
 
-        Object.assign(texture, opts);
+        assign(texture, opts);
       } else {
         texture.load(urlOrImg);
       }
@@ -564,7 +564,7 @@ class App3D extends Notifier {
     if (typeof imgList.px === 'string') {
       textureCube.load(imgList as Record<CubeTarget, string>);
     } else {
-      textureCube.image = Object.assign({}, imgList) as Record<CubeTarget, TextureImageSource>;
+      textureCube.image = assign({}, imgList) as Record<CubeTarget, TextureImageSource>;
     }
     return textureCube;
   }
@@ -600,7 +600,7 @@ class App3D extends Notifier {
         return texture;
       };
     }
-    Object.keys(matConfig).forEach((uniformName) => {
+    util.keys(matConfig).forEach((uniformName) => {
       const val = matConfig![uniformName];
       if (uniforms[uniformName] && val != null) {
         if (

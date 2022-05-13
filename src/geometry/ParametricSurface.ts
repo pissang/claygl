@@ -1,3 +1,4 @@
+import { assign } from '../core/util';
 import Geometry, { GeometryOpts } from '../Geometry';
 
 interface SurfaceGenerator {
@@ -16,7 +17,7 @@ interface ParametricSurfaceGeometry extends ParametricSurfaceGeometryOpts {}
 class ParametricSurfaceGeometry extends Geometry {
   constructor(opts?: Partial<ParametricSurfaceGeometryOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
     this.build();
   }
 

@@ -2,6 +2,7 @@ import Geometry, { GeometryOpts } from '../Geometry';
 import BoundingBox from '../math/BoundingBox';
 import * as vec3 from '../glmatrix/vec3';
 import * as vec2 from '../glmatrix/vec2';
+import { assign } from '../core/util';
 
 export interface ConeGeometryOpts extends GeometryOpts {
   topRadius: number;
@@ -24,7 +25,7 @@ class ConeGeometry extends Geometry {
 
   constructor(opts?: Partial<ConeGeometryOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
     this.build();
   }
 

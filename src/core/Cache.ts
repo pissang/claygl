@@ -89,7 +89,7 @@ class ClayCache<D extends Record<string, any> = Record<string, any>> {
   }
 
   eachContext(cb: (key: string) => void) {
-    const keys = Object.keys(this._caches);
+    const keys = util.keys(this._caches);
     keys.forEach(function (key) {
       cb(key);
     });

@@ -3,6 +3,7 @@ import vendor from '../core/vendor';
 import type Renderer from '../Renderer';
 import type ClayNode from '../Node';
 import Scene from '../Scene';
+import { assign } from '../core/util';
 
 // TODO Use pointer event
 const EVENT_NAMES = [
@@ -46,7 +47,7 @@ function packageEvent(
   offsetY: number,
   wheelDelta?: number
 ) {
-  return Object.assign(
+  return assign(
     {
       type: eventType,
       offsetX: offsetX,

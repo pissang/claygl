@@ -8,7 +8,7 @@ import particleEssl from './particle.glsl.js';
 import ParticleEmitter from './Emitter';
 import ParticleField from './Field';
 import Particle from './Particle';
-import { optional } from '../core/util';
+import { assign, optional } from '../core/util';
 import Renderer from '../Renderer';
 Shader.import(particleEssl);
 
@@ -81,7 +81,7 @@ class ParticleRenderable extends Renderable {
     super(opts);
     opts = opts || {};
 
-    Object.assign(this, opts);
+    assign(this, opts);
     this.geometry = new Geometry({
       dynamic: true
     });

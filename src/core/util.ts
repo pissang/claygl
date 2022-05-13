@@ -133,7 +133,7 @@ export function clone<T>(obj: T): T {
     }
     return ret;
   } else {
-    return Object.assign({}, obj);
+    return assign({}, obj);
   }
 }
 
@@ -144,3 +144,9 @@ export function hasOwn(obj: any, key: string) {
 export function optional<T>(val: T, defaultVal: Exclude<T, undefined | null>) {
   return val == null ? defaultVal : (val as Exclude<T, undefined | null>);
 }
+
+export function keys(obj?: any): string[] {
+  return Object.keys(obj || {});
+}
+
+export const assign = Object.assign;

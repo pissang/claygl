@@ -15,7 +15,7 @@ type MaterialUniformValue =
 const programKeyCache: Record<string, string> = {};
 
 function getDefineCode(defines: Record<string, ShaderDefineValue>) {
-  const defineKeys = Object.keys(defines);
+  const defineKeys = util.keys(defines);
   defineKeys.sort();
   const defineStr = [];
   // Custom Defines
@@ -140,8 +140,8 @@ class Material {
     this.transparent = opts.transparent || false;
     this.precision = opts.precision || 'highp';
 
-    Object.assign(this.vertexDefines, opts.vertexDefines);
-    Object.assign(this.fragmentDefines, opts.fragmentDefines);
+    util.assign(this.vertexDefines, opts.vertexDefines);
+    assign(this.fragmentDefines, opts.fragmentDefines);
   }
 
   get shader() {
@@ -245,7 +245,7 @@ class Material {
     this._shader = shader;
 
     const uniforms = this.uniforms;
-    this._enabledUniforms = Object.keys(uniforms);
+    this._enabledUniforms = util.keys(uniforms);
     // Make sure uniforms are set in same order to avoid texture slot wrong
     this._enabledUniforms.sort();
     this._textureUniforms = this._enabledUniforms.filter((uniformName) => {

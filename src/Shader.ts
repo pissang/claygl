@@ -556,7 +556,7 @@ class Shader {
     shaderType = 'fragment';
     this._fragmentCode = this._fragmentCode.replace(uniformRegex, _uniformParser);
 
-    self.matrixSemanticKeys = Object.keys(this.matrixSemantics);
+    self.matrixSemanticKeys = util.keys(this.matrixSemantics);
 
     function makeDefaultValueFunc(value: any) {
       return value != null

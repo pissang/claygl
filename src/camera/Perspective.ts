@@ -1,4 +1,5 @@
 import Camera, { CameraOpts } from '../Camera';
+import { assign } from '../core/util';
 
 export interface PerspectiveCameraOpts extends CameraOpts {
   /**
@@ -28,7 +29,7 @@ class PerspectiveCamera extends Camera {
 
   constructor(opts?: Partial<PerspectiveCameraOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
     this.update();
   }
 

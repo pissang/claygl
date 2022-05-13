@@ -1,3 +1,4 @@
+import { assign } from '../core/util';
 import Light, { LightOpts } from '../Light';
 
 export interface SpotLightOpts extends LightOpts {
@@ -21,7 +22,7 @@ class SpotLight extends Light {
 
   constructor(opts?: Partial<SpotLightOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
   }
   clone() {
     const light = super.clone();

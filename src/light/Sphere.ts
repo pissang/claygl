@@ -1,3 +1,4 @@
+import { assign } from '../core/util';
 import Light, { LightOpts } from '../Light';
 
 export interface SphereLightOpts extends LightOpts {
@@ -13,7 +14,7 @@ class SphereLight extends Light {
 
   constructor(opts?: Partial<SphereLightOpts>) {
     super(opts);
-    Object.assign(this, opts);
+    assign(this, opts);
   }
 
   clone() {
