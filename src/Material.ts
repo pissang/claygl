@@ -1,6 +1,12 @@
 import * as util from './core/util';
 import * as colorUtil from './core/color';
-import Shader, { ShaderDefineValue, ShaderPrecision, ShaderType, MaterialUniform } from './Shader';
+import Shader, {
+  ShaderDefineValue,
+  ShaderPrecision,
+  ShaderType,
+  VertexShader,
+  FragmentShader
+} from './Shader';
 import Texture from './Texture';
 
 type MaterialUniformValue =
@@ -111,7 +117,12 @@ const material = new clay.Material({
  * @constructor clay.Material
  * @extends clay.core.Base
  */
-class Material<T extends Shader = Shader> {
+class Material<
+  // PENDING
+  // Use any by default to avoid assigning error because key type in get() method is not compatitable.
+  // like: renderPass([{ material }])
+  T extends Shader = Shader<VertexShader<any, any, any, any>, FragmentShader<any, any, any>>
+> {
   readonly __uid__: number = util.genGUID();
 
   name: string;
@@ -386,7 +397,7 @@ class Material<T extends Shader = Shader> {
    * For example, if texture symbol is diffuseMap, it will add a line `#define DIFFUSEMAP_ENABLED` in the shader code
    * @param  {string} symbol
    */
-  enableTexture<K extends keyof PickTextureUniforms<T['uniformTpls']>>(symbol: K) {
+  enableTexture(symbol: keyof PickTextureUniforms<T['uniformTpls']>) {
     if (Array.isArray(symbol)) {
       for (let i = 0; i < symbol.length; i++) {
         this.enableTexture(symbol[i]);
@@ -418,7 +429,7 @@ class Material<T extends Shader = Shader> {
    * Disable a texture, it remove a #define macro in the shader
    * @param  {string} symbol
    */
-  disableTexture(symbol: string) {
+  disableTexture(symbol: keyof PickTextureUniforms<T['uniformTpls']>) {
     if (Array.isArray(symbol)) {
       for (let i = 0; i < symbol.length; i++) {
         this.disableTexture(symbol[i]);
