@@ -129,7 +129,7 @@ class ShadowMapPass extends Notifier {
     directional?: OrthoCamera;
     spot?: PerspectiveCamera;
   } = {};
-  private _lightMaterials: Record<number, Material> = {};
+  private _lightMaterials: Record<string, Material> = {};
 
   private _texturePool = new TexturePool();
 

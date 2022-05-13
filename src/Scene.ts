@@ -237,7 +237,7 @@ class Scene extends ClayNode {
    */
   cloneNode(node: ClayNode) {
     const newNode = node.clone();
-    const clonedNodesMap: Record<number, ClayNode> = {};
+    const clonedNodesMap: Record<string, ClayNode> = {};
     function buildNodesMap(sNode: ClayNode, tNode: ClayNode) {
       clonedNodesMap[sNode.__uid__] = tNode;
 

@@ -1436,7 +1436,7 @@ class Renderer extends Notifier {
     if (parent) {
       parent.remove(root);
     }
-    const disposedMap: Record<number, boolean> = {};
+    const disposedMap: Record<string, boolean> = {};
     root.traverse((node) => {
       const material = (node as Renderable).material;
       if ((node as Renderable).geometry && disposeGeometry) {

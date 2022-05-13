@@ -13,7 +13,7 @@ type ShaderState = 0 | 1 | 2 | 3;
 // Enable attribute operation is global to all programs
 // Here saved the list of all enabled attribute index
 // http://www.mjbshaw.com/2013/03/webgl-fixing-invalidoperation.html
-const enabledAttributeList: Record<number, ShaderState[]> = {};
+const enabledAttributeList: Record<string, ShaderState[]> = {};
 
 // some util functions
 function addLineNumbers(string: string) {

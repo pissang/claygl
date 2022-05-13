@@ -367,7 +367,7 @@ class Skeleton {
     }
   }
 
-  clone(clonedNodesMap: Record<number, ClayNode>) {
+  clone(clonedNodesMap: Record<string, ClayNode>) {
     const skeleton = new Skeleton();
     skeleton.name = this.name;
 
