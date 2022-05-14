@@ -3,13 +3,12 @@ import Texture2D from '../Texture2D';
 import Shader from '../Shader';
 import Material from '../Material';
 
-import colorEssl from './color.glsl.js';
 import type Renderer from '../Renderer';
 import type Camera from '../Camera';
 import type Scene from '../Scene';
 import type ClayNode from '../Node';
 import type Renderable from '../Renderable';
-Shader.import(colorEssl);
+import { colorFragment, colorVertex } from './color.glsl';
 
 /**
  * Pixel picking is gpu based picking, which is fast and accurate.
@@ -33,10 +32,7 @@ class PixelPicking {
 
   private _frameBuffer = new FrameBuffer();
   private _texture = new Texture2D();
-  private _shader = new Shader(
-    Shader.source('clay.picking.color.vertex'),
-    Shader.source('clay.picking.color.fragment')
-  );
+  private _shader = new Shader(colorVertex, colorFragment);
 
   _idMaterials: Material[] = [];
   _lookupTable: Renderable[] = [];
@@ -98,9 +94,7 @@ class PixelPicking {
         const idx = id - this.lookupOffset;
         let material = this._idMaterials[idx];
         if (!material) {
-          material = new Material({
-            shader: this._shader
-          });
+          material = new Material(this._shader);
           const color = packID(id);
           color[0] /= 255;
           color[1] /= 255;

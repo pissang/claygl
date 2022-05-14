@@ -40,7 +40,7 @@ import Camera from './Camera';
 import { EventManager } from './app/EventManager';
 import type Renderable from './Renderable';
 import Shader from './Shader';
-import StandardMRShader from './shader/StandardMRShader';
+import StandardShader from './shader/StandardShader';
 import Geometry from './Geometry';
 import { Color } from './core/type';
 
@@ -167,7 +167,7 @@ class App3D extends Notifier {
   private _frameTime: number = 0;
   private _elapsedTime: number = 0;
 
-  private _defaultShader = new StandardMRShader();
+  private _defaultShader = new StandardShader();
 
   constructor(container: HTMLElement | string, opts?: App3DOpts) {
     super();
@@ -485,7 +485,7 @@ class App3D extends Notifier {
           }
         );
 
-        assign(texture, opts);
+        util.assign(texture, opts);
       } else {
         texture.load(urlOrImg);
       }
@@ -564,7 +564,7 @@ class App3D extends Notifier {
     if (typeof imgList.px === 'string') {
       textureCube.load(imgList as Record<CubeTarget, string>);
     } else {
-      textureCube.image = assign({}, imgList) as Record<CubeTarget, TextureImageSource>;
+      textureCube.image = util.assign({}, imgList) as Record<CubeTarget, TextureImageSource>;
     }
     return textureCube;
   }
@@ -584,9 +584,7 @@ class App3D extends Notifier {
   createMaterial(matConfig?: CreateMaterialConfig) {
     matConfig = matConfig || {};
     const shader = matConfig.shader || this._defaultShader;
-    const material = new Material({
-      shader
-    });
+    const material = new Material(shader);
     if (matConfig.name) {
       material.name = matConfig.name;
     }

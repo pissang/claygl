@@ -1,18 +1,16 @@
 import OrthoCamera from '../camera/Orthographic';
 import Plane from '../geometry/Plane';
-import Shader from '../Shader';
+import Shader, { FragmentShader, VertexShader } from '../Shader';
 import Material from '../Material';
 import Mesh from '../Mesh';
 import * as constants from '../core/constants';
-import vertexGlsl from '../shader/source/compositor/vertex.glsl.js';
+import { fullscreenQuadPassVertex } from '../shader/source/compositor/vertex.glsl';
 import { GLEnum } from '../core/type';
 import { optional } from '../core/util';
 import type Renderer from '../Renderer';
 import type FrameBuffer from '../FrameBuffer';
 import type Texture2D from '../Texture2D';
 import Notifier from '../core/Notifier';
-
-Shader.import(vertexGlsl);
 
 const planeGeo = new Plane();
 const mesh = new Mesh({
@@ -27,8 +25,10 @@ interface FullscreenQuadPassOpts {
   blendWithPrevious?: boolean;
 }
 
-class FullscreenQuadPass extends Notifier {
-  material?: Material;
+class FullscreenQuadPass<
+  T extends FragmentShader<any, any, any> = FragmentShader
+> extends Notifier {
+  material: Material<Shader<VertexShader<{}, {}, {}, {}>, T>>;
 
   clearColor?: boolean;
   clearDepth?: boolean;
@@ -36,17 +36,13 @@ class FullscreenQuadPass extends Notifier {
 
   outputs?: Record<string, Texture2D | undefined> = {};
 
-  constructor(fragment?: string, opts?: Partial<FullscreenQuadPassOpts>) {
+  constructor(frag: T, opts?: Partial<FullscreenQuadPassOpts>) {
     super();
 
-    if (fragment) {
-      const shader = new Shader(Shader.source('clay.composite.vertex'), fragment);
-      const material = new Material({
-        shader
-      });
-      material.enableTexturesAll();
-      this.material = material;
-    }
+    const shader = new Shader(fullscreenQuadPassVertex, frag);
+    const material = new Material(shader);
+    material.enableTexturesAll();
+    this.material = material;
 
     opts = opts || {};
     this.clearColor = opts.clearColor || false;
@@ -54,15 +50,6 @@ class FullscreenQuadPass extends Notifier {
     this.clearDepth = optional(opts.clearColor, true);
   }
 
-  setUniform(name: string, value: any) {
-    this.material && this.material.setUniform(name, value);
-  }
-  getUniform(name: string) {
-    const uniform = this.material && this.material.uniforms[name];
-    if (uniform) {
-      return uniform.value;
-    }
-  }
   attachOutput(texture: Texture2D, attachment?: GLEnum) {
     if (!this.outputs) {
       this.outputs = {};

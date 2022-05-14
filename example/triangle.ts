@@ -26,9 +26,7 @@ geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 
 const mesh = new Mesh({
   geometry: geometry,
-  material: new Material({
-    shader: new BasicShader()
-  })
+  material: new Material(new BasicShader())
 });
 mesh.material.set('color', [0, 0, 1]);
 scene.add(mesh);

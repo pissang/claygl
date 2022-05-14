@@ -4,7 +4,9 @@ import {
   createVarying as varying,
   createUniform as uniform,
   createArrayUniform as arrayUniform,
-  createAttribute as attribute
+  createAttribute as attribute,
+  createShaderFunction,
+  FUNCTION_NAME_PLACEHOLDER
 } from '../../Shader';
 
 // // http://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
@@ -17,26 +19,28 @@ import {
 /**
  * Random in GLSL
  */
-export const random = createShaderChunk(
+export const random = createShaderFunction(
   glsl`
-highp float rand(vec2 uv) {
+highp float ${FUNCTION_NAME_PLACEHOLDER}(vec2 uv) {
   const highp float a = 12.9898, b = 78.233, c = 43758.5453;
   highp float dt = dot(uv.xy, vec2(a,b)), sn = mod(dt, 3.141592653589793);
   return fract(sin(sn) * c);
-}`
+}`,
+  'rand'
 );
+
+export const lightAttenuationUniforms = {
+  attenuationFactor: uniform('float', 5.0)
+};
 
 /**
  * Calculate light attenuation
  */
-export const calculateLightAttenuation = createShaderChunk({
-  uniforms: {
-    attenuationFactor: uniform('float', 5.0)
-  },
+export const lightAttenuationFunction = createShaderFunction(
   // Use light attenuation formula in
   // http://blog.slindev.com/2011/01/10/natural-light-attenuation/
-  code: glsl`
-float lightAttenuation(float dist, float range) {
+  glsl`
+float ${FUNCTION_NAME_PLACEHOLDER}(float dist, float range) {
   float attenuation = 1.0;
   attenuation = dist*dist/(range*range+1.0);
   float att_s = attenuationFactor;
@@ -45,79 +49,77 @@ float lightAttenuation(float dist, float range) {
   attenuation = attenuation - att_s;
   attenuation /= 1.0 - att_s;
   return clamp(attenuation, 0.0, 1.0);
-}`
-});
+}`,
+  'lightAttenuation'
+);
 
 //http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
 /**
  * Edge factor for wireframe implemented with barycentric coord
  */
-export const edgeFactor = createShaderChunk(
+export const edgeFactorFunction = createShaderFunction(
   glsl`
 #ifdef SUPPORT_STANDARD_DERIVATIVES
-float edgeFactor(float width) {
+float ${FUNCTION_NAME_PLACEHOLDER}(float width) {
   vec3 d = fwidth(v_Barycentric);
   vec3 a3 = smoothstep(vec3(0.0), d * width, v_Barycentric);
   return min(min(a3.x, a3.y), a3.z);
 }
 #else
-float edgeFactor(float width) {
+float ${FUNCTION_NAME_PLACEHOLDER}(float width) {
   return 1.0;
 }
-#endif`
+#endif`,
+  'edgeFactor'
 );
 
 /**
  * Encode float value into rgba ubyte value.
  */
-export const encodeFloat = createShaderChunk(
+export const encodeFloatFunction = createShaderFunction(
   // !!!! Float value can only be [0.0 - 1.0)
   glsl`
-vec4 encodeFloat(const in float depth) {
+vec4 ${FUNCTION_NAME_PLACEHOLDER}(const in float depth) {
   const vec4 bitShifts = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);
   const vec4 bit_mask = vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);
   vec4 res = fract(depth * bitShifts);
   res -= res.xxyz * bit_mask;
 
   return res;
-}`
+}`,
+  'encodeFloat'
 );
 
 /**
  * Decode rgba ubyte value into float value.
  */
-export const decodeFloat = createShaderChunk(
+export const decodeFloatFunction = createShaderFunction(
   glsl`
-float decodeFloat(const in vec4 color) {
+float ${FUNCTION_NAME_PLACEHOLDER}(const in vec4 color) {
   const vec4 bitShifts = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0);
   return dot(color, bitShifts);
-}`
+}`,
+  'decodeFloat'
 );
-/**
- * float helper
- * Inlcude encodeFloat and decodeFloat
- */
-export const float = createShaderChunk(`
-${encodeFloat.code}
-${decodeFloat.code}`);
 
 /**
  * Decode RGBM to HDR
  * @see http://graphicrants.blogspot.com/2009/04/rgbm-color-encoding.html
  */
-export const decodeRGBM = createShaderChunk(
+export const decodeRGBMFunction = createShaderFunction(
   glsl`
-vec3 RGBMDecode(vec4 rgbm, float range) {
+vec3 ${FUNCTION_NAME_PLACEHOLDER}(vec4 rgbm, float range) {
   return range * rgbm.rgb * rgbm.a;
-}`
+}`,
+  'RGBMDecode'
 );
 
 /**
  * Encode HDR to RGBM
  */
-export const encodeRGBM = createShaderChunk(
+export const encodeRGBMFunction = createShaderFunction(
   glsl`
-vec4 RGBMEncode(vec3 color, float range) {
+vec4 ${FUNCTION_NAME_PLACEHOLDER}(vec3 color, float range) {
   if (dot(color, color) == 0.0) {
     return vec4(0.0);
   }
@@ -127,55 +129,56 @@ vec4 RGBMEncode(vec3 color, float range) {
   rgbm.a = ceil(rgbm.a * 255.0) / 255.0;
   rgbm.rgb = color / rgbm.a;
   return rgbm;
-}`
+}`,
+  'RGBMEncode'
 );
 
 /**
- * RGBM Helpers. Include encode and decode.
+ * ecode RGBM to HDR if enabled.
  */
-export const RGBM = createShaderChunk(`
-${encodeRGBM.code}
-${decodeRGBM.code}`);
-
-/**
- * Decode RGBM to HDR if enabled.
- */
-export const decodeHDR = createShaderChunk(
+export const decodeHDRFunction = createShaderFunction(
   glsl`
-vec4 decodeHDR(vec4 color) {
+vec4 ${FUNCTION_NAME_PLACEHOLDER}(vec4 color) {
 #if defined(RGBM_DECODE) || defined(RGBM)
   return vec4(decodeRGBM(color, 8.12), 1.0);
 #else
   return color;
 #endif
-}`
+}`,
+  'decodeHDR'
 );
 
 /**
  * Decode HDR to RGBM if enabled.
  */
-export const encodeHDR = createShaderChunk(
+export const encodeHDRFunction = createShaderFunction(
   glsl`
-vec4 encodeHDR(vec4 color) {
+vec4 ${FUNCTION_NAME_PLACEHOLDER}(vec4 color) {
 #if defined(RGBM_ENCODE) || defined(RGBM)
   return encodeRGBM(color.xyz, 8.12);
 #else
   return color;
 #endif
-}`
+}`,
+  'encodeHDR'
 );
 
 /**
  * sRGB helpers. Convert sRGB to Linear and Linear to sRGB
  */
-export const sRGB = createShaderChunk(
+export const sRGBToLinearFunction = createShaderFunction(
   glsl`
-vec4 sRGBToLinear(in vec4 value) {
+vec4 ${FUNCTION_NAME_PLACEHOLDER}(in vec4 value) {
   return vec4(mix(pow(value.rgb * 0.9478672986 + vec3(0.0521327014), vec3(2.4)), value.rgb * 0.0773993808, vec3(lessThanEqual(value.rgb, vec3(0.04045)))), value.w);
-}
-vec4 linearTosRGB(in vec4 value) {
+}`,
+  'sRGBToLinear'
+);
+export const linearToSRGBFunction = createShaderFunction(
+  glsl`
+vec4 ${FUNCTION_NAME_PLACEHOLDER}(in vec4 value) {
   return vec4(mix(pow(value.rgb, vec3(0.41666)) * 1.055 - vec3(0.055), value.rgb * 12.92, vec3(lessThanEqual(value.rgb, vec3(0.0031308)))), value.w);
-}`
+}`,
+  'linearTosRGB'
 );
 
 /**
@@ -189,9 +192,8 @@ export const skinning = createShaderChunk({
   uniforms: {
     skinMatrix: arrayUniform('mat4', 'JOINT_COUNT')
   },
-  code: {
-    // Add uniform in code to be not configurable
-    header: glsl`
+  functions: [
+    createShaderFunction(glsl`
 #ifdef SKINNING
 uniform sampler2D skinMatricesTexture;
 uniform float skinMatricesTextureSize;
@@ -217,11 +219,13 @@ mat4 getSkinMatrix(float idx) {
   return skinMatrix[int(idx)];
 }
 #endif
-#endif`,
+#endif`)
+  ],
+  // Add uniform in code to be not configurable
 
-    // Weighted Sum Skinning Matrix
-    // PENDING Must be assigned.
-    main: glsl`
+  // Weighted Sum Skinning Matrix
+  // PENDING Must be assigned.
+  main: glsl`
 mat4 skinMatrixWS = getSkinMatrix(joint.x) * weight.x;
 if (weight.y > 1e-4) {
   skinMatrixWS += getSkinMatrix(joint.y) * weight.y;
@@ -233,7 +237,6 @@ float weightW = 1.0-weight.x-weight.y-weight.z;
 if (weightW > 1e-4) {
   skinMatrixWS += getSkinMatrix(joint.w) * weightW;
 }`
-  }
 });
 
 export const instancing = createShaderChunk({
@@ -242,7 +245,7 @@ export const instancing = createShaderChunk({
     instanceMat2: attribute('vec4'),
     instanceMat3: attribute('vec4')
   },
-  code: glsl`
+  main: glsl`
 mat4 instanceMat = mat4(
   vec4(instanceMat1.xyz, 0.0),
   vec4(instanceMat2.xyz, 0.0),
@@ -255,9 +258,9 @@ mat4 instanceMat = mat4(
  * Parallax corrected cubemap
  * @see https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
  */
-export const parallaxCorrect = createShaderChunk(
+export const parallaxCorrectFunction = createShaderFunction(
   glsl`
-vec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {
+vec3 ${FUNCTION_NAME_PLACEHOLDER}(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {
   // Find ray box intersect point using slab method
   // https://tavianator.com/fast-branchless-raybounding-box-intersections/
   vec3 first = (boxMax - pos) / dir;
@@ -270,17 +273,18 @@ vec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {
   vec3 boxCenter = (boxMax + boxMin) * 0.5;
 
   return normalize(fixedPos - boxCenter);
-}`
+}`,
+  'parallaxCorrect'
 );
 
 /**
  * Clampped to edge when sampling.
  * In stereo rendering. It will clampped to each part of screen.
  */
-export const clampSample = createShaderChunk(
+export const clampSampleFunction = createShaderFunction(
   glsl`
 // Sample with stereo clamp
-vec4 clampSample(const in sampler2D texture, const in vec2 coord)
+vec4 ${FUNCTION_NAME_PLACEHOLDER}(const in sampler2D texture, const in vec2 coord)
 {
 #ifdef STEREO
   // Left is 0.0 - 0.5, Right is 0.5 - 1.0, avoid leaking
@@ -291,22 +295,24 @@ vec4 clampSample(const in sampler2D texture, const in vec2 coord)
   vec2 coordClamped = clamp(coord, vec2(0.0), vec2(1.0));
 #endif
   return texture2D(texture, coordClamped);
-}`
+}`,
+  'clampSample'
 );
 
 /**
  * ACES tonemapping
  */
-export const ACESToneMapping = createShaderChunk(
+export const ACESToneMappingFunction = createShaderFunction(
   glsl`
-vec3 ACESToneMapping(vec3 color) {
+vec3 ${FUNCTION_NAME_PLACEHOLDER}(vec3 color) {
     float A = 2.51;
     float B = 0.03;
     float C = 2.43;
     float D = 0.59;
     float E = 0.14;
     return (color * (A * color + B)) / (color * (C * color + D) + E);
-}`
+}`,
+  'ACESToneMapping'
 );
 
 /**
@@ -319,7 +325,7 @@ export const logDepthVertex = createShaderChunk({
   uniforms: {
     logDepthBufFC: uniform('float', 0, 'LOG_DEPTH_BUFFER_FC')
   },
-  code: glsl`
+  main: glsl`
 #ifdef LOG_DEPTH
 #ifdef SUPPORT_FRAG_DEPTH
     v_FragDepth = 1.0 + gl_Position.w;
@@ -337,7 +343,7 @@ export const logDepthFragment = createShaderChunk({
   uniforms: {
     logDepthBufFC: uniform('float', 0, 'LOG_DEPTH_BUFFER_FC')
   },
-  code: glsl`
+  main: glsl`
 #if defined(LOG_DEPTH) && defined(SUPPORT_FRAG_DEPTH)
   gl_FragDepthEXT = log2(v_FragDepth) * logDepthBufFC * 0.5;
 #endif

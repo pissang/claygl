@@ -4,7 +4,7 @@ import Geometry from '../Geometry';
 import Material from '../Material';
 import Shader from '../Shader';
 
-import particleEssl from './particle.glsl.js';
+import particleEssl from './particle.glsl';
 import ParticleEmitter from './Emitter';
 import ParticleField from './Field';
 import Particle from './Particle';

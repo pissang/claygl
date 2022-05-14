@@ -1,13 +1,8 @@
-import { importSharedShader } from './shared';
 import Shader from '../Shader.js';
-import lambertEssl from './source/lambert.glsl.js';
-
-importSharedShader();
-Shader.import(lambertEssl);
-
-class LambertShader extends Shader {
+import { lambertFragment, lambertVertex } from './source/lambert.glsl';
+class LambertShader extends Shader<typeof lambertVertex, typeof lambertFragment> {
   constructor() {
-    super(Shader.source('clay.lambert.vertex'), Shader.source('clay.lambert.fragment'));
+    super(lambertVertex, lambertFragment);
   }
 }
 

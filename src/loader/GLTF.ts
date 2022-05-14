@@ -13,7 +13,7 @@ import Material from '../Material';
 import StandardMaterial, { StandardMaterialOpts } from '../StandardMaterial';
 import Mesh from '../Mesh';
 import ClayNode from '../Node';
-import Texture, { TextureOpts } from '../Texture';
+import { TextureOpts } from '../Texture';
 import Texture2D from '../Texture2D';
 import Skeleton from '../Skeleton';
 import Joint from '../Joint';
@@ -264,7 +264,7 @@ export function load(
 }
 
 function doLoadGLTF(url: string, opts?: Partial<GLTFLoadOpts>) {
-  opts = assign(
+  opts = util.assign(
     {
       useStandardMaterial: false,
 
@@ -683,13 +683,9 @@ function KHRCommonMaterialToStandard(
       doubleSided: materialInfo.doubleSided
     });
   } else {
-    material = new Material({
-      name: materialInfo.name,
+    material = new Material(opts.shader!, {
       shader: opts.shader
     });
-
-    material.define('fragment', 'USE_ROUGHNESS');
-    material.define('fragment', 'USE_METALNESS');
 
     if (materialInfo.doubleSided) {
       material.define('fragment', 'DOUBLE_SIDED');
@@ -848,9 +844,8 @@ function pbrMetallicRoughnessToStandard(
       )
     );
   } else {
-    material = new Material({
-      name: materialInfo.name,
-      shader: opts.shader
+    material = new Material(opts.shader!, {
+      name: materialInfo.name
     });
 
     material.define('fragment', 'USE_ROUGHNESS');
@@ -867,7 +862,7 @@ function pbrMetallicRoughnessToStandard(
       material.define('fragment', 'DOUBLE_SIDED');
     }
 
-    material.set(commonProperties);
+    material.set(commonProperties as any);
   }
 
   if (materialInfo.alphaMode === 'BLEND') {
@@ -941,10 +936,10 @@ function pbrSpecularGlossinessToStandard(
     commonProperties.specularColor = [1, 1, 1];
   }
 
-  const material = new Material({
-    name: materialInfo.name,
-    shader: opts.shader
+  const material = new Material(opts.shader!, {
+    name: materialInfo.name
   });
+  material.define('SPECULAR_WORKFLOW');
 
   material.define('fragment', 'GLOSSINESS_CHANNEL', 3);
   material.define('fragment', 'DIFFUSEMAP_ALPHA_ALPHA');
@@ -1096,9 +1091,7 @@ function parseMeshes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpt
       const materialInfo = (json.materials || [])[primitiveInfo.material];
       // Use default material
       if (!material) {
-        material = new Material({
-          shader: opts.shader
-        });
+        material = new Material(opts.shader!);
       }
       const mesh = new Mesh({
         geometry: geometry,

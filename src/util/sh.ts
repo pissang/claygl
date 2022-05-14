@@ -8,43 +8,43 @@ import Scene from '../Scene';
 import * as vec3 from '../glmatrix/vec3';
 import * as constants from '../core/constants';
 
-import projectEnvMapShaderCode from './shader/projectEnvMap.glsl.js';
+// import projectEnvMapShaderCode from './shader/projectEnvMap.glsl';
 import FullscreenQuadPass from '../composite/Pass';
 import type Renderer from '../Renderer';
 import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
 
 // Project on gpu, but needs browser to support readPixels as Float32Array.
-function projectEnvironmentMapGPU(renderer: Renderer, envMap: TextureCube) {
-  const shTexture = new Texture2D({
-    width: 9,
-    height: 1,
-    type: constants.FLOAT
-  });
-  const pass = new FullscreenQuadPass(projectEnvMapShaderCode);
-  pass.material!.define('fragment', 'TEXTURE_SIZE', envMap.width);
-  pass.setUniform('environmentMap', envMap);
+// function projectEnvironmentMapGPU(renderer: Renderer, envMap: TextureCube) {
+//   const shTexture = new Texture2D({
+//     width: 9,
+//     height: 1,
+//     type: constants.FLOAT
+//   });
+//   const pass = new FullscreenQuadPass(projectEnvMapShaderCode);
+//   pass.material!.define('fragment', 'TEXTURE_SIZE', envMap.width);
+//   pass.material.setUniform('environmentMap', envMap);
 
-  const framebuffer = new FrameBuffer();
-  framebuffer.attach(shTexture);
-  pass.render(renderer, framebuffer);
+//   const framebuffer = new FrameBuffer();
+//   framebuffer.attach(shTexture);
+//   pass.render(renderer, framebuffer);
 
-  framebuffer.bind(renderer);
-  // TODO Only chrome and firefox support Float32Array
-  const pixels = new Float32Array(9 * 4);
-  renderer.gl.readPixels(0, 0, 9, 1, constants.RGBA, constants.FLOAT, pixels);
+//   framebuffer.bind(renderer);
+//   // TODO Only chrome and firefox support Float32Array
+//   const pixels = new Float32Array(9 * 4);
+//   renderer.gl.readPixels(0, 0, 9, 1, constants.RGBA, constants.FLOAT, pixels);
 
-  const coeff = new Float32Array(9 * 3);
-  for (let i = 0; i < 9; i++) {
-    coeff[i * 3] = pixels[i * 4];
-    coeff[i * 3 + 1] = pixels[i * 4 + 1];
-    coeff[i * 3 + 2] = pixels[i * 4 + 2];
-  }
-  framebuffer.unbind(renderer);
+//   const coeff = new Float32Array(9 * 3);
+//   for (let i = 0; i < 9; i++) {
+//     coeff[i * 3] = pixels[i * 4];
+//     coeff[i * 3 + 1] = pixels[i * 4 + 1];
+//     coeff[i * 3 + 2] = pixels[i * 4 + 2];
+//   }
+//   framebuffer.unbind(renderer);
 
-  framebuffer.dispose(renderer);
-  pass.dispose(renderer);
-  return coeff;
-}
+//   framebuffer.dispose(renderer);
+//   pass.dispose(renderer);
+//   return coeff;
+// }
 
 function harmonics(normal: vec3.Vec3Array, index: number) {
   const x = normal[0];

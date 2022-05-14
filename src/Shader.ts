@@ -1,14 +1,14 @@
 // TODO check if name of varyings, uniforms, attributes conflicts
-// TODO check if varyings of vertex and fragment are same.
 // TODO Shader slot
 // TODO struct uniform
+// TODO createUniform can be assigned to varying and attributes.
 
 import { parseToFloat } from './core/color';
 import { Dict, UnionToIntersection } from './core/type';
 import { assign, isString, keys } from './core/util';
 import { mat2, mat3, mat4, vec2, vec3, vec4 } from './glmatrix';
 import Texture2D from './Texture2D';
-import TextureCube from './TextureCube';
+import TextureCube, { cubeTargets } from './TextureCube';
 
 export type ShaderDefineValue = boolean | string | number | undefined | null;
 export type ShaderPrecision = 'highp' | 'lowp' | 'mediump';
@@ -245,12 +245,35 @@ export function createVarying<T extends NativeUniformType>(type: T) {
   return { type };
 }
 
+type ShaderFunctionLoose = (functionName?: string) => string;
 export interface ShaderChunkLoose {
   defines: Dict<ShaderDefineValue>;
   uniforms: Dict<ShaderUniformLoose>;
   attributes: Dict<ShaderAttributeLoose>;
   varyings: Dict<ShaderVaringLoose>;
-  code: string | Dict<string>;
+  functions?: ShaderFunctionLoose[];
+  main?: string | Dict<string>;
+}
+
+export const FUNCTION_NAME_PLACEHOLDER = '<function_name>';
+
+// TODO should be named to function or header?
+/**
+ * Shader function is only a plain string that can be reused.
+ * It's not magical. So any shader code can be used here.
+ * It can include multiple functions. Can use #ifdef.
+ * Or even uniforms that want to be not configured
+ */
+export function createShaderFunction<T extends string>(code: string, defaultName?: T) {
+  const func = function (functionName?: string) {
+    if (code.indexOf(FUNCTION_NAME_PLACEHOLDER) >= 0 && !defaultName) {
+      console.error('defaultName must be given in the shader function:');
+      console.error(code);
+    }
+    return code.replace(FUNCTION_NAME_PLACEHOLDER, functionName || defaultName || '');
+  };
+  func.displayName = defaultName;
+  return func;
 }
 
 export function createShaderChunk<
@@ -266,12 +289,16 @@ export function createShaderChunk<
         uniforms?: TUniforms;
         attributes?: TAttributes;
         varyings?: TVaryings;
-        code: TCode;
+        /**
+         * Shader funcitons chunk will be assembled before main code.
+         */
+        functions?: ShaderFunctionLoose[];
+        main?: TCode;
       }
     | string
 ) {
   if (isString(options)) {
-    options = { code: options as TCode };
+    options = { main: options as TCode };
   }
   // Each part of shader chunk needs to be injected separately
   return assign(
@@ -287,7 +314,8 @@ export function createShaderChunk<
     uniforms: TUniforms;
     attributes: TAttributes;
     varyings: TVaryings;
-    code: TCode;
+    functions: ShaderFunctionLoose[];
+    main: TCode;
   };
 }
 
@@ -307,7 +335,8 @@ class StageShader<
   readonly uniforms!: TUniforms & MergeChunk<TChunks, 'uniforms'>;
   readonly attributes!: TAttributes & MergeChunk<TChunks, 'attributes'>;
   readonly varyings!: TVaryings & MergeChunk<TChunks, 'varyings'>;
-  readonly code: string;
+  readonly functions!: ShaderFunctionLoose[];
+  readonly main: string;
 
   constructor(options: {
     defines?: TDefines;
@@ -315,17 +344,21 @@ class StageShader<
     attributes?: TAttributes;
     varyings?: TVaryings;
     includes?: TChunks;
-    code: string;
+    main: string;
   }) {
+    const includes = options.includes || ([] as any as TChunks);
     (['defines', 'uniforms', 'attributes', 'varyings'] as const).forEach((prop) => {
       // @ts-ignore we are sure the readonly property is inited in the constructor here.
       const target = (this[prop] = {});
-      assign(target, options);
-      (options.includes || []).forEach((chunk) => {
+      assign(target, options[prop]);
+      includes.forEach((chunk) => {
         assign(target, chunk[prop]);
       });
     });
-    this.code = options.code;
+    this.functions = ([] as any as ShaderFunctionLoose[]).concat(
+      ...includes.map((a) => a.functions || [])
+    );
+    this.main = options.main;
   }
 }
 
@@ -342,10 +375,10 @@ export class VertexShader<
     attributes?: TAttributes;
     varyings?: TVaryings;
     /**
-     * uniform, defines, attributes, varyings in chunks will be merged automatically.
+     * uniform, defines, attributes, varyings，functions in chunks will be merged automatically.
      */
     includes?: TChunks;
-    code: string;
+    main: string;
   }) {
     super(options);
   }
@@ -361,12 +394,12 @@ export class FragmentShader<
     defines?: TDefines;
     uniforms?: TUniforms;
     /**
-     * uniform, defines, attributes, varyings in chunks will be merged automatically.
+     * uniform, defines, attributes, varyings，functions in chunks will be merged automatically.
      */
     includes?: TChunks;
     // varyings will be shared from vertex
     // varyings?: TVaryings;
-    code: string;
+    main: string;
   }) {
     super(options);
   }
@@ -388,12 +421,17 @@ function composeShaderString(stageShader: StageShader) {
     obj: Dict<ShaderUniformLoose>
   ) {
     return keys(obj)
-      .map(
-        (uniformName) =>
-          `${varType} ${normalizeUniformType(obj[uniformName].type)} ${uniformName}${
-            obj[uniformName].array ? `[${obj[uniformName].len}]` : ''
-          };`
-      )
+      .map((symbol) => {
+        const item = obj[symbol];
+        // Use #define to define the length. Need to check #ifdef here.
+        const isDefinedLen = item.array && isNaN(+item.len!);
+        const arrayExpr = item.array ? `[${item.len}]` : '';
+        return (
+          (isDefinedLen ? `#ifdef ${item.len!}\n` : '') +
+          `${varType} ${normalizeUniformType(item.type)} ${symbol}${arrayExpr};` +
+          (isDefinedLen ? `\n#endif` : '')
+        );
+      })
       .join('\n');
   }
 
@@ -401,7 +439,10 @@ function composeShaderString(stageShader: StageShader) {
 ${composePart('uniform', stageShader.uniforms as any)}
 ${composePart('attribute', stageShader.attributes as any)}
 ${composePart('varying', stageShader.varyings as any)}
-${stageShader.code}
+
+${stageShader.functions.map((func) => func()).join('\n')}
+
+${stageShader.main}
     `;
 }
 

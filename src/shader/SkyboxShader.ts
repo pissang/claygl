@@ -1,13 +1,9 @@
-import { importSharedShader } from './shared';
 import Shader from '../Shader.js';
-import skyboxEssl from './source/skybox.glsl.js';
+import { skyboxFragment, skyboxVertex } from './source/skybox.glsl';
 
-importSharedShader();
-Shader.import(skyboxEssl);
-
-class SkyboxShader extends Shader {
+class SkyboxShader extends Shader<typeof skyboxVertex, typeof skyboxFragment> {
   constructor() {
-    super(Shader.source('clay.skybox.vertex'), Shader.source('clay.skybox.fragment'));
+    super(skyboxVertex, skyboxFragment);
   }
 }
 

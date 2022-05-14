@@ -1,1 +1,83 @@
-export default "@export clay.skybox.vertex\n#define SHADER_NAME skybox\nuniform mat4 world : WORLD;\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nvarying vec3 v_WorldPosition;\nvoid main()\n{\n v_WorldPosition = (world * vec4(position, 1.0)).xyz;\n gl_Position = worldViewProjection * vec4(position, 1.0);\n}\n@end\n@export clay.skybox.fragment\n#define PI 3.1415926\nuniform mat4 viewInverse : VIEWINVERSE;\n#ifdef EQUIRECTANGULAR\nuniform sampler2D environmentMap;\n#else\nuniform samplerCube environmentMap;\n#endif\nuniform float lod: 0.0;\nvarying vec3 v_WorldPosition;\n@import clay.util.rgbm\n@import clay.util.srgb\n@import clay.util.ACES\nvoid main()\n{\n vec3 eyePos = viewInverse[3].xyz;\n vec3 V = normalize(v_WorldPosition - eyePos);\n#ifdef EQUIRECTANGULAR\n float phi = acos(V.y);\n float theta = atan(-V.x, V.z) + PI * 0.5;\n vec2 uv = vec2(theta / 2.0 / PI, phi / PI);\n vec4 texel = decodeHDR(texture2D(environmentMap, fract(uv)));\n#else\n #if defined(LOD) || defined(SUPPORT_TEXTURE_LOD)\n vec4 texel = decodeHDR(textureCubeLodEXT(environmentMap, V, lod));\n #else\n vec4 texel = decodeHDR(textureCube(environmentMap, V));\n #endif\n#endif\n#ifdef SRGB_DECODE\n texel = sRGBToLinear(texel);\n#endif\n#ifdef TONEMAPPING\n texel.rgb = ACESToneMapping(texel.rgb);\n#endif\n#ifdef SRGB_ENCODE\n texel = linearTosRGB(texel);\n#endif\n gl_FragColor = encodeHDR(vec4(texel.rgb, 1.0));\n}\n@end";
+import {
+  createAttribute as attribute,
+  createSemanticUniform as semanticUniform,
+  createUniform as uniform,
+  createVarying as varying,
+  FragmentShader,
+  glsl,
+  VertexShader
+} from '../../Shader';
+import { POSITION, VIEWINVERSE, WORLD, WORLDVIEWPROJECTION } from './shared';
+import {
+  ACESToneMappingFunction,
+  decodeRGBMFunction,
+  encodeRGBMFunction,
+  linearToSRGBFunction,
+  sRGBToLinearFunction
+} from './util.glsl';
+export const skyboxVertex = new VertexShader({
+  uniforms: {
+    world: WORLD(),
+    worldViewProjection: WORLDVIEWPROJECTION()
+  },
+  attributes: {
+    position: POSITION()
+  },
+  varyings: {
+    v_WorldPosition: varying('vec3')
+  },
+  main: glsl`
+void main() {
+  v_WorldPosition = (world * vec4(position, 1.0)).xyz;
+  gl_Position = worldViewProjection * vec4(position, 1.0);
+}`
+});
+
+export const skyboxFragment = new FragmentShader({
+  uniforms: {
+    viewInverse: VIEWINVERSE(),
+    equirectangularMap: uniform('sampler2D'),
+    cubeMap: uniform('samplerCube'),
+    lod: uniform('float', 0)
+  },
+  main: glsl`
+${encodeRGBMFunction()}
+${decodeRGBMFunction()}
+${sRGBToLinearFunction()}
+${linearToSRGBFunction()}
+${ACESToneMappingFunction()}
+
+void main()
+{
+  vec3 eyePos = viewInverse[3].xyz;
+  vec3 V = normalize(v_WorldPosition - eyePos);
+#ifdef EQUIRECTANGULAR
+  float phi = acos(V.y);
+  // consistent with cubemap.
+  // atan(y, x) is same with atan2 ?
+  float theta = atan(-V.x, V.z) + PI * 0.5;
+  vec2 uv = vec2(theta / 2.0 / PI, phi / PI);
+  vec4 texel = decodeHDR(texture2D(equirectangularMap, fract(uv)));
+#else
+  #if defined(LOD) || defined(SUPPORT_TEXTURE_LOD)
+  vec4 texel = decodeHDR(textureCubeLodEXT(cubeMap, V, lod));
+  #else
+  vec4 texel = decodeHDR(textureCube(cubeMap, V));
+  #endif
+#endif
+
+#ifdef SRGB_DECODE
+  texel = sRGBToLinear(texel);
+#endif
+
+#ifdef TONEMAPPING
+  texel.rgb = ACESToneMapping(texel.rgb);
+#endif
+
+#ifdef SRGB_ENCODE
+  texel = linearTosRGB(texel);
+#endif
+
+  gl_FragColor = encodeHDR(vec4(texel.rgb, 1.0));
+}`
+});

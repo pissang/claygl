@@ -25,9 +25,7 @@ geometry.attributes.color.fromArray(VERTEX_COLORS);
 
 const mesh = new Mesh({
   geometry: geometry,
-  material: new Material({
-    shader: new BasicShader()
-  })
+  material: new Material(new BasicShader())
 });
 mesh.material.define('both', 'VERTEX_COLOR');
 mesh.material.set('color', [1, 1, 1]);

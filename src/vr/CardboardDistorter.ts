@@ -11,7 +11,7 @@ import Geometry from '../Geometry';
 import Shader from '../Shader';
 import PerspectiveCamera from '../camera/Perspective';
 
-import outputEssl from './output.glsl.js';
+import outputEssl from './output.glsl';
 import { Color } from '../core/type';
 import type Renderer from '../Renderer';
 import type Texture2D from '../Texture2D';

@@ -3,7 +3,7 @@
 import Shader from '../Shader';
 import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
-import FullQuadPass from '../composite/Pass';
+import FullscreenQuadPass from '../composite/Pass';
 import Texture2D from '../Texture2D';
 import Mesh from '../Mesh';
 import SphereGeo from '../geometry/Sphere';
@@ -13,20 +13,20 @@ import Matrix4 from '../math/Matrix4';
 import Vector3 from '../math/Vector3';
 import GBuffer from './GBuffer';
 
-import prezGlsl from '../shader/source/prez.glsl.js';
-import utilGlsl from '../shader/source/util.glsl.js';
+import prezGlsl from '../shader/source/prez.glsl';
+import utilGlsl from '../shader/source/util.glsl';
 
-import lightvolumeGlsl from '../shader/source/deferred/lightvolume.glsl.js';
+import lightvolumeGlsl from '../shader/source/deferred/lightvolume.glsl';
 // Light shaders
-import spotGlsl from '../shader/source/deferred/spot.glsl.js';
-import directionalGlsl from '../shader/source/deferred/directional.glsl.js';
-import ambientGlsl from '../shader/source/deferred/ambient.glsl.js';
-import ambientshGlsl from '../shader/source/deferred/ambientsh.glsl.js';
-import ambientcubemapGlsl from '../shader/source/deferred/ambientcubemap.glsl.js';
-import pointGlsl from '../shader/source/deferred/point.glsl.js';
-import sphereGlsl from '../shader/source/deferred/sphere.glsl.js';
-import tubeGlsl from '../shader/source/deferred/tube.glsl.js';
-import outputGlsl from '../shader/source/compositor/output.glsl.js';
+import spotGlsl from '../shader/source/deferred/spot.glsl';
+import directionalGlsl from '../shader/source/deferred/directional.glsl';
+import ambientGlsl from '../shader/source/deferred/ambient.glsl';
+import ambientshGlsl from '../shader/source/deferred/ambientsh.glsl';
+import ambientcubemapGlsl from '../shader/source/deferred/ambientcubemap.glsl';
+import pointGlsl from '../shader/source/deferred/point.glsl';
+import sphereGlsl from '../shader/source/deferred/sphere.glsl';
+import tubeGlsl from '../shader/source/deferred/tube.glsl';
+import outputGlsl from '../shader/source/compositor/output.glsl';
 import type ShadowMapPass from '../prePass/ShadowMap';
 import type Geometry from '../Geometry';
 import type Scene from '../Scene';
@@ -104,7 +104,7 @@ class DeferredRenderer extends Notifier {
     magFilter: constants.NEAREST
   });
 
-  private _fullQuadPass = new FullQuadPass('', {
+  private _fullQuadPass = new FullscreenQuadPass('', {
     blendWithPrevious: true
   });
 
@@ -129,7 +129,7 @@ class DeferredRenderer extends Notifier {
 
   private _lightCylinderGeo: Geometry;
 
-  private _outputPass = new FullQuadPass(Shader.source('clay.composite.output'));
+  private _outputPass = new FullscreenQuadPass(Shader.source('clay.composite.output'));
   private _createLightPassMat: (shader: Shader) => Material;
 
   constructor() {

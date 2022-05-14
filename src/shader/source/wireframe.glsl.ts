@@ -1,1 +1,57 @@
-export default "@export clay.wireframe.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\nvarying vec3 v_Barycentric;\nvoid main()\n{\n vec3 skinnedPosition = position;\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0 );\n v_Barycentric = barycentric;\n}\n@end\n@export clay.wireframe.fragment\nuniform vec3 color : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\nuniform float lineWidth : 1.0;\nvarying vec3 v_Barycentric;\n@import clay.util.edge_factor\nvoid main()\n{\n gl_FragColor.rgb = color;\n gl_FragColor.a = (1.0-edgeFactor(lineWidth)) * alpha;\n}\n@end";
+import {
+  createAttribute as attribute,
+  createSemanticUniform as semanticUniform,
+  createUniform as uniform,
+  createVarying as varying,
+  FragmentShader,
+  glsl,
+  VertexShader
+} from '../../Shader';
+import { POSITION, WORLD, WORLDVIEWPROJECTION } from './shared';
+import { edgeFactorFunction, instancing, skinning } from './util.glsl';
+export const wireframeVertex = new VertexShader({
+  uniforms: {
+    world: WORLD(),
+    worldViewProjection: WORLDVIEWPROJECTION()
+  },
+  attributes: {
+    position: POSITION(),
+    barycentric: attribute('vec3')
+  },
+  varyings: {
+    v_WorldPosition: varying('vec3'),
+    v_Barycentric: varying('vec3')
+  },
+  includes: [skinning, instancing],
+  main: glsl`
+void main() {
+
+  vec3 skinnedPosition = position;
+#ifdef SKINNING
+  ${skinning.main}
+  skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+#endif
+#ifdef INSTANCING
+  ${instancing.main}
+  skinnedPosition = instanceMat * skinnedPosition;
+#endif
+  gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0 );
+  v_Barycentric = barycentric;
+  }`
+});
+
+export const wireframeFragment = new FragmentShader({
+  uniforms: {
+    color: uniform('rgb', [0, 0, 0]),
+    alpha: uniform('float', 1),
+    lineWidth: uniform('float', 0)
+  },
+  main: glsl`
+
+${edgeFactorFunction()}
+
+void main() {
+  gl_FragColor.rgb = color;
+  gl_FragColor.a = (1.0-edgeFactor(lineWidth)) * alpha;
+}`
+});

@@ -1,13 +1,9 @@
-import { importSharedShader } from './shared';
 import Shader from '../Shader.js';
-import wireframeEssl from './source/wireframe.glsl.js';
+import { wireframeFragment, wireframeVertex } from './source/wireframe.glsl.js';
 
-importSharedShader();
-Shader.import(wireframeEssl);
-
-class WireframeShader extends Shader {
+class WireframeShader extends Shader<typeof wireframeVertex, typeof wireframeFragment> {
   constructor() {
-    super(Shader.source('clay.wireframe.vertex'), Shader.source('clay.wireframe.fragment'));
+    super(wireframeVertex, wireframeFragment);
   }
 }
 

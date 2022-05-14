@@ -2,7 +2,6 @@
 import Mesh, { MeshOpts } from '../Mesh';
 import CubeGeometry from '../geometry/Cube';
 import Material from '../Material';
-import Texture from '../Texture';
 import PerspectiveCamera from '../camera/Perspective';
 import Matrix4 from '../math/Matrix4';
 
@@ -46,13 +45,14 @@ class Skybox extends Mesh {
   private _environmentMap?: TextureCube | Texture2D;
   private _dummyCamera = new PerspectiveCamera();
 
+  material: Material<SkyboxShader>;
+
   constructor(opts?: Partial<SkyboxOpts>) {
     super(opts);
     this.geometry = new CubeGeometry();
     this.material =
       (opts && opts.material) ||
-      new Material({
-        shader: new SkyboxShader(),
+      new Material(new SkyboxShader(), {
         depthMask: false
       });
 
@@ -103,14 +103,16 @@ class Skybox extends Mesh {
    * @param {clay.TextureCube} envMap
    */
   setEnvironmentMap(envMap: Texture2D | TextureCube) {
+    const material = this.material;
     if (envMap.textureType === 'texture2D') {
-      this.material.define('EQUIRECTANGULAR');
+      material.define('EQUIRECTANGULAR');
       // LINEAR filter can remove the artifacts in pole
       envMap.minFilter = constants.LINEAR;
+      material.uniforms.equirectangularMap.value = envMap;
     } else {
-      this.material.undefine('EQUIRECTANGULAR');
+      material.undefine('EQUIRECTANGULAR');
+      material.uniforms.cubeMap.value = envMap;
     }
-    this.material.set('environmentMap', envMap);
   }
   /**
    * Get environment map

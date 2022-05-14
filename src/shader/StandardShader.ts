@@ -1,13 +1,9 @@
-import { importSharedShader } from './shared';
 import Shader from '../Shader.js';
-import standardEssl from './source/standard.glsl.js';
+import { standardFragment, standardVertex } from './source/standard.glsl';
 
-importSharedShader();
-Shader.import(standardEssl);
-
-class StandardShader extends Shader {
+class StandardShader extends Shader<typeof standardVertex, typeof standardFragment> {
   constructor() {
-    super(Shader.source('clay.standard.vertex'), Shader.source('clay.standard.fragment'));
+    super(standardVertex, standardFragment);
   }
 }
 

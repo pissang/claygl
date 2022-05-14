@@ -1,6 +1,6 @@
 import Material, { MaterialOpts } from './Material';
 
-import StandardMRShader from './shader/StandardMRShader';
+import StandardShader from './shader/StandardShader';
 import { Color } from './core/type';
 import Texture2D from './Texture2D';
 import type TextureCube from './TextureCube';
@@ -56,7 +56,7 @@ const BOOL_DEFINE_MAP = {
   environmentMapPrefiltered: 'ENVIRONMENTMAP_PREFILTER'
 } as const;
 
-let standardShader: StandardMRShader;
+let standardShader: StandardShader;
 
 type MaterialColor = Color | string;
 
@@ -173,7 +173,7 @@ const defaultStandardMaterialOpts = {
 class StandardMaterial extends Material {
   constructor(opts?: Partial<StandardMaterialOpts>) {
     if (!standardShader) {
-      standardShader = new StandardMRShader();
+      standardShader = new StandardShader();
     }
     super(standardShader, opts);
 

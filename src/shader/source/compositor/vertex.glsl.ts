@@ -1,1 +1,26 @@
-export default "\n@export clay.composite.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\nvarying vec2 v_Texcoord;\nvoid main()\n{\n v_Texcoord = texcoord;\n gl_Position = worldViewProjection * vec4(position, 1.0);\n}\n@end";
+import {
+  createAttribute,
+  createSemanticUniform,
+  createVarying,
+  glsl,
+  VertexShader
+} from '../../../Shader';
+
+export const fullscreenQuadPassVertex = new VertexShader({
+  uniforms: {
+    WVP: createSemanticUniform('mat4', 'WORLDVIEWPROJECTION')
+  },
+  attributes: {
+    pos: createAttribute('vec3', 'POSITION'),
+    uv: createAttribute('vec3', 'TEXCOORD_0')
+  },
+  varyings: {
+    v_Texcoord: createVarying('vec2')
+  },
+  main: glsl`
+void main() {
+  v_Texcoord = uv;
+  gl_Position = WVP * vec4(pos, 1.0);
+}
+  `
+});

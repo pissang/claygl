@@ -13,10 +13,11 @@ import EnvironmentMapPass from '../prePass/EnvironmentMap';
 import * as constants from '../core/constants';
 import { panoramaToCubeMap } from './texture';
 
-import integrateBRDFShaderCode from './shader/integrateBRDF.glsl.js';
-import prefilterFragCode from './shader/prefilter.glsl.js';
 import Renderer from '../Renderer';
 import { CLAMP_TO_EDGE } from '../core/constants';
+import { integrateBRDFFragment } from './shader/integrateBRDF.glsl';
+import { skyboxVertex } from '../shader/source/skybox.glsl';
+import { prefilterFragment } from './shader/prefilter.glsl';
 
 const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
 
@@ -64,13 +65,8 @@ export function prefilterEnvironmentMap(
   const size = Math.min(width, height);
   const mipmapNum = Math.log(size) / Math.log(2) + 1;
 
-  const prefilterMaterial = new Material({
-    shader: new Shader({
-      vertex: Shader.source('clay.skybox.vertex'),
-      fragment: prefilterFragCode
-    })
-  });
-  prefilterMaterial.set('normalDistribution', normalDistribution);
+  const prefilterMaterial = new Material(new Shader(skyboxVertex, prefilterFragment));
+  prefilterMaterial.setUniform('normalDistribution', normalDistribution);
 
   textureOpts.encodeRGBM && prefilterMaterial.define('fragment', 'RGBM_ENCODE');
   textureOpts.decodeRGBM && prefilterMaterial.define('fragment', 'RGBM_DECODE');
@@ -194,7 +190,7 @@ export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D)
   const framebuffer = new FrameBuffer({
     depthBuffer: false
   });
-  const quadPass = new FullscreenQuadPass(integrateBRDFShaderCode);
+  const quadPass = new FullscreenQuadPass(integrateBRDFFragment);
 
   const texture = new Texture2D({
     width: 512,
@@ -206,8 +202,8 @@ export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D)
     magFilter: constants.NEAREST,
     useMipmap: false
   });
-  quadPass.setUniform('normalDistribution', normalDistribution);
-  quadPass.setUniform('viewportSize', [512, 256]);
+  quadPass.material.setUniform('normalDistribution', normalDistribution);
+  quadPass.material.setUniform('viewportSize', [512, 256]);
   quadPass.attachOutput(texture);
   quadPass.render(renderer, framebuffer);
 

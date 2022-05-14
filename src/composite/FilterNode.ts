@@ -5,6 +5,7 @@ import Renderer from '../Renderer';
 import FrameBuffer from '../FrameBuffer';
 import Texture from '../Texture';
 import { keys } from '../core/util';
+import { FragmentShader } from '../Shader';
 
 /**
  * Filter node
@@ -39,12 +40,12 @@ import { keys } from '../core/util';
  *
  */
 
-class CompositeFilterNode extends CompositeNode {
-  pass: FullscreenQuadPass;
+class CompositeFilterNode<T extends FragmentShader<any, any, any>> extends CompositeNode {
+  pass: FullscreenQuadPass<T>;
 
   // Example: { name: 2 }
 
-  constructor(shader: string) {
+  constructor(shader: T) {
     super();
     const pass = new FullscreenQuadPass(shader);
     this.pass = pass;
@@ -66,7 +67,7 @@ class CompositeFilterNode extends CompositeNode {
     keys(inputTextures).forEach((inputName) => {
       // Enabled the pin texture in shader
       this.pass.material!.enableTexture(inputName);
-      pass.setUniform(inputName, inputTextures[inputName]);
+      pass.material.setUniform(inputName, inputTextures[inputName]);
     });
 
     // Output
@@ -82,27 +83,8 @@ class CompositeFilterNode extends CompositeNode {
     this.trigger('afterrender', renderer);
   }
 
-  /**
-   * Set parameter
-   */
-  setParameter(name: string, value: any) {
-    this.pass.setUniform(name, value);
-  }
-  /**
-   * Get parameter value
-   * @param  {string} name
-   * @return {}
-   */
-  getParameter(name: string) {
-    return this.pass.getUniform(name);
-  }
-  /**
-   * Set parameters
-   */
-  setParameters(obj: Record<string, any>) {
-    keys(obj).forEach((key) => {
-      this.setParameter(key, obj[key]);
-    });
+  get material() {
+    return this.pass.material;
   }
   // /**
   //  * Set shader code

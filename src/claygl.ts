@@ -74,9 +74,8 @@ export * as easing from './animation/easing';
 export {
   BasicShader,
   LambertShader,
-  WireframeShader,
-  StandardShader,
-  StandardMRShader
+  // WireframeShader,
+  StandardShader
 } from './shader/index';
 
 // Picking
@@ -104,21 +103,21 @@ export * as textureUtil from './util/texture';
 export { default as App3D } from './App3D';
 
 // Composite
-export { default as FullscreenQuadPass } from './composite/Pass';
-export { default as Compositor } from './composite/Compositor';
-export { default as CompositeNode } from './composite/CompositeNode';
-export { default as FilterCompositeNode } from './composite/FilterNode';
-export { default as SceneCompositeNode } from './composite/SceneNode';
-export { default as TextureCompositeNode } from './composite/TextureNode';
-export { default as GroupCompositeNode } from './composite/GroupNode';
+// export { default as FullscreenQuadPass } from './composite/Pass';
+// export { default as Compositor } from './composite/Compositor';
+// export { default as CompositeNode } from './composite/CompositeNode';
+// export { default as FilterCompositeNode } from './composite/FilterNode';
+// export { default as SceneCompositeNode } from './composite/SceneNode';
+// export { default as TextureCompositeNode } from './composite/TextureNode';
+// export { default as GroupCompositeNode } from './composite/GroupNode';
 
-export { default as registerBuiltinCompositeShaders } from './shader/registerBuiltinCompositeShaders';
+// export { default as registerBuiltinCompositeShaders } from './shader/registerBuiltinCompositeShaders';
 
 // Deferred renderer
-export { default as DeferredGBuffer } from './deferred/GBuffer';
-export { default as DeferredRenderer } from './deferred/Renderer';
+// export { default as DeferredGBuffer } from './deferred/GBuffer';
+// export { default as DeferredRenderer } from './deferred/Renderer';
 
 // Particles
-export { default as ParticleEmitter } from './particle/Emitter';
-export { default as ParticleRenderable } from './particle/ParticleRenderable';
-export { default as ForceField } from './particle/ForceField';
+// export { default as ParticleEmitter } from './particle/Emitter';
+// export { default as ParticleRenderable } from './particle/ParticleRenderable';
+// export { default as ForceField } from './particle/ForceField';

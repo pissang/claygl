@@ -8,8 +8,8 @@ import Matrix4 from '../math/Matrix4';
 import * as mat4 from '../glmatrix/mat4';
 import * as constants from '../core/constants';
 
-import gbufferEssl from '../shader/source/deferred/gbuffer.glsl.js';
-import chunkEssl from '../shader/source/deferred/chunk.glsl.js';
+import gbufferEssl from '../shader/source/deferred/gbuffer.glsl';
+import chunkEssl from '../shader/source/deferred/chunk.glsl';
 import Renderer, { RenderableObject, RendererViewport } from '../Renderer';
 import Camera from '../Camera';
 import Scene from '../Scene';

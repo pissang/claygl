@@ -21,7 +21,7 @@ const vs = new Shader.Vertex({
   attributes: {
     position: Shader.attribute('vec3', 'POSITION')
   },
-  code: glsl`
+  main: glsl`
 void main() {
   gl_Position = vec4(position, 1.0);
 }`
@@ -30,7 +30,7 @@ const fs = new Shader.Fragment({
   uniforms: {
     color: Shader.uniform('rgb', 'red')
   },
-  code: glsl`
+  main: glsl`
 void main() {
   gl_FragColor = vec4(color, 1.0);
 }

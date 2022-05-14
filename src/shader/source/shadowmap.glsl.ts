@@ -1,1 +1,330 @@
-export default "@export clay.sm.depth.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\nattribute vec2 texcoord : TEXCOORD_0;\nuniform vec2 uvRepeat = vec2(1.0, 1.0);\nuniform vec2 uvOffset = vec2(0.0, 0.0);\n@import clay.chunk.skinning_header\n@import clay.chunk.instancing_header\nvarying vec4 v_ViewPosition;\nvarying vec2 v_Texcoord;\nvoid main(){\n vec4 P = vec4(position, 1.0);\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n P = skinMatrixWS * P;\n#endif\n#ifdef INSTANCING\n @import clay.chunk.instancing_matrix\n P = instanceMat * P;\n#endif\n v_ViewPosition = worldViewProjection * P;\n gl_Position = v_ViewPosition;\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n}\n@end\n@export clay.sm.depth.fragment\nvarying vec4 v_ViewPosition;\nvarying vec2 v_Texcoord;\nuniform float bias : 0.001;\nuniform float slopeScale : 1.0;\nuniform sampler2D alphaMap;\nuniform float alphaCutoff: 0.0;\n@import clay.util.encode_float\nvoid main(){\n float depth = v_ViewPosition.z / v_ViewPosition.w;\n if (alphaCutoff > 0.0) {\n if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {\n discard;\n }\n }\n #ifdef SUPPORT_STANDARD_DERIVATIVES\n float dx = dFdx(depth);\n float dy = dFdy(depth);\n depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;\n #else\n depth += bias;\n #endif\n gl_FragColor = encodeFloat(depth * 0.5 + 0.5);\n}\n@end\n@export clay.sm.debug_depth\nuniform sampler2D depthMap;\nvarying vec2 v_Texcoord;\n@import clay.util.decode_float\nvoid main() {\n vec4 tex = texture2D(depthMap, v_Texcoord);\n float depth = decodeFloat(tex);\n gl_FragColor = vec4(depth, depth, depth, 1.0);\n}\n@end\n@export clay.sm.distance.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform mat4 world : WORLD;\nattribute vec3 position : POSITION;\n@import clay.chunk.skinning_header\nvarying vec3 v_WorldPosition;\nvoid main (){\n vec4 P = vec4(position, 1.0);\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n P = skinMatrixWS * P;\n#endif\n#ifdef INSTANCING\n @import clay.chunk.instancing_matrix\n P = instanceMat * P;\n#endif\n gl_Position = worldViewProjection * P;\n v_WorldPosition = (world * P).xyz;\n}\n@end\n@export clay.sm.distance.fragment\nuniform vec3 lightPosition;\nuniform float range : 100;\nvarying vec3 v_WorldPosition;\n@import clay.util.encode_float\nvoid main(){\n float dist = distance(lightPosition, v_WorldPosition);\n dist = dist / range;\n gl_FragColor = encodeFloat(dist);\n}\n@end\n@export clay.plugin.shadow_map_common\n@import clay.util.decode_float\nfloat tapShadowMap(sampler2D map, vec2 uv, float z){\n vec4 tex = texture2D(map, uv);\n return step(z, decodeFloat(tex) * 2.0 - 1.0);\n}\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {\n float shadowContrib = tapShadowMap(map, uv, z);\n vec2 offset = vec2(1.0 / textureSize) * scale;\n#ifdef PCF_KERNEL_SIZE\n for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{\n shadowContrib += tapShadowMap(map, uv + offset * pcfKernel[_idx_], z);\n }}\n return shadowContrib / float(PCF_KERNEL_SIZE + 1);\n#else\n shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);\n shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, 0.0), z);\n shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, -offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);\n shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);\n return shadowContrib / 9.0;\n#endif\n}\nfloat pcf(sampler2D map, vec2 uv, float z, float textureSize) {\n return pcf(map, uv, z, textureSize, vec2(1.0));\n}\nfloat computeShadowContrib(\n sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset\n) {\n vec4 posInLightSpace = lightVPM * vec4(position, 1.0);\n posInLightSpace.xyz /= posInLightSpace.w;\n float z = posInLightSpace.z;\n if(all(greaterThan(posInLightSpace.xyz, vec3(-0.99, -0.99, -1.0))) &&\n all(lessThan(posInLightSpace.xyz, vec3(0.99, 0.99, 1.0)))){\n vec2 uv = (posInLightSpace.xy+1.0) / 2.0;\n return pcf(map, uv * scale + offset, z, textureSize, scale);\n }\n return 1.0;\n}\nfloat computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize) {\n return computeShadowContrib(map, lightVPM, position, textureSize, vec2(1.0), vec2(0.0));\n}\nfloat computeShadowContribOmni(samplerCube map, vec3 direction, float range)\n{\n float dist = length(direction);\n vec4 shadowTex = textureCube(map, direction);\n return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);\n}\n@end\n@export clay.plugin.compute_shadow_map\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)\n#ifdef SPOT_LIGHT_SHADOWMAP_COUNT\nuniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\n#endif\n#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT\n#if defined(SHADOW_CASCADE)\nuniform sampler2D directionalLightShadowMaps[1]:unconfigurable;\nuniform mat4 directionalLightMatrices[SHADOW_CASCADE]:unconfigurable;\nuniform float directionalLightShadowMapSizes[1]:unconfigurable;\nuniform float shadowCascadeClipsNear[SHADOW_CASCADE]:unconfigurable;\nuniform float shadowCascadeClipsFar[SHADOW_CASCADE]:unconfigurable;\n#else\nuniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\nuniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\n#endif\n#endif\n#ifdef POINT_LIGHT_SHADOWMAP_COUNT\nuniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT]:unconfigurable;\n#endif\nuniform bool shadowEnabled : true;\n#ifdef PCF_KERNEL_SIZE\nuniform vec2 pcfKernel[PCF_KERNEL_SIZE];\n#endif\n@import clay.plugin.shadow_map_common\n#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)\nvoid computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ) {\n float shadowContrib;\n for(int _idx_ = 0; _idx_ < SPOT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n shadowContrib = computeShadowContrib(\n spotLightShadowMaps[_idx_], spotLightMatrices[_idx_], position,\n spotLightShadowMapSizes[_idx_]\n );\n shadowContribs[_idx_] = shadowContrib;\n }}\n for(int _idx_ = SPOT_LIGHT_SHADOWMAP_COUNT; _idx_ < SPOT_LIGHT_COUNT; _idx_++){{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#endif\n#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)\n#ifdef SHADOW_CASCADE\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)\n / (gl_DepthRange.far - gl_DepthRange.near);\n float shadowContrib;\n shadowContribs[0] = 1.0;\n for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{\n if (\n depth >= shadowCascadeClipsNear[_idx_] &&\n depth <= shadowCascadeClipsFar[_idx_]\n ) {\n shadowContrib = computeShadowContrib(\n directionalLightShadowMaps[0], directionalLightMatrices[_idx_], position,\n directionalLightShadowMapSizes[0],\n vec2(1.0 / float(SHADOW_CASCADE), 1.0),\n vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)\n );\n shadowContribs[0] = shadowContrib;\n }\n }}\n for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#else\nvoid computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){\n float shadowContrib;\n for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n shadowContrib = computeShadowContrib(\n directionalLightShadowMaps[_idx_], directionalLightMatrices[_idx_], position,\n directionalLightShadowMapSizes[_idx_]\n );\n shadowContribs[_idx_] = shadowContrib;\n }}\n for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#endif\n#endif\n#if defined(POINT_LIGHT_SHADOWMAP_COUNT)\nvoid computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_COUNT] ){\n vec3 lightPosition;\n vec3 direction;\n for(int _idx_ = 0; _idx_ < POINT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{\n lightPosition = pointLightPosition[_idx_];\n direction = position - lightPosition;\n shadowContribs[_idx_] = computeShadowContribOmni(pointLightShadowMaps[_idx_], direction, pointLightRange[_idx_]);\n }}\n for(int _idx_ = POINT_LIGHT_SHADOWMAP_COUNT; _idx_ < POINT_LIGHT_COUNT; _idx_++) {{\n shadowContribs[_idx_] = 1.0;\n }}\n}\n#endif\n#endif\n@end";
+import {
+  createUniform as uniform,
+  glsl,
+  VertexShader,
+  createVarying as varying,
+  FragmentShader,
+  createShaderFunction,
+  createShaderChunk,
+  createArrayUniform
+} from '../../Shader';
+import { POSITION, TEXCOORD_0, WORLD, WORLDVIEWPROJECTION } from './shared';
+import { decodeFloatFunction, encodeFloatFunction, instancing, skinning } from './util.glsl';
+
+export const shadowMapDepthVertex = new VertexShader({
+  uniforms: {
+    worldViewProjection: WORLDVIEWPROJECTION(),
+    uvRepeat: uniform('vec2', [1, 1]),
+    offset: uniform('vec2', [0, 0])
+  },
+  attributes: {
+    position: POSITION(),
+    texcoord: TEXCOORD_0()
+  },
+  varyings: {
+    v_ViewPosition: varying('vec4'),
+    v_Texcoord: varying('vec2')
+  },
+  includes: [skinning, instancing],
+
+  main: glsl`
+void main(){
+  vec4 P = vec4(position, 1.0);
+#ifdef SKINNING
+  ${skinning.main}
+  P = skinMatrixWS * P;
+#endif
+
+#ifdef INSTANCING
+  ${instancing.main}
+  P = instanceMat * P;
+#endif
+
+  v_ViewPosition = worldViewProjection * P;
+  gl_Position = v_ViewPosition;
+
+  v_Texcoord = texcoord * uvRepeat + uvOffset;
+}`
+});
+
+export const shadowMapDepthFragment = new FragmentShader({
+  uniforms: {
+    bias: uniform('float', 0.001),
+    slopeScale: uniform('float', 1.0),
+    alphaCutoff: uniform('float', 0.0),
+    alphaMap: uniform('sampler2D')
+  },
+  main: glsl`
+${encodeFloatFunction()}
+
+void main(){
+  // Whats the difference between gl_FragCoord.z and this v_ViewPosition
+  // gl_FragCoord consider the polygon offset ?
+  float depth = v_ViewPosition.z / v_ViewPosition.w;
+  // float depth = gl_FragCoord.z / gl_FragCoord.w;
+
+  if (alphaCutoff > 0.0) {
+    if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {
+      discard;
+    }
+  }
+  // Add slope scaled bias using partial derivative
+  #ifdef SUPPORT_STANDARD_DERIVATIVES
+  float dx = dFdx(depth);
+  float dy = dFdy(depth);
+  depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;
+  #else
+  depth += bias;
+  #endif
+
+  gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
+}`
+});
+
+export const shadowMapDepthDebugFragment = new FragmentShader({
+  uniforms: {
+    depthMap: uniform('sampler2D')
+  },
+  main: glsl`
+${decodeFloatFunction()}
+void main() {
+    vec4 tex = texture2D(depthMap, v_Texcoord);
+#ifdef USE_VSM
+    gl_FragColor = vec4(tex.rgb, 1.0);
+#else
+    float depth = decodeFloat(tex);
+    gl_FragColor = vec4(depth, depth, depth, 1.0);
+#endif
+}`
+});
+
+export const shadowMapDistanceVertex = new VertexShader({
+  uniforms: {
+    worldViewProjection: WORLDVIEWPROJECTION(),
+    world: WORLD()
+  },
+  attributes: {
+    position: POSITION()
+  },
+  varyings: {
+    v_WorldPosition: varying('vec3')
+  },
+  includes: [skinning],
+  main: glsl`
+void main (){
+  vec4 P = vec4(position, 1.0);
+#ifdef SKINNING
+  ${skinning.main}
+  P = skinMatrixWS * P;
+#endif
+
+#ifdef INSTANCING
+  ${instancing.main}
+  P = instanceMat * P;
+#endif
+  gl_Position = worldViewProjection * P;
+  v_WorldPosition = (world * P).xyz;
+}`
+});
+
+export const shadowMapDistanceFragment = new FragmentShader({
+  uniforms: {
+    lightPosition: uniform('vec3'),
+    range: uniform('float', 100)
+  },
+  main: glsl`
+${encodeFloatFunction()}
+void main(){
+    float dist = distance(lightPosition, v_WorldPosition);
+    dist = dist / range;
+    gl_FragColor = encodeFloat(dist);
+}`
+});
+
+// TODO reduce shadow glsl code size.
+export const shadowMapFunction = createShaderFunction(glsl`
+${decodeFloatFunction()}
+
+#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)
+
+#ifdef SPOT_LIGHT_SHADOWMAP_COUNT
+uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];
+uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];
+uniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];
+#endif
+
+#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT
+#if defined(SHADOW_CASCADE)
+uniform sampler2D directionalLightShadowMaps[1];
+uniform mat4 directionalLightMatrices[SHADOW_CASCADE];
+uniform float directionalLightShadowMapSizes[1];
+uniform float shadowCascadeClipsNear[SHADOW_CASCADE];
+uniform float shadowCascadeClipsFar[SHADOW_CASCADE];
+#else
+uniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
+uniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
+uniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
+#endif
+#endif
+
+#ifdef POINT_LIGHT_SHADOWMAP_COUNT
+uniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT];
+#endif
+
+float tapShadowMap(sampler2D map, vec2 uv, float z) {
+  vec4 tex = texture2D(map, uv);
+  return step(z, decodeFloat(tex) * 2.0 - 1.0);
+}
+
+float pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {
+
+  float shadowContrib = tapShadowMap(map, uv, z);
+  vec2 offset = vec2(1.0 / textureSize) * scale;
+#ifdef PCF_KERNEL_SIZE
+  for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{
+      shadowContrib += tapShadowMap(map, uv + offset * pcfKernel[_idx_], z);
+  }}
+
+  return shadowContrib / float(PCF_KERNEL_SIZE + 1);
+#else
+  // TODO Removed in deferred pipeline
+  shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);
+  shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);
+  shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);
+  shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset.y), z);
+  shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, 0.0), z);
+  shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, -offset.y), z);
+  shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);
+  shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);
+
+  return shadowContrib / 9.0;
+#endif
+}
+
+float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
+  return pcf(map, uv, z, textureSize, vec2(1.0));
+}
+
+float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset) {
+
+  vec4 posInLightSpace = lightVPM * vec4(position, 1.0);
+  posInLightSpace.xyz /= posInLightSpace.w;
+  float z = posInLightSpace.z;
+  // In frustum
+  if(all(greaterThan(posInLightSpace.xyz, vec3(-0.99, -0.99, -1.0))) &&
+      all(lessThan(posInLightSpace.xyz, vec3(0.99, 0.99, 1.0)))){
+      // To texture uv
+      vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
+
+      return pcf(map, uv * scale + offset, z, textureSize, scale);
+  }
+  return 1.0;
+}
+
+float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize) {
+  return computeShadowContrib(map, lightVPM, position, textureSize, vec2(1.0), vec2(0.0));
+}
+
+float computeShadowContribOmni(samplerCube map, vec3 direction, float range)
+{
+  float dist = length(direction);
+  vec4 shadowTex = textureCube(map, direction);
+  return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);
+}
+#if defined(SPOT_LIGHT_SHADOWMAP_COUNT)
+
+void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ) {
+  float shadowContrib;
+  for(int _idx_ = 0; _idx_ < SPOT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{
+    shadowContrib = computeShadowContrib(
+      spotLightShadowMaps[_idx_], spotLightMatrices[_idx_], position,
+      spotLightShadowMapSizes[_idx_]
+    );
+    shadowContribs[_idx_] = shadowContrib;
+  }}
+  // set default fallof of rest lights
+  for(int _idx_ = SPOT_LIGHT_SHADOWMAP_COUNT; _idx_ < SPOT_LIGHT_COUNT; _idx_++){{
+    shadowContribs[_idx_] = 1.0;
+  }}
+}
+
+#endif
+
+
+#if defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT)
+#ifdef SHADOW_CASCADE
+void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){
+  // http://www.opengl.org/wiki/Compute_eye_space_from_window_space
+  float depth = (2.0 * gl_FragCoord.z - gl_DepthRange.near - gl_DepthRange.far)
+    / (gl_DepthRange.far - gl_DepthRange.near);
+
+  float shadowContrib;
+  // Pixels not in light box are lighted
+  // TODO
+  shadowContribs[0] = 1.0;
+
+  for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{
+    if (
+      depth >= shadowCascadeClipsNear[_idx_] &&
+      depth <= shadowCascadeClipsFar[_idx_]
+    ) {
+      shadowContrib = computeShadowContrib(
+        directionalLightShadowMaps[0], directionalLightMatrices[_idx_], position,
+        directionalLightShadowMapSizes[0],
+        vec2(1.0 / float(SHADOW_CASCADE), 1.0),
+        vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)
+      );
+      // TODO Will get a sampler needs to be be uniform error in native gl
+      shadowContribs[0] = shadowContrib;
+    }
+  }}
+  // set default fallof of rest lights
+  for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{
+    shadowContribs[_idx_] = 1.0;
+  }}
+}
+#else
+
+void computeShadowOfDirectionalLights(vec3 position, inout float shadowContribs[DIRECTIONAL_LIGHT_COUNT]){
+  float shadowContrib;
+
+  for(int _idx_ = 0; _idx_ < DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_++) {{
+    shadowContrib = computeShadowContrib(
+      directionalLightShadowMaps[_idx_], directionalLightMatrices[_idx_], position,
+      directionalLightShadowMapSizes[_idx_]
+    );
+    shadowContribs[_idx_] = shadowContrib;
+  }}
+  // set default fallof of rest lights
+  for(int _idx_ = DIRECTIONAL_LIGHT_SHADOWMAP_COUNT; _idx_ < DIRECTIONAL_LIGHT_COUNT; _idx_++) {{
+    shadowContribs[_idx_] = 1.0;
+  }}
+}
+#endif
+#endif
+
+
+#if defined(POINT_LIGHT_SHADOWMAP_COUNT)
+void computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_LIGHT_COUNT] ){
+  vec3 lightPosition;
+  vec3 direction;
+  for(int _idx_ = 0; _idx_ < POINT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{
+    lightPosition = pointLightPosition[_idx_];
+    direction = position - lightPosition;
+    shadowContribs[_idx_] = computeShadowContribOmni(pointLightShadowMaps[_idx_], direction, pointLightRange[_idx_]);
+  }}
+  for(int _idx_ = POINT_LIGHT_SHADOWMAP_COUNT; _idx_ < POINT_LIGHT_COUNT; _idx_++) {{
+    shadowContribs[_idx_] = 1.0;
+  }}
+}
+#endif
+#endif
+`);
+
+export const shadowMap = createShaderChunk({
+  uniforms: {
+    shadowEnabled: uniform('bool', 1),
+    pcfKernel: createArrayUniform('vec2', 'PCF_KERNEL_SIZE')
+  },
+  functions: [shadowMapFunction]
+});

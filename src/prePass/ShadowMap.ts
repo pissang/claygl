@@ -17,7 +17,6 @@ import TexturePool from '../composite/TexturePool';
 
 import * as mat4 from '../glmatrix/mat4';
 
-import shadowmapEssl from '../shader/source/shadowmap.glsl.js';
 import type Renderable from '../Renderable';
 import { Notifier } from '../core';
 import Scene from '../Scene';
@@ -28,8 +27,13 @@ import DirectionalLight from '../light/Directional';
 import SpotLight from '../light/Spot';
 import PointLight from '../light/Point';
 import { assign } from '../core/util';
-
-Shader.import(shadowmapEssl);
+import {
+  shadowMapDepthDebugFragment,
+  shadowMapDepthFragment,
+  shadowMapDepthVertex,
+  shadowMapDistanceFragment,
+  shadowMapDistanceVertex
+} from '../shader/source/shadowmap.glsl';
 
 function getDepthMaterialUniform(renderable: Renderable, depthMaterial: Material, symbol: string) {
   if (symbol === 'alphaMap') {
@@ -118,9 +122,6 @@ class ShadowMapPass extends Notifier {
     SPOT_LIGHT: 0
   };
 
-  private _depthMaterials: Record<string, Material> = {};
-  private _distanceMaterials: Record<string, Material> = {};
-
   private _receivers: Renderable[] = [];
   private _lightsCastShadow: Light[] = [];
 
@@ -133,7 +134,7 @@ class ShadowMapPass extends Notifier {
 
   private _texturePool = new TexturePool();
 
-  private _debugPass?: FullscreenQuadPass;
+  private _debugPass?: FullscreenQuadPass<typeof shadowMapDepthDebugFragment>;
 
   constructor(opts?: Partial<ShadowMapPassOpts>) {
     super();
@@ -158,7 +159,7 @@ class ShadowMapPass extends Notifier {
   renderDebug(renderer: Renderer, size?: number) {
     let debugPass = this._debugPass;
     if (!debugPass) {
-      debugPass = this._debugPass = new FullscreenQuadPass(Shader.source('clay.sm.debug_depth'));
+      debugPass = this._debugPass = new FullscreenQuadPass(shadowMapDepthDebugFragment);
     }
     renderer.saveClear();
     const viewport = renderer.viewport;
@@ -637,14 +638,15 @@ class ShadowMapPass extends Notifier {
     let shadowMaterial = this._lightMaterials[light.__uid__];
     const isPointLight = light.type === 'POINT_LIGHT';
     if (!shadowMaterial) {
-      const shaderPrefix = 'clay.sm.' + (isPointLight ? 'distance.' : 'depth.');
-      shadowMaterial = new Material({
-        precision: this.precision,
-        shader: new Shader(
-          Shader.source(shaderPrefix + 'vertex'),
-          Shader.source(shaderPrefix + 'fragment')
-        )
-      });
+      shadowMaterial = new Material(
+        new Shader(
+          isPointLight ? shadowMapDistanceVertex : shadowMapDepthVertex,
+          isPointLight ? shadowMapDistanceFragment : shadowMapDepthFragment
+        ),
+        {
+          precision: this.precision
+        }
+      );
 
       this._lightMaterials[light.__uid__] = shadowMaterial;
     }
@@ -690,17 +692,14 @@ class ShadowMapPass extends Notifier {
   }
 
   _getPointLightCamera(light: PointLight, target: CubeTarget) {
-    if (!this._lightCameras.point) {
-      this._lightCameras.point = {
-        px: new PerspectiveCamera(),
-        nx: new PerspectiveCamera(),
-        py: new PerspectiveCamera(),
-        ny: new PerspectiveCamera(),
-        pz: new PerspectiveCamera(),
-        nz: new PerspectiveCamera()
-      };
+    const lightCameras = this._lightCameras;
+    if (!lightCameras.point) {
+      lightCameras.point = cubeTargets.reduce((obj, target) => {
+        obj[target] = new PerspectiveCamera();
+        return obj;
+      }, {} as Record<CubeTarget, PerspectiveCamera>);
     }
-    const camera = this._lightCameras.point[target];
+    const camera = lightCameras.point[target];
 
     camera.far = light.range;
     camera.fov = 90;
@@ -816,8 +815,6 @@ class ShadowMapPass extends Notifier {
 
     this._texturePool.clear(renderer);
 
-    this._depthMaterials = {};
-    this._distanceMaterials = {};
     this._textures = {};
     this._lightCameras = {};
     this._shadowMapNumber = {
