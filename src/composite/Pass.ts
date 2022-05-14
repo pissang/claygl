@@ -13,10 +13,7 @@ import type Texture2D from '../Texture2D';
 import Notifier from '../core/Notifier';
 
 const planeGeo = new Plane();
-const mesh = new Mesh({
-  geometry: planeGeo,
-  frustumCulling: false
-});
+let mesh: Mesh;
 const camera = new OrthoCamera();
 
 interface FullscreenQuadPassOpts {
@@ -143,10 +140,14 @@ class FullscreenQuadPass<
    * Simply do quad rendering
    */
   renderQuad(renderer: Renderer) {
-    if (this.material) {
-      mesh.material = this.material;
-      renderer.renderPass([mesh], camera);
-    }
+    const material = this.material;
+    mesh =
+      mesh ||
+      new Mesh(planeGeo, material, {
+        frustumCulling: false
+      });
+    mesh.material = material;
+    renderer.renderPass([mesh], camera);
   }
 
   /**

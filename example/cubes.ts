@@ -4,9 +4,8 @@ import {
   PerspectiveCamera,
   Renderer,
   Scene,
-  StandardShader,
+  createStandardShader,
   Texture2D,
-  Timeline,
   Node as ClayNode,
   Mesh,
   PointLight,
@@ -29,9 +28,7 @@ const camera = new PerspectiveCamera({
 
 const cube = new CubeGeometry();
 cube.generateTangents();
-const material = new Material({
-  shader: new StandardShader()
-});
+const material = new Material(createStandardShader());
 material.set('glossiness', 0.4);
 const diffuse = new Texture2D();
 diffuse.load('assets/textures/crate.gif');
@@ -49,10 +46,7 @@ scene.add(root);
 for (let i = 0; i < 20; i++) {
   for (let j = 0; j < 10; j++) {
     for (let k = 0; k < 50; k++) {
-      const mesh = new Mesh({
-        geometry: cube,
-        material: material
-      });
+      const mesh = new Mesh(cube, material);
       mesh.position.set(
         50 - Math.random() * 100,
         50 - Math.random() * 100,

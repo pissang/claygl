@@ -170,7 +170,7 @@ class ShadowMapPass extends Notifier {
     for (const name in this._textures) {
       const texture = this._textures[name];
       renderer.setViewport(x, y, (width * texture.width) / texture.height, height);
-      debugPass.setUniform('depthMap', texture);
+      debugPass.set('depthMap', texture);
       debugPass.renderQuad(renderer);
       x += (width * texture.width) / texture.height;
     }
@@ -651,10 +651,10 @@ class ShadowMapPass extends Notifier {
       this._lightMaterials[light.__uid__] = shadowMaterial;
     }
     if ((light as DirectionalLight).shadowSlopeScale != null) {
-      shadowMaterial.setUniform('slopeScale', (light as DirectionalLight).shadowSlopeScale);
+      shadowMaterial.set('slopeScale', (light as DirectionalLight).shadowSlopeScale);
     }
     if ((light as DirectionalLight).shadowBias != null) {
-      shadowMaterial.setUniform('bias', (light as DirectionalLight).shadowBias);
+      shadowMaterial.set('bias', (light as DirectionalLight).shadowBias);
     }
 
     if (isPointLight) {

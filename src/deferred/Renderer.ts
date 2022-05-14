@@ -249,7 +249,7 @@ class DeferredRenderer extends Notifier {
     this._accumulateLightBuffer(renderer, scene, camera, !opts.notUpdateShadow);
 
     if (!opts.renderToTarget) {
-      this._outputPass.setUniform('texture', this._lightAccumTex);
+      this._outputPass.set('texture', this._lightAccumTex);
 
       this._outputPass.render(renderer);
       // this._gBuffer.renderDebug(renderer, camera, 'normal');
@@ -381,33 +381,30 @@ class DeferredRenderer extends Notifier {
         let unknownLightType = false;
         switch (light.type) {
           case 'POINT_LIGHT':
-            material.setUniform('lightColor', uTpl.pointLightColor.value(light));
-            material.setUniform('lightRange', uTpl.pointLightRange.value(light));
-            material.setUniform('lightPosition', uTpl.pointLightPosition.value(light));
+            material.set('lightColor', uTpl.pointLightColor.value(light));
+            material.set('lightRange', uTpl.pointLightRange.value(light));
+            material.set('lightPosition', uTpl.pointLightPosition.value(light));
             break;
           case 'SPOT_LIGHT':
-            material.setUniform('lightPosition', uTpl.spotLightPosition.value(light));
-            material.setUniform('lightColor', uTpl.spotLightColor.value(light));
-            material.setUniform('lightRange', uTpl.spotLightRange.value(light));
-            material.setUniform('lightDirection', uTpl.spotLightDirection.value(light));
-            material.setUniform('umbraAngleCosine', uTpl.spotLightUmbraAngleCosine.value(light));
-            material.setUniform(
-              'penumbraAngleCosine',
-              uTpl.spotLightPenumbraAngleCosine.value(light)
-            );
-            material.setUniform('falloffFactor', uTpl.spotLightFalloffFactor.value(light));
+            material.set('lightPosition', uTpl.spotLightPosition.value(light));
+            material.set('lightColor', uTpl.spotLightColor.value(light));
+            material.set('lightRange', uTpl.spotLightRange.value(light));
+            material.set('lightDirection', uTpl.spotLightDirection.value(light));
+            material.set('umbraAngleCosine', uTpl.spotLightUmbraAngleCosine.value(light));
+            material.set('penumbraAngleCosine', uTpl.spotLightPenumbraAngleCosine.value(light));
+            material.set('falloffFactor', uTpl.spotLightFalloffFactor.value(light));
             break;
           case 'SPHERE_LIGHT':
-            material.setUniform('lightColor', uTpl.sphereLightColor.value(light));
-            material.setUniform('lightRange', uTpl.sphereLightRange.value(light));
-            material.setUniform('lightRadius', uTpl.sphereLightRadius.value(light));
-            material.setUniform('lightPosition', uTpl.sphereLightPosition.value(light));
+            material.set('lightColor', uTpl.sphereLightColor.value(light));
+            material.set('lightRange', uTpl.sphereLightRange.value(light));
+            material.set('lightRadius', uTpl.sphereLightRadius.value(light));
+            material.set('lightPosition', uTpl.sphereLightPosition.value(light));
             break;
           case 'TUBE_LIGHT':
-            material.setUniform('lightColor', uTpl.tubeLightColor.value(light));
-            material.setUniform('lightRange', uTpl.tubeLightRange.value(light));
-            material.setUniform('lightExtend', uTpl.tubeLightExtend.value(light));
-            material.setUniform('lightPosition', uTpl.tubeLightPosition.value(light));
+            material.set('lightColor', uTpl.tubeLightColor.value(light));
+            material.set('lightRange', uTpl.tubeLightRange.value(light));
+            material.set('lightExtend', uTpl.tubeLightExtend.value(light));
+            material.set('lightPosition', uTpl.tubeLightPosition.value(light));
             break;
           default:
             unknownLightType = true;
@@ -417,11 +414,11 @@ class DeferredRenderer extends Notifier {
           continue;
         }
 
-        material.setUniform('eyePosition', eyePosition);
-        material.setUniform('viewProjectionInv', viewProjectionInv.array);
-        material.setUniform('gBufferTexture1', gBuffer.getTargetTexture1());
-        material.setUniform('gBufferTexture2', gBuffer.getTargetTexture2());
-        material.setUniform('gBufferTexture3', gBuffer.getTargetTexture3());
+        material.set('eyePosition', eyePosition);
+        material.set('viewProjectionInv', viewProjectionInv.array);
+        material.set('gBufferTexture1', gBuffer.getTargetTexture1());
+        material.set('gBufferTexture2', gBuffer.getTargetTexture2());
+        material.set('gBufferTexture3', gBuffer.getTargetTexture3());
 
         volumeMeshList.push(volumeMesh);
       } else {
@@ -432,21 +429,18 @@ class DeferredRenderer extends Notifier {
         switch (light.type) {
           case 'AMBIENT_LIGHT':
             pass.material = this._ambientMat;
-            pass.material.setUniform('lightColor', uTpl.ambientLightColor.value(light));
+            pass.material.set('lightColor', uTpl.ambientLightColor.value(light));
             break;
           case 'AMBIENT_SH_LIGHT':
             pass.material = this._ambientSHMat;
-            pass.material.setUniform('lightColor', uTpl.ambientSHLightColor.value(light));
-            pass.material.setUniform(
-              'lightCoefficients',
-              uTpl.ambientSHLightCoefficients.value(light)
-            );
+            pass.material.set('lightColor', uTpl.ambientSHLightColor.value(light));
+            pass.material.set('lightCoefficients', uTpl.ambientSHLightCoefficients.value(light));
             break;
           case 'AMBIENT_CUBEMAP_LIGHT':
             pass.material = this._ambientCubemapMat;
-            pass.material.setUniform('lightColor', uTpl.ambientCubemapLightColor.value(light));
-            pass.material.setUniform('lightCubemap', uTpl.ambientCubemapLightCubemap.value(light));
-            pass.material.setUniform('brdfLookup', uTpl.ambientCubemapLightBRDFLookup.value(light));
+            pass.material.set('lightColor', uTpl.ambientCubemapLightColor.value(light));
+            pass.material.set('lightCubemap', uTpl.ambientCubemapLightCubemap.value(light));
+            pass.material.set('brdfLookup', uTpl.ambientCubemapLightBRDFLookup.value(light));
             break;
           case 'DIRECTIONAL_LIGHT':
             hasShadow = shadowMapPass && light.castShadow;
@@ -459,8 +453,8 @@ class DeferredRenderer extends Notifier {
                 (light as DirectionalLight).shadowCascade
               );
             }
-            pass.material.setUniform('lightColor', uTpl.directionalLightColor.value(light));
-            pass.material.setUniform('lightDirection', uTpl.directionalLightDirection.value(light));
+            pass.material.set('lightColor', uTpl.directionalLightColor.value(light));
+            pass.material.set('lightDirection', uTpl.directionalLightDirection.value(light));
             break;
           default:
             // Unkonw light type
@@ -471,21 +465,21 @@ class DeferredRenderer extends Notifier {
         }
 
         const passMaterial = pass.material!;
-        passMaterial.setUniform('eyePosition', eyePosition);
-        passMaterial.setUniform('viewProjectionInv', viewProjectionInv.array);
-        passMaterial.setUniform('gBufferTexture1', gBuffer.getTargetTexture1());
-        passMaterial.setUniform('gBufferTexture2', gBuffer.getTargetTexture2());
-        passMaterial.setUniform('gBufferTexture3', gBuffer.getTargetTexture3());
+        passMaterial.set('eyePosition', eyePosition);
+        passMaterial.set('viewProjectionInv', viewProjectionInv.array);
+        passMaterial.set('gBufferTexture1', gBuffer.getTargetTexture1());
+        passMaterial.set('gBufferTexture2', gBuffer.getTargetTexture2());
+        passMaterial.set('gBufferTexture3', gBuffer.getTargetTexture3());
 
         // TODO
         if (shadowMapPass && light.castShadow) {
           const lightShadowInfo = lightShadowInfosMap.get(light)!;
-          passMaterial.setUniform('lightShadowMap', lightShadowInfo.shadowMap);
-          passMaterial.setUniform('lightMatrices', lightShadowInfo.lightMatrices);
-          passMaterial.setUniform('shadowCascadeClipsNear', lightShadowInfo.cascadeClipsNear);
-          passMaterial.setUniform('shadowCascadeClipsFar', lightShadowInfo.cascadeClipsFar);
+          passMaterial.set('lightShadowMap', lightShadowInfo.shadowMap);
+          passMaterial.set('lightMatrices', lightShadowInfo.lightMatrices);
+          passMaterial.set('shadowCascadeClipsNear', lightShadowInfo.cascadeClipsNear);
+          passMaterial.set('shadowCascadeClipsFar', lightShadowInfo.cascadeClipsFar);
 
-          passMaterial.setUniform('lightShadowMapSize', light.shadowResolution);
+          passMaterial.set('lightShadowMapSize', light.shadowResolution);
         }
 
         pass.renderQuad(renderer);
@@ -541,15 +535,15 @@ class DeferredRenderer extends Notifier {
     if (light.type === 'POINT_LIGHT') {
       const shadowMaps: TextureCube[] = [];
       shadowMapPass.renderPointLightShadow(renderer, scene, light, shadowMaps);
-      material!.setUniform('lightShadowMap', shadowMaps[0]);
-      material!.setUniform('lightShadowMapSize', light.shadowResolution);
+      material!.set('lightShadowMap', shadowMaps[0]);
+      material!.set('lightShadowMapSize', light.shadowResolution);
     } else if (light.type === 'SPOT_LIGHT') {
       const shadowMaps: Texture2D[] = [];
       const lightMatrices: mat4.Mat4Array[] = [];
       shadowMapPass.renderSpotLightShadow(renderer, scene, light, lightMatrices, shadowMaps);
-      material!.setUniform('lightShadowMap', shadowMaps[0]);
-      material!.setUniform('lightMatrix', lightMatrices[0]);
-      material!.setUniform('lightShadowMapSize', light.shadowResolution);
+      material!.set('lightShadowMap', shadowMaps[0]);
+      material!.set('lightMatrix', lightMatrices[0]);
+      material!.set('lightShadowMapSize', light.shadowResolution);
     } else if (light.type === 'DIRECTIONAL_LIGHT') {
       const shadowMaps: Texture2D[] = [];
       const lightMatrices: mat4.Mat4Array[] = [];

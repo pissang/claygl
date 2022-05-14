@@ -8,7 +8,7 @@ import {
   Skybox,
   Mesh,
   Material,
-  StandardShader,
+  createStandardShader,
   AmbientSHLight,
   OrbitControl,
   startTimeline
@@ -49,18 +49,11 @@ loadGLTF('assets/models/suzanne/suzanne.gltf').then((res) => {
       console.log(coeff);
       scene.add(light);
 
-      const material = new Material({
-        shader: new StandardShader()
-      });
-      const sphere = new Mesh({
-        material: material,
-        geometry: sphereGeo
-      });
+      const material = new Material(createStandardShader());
+      const sphere = new Mesh(sphereGeo, material);
 
-      const monkey = new Mesh({
-        geometry: suzanneGeometry,
-        material: material
-      });
+      const monkey = new Mesh(suzanneGeometry, material);
+
       sphere.position.x = -2;
       monkey.position.x = 2;
 

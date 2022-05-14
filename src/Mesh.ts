@@ -3,7 +3,8 @@ import * as constants from './core/constants';
 import { optional } from './core/util';
 import type Skeleton from './Skeleton';
 import type Matrix4 from './math/Matrix4';
-import type BoundingBox from './math/BoundingBox';
+import Material from './Material';
+import Geometry from './Geometry';
 
 export interface MeshOpts extends RenderableOpts {
   /**
@@ -16,15 +17,15 @@ export interface MeshOpts extends RenderableOpts {
   joints: number[];
 }
 
-interface Mesh extends MeshOpts {}
-class Mesh extends Renderable {
+interface Mesh<T extends Material = Material> extends MeshOpts {}
+class Mesh<T extends Material = Material> extends Renderable<T> {
   /**
    * Offset matrix used for multiple skinned mesh clone sharing one skeleton
    */
   offsetMatrix?: Matrix4;
 
-  constructor(opts?: Partial<MeshOpts>) {
-    super(opts);
+  constructor(geometry: Geometry, material: T, opts?: Partial<MeshOpts>) {
+    super(geometry, material, opts);
     opts = opts || {};
     if (opts.skeleton) {
       this.skeleton = opts.skeleton;

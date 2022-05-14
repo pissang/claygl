@@ -10,7 +10,8 @@ import {
   Node as ClayNode,
   PointLight,
   startTimeline,
-  AmbientLight
+  AmbientLight,
+  createStandardShader
 } from 'claygl';
 import Stats from 'stats.js';
 
@@ -33,20 +34,10 @@ diffuse.load('assets/textures/crate.gif');
 const normal = new Texture2D();
 normal.load('assets/textures/normal_map.jpg');
 
-const material1 = new Material({
-  shader: new Shader({
-    vertex: Shader.source('clay.standard.vertex'),
-    fragment: Shader.source('clay.standard.fragment')
-  })
-});
+const material1 = new Material(createStandardShader());
 material1.set('diffuseMap', diffuse);
 material1.set('normalMap', normal);
-const material2 = new Material({
-  shader: new Shader({
-    vertex: Shader.source('clay.standard.vertex'),
-    fragment: Shader.source('clay.standard.fragment')
-  })
-});
+const material2 = new Material(createStandardShader());
 material2.set('diffuseMap', diffuse);
 material2.set('normalMap', normal);
 
@@ -57,9 +48,7 @@ scene.add(root);
 for (let i = 0; i < 20; i++) {
   for (let j = 0; j < 10; j++) {
     for (let k = 0; k < 50; k++) {
-      const mesh = new Mesh({
-        geometry: cube,
-        material: i % 2 ? material1 : material2,
+      const mesh = new Mesh(cube, i % 2 ? material1 : material2, {
         lightGroup: i % 2
       });
       mesh.position.set(

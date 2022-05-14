@@ -121,10 +121,7 @@ export function merge(meshes: Mesh[], applyWorldTransform?: boolean) {
     vertexOffset += nVertex;
   }
 
-  return new Mesh({
-    material: material,
-    geometry: geometry
-  });
+  return new Mesh(geometry, material);
 }
 
 /**
@@ -239,11 +236,9 @@ export function splitByJoints(mesh: Mesh, maxJointNumber: number, inPlace?: bool
 
     const subGeo = new Geometry();
 
-    const subMesh = new Mesh({
+    const subMesh = new Mesh(subGeo, material, {
       name: [mesh.name, b].join('-'),
       // DON'T clone material.
-      material: material,
-      geometry: subGeo,
       skeleton: skeleton,
       joints: bucket.joints.slice()
     });

@@ -23,10 +23,7 @@ renderer.resize(window.innerWidth, window.innerHeight);
 
 const scene = new Scene();
 
-const cube = new Mesh({
-  geometry: new CubeGeometry(),
-  material: new StandardMaterial()
-});
+const cube = new Mesh(new CubeGeometry(), new StandardMaterial());
 scene.add(cube);
 
 function update() {

@@ -38,12 +38,12 @@ const cubes: Mesh[] = [];
 const CUBE_COUNT = 24;
 for (let i = 0; i < CUBE_COUNT; i++) {
   for (let j = 0; j < CUBE_COUNT; j++) {
-    const mesh = new Mesh({
-      geometry: cubeGeo,
-      material: new StandardMaterial({
+    const mesh = new Mesh(
+      cubeGeo,
+      new StandardMaterial({
         color: [i / CUBE_COUNT, j / CUBE_COUNT, 0.5]
       })
-    });
+    );
     mesh.position.x = i - CUBE_COUNT / 2;
     mesh.position.z = j - CUBE_COUNT / 2;
     mesh.scale.set(0.5, 0, 0.5);

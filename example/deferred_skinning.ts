@@ -24,16 +24,12 @@ function createSkeletonDebugScene(skeleton: Skeleton) {
   const sphereGeo = new SphereGeometry({
     radius: 0.1
   });
-  const sphereMat = new Material({
-    shader: new BasicShader()
-  });
+  const sphereMat = new Material(new BasicShader());
   sphereMat.set('color', [0.3, 0.3, 0.3]);
 
   const updates: (() => void)[] = [];
   skeleton.joints.forEach(function (joint) {
-    const sphere = new Mesh({
-      geometry: sphereGeo,
-      material: sphereMat,
+    const sphere = new Mesh(sphereGeo, sphereMat, {
       autoUpdateLocalTransform: false
     });
     scene.add(sphere);
@@ -41,9 +37,7 @@ function createSkeletonDebugScene(skeleton: Skeleton) {
     const lineGeo = new Geometry();
     const lineGeoVertices = lineGeo.attributes.position;
     lineGeoVertices.fromArray([0, 0, 0, 0, 0, 0]);
-    const line = new Mesh({
-      geometry: lineGeo,
-      material: sphereMat,
+    const line = new Mesh(lineGeo, sphereMat, {
       mode: Mesh.LINES,
       lineWidth: 2
     });
@@ -103,10 +97,7 @@ loadGLTF('assets/models/whale/whale-anim.gltf').then((res) => {
   light.lookAt(scene.position);
   scene.add(light);
 
-  const plane = new Mesh({
-    geometry: new PlaneGeometry(),
-    material: new StandardMaterial()
-  });
+  const plane = new Mesh(new PlaneGeometry(), new StandardMaterial());
   plane.rotation.rotateX(-Math.PI / 2);
   plane.scale.set(20, 20, 1);
   scene.add(plane);

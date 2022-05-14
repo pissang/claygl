@@ -1,6 +1,6 @@
 import Material, { MaterialOpts } from './Material';
 
-import StandardShader from './shader/StandardShader';
+import { createStandardShader } from './shader/create';
 import { Color } from './core/type';
 import Texture2D from './Texture2D';
 import type TextureCube from './TextureCube';
@@ -56,7 +56,7 @@ const BOOL_DEFINE_MAP = {
   environmentMapPrefiltered: 'ENVIRONMENTMAP_PREFILTER'
 } as const;
 
-let standardShader: StandardShader;
+let standardShader: ReturnType<typeof createStandardShader>;
 
 type MaterialColor = Color | string;
 
@@ -173,7 +173,7 @@ const defaultStandardMaterialOpts = {
 class StandardMaterial extends Material {
   constructor(opts?: Partial<StandardMaterialOpts>) {
     if (!standardShader) {
-      standardShader = new StandardShader();
+      standardShader = createStandardShader();
     }
     super(standardShader, opts);
 
@@ -202,7 +202,7 @@ SIMPLE_PROPERTIES.forEach(function (propName) {
       return this.get(propName);
     },
     set: function (value) {
-      this.setUniform(propName, value);
+      this.set(propName, value);
     }
   });
 });
@@ -213,7 +213,7 @@ TEXTURE_PROPERTIES.forEach(function (propName) {
       return this.get(propName);
     },
     set: function (value) {
-      this.setUniform(propName, value);
+      this.set(propName, value);
     }
   });
 });
@@ -261,8 +261,8 @@ Object.defineProperty(StandardMaterial.prototype, 'environmentBox', {
 
     // TODO Can't detect operation like box.min = new Vector()
     if (value) {
-      this.setUniform('environmentBoxMin', value.min.array);
-      this.setUniform('environmentBoxMax', value.max.array);
+      this.set('environmentBoxMin', value.min.array);
+      this.set('environmentBoxMax', value.max.array);
     }
 
     if (value) {

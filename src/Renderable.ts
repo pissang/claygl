@@ -5,11 +5,9 @@ import type Renderer from './Renderer';
 import type Material from './Material';
 import type Geometry from './Geometry';
 import { GLEnum } from './core/type';
+import GeometryBase from './GeometryBase';
 
 export interface RenderableOpts extends ClayNodeOpts {
-  material: Material;
-  geometry: Geometry;
-
   mode: number;
 
   /**
@@ -95,8 +93,10 @@ const properties = [
   'ignoreGBuffer'
 ] as const;
 
-interface Renderable extends RenderableOpts {}
-class Renderable extends ClayNode {
+interface Renderable<T extends Material = Material> extends RenderableOpts {}
+class Renderable<T extends Material = Material> extends ClayNode {
+  geometry: Geometry;
+  material: T;
   /**
    * Bounding box of renderable
    */
@@ -109,7 +109,7 @@ class Renderable extends ClayNode {
   // Depth for transparent list sorting
   __depth = 0;
 
-  constructor(opts?: Partial<RenderableOpts>) {
+  constructor(geometry: Geometry, material: T, opts?: Partial<RenderableOpts>) {
     super(opts);
     opts = opts || {};
 
@@ -120,8 +120,8 @@ class Renderable extends ClayNode {
       }
     }
 
-    opts.geometry && (this.geometry = opts.geometry);
-    opts.material && (this.material = opts.material);
+    this.geometry = geometry;
+    this.material = material;
   }
 
   /**
@@ -195,20 +195,21 @@ class Renderable extends ClayNode {
   static CCW = constants.CCW;
 }
 
-Renderable.prototype.mode = constants.TRIANGLES;
+const proto = Renderable.prototype;
+proto.mode = constants.TRIANGLES;
 
-Renderable.prototype.lightGroup = 0;
-Renderable.prototype.renderOrder = 0;
+proto.lightGroup = 0;
+proto.renderOrder = 0;
 
-Renderable.prototype.culling = true;
-Renderable.prototype.cullFace = constants.BACK;
-Renderable.prototype.frontFace = constants.CCW;
+proto.culling = true;
+proto.cullFace = constants.BACK;
+proto.frontFace = constants.CCW;
 
-Renderable.prototype.frustumCulling = true;
-Renderable.prototype.receiveShadow = true;
-Renderable.prototype.castShadow = true;
-Renderable.prototype.ignorePicking = false;
-Renderable.prototype.ignorePreZ = false;
-Renderable.prototype.ignoreGBuffer = false;
+proto.frustumCulling = true;
+proto.receiveShadow = true;
+proto.castShadow = true;
+proto.ignorePicking = false;
+proto.ignorePreZ = false;
+proto.ignoreGBuffer = false;
 
 export default Renderable;

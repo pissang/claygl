@@ -34,10 +34,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
     uvRepeat: [3, 3],
     roughness: 0.5
   });
-  const mesh = new Mesh({
-    geometry: suzanneGeometry,
-    material
-  });
+  const mesh = new Mesh(suzanneGeometry, material);
   mesh.geometry.generateTangents();
 
   (

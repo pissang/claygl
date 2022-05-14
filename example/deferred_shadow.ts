@@ -31,15 +31,15 @@ const camera = new PerspectiveCamera({
 
 const scene = new Scene();
 
-const cube = new Mesh({
-  material: new StandardMaterial({
-    roughness: 0.9
-  }),
-  culling: false,
-  geometry: new CubeGeometry({
+const cube = new Mesh(
+  new CubeGeometry({
     inside: true
-  })
-});
+  }),
+  new StandardMaterial({ roughness: 0.9 }),
+  {
+    culling: false
+  }
+);
 cube.scale.set(10, 10, 10);
 scene.add(cube);
 
@@ -48,12 +48,12 @@ function randomInSquare(size: number) {
 }
 const sphereGeo = new SphereGeometry();
 for (let i = 0; i < 20; i++) {
-  const sphere = new Mesh({
-    material: new StandardMaterial({
+  const sphere = new Mesh(
+    sphereGeo,
+    new StandardMaterial({
       roughness: 0.9
-    }),
-    geometry: sphereGeo
-  });
+    })
+  );
   sphere.scale.set(0.5, 0.5, 0.5);
   sphere.position.set(randomInSquare(8), randomInSquare(8), randomInSquare(8));
   scene.add(sphere);
@@ -79,14 +79,14 @@ for (let i = 0; i < 10; i++) {
   });
   pointLights.push(pointLight);
   pointLight.position.set(randomInSquare(5), randomInSquare(5), randomInSquare(5));
-  const debugMesh = new Mesh({
-    material: new StandardMaterial({
+  const debugMesh = new Mesh(
+    sphereGeo,
+    new StandardMaterial({
       color: [0, 0, 0],
       roughness: 1,
       emission: pointLight.color
-    }),
-    geometry: sphereGeo
-  });
+    })
+  );
   debugMesh.scale.set(0.1, 0.1, 0.1);
   pointLight.add(debugMesh);
 

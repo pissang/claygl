@@ -40,7 +40,7 @@ import Camera from './Camera';
 import { EventManager } from './app/EventManager';
 import type Renderable from './Renderable';
 import Shader from './Shader';
-import StandardShader from './shader/StandardShader';
+import { createStandardShader } from './shader/create';
 import Geometry from './Geometry';
 import { Color } from './core/type';
 
@@ -167,7 +167,7 @@ class App3D extends Notifier {
   private _frameTime: number = 0;
   private _elapsedTime: number = 0;
 
-  private _defaultShader = new StandardShader();
+  private _defaultShader = createStandardShader();
 
   constructor(container: HTMLElement | string, opts?: App3DOpts) {
     super();
@@ -593,7 +593,7 @@ class App3D extends Notifier {
     const texturesLoading: Promise<Texture>[] = [];
     function makeTextureSetter(key: string) {
       return function (texture: Texture) {
-        material.setUniform(key, texture);
+        material.set(key, texture);
         matConfig!.textureLoaded && matConfig!.textureLoaded(key, texture);
         return texture;
       };
@@ -613,7 +613,7 @@ class App3D extends Notifier {
             }).then(makeTextureSetter(uniformName))
           );
         } else {
-          material.setUniform(uniformName, val);
+          material.set(uniformName, val);
         }
       }
     });
@@ -803,10 +803,7 @@ class App3D extends Notifier {
    * @param geometry
    */
   createMesh(geometry: Geometry, mat?: CreateMaterialConfig | Material, parentNode?: ClayNode) {
-    const mesh = new Mesh({
-      geometry: geometry,
-      material: mat instanceof Material ? mat : this.createMaterial(mat)
-    });
+    const mesh = new Mesh(geometry, mat instanceof Material ? mat : this.createMaterial(mat));
     parentNode = parentNode || this._scene;
     parentNode.add(mesh);
     return mesh;

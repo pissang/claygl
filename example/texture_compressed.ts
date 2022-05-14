@@ -6,14 +6,11 @@ import {
   PlaneGeometry,
   Scene,
   OrthographicCamera,
-  registerBuiltinCompositeShaders,
   Texture2D,
   constants
 } from 'claygl';
 
 import { parse as parseKTX } from '../src/util/ktx';
-
-registerBuiltinCompositeShaders(Shader);
 
 const canvas = document.querySelector('canvas')!;
 canvas.width = window.innerWidth;

@@ -39,14 +39,14 @@ texture.load('assets/textures/rockwall_n.jpg');
 
 const scene = new Scene();
 
-const plane = new Mesh({
-  material: new StandardMaterial({
+const plane = new Mesh(
+  new PlaneGeometry(),
+  new StandardMaterial({
     roughness: 0.5,
     uvRepeat: [100, 100],
     normalMap: texture
-  }),
-  geometry: new PlaneGeometry()
-});
+  })
+);
 plane.scale.set(10000, 10000, 1);
 plane.rotation.rotateX(-Math.PI / 2);
 plane.geometry.generateTangents();
@@ -74,15 +74,15 @@ for (let i = 0; i < 20; i++) {
   tubeLight.position.set(x, y, z);
   scene.add(tubeLight);
 
-  const lightMesh = new Mesh({
-    material: new StandardMaterial({
+  const lightMesh = new Mesh(
+    cylinder,
+    new StandardMaterial({
       color: [0, 0, 0],
       roughness: 1,
       metalness: 0,
       emission: tubeLight.color
-    }),
-    geometry: cylinder
-  });
+    })
+  );
   const r = 1;
   const l = tubeLight.length;
   lightMesh.scale.set(r + l / 2, r, r);
@@ -96,13 +96,13 @@ const sphereGeo = new SphereGeometry({
 });
 for (let i = 0; i < 10; i++) {
   for (let j = 0; j < 10; j++) {
-    const sphere = new Mesh({
-      material: new StandardMaterial({
+    const sphere = new Mesh(
+      sphereGeo,
+      new StandardMaterial({
         roughness: 0.6,
         color: [0, 0, 0]
-      }),
-      geometry: sphereGeo
-    });
+      })
+    );
     sphere.scale.set(40, 40, 40);
     sphere.position.set((i - 5) * 200, 200, (j - 5) * 200);
     scene.add(sphere);

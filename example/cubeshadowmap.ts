@@ -6,10 +6,9 @@ import {
   Mesh,
   Scene,
   CubeGeometry,
-  meshUtil,
   PerspectiveCamera,
   ShadowMapPass,
-  LambertShader,
+  createLambertShader,
   Node as ClayNode,
   Vector3,
   PointLight
@@ -29,18 +28,13 @@ const camera = new PerspectiveCamera({
 });
 
 const cube = new CubeGeometry();
-const material = new Material({
-  shader: new LambertShader()
-});
+const material = new Material(createLambertShader());
 
 const root = new ClayNode();
 for (let i = 0; i < 2; i++) {
   for (let j = 0; j < 2; j++) {
     for (let k = 0; k < 2; k++) {
-      const mesh = new Mesh({
-        geometry: cube,
-        material: material
-      });
+      const mesh = new Mesh(cube, material);
       mesh.scale.set(0.5, 0.5, 0.5);
       mesh.position.set((i - 0.5) * 5, (j - 0.5) * 5, (k - 0.5) * 5);
       root.add(mesh);
@@ -49,11 +43,7 @@ for (let i = 0; i < 2; i++) {
 }
 scene.add(root);
 
-const bigCube = new Mesh({
-  geometry: new CubeGeometry({ inside: true }),
-  material: new Material({
-    shader: new LambertShader()
-  }),
+const bigCube = new Mesh(new CubeGeometry({ inside: true }), new Material(createLambertShader()), {
   culling: false,
   scale: new Vector3(10, 10, 10)
 });

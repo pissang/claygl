@@ -1,4 +1,12 @@
-import { BasicShader, Material, Mesh, OrthographicCamera, Renderer, Scene, Geometry } from 'claygl';
+import {
+  createBasicShader,
+  Material,
+  Mesh,
+  OrthographicCamera,
+  Renderer,
+  Scene,
+  Geometry
+} from 'claygl';
 
 const TRIANGLE_POSITIONS = [
   [-0.5, -0.5, 0],
@@ -24,10 +32,7 @@ const geometry = new Geometry({
 // Add triangle vertices to position attribute.
 geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 
-const mesh = new Mesh({
-  geometry: geometry,
-  material: new Material(new BasicShader())
-});
+const mesh = new Mesh(geometry, new Material(createBasicShader()));
 mesh.material.set('color', [0, 0, 1]);
 scene.add(mesh);
 

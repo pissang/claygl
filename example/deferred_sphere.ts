@@ -39,14 +39,14 @@ texture.load('assets/textures/rockwall_n.jpg');
 
 const scene = new Scene();
 
-const plane = new Mesh({
-  material: new StandardMaterial({
+const plane = new Mesh(
+  new PlaneGeometry(),
+  new StandardMaterial({
     roughness: 0.5,
     uvRepeat: [100, 100],
     normalMap: texture
-  }),
-  geometry: new PlaneGeometry()
-});
+  })
+);
 plane.scale.set(10000, 10000, 1);
 plane.rotation.rotateX(-Math.PI / 2);
 plane.geometry.generateTangents();
@@ -76,14 +76,14 @@ for (let i = 0; i < 10; i++) {
     sphereLight.position.set(x, y, z);
     scene.add(sphereLight);
 
-    const lightMesh = new Mesh({
-      material: new StandardMaterial({
+    const lightMesh = new Mesh(
+      sphereGeo,
+      new StandardMaterial({
         color: [0, 0, 0],
         roughness: 1,
         emission: sphereLight.color
-      }),
-      geometry: sphereGeo
-    });
+      })
+    );
     const r = sphereLight.radius;
     lightMesh.scale.set(r, r, r);
 
@@ -103,10 +103,7 @@ loadGLTF('assets/models/suzanne/suzanne.gltf').then((res) => {
 
   for (let i = 0; i < 5; i++) {
     for (let j = 0; j < 5; j++) {
-      const mesh = new Mesh({
-        material,
-        geometry: suzanneGeometry
-      });
+      const mesh = new Mesh(suzanneGeometry, material);
       mesh.position.set((i - 2.5) * 500, 150, (j - 2.5) * 500);
       mesh.scale.set(100, 100, 100);
       scene.add(mesh);

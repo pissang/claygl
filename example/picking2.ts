@@ -4,8 +4,8 @@ import {
   Scene,
   Material,
   SphereGeometry,
-  StandardShader,
-  BasicShader,
+  createStandardShader,
+  createBasicShader,
   Mesh,
   DirectionalLight,
   AmbientLight,
@@ -34,12 +34,7 @@ const scene = new Scene();
 
 loadGLTF('assets/models/suzanne/suzanne.gltf').then((res) => {
   const geo = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
-  const mesh = new Mesh({
-    material: new Material({
-      shader: new StandardShader()
-    }),
-    geometry: geo
-  });
+  const mesh = new Mesh(geo, new Material(createStandardShader()));
 
   scene.add(mesh);
 });
@@ -59,12 +54,7 @@ startTimeline((dTime) => {
   renderer.render(scene, camera);
 });
 
-const sphere = new Mesh({
-  material: new Material({
-    shader: new BasicShader()
-  }),
-  geometry: new SphereGeometry()
-});
+const sphere = new Mesh(new SphereGeometry(), new Material(createBasicShader()));
 sphere.scale.set(0.02, 0.02, 0.02);
 sphere.material.set('color', [1, 0, 0]);
 scene.add(sphere);

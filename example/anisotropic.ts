@@ -2,7 +2,7 @@ import {
   Renderer,
   Scene,
   PerspectiveCamera,
-  BasicShader,
+  createBasicShader,
   Material,
   Texture2D,
   Node as ClayNode,
@@ -24,9 +24,7 @@ const camera = new PerspectiveCamera({
   far: 500
 });
 
-const shader = new BasicShader();
-
-const material = new Material({ shader });
+const material = new Material(createBasicShader());
 const image = new Image();
 image.src = 'assets/textures/ground_tile.jpg';
 const texture = new Texture2D({
@@ -52,9 +50,7 @@ const plane = new PlaneGeometry({
   widthSegments: 1,
   heightSegments: 1
 });
-const planeMesh = new Mesh({
-  geometry: plane,
-  material: material,
+const planeMesh = new Mesh(plane, material, {
   scale: new Vector3(60, 60, 60)
 });
 planeMesh.position.y = -0.8;

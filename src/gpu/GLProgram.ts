@@ -106,7 +106,7 @@ class GLProgram {
     return textureSlot;
   }
 
-  setUniform(_gl: WebGLRenderingContext, type: string, symbol: string, value: any) {
+  set(_gl: WebGLRenderingContext, type: string, symbol: string, value: any) {
     const locationMap = this._uniformLocations;
     const location = locationMap[symbol];
     // Uniform is not existed in the shader
@@ -205,7 +205,7 @@ class GLProgram {
   setUniformOfSemantic(_gl: WebGLRenderingContext, semantic: string, val: any) {
     const semanticInfo = this.semanticsMap[semantic as UniformSemantic];
     if (semanticInfo) {
-      return this.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, val);
+      return this.set(_gl, semanticInfo.type, semanticInfo.symbol, val);
     }
     return false;
   }

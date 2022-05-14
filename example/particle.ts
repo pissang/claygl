@@ -6,7 +6,7 @@ import {
   Material,
   Texture2D,
   Mesh,
-  LambertShader,
+  createLambertShader,
   Vector3,
   ParticleRenderable,
   ParticleEmitter,
@@ -47,12 +47,7 @@ const camera = new PerspectiveCamera({
 camera.position.set(0, 0, 120);
 scene.add(particleRenderable);
 
-const planeMesh = new Mesh({
-  geometry: new PlaneGeometry(),
-  material: new Material({
-    shader: new LambertShader()
-  })
-});
+const planeMesh = new Mesh(new PlaneGeometry(), new Material(createLambertShader()));
 planeMesh.material.set('color', [0.3, 0, 0]);
 planeMesh.scale.set(10000, 10000, 1);
 scene.add(planeMesh);

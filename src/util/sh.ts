@@ -22,7 +22,7 @@ import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
 //   });
 //   const pass = new FullscreenQuadPass(projectEnvMapShaderCode);
 //   pass.material!.define('fragment', 'TEXTURE_SIZE', envMap.width);
-//   pass.material.setUniform('environmentMap', envMap);
+//   pass.material.set('environmentMap', envMap);
 
 //   const framebuffer = new FrameBuffer();
 //   framebuffer.attach(shTexture);

@@ -30,7 +30,7 @@ import Geometry from '../Geometry';
 
 // Import builtin shader
 import Shader from '../Shader';
-import StandardShader from '../shader/StandardShader';
+import { createStandardShader } from '../shader/create';
 import type Camera from '../Camera';
 
 type GLTFFormat = any;
@@ -268,7 +268,7 @@ function doLoadGLTF(url: string, opts?: Partial<GLTFLoadOpts>) {
     {
       useStandardMaterial: false,
 
-      shader: new StandardShader(),
+      shader: createStandardShader(),
       includeCamera: true,
 
       includeAnimation: true,
@@ -862,7 +862,7 @@ function pbrMetallicRoughnessToStandard(
       material.define('fragment', 'DOUBLE_SIDED');
     }
 
-    material.set(commonProperties as any);
+    material.setUniforms(commonProperties as any);
   }
 
   if (materialInfo.alphaMode === 'BLEND') {
@@ -951,7 +951,7 @@ function pbrSpecularGlossinessToStandard(
     material.define('fragment', 'DOUBLE_SIDED');
   }
 
-  material.set(commonProperties);
+  material.setUniforms(commonProperties);
 
   if (materialInfo.alphaMode === 'BLEND') {
     material.depthMask = false;
@@ -1093,9 +1093,7 @@ function parseMeshes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpt
       if (!material) {
         material = new Material(opts.shader!);
       }
-      const mesh = new Mesh({
-        geometry: geometry,
-        material: material,
+      const mesh = new Mesh(geometry, material, {
         mode:
           [
             Mesh.POINTS,
@@ -1161,10 +1159,8 @@ function instanceCamera(json: GLTFFormat, nodeInfo: GLTFNode) {
 
 function parseNodes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpts>) {
   function instanceMesh(mesh: Mesh): Mesh {
-    return new Mesh({
+    return new Mesh(mesh.geometry, mesh.material, {
       name: mesh.name,
-      geometry: mesh.geometry,
-      material: mesh.material,
       culling: mesh.culling,
       mode: mesh.mode
     });

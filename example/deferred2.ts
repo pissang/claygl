@@ -41,10 +41,7 @@ const material = new StandardMaterial({
 loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   const suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
 
-  const mesh = new Mesh({
-    geometry: suzanneGeometry,
-    material: material
-  });
+  const mesh = new Mesh(suzanneGeometry, material);
   mesh.geometry.generateTangents();
 
   (
@@ -90,14 +87,14 @@ for (let i = 0; i < 100; i++) {
   lights.push(rootNode);
   scene.add(rootNode);
 
-  const debugMesh = new Mesh({
-    material: new StandardMaterial({
+  const debugMesh = new Mesh(
+    sphereGeo,
+    new StandardMaterial({
       color: [0, 0, 0],
       roughness: 1,
       emission: pointLight.color
-    }),
-    geometry: sphereGeo
-  });
+    })
+  );
   debugMesh.scale.set(0.02, 0.02, 0.02);
   pointLight.add(debugMesh);
 }

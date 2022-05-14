@@ -23,10 +23,7 @@ const geometry = new Geometry();
 geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 geometry.attributes.color.fromArray(VERTEX_COLORS);
 
-const mesh = new Mesh({
-  geometry: geometry,
-  material: new Material(new BasicShader())
-});
+const mesh = new Mesh(geometry, new Material(new BasicShader()));
 mesh.material.define('both', 'VERTEX_COLOR');
 mesh.material.set('color', [1, 1, 1]);
 scene.add(mesh);

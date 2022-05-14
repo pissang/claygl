@@ -4,7 +4,7 @@ import {
   Scene,
   Mesh,
   Material,
-  WireframeShader,
+  createWireframeShader,
   SphereGeometry,
   CubeGeometry,
   PlaneGeometry,
@@ -66,8 +66,7 @@ cone.generateBarycentric();
 cylinder.generateBarycentric();
 parametricSurfae.generateBarycentric();
 
-const material = new Material({
-  shader: new WireframeShader(),
+const material = new Material(createWireframeShader(), {
   transparent: true,
   depthTest: false
 });
@@ -75,34 +74,22 @@ material.set('lineWidth', 2);
 
 camera.position.set(0, 0, 9);
 
-const sphereMesh = new Mesh({
-  geometry: sphere,
-  material: material,
+const sphereMesh = new Mesh(sphere, material, {
   culling: false
 });
-const cubeMesh = new Mesh({
-  geometry: cube,
-  material: material,
+const cubeMesh = new Mesh(cube, material, {
   culling: false
 });
-const planeMesh = new Mesh({
-  geometry: plane,
-  material: material,
+const planeMesh = new Mesh(plane, material, {
   culling: false
 });
-const coneMesh = new Mesh({
-  geometry: cone,
-  material: material,
+const coneMesh = new Mesh(cone, material, {
   culling: false
 });
-const cylinderMesh = new Mesh({
-  geometry: cylinder,
-  material: material,
+const cylinderMesh = new Mesh(cylinder, material, {
   culling: false
 });
-const parametricSurfaceMesh = new Mesh({
-  geometry: parametricSurfae,
-  material: material,
+const parametricSurfaceMesh = new Mesh(parametricSurfae, material, {
   culling: false
 });
 sphereMesh.position.x = -3;

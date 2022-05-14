@@ -72,11 +72,11 @@ export * as easing from './animation/easing';
 
 // Bultin shader
 export {
-  BasicShader,
-  LambertShader,
-  // WireframeShader,
-  StandardShader
-} from './shader/index';
+  createBasicShader,
+  createLambertShader,
+  createStandardShader,
+  createWireframeShader
+} from './shader/create';
 
 // Picking
 export { pick as pickByRay, pickAll as pickAllByRay } from './picking/rayPicking';

@@ -29,23 +29,23 @@ const camera = new PerspectiveCamera({
 
 const scene = new Scene();
 
-const plane = new Mesh({
-  material: new StandardMaterial({
+const plane = new Mesh(
+  new PlaneGeometry(),
+  new StandardMaterial({
     roughness: 0.9
-  }),
-  geometry: new PlaneGeometry()
-});
+  })
+);
 plane.scale.set(10000, 10000, 1);
 plane.rotation.rotateX(-Math.PI / 2);
 
 const sphereGeo = new SphereGeometry();
 for (let i = 0; i < 100; i++) {
-  const sphere = new Mesh({
-    material: new StandardMaterial({
+  const sphere = new Mesh(
+    sphereGeo,
+    new StandardMaterial({
       roughness: 0.9
-    }),
-    geometry: sphereGeo
-  });
+    })
+  );
   sphere.scale.set(40, 40, 40);
   sphere.position.set(randomInSquare(1000), 40, randomInSquare(1000));
   scene.add(sphere);

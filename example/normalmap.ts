@@ -3,7 +3,7 @@ import {
   Scene,
   PerspectiveCamera,
   CubeGeometry,
-  StandardShader,
+  createStandardShader,
   Material,
   Texture2D,
   Mesh,
@@ -26,18 +26,13 @@ const cube = new CubeGeometry({
 cube.generateUniqueVertex();
 cube.generateTangents();
 
-const material = new Material({
-  shader: new StandardShader()
-});
+const material = new Material(createStandardShader());
 material.set('normalMap', loadTexture('assets/textures/normal_map.jpg'));
 material.set('diffuseMap', loadTexture('assets/textures/diffuse.jpg'));
 
 camera.position.set(0, 0, 4);
 
-const mesh = new Mesh({
-  geometry: cube,
-  material: material
-});
+const mesh = new Mesh(cube, material);
 scene.add(mesh);
 const light = new DirectionalLight({
   position: new Vector3(10, 10, 10)

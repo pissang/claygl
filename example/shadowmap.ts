@@ -6,10 +6,9 @@ import {
   Scene,
   Mesh,
   Material,
-  StandardShader,
+  createStandardShader,
   SpotLight,
   Vector3,
-  OrbitControl,
   PlaneGeometry,
   startTimeline
 } from 'claygl';
@@ -48,24 +47,17 @@ const plane = new PlaneGeometry({
   heightSegments: 1
 });
 
-const material = new Material({
-  shader: new StandardShader()
-});
+const material = new Material(createStandardShader());
 
-const cube = new Mesh({
-  material: material,
-  geometry: new CubeGeometry()
-});
+const cube = new Mesh(new CubeGeometry(), material);
+
 cube.position.y = 1;
 scene.add(cube);
 
 camera.position.set(0, 4, 5);
 camera.lookAt(new Vector3(0, 1, 0));
 
-const planeMesh = new Mesh({
-  geometry: plane,
-  material: material
-});
+const planeMesh = new Mesh(plane, material);
 planeMesh.rotation.rotateX(-Math.PI / 2);
 planeMesh.scale.set(10, 10, 10);
 

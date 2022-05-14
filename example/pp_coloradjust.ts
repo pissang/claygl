@@ -3,7 +3,7 @@ import {
   Scene,
   PerspectiveCamera,
   Material,
-  LambertShader,
+  createLambertShader,
   Shader,
   FilterCompositeNode,
   SceneCompositeNode,
@@ -13,11 +13,9 @@ import {
   Mesh,
   Vector3,
   DirectionalLight,
-  startTimeline,
-  registerBuiltinCompositeShaders
+  startTimeline
 } from 'claygl';
 
-registerBuiltinCompositeShaders(Shader);
 const compositor = new Compositor();
 
 const renderer = new Renderer({
@@ -31,17 +29,12 @@ const camera = new PerspectiveCamera({
   far: 500
 });
 const cube = new CubeGeometry();
-const shader = new LambertShader();
-const material = new Material({
-  shader: shader
-});
+const shader = createLambertShader();
+const material = new Material(shader);
 const texture = new Texture2D();
 texture.load('assets/textures/crate.gif');
 material.set('diffuseMap', texture);
-const mesh = new Mesh({
-  material: material,
-  geometry: cube
-});
+const mesh = new Mesh(cube, material);
 
 scene.add(mesh);
 
@@ -66,7 +59,7 @@ sceneCompositeNode.outputs = {
 };
 compositor.addNode(sceneCompositeNode);
 
-const colorAdjustNode = new FilterCompositeNode(Shader.source('clay.compositor.coloradjust'));
+const colorAdjustNode = new FilterCompositeNode(Shader.source('clay.composite.coloradjust'));
 colorAdjustNode.inputs = {
   texture: {
     node: sceneCompositeNode,

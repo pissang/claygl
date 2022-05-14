@@ -67,7 +67,7 @@ class CompositeFilterNode<T extends FragmentShader<any, any, any>> extends Compo
     keys(inputTextures).forEach((inputName) => {
       // Enabled the pin texture in shader
       this.pass.material!.enableTexture(inputName);
-      pass.material.setUniform(inputName, inputTextures[inputName]);
+      pass.material.set(inputName, inputTextures[inputName]);
     });
 
     // Output

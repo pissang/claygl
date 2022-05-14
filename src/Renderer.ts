@@ -957,7 +957,7 @@ class Renderer extends Notifier {
             const matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose!];
             mat4.transpose(matrix, matrixNoTranspose);
           }
-          program.setUniform(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
+          program.set(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
         }
       }
 
@@ -1013,11 +1013,11 @@ class Renderer extends Notifier {
           object.joints
         );
         program.useTextureSlot(this, skinMatricesTexture, slot);
-        program.setUniform(_gl, '1i', 'skinMatricesTexture', slot);
-        program.setUniform(_gl, '1f', 'skinMatricesTextureSize', skinMatricesTexture.width);
+        program.set(_gl, '1i', 'skinMatricesTexture', slot);
+        program.set(_gl, '1f', 'skinMatricesTextureSize', skinMatricesTexture.width);
       } else {
         const skinMatricesArray = skeleton.getSubSkinMatrices(object.__uid__, object.joints);
-        program.setUniform(_gl, 'm4v', 'skinMatrix', skinMatricesArray);
+        program.set(_gl, 'm4v', 'skinMatrix', skinMatricesArray);
       }
     }
   }
@@ -1206,7 +1206,7 @@ class Renderer extends Notifier {
       } else if (isTexture) {
         if (uniformValue.__slot < 0) {
           const slot = program.currentTextureSlot();
-          const res = program.setUniform(_gl, '1i', symbol, slot);
+          const res = program.set(_gl, '1i', symbol, slot);
           if (res) {
             // Texture uniform is enabled
             program.takeCurrentTextureSlot(this, uniformValue);
@@ -1215,7 +1215,7 @@ class Renderer extends Notifier {
         }
         // Multiple uniform use same texture..
         else {
-          program.setUniform(_gl, '1i', symbol, uniformValue.__slot);
+          program.set(_gl, '1i', symbol, uniformValue.__slot);
         }
       } else if (Array.isArray(uniformValue)) {
         if (uniformValue.length === 0) {
@@ -1241,12 +1241,12 @@ class Renderer extends Notifier {
             }
           }
 
-          program.setUniform(_gl, '1iv', symbol, arr);
+          program.set(_gl, '1iv', symbol, arr);
         } else {
-          program.setUniform(_gl, uniform.type, symbol, uniformValue);
+          program.set(_gl, uniform.type, symbol, uniformValue);
         }
       } else {
-        program.setUniform(_gl, uniform.type, symbol, uniformValue);
+        program.set(_gl, uniform.type, symbol, uniformValue);
       }
     }
     const newSlot = program.currentTextureSlot();
@@ -1358,7 +1358,7 @@ class Renderer extends Notifier {
       this._prezMaterial || new Material(new Shader(preZVertex, preZFragment));
     this._prezMaterial = preZPassMaterial;
     if (this.logDepthBuffer) {
-      this._prezMaterial.setUniform(
+      this._prezMaterial.set(
         'logDepthBufFC',
         2.0 / (Math.log((camera as PerspectiveCamera).far + 1.0) / Math.LN2)
       );

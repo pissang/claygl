@@ -5,47 +5,29 @@
 [![NPM Version](https://img.shields.io/npm/v/claygl.svg)](https://github.com/pissang/claygl)
 [![Circle CI](https://circleci.com/gh/pissang/claygl.svg?style=shield)](https://circleci.com/gh/pissang/claygl)
 
-ClayGL is a WebGL graphic library for building scalable Web3D applications.
+ClayGL is a type friendly WebGL graphic library for building scalable Web3D applications.
 
 It's easy to use, configurable for high-quality graphics. Benefit from the modularity and tree shaking, it can be scaled down to 22k(gzipped) for a basic 3D application.
 
-#### [Download](https://github.com/pissang/claygl/releases)
-
-#### [API](http://docs.claygl.xyz/api)
-
-#### [Examples](http://examples.claygl.xyz)
+<ul>
+<li style="display:inline-block;"><a href="https://github.com/pissang/claygl/releases">Download</a></li>
+<li style="display:inline-block;"><a href="http://docs.claygl.xyz/api">API</a></li>
+<li style="display:inline-block;"><a href="http://examples.claygl.xyz">Examples</a></li>
+</ul>
 
 ## Projects
 
-[ECharts GL](https://github.com/ecomfe/echarts-gl)
-
+<p>
 <a href="https://github.com/ecomfe/echarts-gl" target="_blank">
-<img src="./asset/echarts-gl.jpg" width="500" />
+<img src="./asset/screenshot/echarts-gl.jpg" style="object-fit: cover;aspect-ratio: 10/6; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.2);margin:5px;width:calc(50% - 10px);float:left;" />
+</a><a href="https://github.com/pissang/clay-viewer" target="_blank">
+<img src="./asset/screenshot/clay-viewer.jpg" style="object-fit: cover;aspect-ratio: 10/6; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.2);margin:5px;width:calc(50% - 10px);float:left;" />
+</a><a href="https://github.com/pissang/dota2hero" target="_blank">
+<img src="./asset/screenshot/dota2hero.jpg" style="object-fit: cover;aspect-ratio: 10/6; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.2);margin:5px;width:calc(50% - 10px);float:left;" />
+<img src="https://github.com/pissang/little-big-city/blob/gh-pages/asset/screenshot.png" style="object-fit: cover;aspect-ratio: 10/6; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.2);margin:5px;width:calc(50% - 10px);float:left;" alt="">
 </a>
-
-[Clay Viewer](https://github.com/pissang/clay-viewer)
-
-<a href="https://github.com/pissang/clay-viewer" target="_blank">
-<img src="./asset/clay-viewer.jpg" width="500" />
-</a>
-
-[DOTA2 Hero Viewer](https://github.com/pissang/dota2hero)
-
-<a href="https://github.com/pissang/dota2hero" target="_blank">
-<img src="./asset/dota2hero.jpg" width="500" />
-</a>
-
-[Paper Cut Art Generator](https://github.com/pissang/papercut-box-art)
-
-<a href="https://github.com/pissang/papercut-box-art" target="_blank">
-<img src="https://github.com/pissang/papercut-box-art/blob/master/screenshots/3.jpg" width="500" alt="">
-</a>
-
-[Little Big City](https://github.com/pissang/little-big-city)
-
-<a href="https://github.com/pissang/little-big-city" target="_blank">
-<img src="https://github.com/pissang/little-big-city/blob/gh-pages/asset/screenshot.png" width="500" alt="">
-</a>
+<div style="clear: both;">
+</p>
 
 ## Quick Start
 
@@ -88,19 +70,27 @@ It's easy to use, configurable for high-quality graphics. Benefit from the modul
 This example is about 22k(gzipped) after bundled by webpack 4.0. It draws a triangle on the screen.
 
 ```js
-import { Renderer, GeometryBase, Shader, Material } from 'claygl';
+import { Renderer, GeometryBase, Shader, Material, glsl } from 'claygl';
 
-const vsCode = `
-attribute vec3 position: POSITION;
+const vs = new Shader.Vertex({
+  attributes: {
+    position: Shader.attribute('vec3', 'POSITION')
+  },
+  main: glsl`
 void main() {
-    gl_Position = vec4(position, 1.0);
-}
-`;
-const fsCode = `
+  gl_Position = vec4(position, 1.0);
+}`
+});
+const fs = new Shader.Fragment({
+  uniforms: {
+    color: Shader.uniform('rgb', 'red')
+  },
+  main: glsl`
 void main() {
-    gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+  gl_FragColor = vec4(color, 1.0);
 }
-`;
+`
+});
 
 const renderer = new Renderer({
   canvas: document.getElementById('main')
@@ -116,9 +106,10 @@ positionAttrib.fromArray([
   [0, 0.5, 0]
 ]);
 
-const material = new Material({
-  shader: new Shader(vsCode, fsCode)
-});
+const material = new Material(new Shader(vs, fs));
+// 'color' have correct type here.
+material.set('color', 'red');
+
 renderer.renderPass([{ geometry, material }]);
 ```
 

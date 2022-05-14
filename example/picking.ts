@@ -4,7 +4,7 @@ import {
   Scene,
   CubeGeometry,
   Material,
-  LambertShader,
+  createLambertShader,
   Mesh,
   DirectionalLight,
   AmbientLight,
@@ -27,17 +27,12 @@ camera.position.z = 10;
 const scene = new Scene();
 
 const cubeGeo = new CubeGeometry();
-const shader = new LambertShader();
+const shader = createLambertShader();
 for (let i = 0; i < 5; i++) {
   for (let j = 0; j < 5; j++) {
-    const material = new Material({
-      shader
-    });
+    const material = new Material(shader);
     material.set('color', [Math.random(), Math.random(), Math.random()]);
-    const mesh = new Mesh({
-      material: material,
-      geometry: cubeGeo
-    });
+    const mesh = new Mesh(cubeGeo, material);
     mesh.position.set(Math.random() * 10 - 5, Math.random() * 10 - 5, Math.random() * -10);
     scene.add(mesh);
   }

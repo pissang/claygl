@@ -74,10 +74,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
           // color: [0.7, 0.0, 0.0],
           roughness: i / 12
         });
-        var mesh = new Mesh({
-          material: material,
-          geometry: suzanneGeometry
-        });
+        var mesh = new Mesh(suzanneGeometry, material);
         mesh.position.set((i - 5) * 2.5, 0, 0);
         scene.add(mesh);
       }

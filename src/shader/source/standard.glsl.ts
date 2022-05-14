@@ -108,6 +108,7 @@ export const standardFragment = new FragmentShader({
   uniforms: {
     viewInverse: VIEWINVERSE(),
     ...sharedLambertFragmentUniforms,
+    normalMap: uniform('sampler2D'),
     occlusionMap: uniform('sampler2D'),
     environmentMap: uniform('samplerCube'),
     environmentBoxMin: uniform('vec3'),

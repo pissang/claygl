@@ -5,7 +5,7 @@ import {
   PerspectiveCamera,
   SphereGeometry,
   Material,
-  WireframeShader,
+  createWireframeShader,
   Mesh,
   startTimeline
 } from 'claygl';
@@ -25,8 +25,7 @@ const sphere = new SphereGeometry({
 sphere.generateUniqueVertex();
 sphere.generateBarycentric();
 
-const material = new Material({
-  shader: new WireframeShader(),
+const material = new Material(createWireframeShader(), {
   transparent: true,
   depthTest: false
 });
@@ -35,10 +34,7 @@ material.set('width', 2);
 camera.position.set(0, 1, 2);
 camera.lookAt(scene.position);
 
-const sphereMesh = new Mesh({
-  geometry: sphere,
-  material: material
-});
+const sphereMesh = new Mesh(sphere, material);
 scene.add(sphereMesh);
 
 renderer.render(scene, camera);

@@ -1,5 +1,5 @@
 import {
-  BasicShader,
+  createBasicShader,
   Renderer,
   startTimeline,
   Vector3,
@@ -38,17 +38,12 @@ camera.lookAt(new Vector3(0, 0, 0));
 const cnt = 100;
 const distance = 20;
 const size = 10 / 2;
-const shader = new BasicShader();
+const shader = createBasicShader();
 for (let i = 0; i < cnt; ++i) {
   for (let j = 0; j < cnt; ++j) {
-    const material = new Material({
-      shader: shader
-    });
+    const material = new Material(shader);
     material.set('color', 'red');
-    const cube = new Mesh({
-      geometry: cubeGeo,
-      material: material
-    });
+    const cube = new Mesh(cubeGeo, material);
     cube.position.set((i - cnt / 2) * distance, (j - cnt / 2) * distance, 0);
     cube.scale.set(size, size, size);
     scene.add(cube);

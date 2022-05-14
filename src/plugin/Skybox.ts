@@ -10,15 +10,18 @@ import type TextureCube from '../TextureCube';
 import type Renderer from '../Renderer';
 import type Texture2D from '../Texture2D';
 import type Camera from '../Camera';
-import SkyboxShader from '../shader/SkyboxShader';
 import * as constants from '../core/constants';
+import Shader from '../Shader';
+import { skyboxFragment, skyboxVertex } from '../shader/source/skybox.glsl';
 
 const sceneSkyboxMap = new WeakMap<Scene, Skybox>();
 interface SkyboxOpts extends MeshOpts {
   scene?: Scene;
   environmentMap?: TextureCube | Texture2D;
+}
 
-  material: Material;
+function createSkyboxShader() {
+  return new Shader(skyboxVertex, skyboxFragment);
 }
 /**
  * @constructor clay.plugin.Skybox
@@ -38,23 +41,21 @@ interface SkyboxOpts extends MeshOpts {
  *     });
  *     skybox.material.set('environmentMap', skyTex);
  */
-class Skybox extends Mesh {
+class Skybox extends Mesh<Material<ReturnType<typeof createSkyboxShader>>> {
   culling = false;
 
   private _targetScene?: Scene;
   private _environmentMap?: TextureCube | Texture2D;
   private _dummyCamera = new PerspectiveCamera();
 
-  material: Material<SkyboxShader>;
-
   constructor(opts?: Partial<SkyboxOpts>) {
-    super(opts);
-    this.geometry = new CubeGeometry();
-    this.material =
-      (opts && opts.material) ||
-      new Material(new SkyboxShader(), {
+    super(
+      new CubeGeometry(),
+      new Material(createSkyboxShader(), {
         depthMask: false
-      });
+      }),
+      opts
+    );
 
     opts = opts || {};
     if (opts.scene) {

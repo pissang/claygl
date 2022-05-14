@@ -614,13 +614,13 @@ class DeferredGBuffer {
     Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
 
     const debugPass = this._debugPass;
-    debugPass.setUniform('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
-    debugPass.setUniform('gBufferTexture1', this._gBufferTex1);
-    debugPass.setUniform('gBufferTexture2', this._gBufferTex2);
-    debugPass.setUniform('gBufferTexture3', this._gBufferTex3);
-    debugPass.setUniform('gBufferTexture4', this._gBufferTex4);
-    debugPass.setUniform('debug', debugTypes[type!]);
-    debugPass.setUniform('viewProjectionInv', viewProjectionInv.array);
+    debugPass.set('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
+    debugPass.set('gBufferTexture1', this._gBufferTex1);
+    debugPass.set('gBufferTexture2', this._gBufferTex2);
+    debugPass.set('gBufferTexture3', this._gBufferTex3);
+    debugPass.set('gBufferTexture4', this._gBufferTex4);
+    debugPass.set('debug', debugTypes[type!]);
+    debugPass.set('viewProjectionInv', viewProjectionInv.array);
     debugPass.render(renderer);
 
     renderer.restoreViewport();

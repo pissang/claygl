@@ -7,11 +7,11 @@ import {
   Material,
   Texture2D,
   constants,
-  BasicShader,
+  createStandardShader,
+  createBasicShader,
   TextureCube,
   SphereGeometry,
   PlaneGeometry,
-  StandardShader,
   Mesh,
   Vector3,
   Node as ClayNode
@@ -29,9 +29,7 @@ const camera = new PerspectiveCamera({
   far: 500
 });
 
-const material = new Material({
-  shader: new BasicShader()
-});
+const material = new Material(createBasicShader());
 const texture = new Texture2D({
   wrapS: constants.REPEAT,
   wrapT: constants.REPEAT,
@@ -106,9 +104,7 @@ const plane = new PlaneGeometry({
   widthSegments: 1,
   heightSegments: 1
 });
-const planeMesh = new Mesh({
-  geometry: plane,
-  material: material,
+const planeMesh = new Mesh(plane, material, {
   scale: new Vector3(60, 60, 60)
 });
 planeMesh.position.y = -0.8;
@@ -116,16 +112,10 @@ planeMesh.rotation.rotateX(-Math.PI / 2);
 root.add(planeMesh);
 
 const sphereGeo = new SphereGeometry();
-const envMapMaterial = new Material({
-  shader: new StandardShader()
-});
-envMapMaterial.set('reflectivity', 1.0);
+const envMapMaterial = new Material(createStandardShader());
 envMapMaterial.set('environmentMap', textureCube);
 for (let i = 0; i < 10; i++) {
-  const sphere = new Mesh({
-    geometry: sphereGeo,
-    material: envMapMaterial
-  });
+  const sphere = new Mesh(sphereGeo, envMapMaterial);
   sphere.scale.set(5, 5, 5);
   sphere.position.set(-10, 5, -i * 10);
   root.add(sphere);

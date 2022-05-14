@@ -52,10 +52,8 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
           metalness: 1,
           roughness: i / 12
         });
-        const mesh = new Mesh({
-          material: material,
-          geometry: suzanneGeometry
-        });
+        const mesh = new Mesh(suzanneGeometry, material);
+
         mesh.position.set((i - 5) * 2.1, 0, 0);
         scene.add(mesh);
       }

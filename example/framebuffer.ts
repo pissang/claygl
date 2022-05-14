@@ -11,8 +11,8 @@ import {
   Vector3,
   PointLight,
   Scene,
-  StandardShader,
-  BasicShader,
+  createStandardShader,
+  createBasicShader,
   startTimeline
 } from 'claygl';
 
@@ -27,16 +27,11 @@ const camera = new PerspectiveCamera({
   far: 500
 });
 const cube = new CubeGeometry();
-const material = new Material({
-  shader: new StandardShader()
-});
+const material = new Material(createStandardShader());
 const texture = new Texture2D();
 texture.load('assets/textures/crate.gif');
 material.set('diffuseMap', texture);
-const mesh = new Mesh({
-  material: material,
-  geometry: cube
-});
+const mesh = new Mesh(cube, material);
 
 scene.add(mesh);
 
@@ -55,13 +50,8 @@ const rtt = new Texture2D({
   height: 1024
 });
 frameBuffer.attach(rtt);
-const rttShader = new BasicShader();
-const rttMesh = new Mesh({
-  geometry: new PlaneGeometry(),
-  material: new Material({
-    shader: rttShader
-  })
-});
+const rttShader = createBasicShader();
+const rttMesh = new Mesh(new PlaneGeometry(), new Material(rttShader));
 rttMesh.material.set('diffuseMap', rtt);
 const rttScene = new Scene();
 rttScene.add(rttMesh);

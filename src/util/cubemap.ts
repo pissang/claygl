@@ -66,7 +66,7 @@ export function prefilterEnvironmentMap(
   const mipmapNum = Math.log(size) / Math.log(2) + 1;
 
   const prefilterMaterial = new Material(new Shader(skyboxVertex, prefilterFragment));
-  prefilterMaterial.setUniform('normalDistribution', normalDistribution);
+  prefilterMaterial.set('normalDistribution', normalDistribution);
 
   textureOpts.encodeRGBM && prefilterMaterial.define('fragment', 'RGBM_ENCODE');
   textureOpts.decodeRGBM && prefilterMaterial.define('fragment', 'RGBM_DECODE');
@@ -202,8 +202,8 @@ export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D)
     magFilter: constants.NEAREST,
     useMipmap: false
   });
-  quadPass.material.setUniform('normalDistribution', normalDistribution);
-  quadPass.material.setUniform('viewportSize', [512, 256]);
+  quadPass.material.set('normalDistribution', normalDistribution);
+  quadPass.material.set('viewportSize', [512, 256]);
   quadPass.attachOutput(texture);
   quadPass.render(renderer, framebuffer);
 

@@ -58,9 +58,9 @@ function setUniforms(
         const slot = program.takeCurrentTextureSlot(renderer, texture);
         texSlots.push(slot);
       }
-      program.setUniform(renderer.gl, '1iv', symbol, texSlots);
+      program.set(renderer.gl, '1iv', symbol, texSlots);
     } else {
-      program.setUniform(renderer.gl, lu.type, symbol, lu.value);
+      program.set(renderer.gl, lu.type, symbol, lu.value);
     }
   }
 }

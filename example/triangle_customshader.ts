@@ -1,9 +1,4 @@
-// import { Renderer, GeometryBase, Material, Shader, glsl } from 'claygl';
-
-import GeometryBase from '../src/GeometryBase';
-import Material from '../src/Material';
-import Renderer from '../src/Renderer';
-import Shader, { glsl } from '../src/Shader';
+import { Renderer, GeometryBase, Material, Shader, glsl } from 'claygl';
 
 const { uniform, attribute } = Shader;
 

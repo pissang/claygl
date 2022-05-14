@@ -1,11 +1,9 @@
-import { Scene, Node as ClayNode, Mesh, CubeGeometry, Material, BasicShader } from 'claygl';
+import { Scene, Node as ClayNode, Mesh, CubeGeometry, Material, createBasicShader } from 'claygl';
 
 const scene = new Scene();
 
 const cube = new CubeGeometry();
-const material = new Material({
-  shader: new BasicShader()
-});
+const material = new Material(createBasicShader());
 const root = new ClayNode();
 scene.add(root);
 for (let i = 0; i < 10; i++) {
@@ -15,10 +13,7 @@ for (let i = 0; i < 10; i++) {
     const subRoot2 = new ClayNode();
     subRoot.add(subRoot2);
     for (let k = 0; k < 100; k++) {
-      const mesh = new Mesh({
-        geometry: cube,
-        material: material
-      });
+      const mesh = new Mesh(cube, material);
       mesh.position.set(20 - Math.random() * 40, 20 - Math.random() * 40, 20 - Math.random() * 40);
       subRoot2.add(mesh);
     }

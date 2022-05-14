@@ -175,11 +175,11 @@ class Material<
   /**
    * Set material uniform
    * @example
-   *  mat.setUniform('color', [1, 1, 1, 1]);
+   *  mat.set('color', [1, 1, 1, 1]);
    * @param symbol
    * @param value
    */
-  setUniform<K extends keyof T['uniformTpls']>(symbol: K, value: T['uniformTpls'][K]['value']) {
+  set<K extends keyof T['uniformTpls']>(symbol: K, value: T['uniformTpls'][K]['value']) {
     if (value === undefined) {
       return;
       // console.warn('Uniform value "' + symbol + '" is undefined');
@@ -203,7 +203,7 @@ class Material<
   setUniforms(obj: UniformValueRecord<T['uniformTpls']>) {
     util.keys(obj).forEach((key) => {
       const val = obj[key];
-      this.setUniform(key, val);
+      this.set(key, val);
     });
   }
 
@@ -220,24 +220,6 @@ class Material<
     return this._textureUniforms;
   }
 
-  /**
-   * Alias of setUniform and setUniforms
-   */
-  set(symbol: UniformValueRecord<T['uniformTpls']>): void;
-  set<K extends keyof T['uniformTpls']>(symbol: K, value: T['uniformTpls'][K]['value']): void;
-  set<K extends keyof T['uniformTpls']>(
-    symbol: K | UniformValueRecord<T['uniformTpls']>,
-    value?: T['uniformTpls'][K]['value']
-  ) {
-    if (typeof symbol === 'object') {
-      for (const key in symbol) {
-        const val = symbol[key];
-        this.setUniform(key, val);
-      }
-    } else {
-      this.setUniform(symbol, value);
-    }
-  }
   /**
    * Get uniform value
    *
