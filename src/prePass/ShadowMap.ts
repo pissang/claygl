@@ -170,7 +170,7 @@ class ShadowMapPass extends Notifier {
     for (const name in this._textures) {
       const texture = this._textures[name];
       renderer.setViewport(x, y, (width * texture.width) / texture.height, height);
-      debugPass.set('depthMap', texture);
+      debugPass.material.set('depthMap', texture as Texture2D);
       debugPass.renderQuad(renderer);
       x += (width * texture.width) / texture.height;
     }

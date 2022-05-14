@@ -1,4 +1,12 @@
-import { BasicShader, Material, Mesh, OrthographicCamera, Renderer, Scene, Geometry } from 'claygl';
+import {
+  createBasicShader,
+  Material,
+  Mesh,
+  OrthographicCamera,
+  Renderer,
+  Scene,
+  Geometry
+} from 'claygl';
 
 const TRIANGLE_POSITIONS = [
   [-0.5, -0.5, 0],
@@ -23,7 +31,7 @@ const geometry = new Geometry();
 geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 geometry.attributes.color.fromArray(VERTEX_COLORS);
 
-const mesh = new Mesh(geometry, new Material(new BasicShader()));
+const mesh = new Mesh(geometry, new Material(createBasicShader()));
 mesh.material.define('both', 'VERTEX_COLOR');
 mesh.material.set('color', [1, 1, 1]);
 scene.add(mesh);

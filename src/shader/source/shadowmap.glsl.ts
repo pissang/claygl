@@ -15,7 +15,7 @@ export const shadowMapDepthVertex = new VertexShader({
   uniforms: {
     worldViewProjection: WORLDVIEWPROJECTION(),
     uvRepeat: uniform('vec2', [1, 1]),
-    offset: uniform('vec2', [0, 0])
+    uvOffset: uniform('vec2', [0, 0])
   },
   attributes: {
     position: POSITION(),

@@ -25,7 +25,7 @@ export const sharedBasicVertexAttributes = {
   position: POSITION(),
   texcoord: TEXCOORD_0(),
   barycentric: attribute('vec3'),
-  a_Color: attribute('vec4')
+  a_Color: attribute('vec4', 'COLOR')
 };
 
 export const basicVertex = new VertexShader({

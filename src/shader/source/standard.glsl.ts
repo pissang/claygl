@@ -102,7 +102,7 @@ export const standardFragment = new FragmentShader({
     GLOSSINESS_CHANNEL: 0,
     ROUGHNESS_CHANNEL: 0,
     METALNESS_CHANNEL: 1,
-    SPECULAR_WORKFLOW: null,
+    // SPECULAR_WORKFLOW: null,
     DIFFUSEMAP_ALPHA_ALPHA: null
   },
   uniforms: {

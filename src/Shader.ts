@@ -270,7 +270,10 @@ export function createShaderFunction<T extends string>(code: string, defaultName
       console.error('defaultName must be given in the shader function:');
       console.error(code);
     }
-    return code.replace(FUNCTION_NAME_PLACEHOLDER, functionName || defaultName || '');
+    return code.replace(
+      new RegExp(FUNCTION_NAME_PLACEHOLDER, 'g'),
+      functionName || defaultName || ''
+    );
   };
   func.displayName = defaultName;
   return func;
@@ -472,8 +475,6 @@ export class Shader<
   readonly vertexDefines: Dict<ShaderDefineValue>;
   readonly fragmentDefines: Dict<ShaderDefineValue>;
 
-  readonly uniforms: (keyof ConvertShaderUniformToMaterialUniform<V['uniforms'] & F['uniforms']>)[];
-
   readonly textures: Record<
     string,
     {
@@ -545,7 +546,6 @@ export class Shader<
 
     const textures: Shader['textures'] = {};
 
-    const uniformsList: Shader['uniforms'] = [];
     const uniformsTpls: Shader['uniformTpls'] = {};
     const semanticsMap: Shader['semanticsMap'] = {};
     const attributes: Shader['attributes'] = {};
@@ -553,7 +553,6 @@ export class Shader<
     // TODO remove any
     function processUniforms(uniforms: Dict<ShaderUniformLoose>, shaderType: ShaderType) {
       keys(uniforms).forEach((uniformName) => {
-        uniformsList.push(uniformName);
         const uniform = uniforms[uniformName];
         const uniformType = uniform.type as NativeUniformType;
         const uniformValue = uniform.value as NativeUniformType;
@@ -570,7 +569,7 @@ export class Shader<
         };
 
         if (uniformSemantic) {
-          const isTranpose = uniformSemantic.endsWith('TRANPOSE');
+          const isTranpose = uniformSemantic.endsWith('TRANSPOSE');
           const isInverse = uniformSemantic.endsWith('INVERSE');
           semanticsMap[uniformSemantic] = assign(
             {
@@ -617,7 +616,6 @@ export class Shader<
     });
 
     this.textures = textures;
-    this.uniforms = uniformsList;
     this.uniformTpls = uniformsTpls;
     this.semanticsMap = semanticsMap;
     this.matrixSemantics = matrixSemantics;
