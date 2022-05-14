@@ -210,7 +210,7 @@ export function createUniform<
 export function createSemanticUniform<
   T extends NativeUniformType,
   S extends MatrixSemantic | UniformSemantic
->(type: T, semantic?: S) {
+>(type: T, semantic: S) {
   return {
     type,
     semantic
@@ -296,22 +296,6 @@ type MergeChunk<
   P extends 'defines' | 'uniforms' | 'attributes' | 'varyings'
 > = UnionToIntersection<Chunks[number][P]>;
 
-const a = createShaderChunk({
-  uniforms: {
-    foo: createUniform('float')
-  },
-  code: ''
-});
-const b = createShaderChunk({
-  uniforms: {
-    bar: createUniform('float')
-  },
-  code: ''
-});
-const chunks = [a, b];
-
-type A = MergeChunk<typeof chunks, 'uniforms'>;
-
 class StageShader<
   TDefines extends Dict<ShaderDefineValue> = Dict<ShaderDefineValue>,
   TUniforms extends Dict<ShaderUniformLoose> = Dict<ShaderUniformLoose>,
@@ -330,14 +314,14 @@ class StageShader<
     uniforms?: TUniforms;
     attributes?: TAttributes;
     varyings?: TVaryings;
-    chunks?: TChunks;
+    includes?: TChunks;
     code: string;
   }) {
     (['defines', 'uniforms', 'attributes', 'varyings'] as const).forEach((prop) => {
       // @ts-ignore we are sure the readonly property is inited in the constructor here.
       const target = (this[prop] = {});
       assign(target, options);
-      (options.chunks || []).forEach((chunk) => {
+      (options.includes || []).forEach((chunk) => {
         assign(target, chunk[prop]);
       });
     });
@@ -360,7 +344,7 @@ export class VertexShader<
     /**
      * uniform, defines, attributes, varyings in chunks will be merged automatically.
      */
-    chunks?: TChunks;
+    includes?: TChunks;
     code: string;
   }) {
     super(options);
@@ -379,7 +363,7 @@ export class FragmentShader<
     /**
      * uniform, defines, attributes, varyings in chunks will be merged automatically.
      */
-    chunks?: TChunks;
+    includes?: TChunks;
     // varyings will be shared from vertex
     // varyings?: TVaryings;
     code: string;

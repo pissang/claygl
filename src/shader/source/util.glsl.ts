@@ -1,10 +1,10 @@
 import {
   createShaderChunk,
   glsl,
-  createUniform,
-  createAttribute,
-  createArrayUniform,
-  createVarying
+  createVarying as varying,
+  createUniform as uniform,
+  createArrayUniform as arrayUniform,
+  createAttribute as attribute
 } from '../../Shader';
 
 // // http://stackoverflow.com/questions/4200224/random-noise-functions-for-glsl
@@ -31,7 +31,7 @@ highp float rand(vec2 uv) {
  */
 export const calculateLightAttenuation = createShaderChunk({
   uniforms: {
-    attenuationFactor: createUniform('float', 5.0)
+    attenuationFactor: uniform('float', 5.0)
   },
   // Use light attenuation formula in
   // http://blog.slindev.com/2011/01/10/natural-light-attenuation/
@@ -183,11 +183,11 @@ vec4 linearTosRGB(in vec4 value) {
  */
 export const skinning = createShaderChunk({
   attributes: {
-    weight: createAttribute('vec3', 'WEIGHT'),
-    joint: createAttribute('vec4', 'JOINT')
+    weight: attribute('vec3', 'WEIGHT'),
+    joint: attribute('vec4', 'JOINT')
   },
   uniforms: {
-    skinMatrix: createArrayUniform('mat4', 'JOINT_COUNT')
+    skinMatrix: arrayUniform('mat4', 'JOINT_COUNT')
   },
   code: {
     // Add uniform in code to be not configurable
@@ -238,9 +238,9 @@ if (weightW > 1e-4) {
 
 export const instancing = createShaderChunk({
   attributes: {
-    instanceMat1: createAttribute('vec4'),
-    instanceMat2: createAttribute('vec4'),
-    instanceMat3: createAttribute('vec4')
+    instanceMat1: attribute('vec4'),
+    instanceMat2: attribute('vec4'),
+    instanceMat3: attribute('vec4')
   },
   code: glsl`
 mat4 instanceMat = mat4(
@@ -314,10 +314,10 @@ vec3 ACESToneMapping(vec3 color) {
  */
 export const logDepthVertex = createShaderChunk({
   varyings: {
-    v_FragDepth: createVarying('float')
+    v_FragDepth: varying('float')
   },
   uniforms: {
-    logDepthBufFC: createUniform('float', 0, 'LOG_DEPTH_BUFFER_FC')
+    logDepthBufFC: uniform('float', 0, 'LOG_DEPTH_BUFFER_FC')
   },
   code: glsl`
 #ifdef LOG_DEPTH
@@ -335,7 +335,7 @@ export const logDepthVertex = createShaderChunk({
  */
 export const logDepthFragment = createShaderChunk({
   uniforms: {
-    logDepthBufFC: createUniform('float', 0, 'LOG_DEPTH_BUFFER_FC')
+    logDepthBufFC: uniform('float', 0, 'LOG_DEPTH_BUFFER_FC')
   },
   code: glsl`
 #if defined(LOG_DEPTH) && defined(SUPPORT_FRAG_DEPTH)

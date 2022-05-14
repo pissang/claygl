@@ -3,10 +3,10 @@
 import {
   VertexShader,
   glsl,
-  createVarying,
-  createUniform,
-  createSemanticUniform,
-  createAttribute,
+  createVarying as varying,
+  createUniform as uniform,
+  createSemanticUniform as semanticUniform,
+  createAttribute as attribute,
   FragmentShader
 } from '../../Shader';
 import { instancing, logDepthFragment, logDepthVertex, skinning } from './util.glsl';
@@ -18,18 +18,18 @@ export const preZVertex = new VertexShader({
     SHADER_NAME: 'prez'
   },
   varyings: {
-    v_Texcoord: createVarying('vec2')
+    v_Texcoord: varying('vec2')
   },
   uniforms: {
-    WVP: createSemanticUniform('mat4', 'WORLDVIEWPROJECTION'),
-    uvRepeat: createUniform('vec2', [1, 1]),
-    uvOffset: createUniform('vec2', [0, 0])
+    WVP: semanticUniform('mat4', 'WORLDVIEWPROJECTION'),
+    uvRepeat: uniform('vec2', [1, 1]),
+    uvOffset: uniform('vec2', [0, 0])
   },
   attributes: {
-    pos: createAttribute('vec3', 'POSITION'),
-    uv: createAttribute('vec2', 'TEXCOORD_0')
+    pos: attribute('vec3', 'POSITION'),
+    uv: attribute('vec2', 'TEXCOORD_0')
   },
-  chunks: [skinning, logDepthVertex, instancing],
+  includes: [skinning, logDepthVertex, instancing],
 
   code: glsl`
 ${skinning.code.header}
@@ -61,8 +61,8 @@ void main() {
  */
 export const preZFragment = new FragmentShader({
   uniforms: {
-    alphaMap: createUniform('sampler2D'),
-    alphaCutoff: createUniform('float', 0),
+    alphaMap: uniform('sampler2D'),
+    alphaCutoff: uniform('float', 0),
     ...logDepthFragment.uniforms
   },
   // Varyings will be shared from vertex
