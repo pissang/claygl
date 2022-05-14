@@ -5,6 +5,8 @@ import Material from '../src/Material';
 import Renderer from '../src/Renderer';
 import Shader, { glsl } from '../src/Shader';
 
+const { uniform, attribute } = Shader;
+
 const TRIANGLE_POSITIONS = [
   [-0.5, -0.5, 0],
   [0.5, -0.5, 0],
@@ -19,7 +21,7 @@ geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 
 const vs = new Shader.Vertex({
   attributes: {
-    position: Shader.attribute('vec3', 'POSITION')
+    position: attribute('vec3', 'POSITION')
   },
   main: glsl`
 void main() {
@@ -28,7 +30,7 @@ void main() {
 });
 const fs = new Shader.Fragment({
   uniforms: {
-    color: Shader.uniform('rgb', 'red')
+    color: uniform('rgb', 'red')
   },
   main: glsl`
 void main() {

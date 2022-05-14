@@ -1,1 +1,153 @@
-export default "@export clay.basic.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nuniform vec2 uvRepeat : [1.0, 1.0];\nuniform vec2 uvOffset : [0.0, 0.0];\nattribute vec2 texcoord : TEXCOORD_0;\nattribute vec3 position : POSITION;\nattribute vec3 barycentric;\n@import clay.chunk.skinning_header\n@import clay.chunk.instancing_header\n@import clay.util.logdepth_vertex_header\nvarying vec2 v_Texcoord;\nvarying vec3 v_Barycentric;\n#ifdef VERTEX_COLOR\nattribute vec4 a_Color : COLOR;\nvarying vec4 v_Color;\n#endif\nvoid main()\n{\n vec4 skinnedPosition = vec4(position, 1.0);\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = skinMatrixWS * skinnedPosition;\n#endif\n#ifdef INSTANCING\n @import clay.chunk.instancing_matrix\n skinnedPosition = instanceMat * skinnedPosition;\n#endif\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n v_Barycentric = barycentric;\n gl_Position = worldViewProjection * skinnedPosition;\n#ifdef VERTEX_COLOR\n v_Color = a_Color;\n#endif\n @import clay.util.logdepth_vertex_main\n}\n@end\n@export clay.basic.fragment\n#define DIFFUSEMAP_ALPHA_ALPHA\nvarying vec2 v_Texcoord;\nuniform sampler2D diffuseMap;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform vec3 emission : [0.0, 0.0, 0.0];\nuniform float alpha : 1.0;\n#ifdef ALPHA_TEST\nuniform float alphaCutoff: 0.9;\n#endif\n#ifdef VERTEX_COLOR\nvarying vec4 v_Color;\n#endif\nuniform float lineWidth : 0.0;\nuniform vec4 lineColor : [0.0, 0.0, 0.0, 0.6];\nvarying vec3 v_Barycentric;\n@import clay.util.logdepth_fragment_header\n@import clay.util.edge_factor\n@import clay.util.rgbm\n@import clay.util.srgb\n@import clay.util.ACES\nvoid main()\n{\n gl_FragColor = vec4(color, alpha);\n#ifdef VERTEX_COLOR\n gl_FragColor *= v_Color;\n#endif\n#ifdef SRGB_DECODE\n gl_FragColor = sRGBToLinear(gl_FragColor);\n#endif\n#ifdef DIFFUSEMAP_ENABLED\n vec4 texel = decodeHDR(texture2D(diffuseMap, v_Texcoord));\n#ifdef SRGB_DECODE\n texel = sRGBToLinear(texel);\n#endif\n#if defined(DIFFUSEMAP_ALPHA_ALPHA)\n gl_FragColor.a = texel.a;\n#endif\n gl_FragColor.rgb *= texel.rgb;\n#endif\n gl_FragColor.rgb += emission;\n if( lineWidth > 0.)\n {\n gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);\n }\n#ifdef ALPHA_TEST\n if (gl_FragColor.a < alphaCutoff) {\n discard;\n }\n#endif\n#ifdef TONEMAPPING\n gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);\n#endif\n#ifdef SRGB_ENCODE\n gl_FragColor = linearTosRGB(gl_FragColor);\n#endif\n gl_FragColor = encodeHDR(gl_FragColor);\n @import clay.util.logdepth_fragment_main\n}\n@end";
+import {
+  createAttribute as attribute,
+  createSemanticUniform as semanticUniform,
+  createUniform as uniform,
+  createVarying as varying,
+  FragmentShader,
+  glsl,
+  VertexShader
+} from '../../Shader';
+import { POSITION, TEXCOORD_0, WORLDVIEWPROJECTION } from './shared';
+import {
+  ACESToneMappingFunction,
+  decodeHDRFunction,
+  edgeFactorFunction,
+  encodeHDRFunction,
+  instancing,
+  linearToSRGBFunction,
+  logDepthFragment,
+  logDepthVertex,
+  skinning,
+  sRGBToLinearFunction
+} from './util.glsl';
+
+export const sharedBasicVertexAttributes = {
+  position: POSITION(),
+  texcoord: TEXCOORD_0(),
+  barycentric: attribute('vec3'),
+  a_Color: attribute('vec4')
+};
+
+export const basicVertex = new VertexShader({
+  attributes: {
+    ...sharedBasicVertexAttributes
+  },
+  uniforms: {
+    worldViewProjection: WORLDVIEWPROJECTION(),
+    uvRepeat: uniform('vec2', [1, 1]),
+    uvOffset: uniform('vec2', [0, 0])
+  },
+  varyings: {
+    v_Texcoord: varying('vec2'),
+    v_Barycentric: varying('vec3'),
+    v_Color: varying('vec4')
+  },
+  includes: [skinning, instancing, logDepthVertex, skinning],
+
+  main: glsl`
+void main()
+{
+  vec4 skinnedPosition = vec4(position, 1.0);
+
+#ifdef SKINNING
+  ${skinning.main}
+  skinnedPosition = skinMatrixWS * skinnedPosition;
+#endif
+
+#ifdef INSTANCING
+  ${instancing.main}
+  skinnedPosition = instanceMat * skinnedPosition;
+#endif
+
+  v_Texcoord = texcoord * uvRepeat + uvOffset;
+  v_Barycentric = barycentric;
+
+  gl_Position = worldViewProjection * skinnedPosition;
+
+#ifdef VERTEX_COLOR
+  v_Color = a_Color;
+#endif
+
+  ${logDepthVertex.main}
+}`
+});
+
+export const sharedBasicFragmentUniforms = {
+  diffuseMap: uniform('sampler2D'),
+  color: uniform('rgb', [1, 1, 1]),
+  emission: uniform('vec3', [0, 0, 0]),
+  alpha: uniform('float', 1),
+  alphaCutoff: uniform('float', 0.9),
+  lineWidth: uniform('float', 0),
+  lineColor: uniform('rgba', [0, 0, 0, 0.6])
+};
+
+export const basicFragment = new FragmentShader({
+  defines: {
+    DIFFUSEMAP_ALPHA_ALPHA: null
+  },
+  uniforms: {
+    ...sharedBasicFragmentUniforms
+  },
+
+  includes: [logDepthFragment],
+
+  main: glsl`
+
+${ACESToneMappingFunction()}
+${edgeFactorFunction()}
+${encodeHDRFunction()}
+${decodeHDRFunction()}
+${sRGBToLinearFunction()}
+${linearToSRGBFunction()}
+
+void main() {
+  gl_FragColor = vec4(color, alpha);
+#ifdef VERTEX_COLOR
+  gl_FragColor *= v_Color;
+#endif
+
+#ifdef SRGB_DECODE
+  gl_FragColor = sRGBToLinear(gl_FragColor);
+#endif
+
+#ifdef DIFFUSEMAP_ENABLED
+  vec4 texel = decodeHDR(texture2D(diffuseMap, v_Texcoord));
+
+  #ifdef SRGB_DECODE
+  texel = sRGBToLinear(texel);
+  #endif
+
+  #if defined(DIFFUSEMAP_ALPHA_ALPHA)
+  gl_FragColor.a = texel.a;
+  #else
+  gl_FragColor.rgb *= texel.rgb;
+  #endif
+
+#endif
+
+  gl_FragColor.rgb += emission;
+  if (lineWidth > 0.) {
+    gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);
+  }
+
+#ifdef ALPHA_TEST
+  if (gl_FragColor.a < alphaCutoff) {
+    discard;
+  }
+#endif
+
+#ifdef TONEMAPPING
+  gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);
+#endif
+#ifdef SRGB_ENCODE
+  gl_FragColor = linearTosRGB(gl_FragColor);
+#endif
+
+  gl_FragColor = encodeHDR(gl_FragColor);
+
+  ${logDepthFragment.main}
+
+}
+  `
+});

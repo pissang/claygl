@@ -451,7 +451,7 @@ type ConvertShaderUniformToMaterialUniform<T extends Dict<ShaderUniformLoose>> =
     value: T[key]['value'];
     // TODO Needs more precise type
     type: MaterialUniformType;
-    semantic?: UniformSemantic;
+    semantic?: T[key]['semantic'];
   };
 };
 
@@ -472,7 +472,7 @@ export class Shader<
   readonly vertexDefines: Dict<ShaderDefineValue>;
   readonly fragmentDefines: Dict<ShaderDefineValue>;
 
-  readonly uniforms: (keyof ConvertShaderUniformToMaterialUniform<V['uniforms'] | F['uniforms']>)[];
+  readonly uniforms: (keyof ConvertShaderUniformToMaterialUniform<V['uniforms'] & F['uniforms']>)[];
 
   readonly textures: Record<
     string,
@@ -484,7 +484,7 @@ export class Shader<
   /**
    * Processed uniform for material
    */
-  readonly uniformTpls: ConvertShaderUniformToMaterialUniform<V['uniforms'] | F['uniforms']>;
+  readonly uniformTpls: ConvertShaderUniformToMaterialUniform<V['uniforms'] & F['uniforms']>;
   // TODO More precise attributes type
   /**
    * Processed attributes for geometry

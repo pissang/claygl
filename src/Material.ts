@@ -137,7 +137,7 @@ class Material<
   vertexDefines: Record<string, ShaderDefineValue> = {};
   fragmentDefines: Record<string, ShaderDefineValue> = {};
 
-  private readonly _shader?: Shader;
+  private readonly _shader: T;
 
   private _textureStatus = {} as Record<keyof PickTextureUniforms<T['uniformTpls']>, TextureStatus>;
 

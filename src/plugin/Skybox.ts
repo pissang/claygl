@@ -141,7 +141,7 @@ class Skybox extends Mesh {
 
     // Don't remember to disable blend
     renderer.gl.disable(renderer.gl.BLEND);
-    if (material.get('lod') > 0) {
+    if (material.get('lod')! > 0) {
       material.define('fragment', 'LOD');
     } else {
       material.undefine('fragment', 'LOD');
