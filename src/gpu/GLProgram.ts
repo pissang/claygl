@@ -49,7 +49,7 @@ class GLProgram {
   fragmentCode: string = '';
 
   private _attrLocations: Record<string, number> = {};
-  private _uniformLocations: Record<string, WebGLUniformLocation | null> = {};
+  private _uniformLocations: Record<string, WebGLUniformLocation> = {};
   private _textureSlot: number = 0;
 
   private _program?: WebGLProgram;
@@ -108,12 +108,8 @@ class GLProgram {
 
   set(_gl: WebGLRenderingContext, type: string, symbol: string, value: any) {
     const locationMap = this._uniformLocations;
-    let location = locationMap[symbol];
-    // Try getting location for the first time.
-    if (location === undefined) {
-      location = locationMap[symbol] = _gl.getUniformLocation(this._program!, symbol);
-    }
-    // Uniform is not existed in the shader and already tried once.
+    const location = locationMap[symbol];
+    // Uniform is not existed in the shader
     if (location == null) {
       return false;
     }
@@ -362,6 +358,21 @@ class GLProgram {
 
     if (!_gl.getProgramParameter(program, constants.LINK_STATUS)) {
       return 'Could not link program\n' + _gl.getProgramInfoLog(program);
+    }
+
+    // Cache uniform locations
+    const numUniforms = _gl.getProgramParameter(program, constants.ACTIVE_UNIFORMS);
+    for (let i = 0; i < numUniforms; ++i) {
+      const info = _gl.getActiveUniform(program, i);
+      // TODO Cache other properties?
+      if (info) {
+        const symbol = info.name;
+        // TODO is it robust enough to remove [0]?
+        this._uniformLocations[symbol.replace('[0]', '')] = _gl.getUniformLocation(
+          program,
+          symbol
+        )!;
+      }
     }
   }
 }

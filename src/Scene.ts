@@ -9,7 +9,7 @@ import Matrix4 from './math/Matrix4';
 import type Renderable from './Renderable';
 import type Material from './Material';
 import Mesh from './Mesh';
-import { ShaderUniform, UniformType } from './Shader';
+import { MaterialUniform, MaterialUniformType } from './Shader';
 import Renderer from './Renderer';
 import GLProgram from './gpu/GLProgram';
 import Skybox from './plugin/Skybox';
@@ -42,7 +42,7 @@ function getProgramKey(lightNumbers: Record<string, number>) {
 }
 
 function setUniforms(
-  uniforms: Record<string, ShaderUniform>,
+  uniforms: Record<string, MaterialUniform>,
   program: GLProgram,
   renderer: Renderer
 ) {
@@ -112,7 +112,7 @@ class Scene extends ClayNode {
   viewBoundingBoxLastFrame = new BoundingBox();
 
   // Uniforms for shadow map.
-  shadowUniforms: Record<string, ShaderUniform> = {};
+  shadowUniforms: Record<string, MaterialUniform> = {};
 
   skybox?: Skybox;
 
@@ -120,7 +120,7 @@ class Scene extends ClayNode {
 
   // Properties to save the light information in the scene
   // Will be set in the render function
-  private _lightUniforms: Record<string, Record<string, ShaderUniform>> = {};
+  private _lightUniforms: Record<string, Record<string, MaterialUniform>> = {};
 
   private _previousLightNumber: Record<string, Record<string, number>> = {};
 
@@ -444,10 +444,10 @@ class Scene extends ClayNode {
         if (!lightUniforms[group][symbol]) {
           lightUniforms[group][symbol] = {
             value: []
-          } as ShaderUniform;
+          } as MaterialUniform;
         }
         const lu = lightUniforms[group][symbol];
-        lu.type = (uniformTpl.type + 'v') as UniformType;
+        lu.type = (uniformTpl.type + 'v') as MaterialUniformType;
         switch (uniformTpl.type) {
           case '1i':
           case '1f':
