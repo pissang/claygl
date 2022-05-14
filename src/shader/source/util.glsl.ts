@@ -13,6 +13,10 @@ import {
 // }
 // expects values in the range of [0,1]x[0,1], returns values in the [0,1] range.
 // do not collapse into a single function per: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
+
+/**
+ * Random in GLSL
+ */
 export const random = createShaderChunk(
   glsl`
 highp float rand(vec2 uv) {
@@ -22,12 +26,15 @@ highp float rand(vec2 uv) {
 }`
 );
 
-// Use light attenuation formula in
-// http://blog.slindev.com/2011/01/10/natural-light-attenuation/
+/**
+ * Calculate light attenuation
+ */
 export const calculateLightAttenuation = createShaderChunk({
   uniforms: {
     attenuationFactor: createUniform('float', 5.0)
   },
+  // Use light attenuation formula in
+  // http://blog.slindev.com/2011/01/10/natural-light-attenuation/
   code: glsl`
 float lightAttenuation(float dist, float range) {
   float attenuation = 1.0;
@@ -42,7 +49,9 @@ float lightAttenuation(float dist, float range) {
 });
 
 //http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
-
+/**
+ * Edge factor for wireframe implemented with barycentric coord
+ */
 export const edgeFactor = createShaderChunk(
   glsl`
 #ifdef SUPPORT_STANDARD_DERIVATIVES
@@ -58,9 +67,11 @@ float edgeFactor(float width) {
 #endif`
 );
 
-// Pack depth
-// !!!! Float value can only be [0.0 - 1.0)
+/**
+ * Encode float value into rgba ubyte value.
+ */
 export const encodeFloat = createShaderChunk(
+  // !!!! Float value can only be [0.0 - 1.0)
   glsl`
 vec4 encodeFloat(const in float depth) {
   const vec4 bitShifts = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);
@@ -72,6 +83,9 @@ vec4 encodeFloat(const in float depth) {
 }`
 );
 
+/**
+ * Decode rgba ubyte value into float value.
+ */
 export const decodeFloat = createShaderChunk(
   glsl`
 float decodeFloat(const in vec4 color) {
@@ -79,12 +93,18 @@ float decodeFloat(const in vec4 color) {
   return dot(color, bitShifts);
 }`
 );
-
+/**
+ * float helper
+ * Inlcude encodeFloat and decodeFloat
+ */
 export const float = createShaderChunk(`
 ${encodeFloat.code}
 ${decodeFloat.code}`);
 
-// http://graphicrants.blogspot.com/2009/04/rgbm-color-encoding.html
+/**
+ * Decode RGBM to HDR
+ * @see http://graphicrants.blogspot.com/2009/04/rgbm-color-encoding.html
+ */
 export const decodeRGBM = createShaderChunk(
   glsl`
 vec3 RGBMDecode(vec4 rgbm, float range) {
@@ -92,6 +112,9 @@ vec3 RGBMDecode(vec4 rgbm, float range) {
 }`
 );
 
+/**
+ * Encode HDR to RGBM
+ */
 export const encodeRGBM = createShaderChunk(
   glsl`
 vec4 RGBMEncode(vec3 color, float range) {
@@ -107,10 +130,16 @@ vec4 RGBMEncode(vec3 color, float range) {
 }`
 );
 
+/**
+ * RGBM Helpers. Include encode and decode.
+ */
 export const RGBM = createShaderChunk(`
 ${encodeRGBM.code}
 ${decodeRGBM.code}`);
 
+/**
+ * Decode RGBM to HDR if enabled.
+ */
 export const decodeHDR = createShaderChunk(
   glsl`
 vec4 decodeHDR(vec4 color) {
@@ -122,6 +151,9 @@ vec4 decodeHDR(vec4 color) {
 }`
 );
 
+/**
+ * Decode HDR to RGBM if enabled.
+ */
 export const encodeHDR = createShaderChunk(
   glsl`
 vec4 encodeHDR(vec4 color) {
@@ -133,6 +165,9 @@ vec4 encodeHDR(vec4 color) {
 }`
 );
 
+/**
+ * sRGB helpers. Convert sRGB to Linear and Linear to sRGB
+ */
 export const sRGB = createShaderChunk(
   glsl`
 vec4 sRGBToLinear(in vec4 value) {
@@ -143,6 +178,9 @@ vec4 linearTosRGB(in vec4 value) {
 }`
 );
 
+/**
+ * Skinning helpers.
+ */
 export const skinning = createShaderChunk({
   attributes: {
     weight: createAttribute('vec3', 'WEIGHT'),
@@ -213,7 +251,10 @@ mat4 instanceMat = mat4(
 );`
 });
 
-// https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
+/**
+ * Parallax corrected cubemap
+ * @see https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
+ */
 export const parallaxCorrect = createShaderChunk(
   glsl`
 vec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {
@@ -232,6 +273,10 @@ vec3 parallaxCorrect(in vec3 dir, in vec3 pos, in vec3 boxMin, in vec3 boxMax) {
 }`
 );
 
+/**
+ * Clampped to edge when sampling.
+ * In stereo rendering. It will clampped to each part of screen.
+ */
 export const clampSample = createShaderChunk(
   glsl`
 // Sample with stereo clamp
@@ -249,6 +294,9 @@ vec4 clampSample(const in sampler2D texture, const in vec2 coord)
 }`
 );
 
+/**
+ * ACES tonemapping
+ */
 export const ACESToneMapping = createShaderChunk(
   glsl`
 vec3 ACESToneMapping(vec3 color) {
@@ -261,6 +309,9 @@ vec3 ACESToneMapping(vec3 color) {
 }`
 );
 
+/**
+ * Log depth helper in vertex shader
+ */
 export const logDepthVertex = createShaderChunk({
   varyings: {
     v_FragDepth: createVarying('float')
@@ -279,6 +330,9 @@ export const logDepthVertex = createShaderChunk({
 #endif`
 });
 
+/**
+ * Log depth helper in fragment shader
+ */
 export const logDepthFragment = createShaderChunk({
   uniforms: {
     logDepthBufFC: createUniform('float', 0, 'LOG_DEPTH_BUFFER_FC')

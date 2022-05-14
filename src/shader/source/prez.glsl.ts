@@ -10,30 +10,28 @@ import {
   FragmentShader
 } from '../../Shader';
 import { instancing, logDepthFragment, logDepthVertex, skinning } from './util.glsl';
-
+/**
+ * Prez vertex shader
+ */
 export const preZVertex = new VertexShader({
   defines: {
     SHADER_NAME: 'prez'
   },
   varyings: {
-    v_Texcoord: createVarying('vec2'),
-    ...logDepthVertex.varyings
+    v_Texcoord: createVarying('vec2')
   },
   uniforms: {
     WVP: createSemanticUniform('mat4', 'WORLDVIEWPROJECTION'),
     uvRepeat: createUniform('vec2', [1, 1]),
-    uvOffset: createUniform('vec2', [0, 0]),
-    ...skinning.uniforms,
-    ...logDepthFragment.uniforms
+    uvOffset: createUniform('vec2', [0, 0])
   },
   attributes: {
     pos: createAttribute('vec3', 'POSITION'),
-    uv: createAttribute('vec2', 'TEXCOORD_0'),
-    ...skinning.attributes,
-    ...instancing.attributes
+    uv: createAttribute('vec2', 'TEXCOORD_0')
   },
-  code: glsl`
+  chunks: [skinning, logDepthVertex, instancing],
 
+  code: glsl`
 ${skinning.code.header}
 ${instancing.code}
 ${logDepthVertex.code}
@@ -58,6 +56,9 @@ void main() {
 }`
 });
 
+/**
+ * Prez fragment shader
+ */
 export const preZFragment = new FragmentShader({
   uniforms: {
     alphaMap: createUniform('sampler2D'),
