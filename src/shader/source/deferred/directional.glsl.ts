@@ -1,1 +1,63 @@
-export default "@export clay.deferred.directional_light\n@import clay.deferred.chunk.light_head\n@import clay.deferred.chunk.light_equation\nuniform vec3 lightDirection;\nuniform vec3 lightColor;\nuniform vec3 eyePosition;\n#ifdef SHADOWMAP_ENABLED\nuniform sampler2D lightShadowMap;\nuniform float lightShadowMapSize;\nuniform mat4 lightMatrices[SHADOW_CASCADE];\nuniform float shadowCascadeClipsNear[SHADOW_CASCADE];\nuniform float shadowCascadeClipsFar[SHADOW_CASCADE];\n#endif\n@import clay.plugin.shadow_map_common\nvoid main()\n{\n @import clay.deferred.chunk.gbuffer_read\n vec3 L = -normalize(lightDirection);\n vec3 V = normalize(eyePosition - position);\n vec3 H = normalize(L + V);\n float ndl = clamp(dot(N, L), 0.0, 1.0);\n float ndh = clamp(dot(N, H), 0.0, 1.0);\n float ndv = clamp(dot(N, V), 0.0, 1.0);\n gl_FragColor.rgb = lightEquation(\n lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n );\n#ifdef SHADOWMAP_ENABLED\n float shadowContrib = 1.0;\n for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{\n if (\n z >= shadowCascadeClipsNear[_idx_] &&\n z <= shadowCascadeClipsFar[_idx_]\n ) {\n shadowContrib = computeShadowContrib(\n lightShadowMap, lightMatrices[_idx_], position, lightShadowMapSize,\n vec2(1.0 / float(SHADOW_CASCADE), 1.0),\n vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)\n );\n }\n }}\n gl_FragColor.rgb *= shadowContrib;\n#endif\n gl_FragColor.a = 1.0;\n}\n@end\n";
+import {
+  FragmentShader,
+  createUniform as uniform,
+  createSemanticUniform as semanticUniform,
+  glsl,
+  createArrayUniform as arrayUniform
+} from '../../../Shader';
+import { shadowMap } from '../shadowmap.glsl';
+import { gBufferRead, lightEquationFunction } from './chunk.glsl';
+
+export const directionalLightFragment = new FragmentShader({
+  uniforms: {
+    lightDirection: uniform('vec3'),
+    lightColor: uniform('vec3'),
+    eyePosition: uniform('vec3'),
+    lightShadowMap: uniform('sampler2D'),
+    lightShadowMapSize: uniform('float'),
+    lightMatrices: arrayUniform('mat4', 'SHADOW_CASCADE'),
+    shadowCascadeClipsNear: arrayUniform('float', 'SHADOW_CASCADE'),
+    shadowCascadeClipsFar: arrayUniform('float', 'SHADOW_CASCADE')
+  },
+  includes: [shadowMap, gBufferRead],
+  main: glsl`
+
+${lightEquationFunction()}
+
+void main()
+{
+  ${gBufferRead.main}
+
+  vec3 L = -normalize(lightDirection);
+  vec3 V = normalize(eyePosition - position);
+
+  vec3 H = normalize(L + V);
+  float ndl = clamp(dot(N, L), 0.0, 1.0);
+  float ndh = clamp(dot(N, H), 0.0, 1.0);
+  float ndv = clamp(dot(N, V), 0.0, 1.0);
+
+  gl_FragColor.rgb = lightEquation(
+    lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness
+  );
+
+#ifdef SHADOWMAP_ENABLED
+  float shadowContrib = 1.0;
+  for (int _idx_ = 0; _idx_ < SHADOW_CASCADE; _idx_++) {{
+    if (
+      z >= shadowCascadeClipsNear[_idx_] &&
+      z <= shadowCascadeClipsFar[_idx_]
+    ) {
+      shadowContrib = computeShadowContrib(
+        lightShadowMap, lightMatrices[_idx_], position, lightShadowMapSize,
+        vec2(1.0 / float(SHADOW_CASCADE), 1.0),
+        vec2(float(_idx_) / float(SHADOW_CASCADE), 0.0)
+      );
+    }
+  }}
+
+  gl_FragColor.rgb *= shadowContrib;
+#endif
+
+  gl_FragColor.a = 1.0;
+}`
+});

@@ -5,7 +5,6 @@ import {
   createUniform as uniform,
   glsl
 } from '../../../Shader';
-import { decodeFloatFunction } from '../util.glsl';
 
 export const gBufferRead = createShaderChunk({
   uniforms: {
@@ -21,7 +20,6 @@ export const gBufferRead = createShaderChunk({
     viewProjectionInv: uniform('mat4')
   },
 
-  functions: [decodeFloatFunction],
   main: glsl`
 // Extract
 // - N, z, position
@@ -67,7 +65,7 @@ vec3 specularColor = mix(vec3(0.04), albedo, metalness);
 });
 
 // TODO reuse with standard
-export const lightEquation = createShaderFunction(glsl`
+export const lightEquationFunction = createShaderFunction(glsl`
 float D_Phong(in float g, in float ndh) {
   // from black ops 2
   float a = pow(8192.0, g);

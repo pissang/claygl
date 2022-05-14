@@ -29,14 +29,14 @@ highp float ${FUNCTION_NAME_PLACEHOLDER}(vec2 uv) {
   'rand'
 );
 
-export const lightAttenuationUniforms = {
+const lightAttenuationUniforms = {
   attenuationFactor: uniform('float', 5.0)
 };
 
 /**
  * Calculate light attenuation
  */
-export const lightAttenuationFunction = createShaderFunction(
+const lightAttenuationFunction = createShaderFunction(
   // Use light attenuation formula in
   // http://blog.slindev.com/2011/01/10/natural-light-attenuation/
   glsl`
@@ -52,6 +52,11 @@ float ${FUNCTION_NAME_PLACEHOLDER}(float dist, float range) {
 }`,
   'lightAttenuation'
 );
+
+export const lightAttenuation = createShaderChunk({
+  uniforms: lightAttenuationUniforms,
+  functions: [lightAttenuationFunction]
+});
 
 //http://codeflow.org/entries/2012/aug/02/easy-wireframe-display-with-barycentric-coordinates/
 /**

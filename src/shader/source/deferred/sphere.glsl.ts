@@ -1,1 +1,58 @@
-export default "@export clay.deferred.sphere_light\n@import clay.deferred.chunk.light_head\n@import clay.util.calculate_attenuation\n@import clay.deferred.chunk.light_equation\nuniform vec3 lightPosition;\nuniform vec3 lightColor;\nuniform float lightRange;\nuniform float lightRadius;\nuniform vec3 eyePosition;\nvarying vec3 v_Position;\nvoid main()\n{\n @import clay.deferred.chunk.gbuffer_read\n vec3 L = lightPosition - position;\n vec3 V = normalize(eyePosition - position);\n float dist = length(L);\n vec3 R = reflect(V, N);\n float tmp = dot(L, R);\n vec3 cToR = tmp * R - L;\n float d = length(cToR);\n L = L + cToR * clamp(lightRadius / d, 0.0, 1.0);\n L = normalize(L);\n vec3 H = normalize(L + V);\n float ndl = clamp(dot(N, L), 0.0, 1.0);\n float ndh = clamp(dot(N, H), 0.0, 1.0);\n float ndv = clamp(dot(N, V), 0.0, 1.0);\n float attenuation = lightAttenuation(dist, lightRange);\n gl_FragColor.rgb = lightColor * ndl * attenuation;\n glossiness = clamp(glossiness - lightRadius / 2.0 / dist, 0.0, 1.0);\n gl_FragColor.rgb = attenuation * lightEquation(\n lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n );\n gl_FragColor.a = 1.0;\n}\n@end";
+import {
+  FragmentShader,
+  createUniform as uniform,
+  createSemanticUniform as semanticUniform,
+  glsl,
+  createArrayUniform as arrayUniform
+} from '../../../Shader';
+import { lightAttenuation } from '../util.glsl';
+import { gBufferRead, lightEquationFunction } from './chunk.glsl';
+
+export const sphereLightFragment = new FragmentShader({
+  uniforms: {
+    lightPosition: uniform('vec3'),
+    lightColor: uniform('vec3'),
+    lightRange: uniform('float'),
+    lightRadius: uniform('float'),
+    eyePosition: uniform('vec3')
+  },
+  includes: [gBufferRead, lightAttenuation],
+  main: glsl`
+${lightEquationFunction()}
+
+void main()
+{
+  ${gBufferRead.main}
+  vec3 L = lightPosition - position;
+
+  vec3 V = normalize(eyePosition - position);
+
+  float dist = length(L);
+  // Light pos fix
+  vec3 R = reflect(V, N);
+  float tmp = dot(L, R);
+  vec3 cToR = tmp * R - L;
+  float d = length(cToR);
+  L = L + cToR * clamp(lightRadius / d, 0.0, 1.0);
+
+  L = normalize(L);
+
+  vec3 H = normalize(L + V);
+
+  float ndl = clamp(dot(N, L), 0.0, 1.0);
+  float ndh = clamp(dot(N, H), 0.0, 1.0);
+  float ndv = clamp(dot(N, V), 0.0, 1.0);
+  float attenuation = lightAttenuation(dist, lightRange);
+  // Diffuse term
+  gl_FragColor.rgb = lightColor * ndl * attenuation;
+
+  // Specular fix
+  glossiness = clamp(glossiness - lightRadius / 2.0 / dist, 0.0, 1.0);
+
+  gl_FragColor.rgb = attenuation * lightEquation(
+    lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness
+  );
+
+  gl_FragColor.a = 1.0;
+}`
+});

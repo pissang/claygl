@@ -10,16 +10,15 @@ import { lightHeader } from './header/light.glsl';
 import { shadowMap } from './shadowmap.glsl';
 import { NORMAL, WORLD, WORLDINVERSETRANSPOSE, WORLDVIEWPROJECTION } from './shared';
 import {
-  lightAttenuationUniforms,
   instancing,
   logDepthVertex,
   skinning,
-  lightAttenuationFunction,
   edgeFactorFunction,
   logDepthFragment,
   ACESToneMappingFunction,
   encodeHDRFunction,
-  decodeHDRFunction
+  decodeHDRFunction,
+  lightAttenuation
 } from './util.glsl';
 
 export const sharedLambertVertexUniforms = {
@@ -48,8 +47,7 @@ export const sharedLambertFragmentUniforms = {
 
 export const lambertVertex = new VertexShader({
   uniforms: {
-    ...sharedLambertVertexUniforms,
-    ...lightAttenuationUniforms
+    ...sharedLambertVertexUniforms
   },
 
   attributes: {
@@ -105,9 +103,8 @@ export const lambertFragment = new FragmentShader({
   uniforms: {
     ...sharedLambertFragmentUniforms
   },
-  includes: [lightHeader, logDepthFragment, shadowMap],
+  includes: [lightHeader, logDepthFragment, shadowMap, lightAttenuation],
   main: glsl`
-${lightAttenuationFunction()}
 ${edgeFactorFunction()}
 ${encodeHDRFunction()}
 ${decodeHDRFunction()}

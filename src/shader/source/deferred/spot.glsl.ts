@@ -1,1 +1,65 @@
-export default "@export clay.deferred.spot_light\n@import clay.deferred.chunk.light_head\n@import clay.deferred.chunk.light_equation\n@import clay.util.calculate_attenuation\nuniform vec3 lightPosition;\nuniform vec3 lightDirection;\nuniform vec3 lightColor;\nuniform float umbraAngleCosine;\nuniform float penumbraAngleCosine;\nuniform float lightRange;\nuniform float falloffFactor;\nuniform vec3 eyePosition;\n#ifdef SHADOWMAP_ENABLED\nuniform sampler2D lightShadowMap;\nuniform mat4 lightMatrix;\nuniform float lightShadowMapSize;\n#endif\n@import clay.plugin.shadow_map_common\nvoid main()\n{\n @import clay.deferred.chunk.gbuffer_read\n vec3 L = lightPosition - position;\n vec3 V = normalize(eyePosition - position);\n float dist = length(L);\n L /= dist;\n float attenuation = lightAttenuation(dist, lightRange);\n float c = dot(-normalize(lightDirection), L);\n float falloff = clamp((c - umbraAngleCosine) / (penumbraAngleCosine - umbraAngleCosine), 0.0, 1.0);\n falloff = pow(falloff, falloffFactor);\n vec3 H = normalize(L + V);\n float ndl = clamp(dot(N, L), 0.0, 1.0);\n float ndh = clamp(dot(N, H), 0.0, 1.0);\n float ndv = clamp(dot(N, V), 0.0, 1.0);\n gl_FragColor.rgb = (1.0 - falloff) * attenuation * lightEquation(\n lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness\n );\n#ifdef SHADOWMAP_ENABLED\n float shadowContrib = computeShadowContrib(\n lightShadowMap, lightMatrix, position, lightShadowMapSize\n );\n gl_FragColor.rgb *= shadowContrib;\n#endif\n gl_FragColor.a = 1.0;\n}\n@end\n";
+import {
+  FragmentShader,
+  createUniform as uniform,
+  createSemanticUniform as semanticUniform,
+  glsl,
+  createArrayUniform as arrayUniform
+} from '../../../Shader';
+import { shadowMap } from '../shadowmap.glsl';
+import { lightAttenuation } from '../util.glsl';
+import { gBufferRead, lightEquationFunction } from './chunk.glsl';
+
+export const spotLightFragment = new FragmentShader({
+  uniforms: {
+    lightPosition: uniform('vec3'),
+    lightDirection: uniform('vec3'),
+    lightColor: uniform('vec3'),
+    umbraAngleCosine: uniform('float'),
+    penumbraAngleCosine: uniform('float'),
+    lightRange: uniform('float'),
+    falloffFactor: uniform('float'),
+    eyePosition: uniform('vec3'),
+    lightShadowMap: uniform('sampler2D'),
+    lightMatrix: uniform('mat4'),
+    lightShadowMapSize: uniform('float')
+  },
+  includes: [shadowMap, gBufferRead, lightAttenuation],
+  main: glsl`
+
+${lightEquationFunction()}
+
+void main() {
+  ${gBufferRead.main}
+
+  vec3 L = lightPosition - position;
+  vec3 V = normalize(eyePosition - position);
+
+  float dist = length(L);
+  L /= dist;
+
+  float attenuation = lightAttenuation(dist, lightRange);
+  float c = dot(-normalize(lightDirection), L);
+
+  float falloff = clamp((c - umbraAngleCosine) / (penumbraAngleCosine - umbraAngleCosine), 0.0, 1.0);
+  falloff = pow(falloff, falloffFactor);
+
+  vec3 H = normalize(L + V);
+  float ndl = clamp(dot(N, L), 0.0, 1.0);
+  float ndh = clamp(dot(N, H), 0.0, 1.0);
+  float ndv = clamp(dot(N, V), 0.0, 1.0);
+
+  // Diffuse term
+  gl_FragColor.rgb = (1.0 - falloff) * attenuation * lightEquation(
+    lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness
+  );
+
+#ifdef SHADOWMAP_ENABLED
+  float shadowContrib = computeShadowContrib(
+    lightShadowMap, lightMatrix, position, lightShadowMapSize
+  );
+  gl_FragColor.rgb *= shadowContrib;
+#endif
+
+  gl_FragColor.a = 1.0;
+}`
+});

@@ -1,1 +1,43 @@
-export default "@export clay.deferred.ambient_cubemap_light\n@import clay.deferred.chunk.light_head\nuniform vec3 lightColor;\nuniform samplerCube lightCubemap;\nuniform sampler2D brdfLookup;\nuniform vec3 eyePosition;\n@import clay.util.rgbm\nvoid main()\n{\n @import clay.deferred.chunk.gbuffer_read\n vec3 V = normalize(eyePosition - position);\n vec3 L = reflect(-V, N);\n float ndv = clamp(dot(N, V), 0.0, 1.0);\n float rough = clamp(1.0 - glossiness, 0.0, 1.0);\n float bias = rough * 5.0;\n vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;\n vec3 envWeight = specularColor * brdfParam.x + brdfParam.y;\n vec3 envTexel = RGBMDecode(textureCubeLodEXT(lightCubemap, L, bias), 8.12);\n gl_FragColor.rgb = lightColor * envTexel * envWeight;\n gl_FragColor.a = 1.0;\n}\n@end";
+import {
+  FragmentShader,
+  createUniform as uniform,
+  createSemanticUniform as semanticUniform,
+  glsl
+} from '../../../Shader';
+import { encodeRGBMFunction } from '../util.glsl';
+import { gBufferRead } from './chunk.glsl';
+
+export const ambientCubemapLightFragment = new FragmentShader({
+  uniforms: {
+    lightColor: uniform('vec3'),
+    lightCubemap: uniform('samplerCube'),
+    brdfLookup: uniform('sampler2D'),
+
+    eyePosition: uniform('vec3')
+  },
+  includes: [gBufferRead],
+  main: glsl`
+${encodeRGBMFunction()}
+
+void main()
+{
+  ${gBufferRead.main}
+
+  vec3 V = normalize(eyePosition - position);
+  vec3 L = reflect(-V, N);
+
+  float ndv = clamp(dot(N, V), 0.0, 1.0);
+  float rough = clamp(1.0 - glossiness, 0.0, 1.0);
+  // FIXME fixed maxMipmapLevel ?
+  float bias = rough * 5.0;
+  // One brdf lookup is enough
+  vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;
+  vec3 envWeight = specularColor * brdfParam.x + brdfParam.y;
+
+  vec3 envTexel = RGBMDecode(textureCubeLodEXT(lightCubemap, L, bias), 8.12);
+  // TODO mix ?
+  gl_FragColor.rgb = lightColor * envTexel * envWeight;
+
+  gl_FragColor.a = 1.0;
+}`
+});

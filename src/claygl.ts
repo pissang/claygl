@@ -115,7 +115,7 @@ export { default as FullscreenQuadPass } from './composite/Pass';
 
 // Deferred renderer
 export { default as DeferredGBuffer } from './deferred/GBuffer';
-// export { default as DeferredRenderer } from './deferred/Renderer';
+export { default as DeferredRenderer } from './deferred/Renderer';
 
 // Particles
 // export { default as ParticleEmitter } from './particle/Emitter';

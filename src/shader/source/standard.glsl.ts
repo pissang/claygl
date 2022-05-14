@@ -28,8 +28,7 @@ import {
   parallaxCorrectFunction,
   skinning,
   sRGBToLinearFunction,
-  lightAttenuationFunction,
-  lightAttenuationUniforms
+  lightAttenuation
 } from './util.glsl';
 
 export const standardVertex = new VertexShader({
@@ -109,7 +108,6 @@ export const standardFragment = new FragmentShader({
   },
   uniforms: {
     ...sharedLambertFragmentUniforms,
-    ...lightAttenuationUniforms,
     viewInverse: VIEWINVERSE(),
     normalMap: uniform('sampler2D'),
     occlusionMap: uniform('sampler2D'),
@@ -147,7 +145,7 @@ export const standardFragment = new FragmentShader({
     parallaxMinLayers: uniform('float', 5),
     parallaxOcclusionMap: uniform('sampler2D')
   },
-  includes: [lightHeader, logDepthFragment, shadowMap],
+  includes: [lightHeader, logDepthFragment, shadowMap, lightAttenuation],
 
   main: glsl`
 ${ACESToneMappingFunction()}
@@ -157,7 +155,6 @@ ${encodeHDRFunction()}
 ${sRGBToLinearFunction()}
 ${linearToSRGBFunction()}
 ${parallaxCorrectFunction()}
-${lightAttenuationFunction()}
 
 float G_Smith(float g, float ndv, float ndl)
 {

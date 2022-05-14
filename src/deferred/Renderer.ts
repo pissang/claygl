@@ -13,16 +13,6 @@ import Matrix4 from '../math/Matrix4';
 import Vector3 from '../math/Vector3';
 import GBuffer from './GBuffer';
 
-import lightvolumeGlsl from '../shader/source/deferred/lightvolume.glsl';
-// Light shaders
-import spotGlsl from '../shader/source/deferred/spot.glsl';
-import directionalGlsl from '../shader/source/deferred/directional.glsl';
-import ambientGlsl from '../shader/source/deferred/ambient.glsl';
-import ambientshGlsl from '../shader/source/deferred/ambientsh.glsl';
-import ambientcubemapGlsl from '../shader/source/deferred/ambientcubemap.glsl';
-import pointGlsl from '../shader/source/deferred/point.glsl';
-import sphereGlsl from '../shader/source/deferred/sphere.glsl';
-import tubeGlsl from '../shader/source/deferred/tube.glsl';
 import type ShadowMapPass from '../prePass/ShadowMap';
 import type Geometry from '../Geometry';
 import type Scene from '../Scene';
@@ -40,26 +30,21 @@ import type Light from '../Light';
 import PerspectiveCamera from '../camera/Perspective';
 import OrthographicCamera from '../camera/Orthographic';
 import * as constants from '../core/constants';
-
-Shader.import(lightvolumeGlsl);
-
-// Light shaders
-Shader.import(spotGlsl);
-Shader.import(directionalGlsl);
-Shader.import(ambientGlsl);
-Shader.import(ambientshGlsl);
-Shader.import(ambientcubemapGlsl);
-Shader.import(pointGlsl);
-Shader.import(sphereGlsl);
-Shader.import(tubeGlsl);
-
-Shader.import(prezGlsl);
-Shader.import(outputGlsl);
+import { preZFragment, preZVertex } from '../shader/source/prez.glsl';
+import { outputFragment } from '../shader/source/compositor/output.glsl';
+import { directionalLightFragment } from '../shader/source/deferred/directional.glsl';
+import { fullscreenQuadPassVertex } from '../shader/source/compositor/vertex.glsl';
+import { lightVolumeVertex } from '../shader/source/deferred/lightvolume.glsl';
+import { ambientLightFragment } from '../shader/source/deferred/ambient.glsl';
+import { ambientSHLightFragment } from '../shader/source/deferred/ambientsh.glsl';
+import { ambientCubemapLightFragment } from '../shader/source/deferred/ambientcubemap.glsl';
+import { spotLightFragment } from '../shader/source/deferred/spot.glsl';
+import { pointLightFragment } from '../shader/source/deferred/point.glsl';
+import { sphereLightFragment } from '../shader/source/deferred/sphere.glsl';
+import { tubeLightFragment } from '../shader/source/deferred/tube.glsl';
 
 const worldView = new Matrix4();
-const preZMaterial = new Material({
-  shader: new Shader(Shader.source('clay.prez.vertex'), Shader.source('clay.prez.fragment'))
-});
+const preZMaterial = new Material(new Shader(preZVertex, preZFragment));
 
 type DeferredLight = PointLight | SphereLight | SpotLight | TubeLight | DirectionalLight;
 
@@ -98,7 +83,8 @@ class DeferredRenderer extends Notifier {
     magFilter: constants.NEAREST
   });
 
-  private _fullQuadPass = new FullscreenQuadPass('', {
+  // TODO Support dynamic material?
+  private _fullQuadPass = new FullscreenQuadPass(outputFragment, {
     blendWithPrevious: true
   });
 
@@ -123,37 +109,26 @@ class DeferredRenderer extends Notifier {
 
   private _lightCylinderGeo: Geometry;
 
-  private _outputPass = new FullscreenQuadPass(Shader.source('clay.composite.output'));
+  private _outputPass = new FullscreenQuadPass(outputFragment);
   private _createLightPassMat: (shader: Shader) => Material;
 
   constructor() {
     super();
-    const fullQuadVertex = Shader.source('clay.composite.vertex');
-    const lightVolumeVertex = Shader.source('clay.deferred.light_volume.vertex');
-
-    const directionalLightShader = new Shader(
-      fullQuadVertex,
-      Shader.source('clay.deferred.directional_light')
-    );
+    const directionalLightShader = new Shader(fullscreenQuadPassVertex, directionalLightFragment);
 
     const lightAccumulateBlendFunc = function (gl: WebGLRenderingContext) {
       gl.blendEquation(gl.FUNC_ADD);
       gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
     };
 
-    const createLightPassMat = function (shader: Shader) {
-      return new Material({
-        shader,
+    const createLightPassMat = function <T extends Shader>(shader: T) {
+      return new Material(shader, {
         blend: lightAccumulateBlendFunc,
         transparent: true,
         depthMask: false
       });
     };
     this._createLightPassMat = createLightPassMat;
-
-    const createVolumeShader = function (name: string) {
-      return new Shader(lightVolumeVertex, Shader.source('clay.deferred.' + name));
-    };
 
     // Rotate and positioning to fit the spot light
     // Which the cusp of cone pointing to the positive z
@@ -176,20 +151,20 @@ class DeferredRenderer extends Notifier {
     this._directionalLightMat = this._createLightPassMat(directionalLightShader);
 
     this._ambientMat = this._createLightPassMat(
-      new Shader(fullQuadVertex, Shader.source('clay.deferred.ambient_light'))
+      new Shader(fullscreenQuadPassVertex, ambientLightFragment)
     );
     this._ambientSHMat = this._createLightPassMat(
-      new Shader(fullQuadVertex, Shader.source('clay.deferred.ambient_sh_light'))
+      new Shader(fullscreenQuadPassVertex, ambientSHLightFragment)
     );
     this._ambientCubemapMat = this._createLightPassMat(
-      new Shader(fullQuadVertex, Shader.source('clay.deferred.ambient_cubemap_light'))
+      new Shader(fullscreenQuadPassVertex, ambientCubemapLightFragment)
     );
 
-    this._spotLightShader = createVolumeShader('spot_light');
-    this._pointLightShader = createVolumeShader('point_light');
+    this._spotLightShader = new Shader(lightVolumeVertex, spotLightFragment);
+    this._pointLightShader = new Shader(lightVolumeVertex, pointLightFragment);
 
-    this._sphereLightShader = createVolumeShader('sphere_light');
-    this._tubeLightShader = createVolumeShader('tube_light');
+    this._sphereLightShader = new Shader(lightVolumeVertex, sphereLightFragment);
+    this._tubeLightShader = new Shader(lightVolumeVertex, tubeLightFragment);
 
     this._lightConeGeo = coneGeo;
     this._lightCylinderGeo = cylinderGeo;
@@ -243,8 +218,7 @@ class DeferredRenderer extends Notifier {
     this._accumulateLightBuffer(renderer, scene, camera, !opts.notUpdateShadow);
 
     if (!opts.renderToTarget) {
-      this._outputPass.set('texture', this._lightAccumTex);
-
+      this._outputPass.material.set('texture', this._lightAccumTex);
       this._outputPass.render(renderer);
       // this._gBuffer.renderDebug(renderer, camera, 'normal');
     }
@@ -416,39 +390,39 @@ class DeferredRenderer extends Notifier {
 
         volumeMeshList.push(volumeMesh);
       } else {
-        const pass = this._fullQuadPass;
         let unknownLightType = false;
+        let passMaterial!: Material;
         let hasShadow;
         // Full quad light
         switch (light.type) {
           case 'AMBIENT_LIGHT':
-            pass.material = this._ambientMat;
-            pass.material.set('lightColor', uTpl.ambientLightColor.value(light));
+            passMaterial = this._ambientMat;
+            passMaterial.set('lightColor', uTpl.ambientLightColor.value(light));
             break;
           case 'AMBIENT_SH_LIGHT':
-            pass.material = this._ambientSHMat;
-            pass.material.set('lightColor', uTpl.ambientSHLightColor.value(light));
-            pass.material.set('lightCoefficients', uTpl.ambientSHLightCoefficients.value(light));
+            passMaterial = this._ambientSHMat;
+            passMaterial.set('lightColor', uTpl.ambientSHLightColor.value(light));
+            passMaterial.set('lightCoefficients', uTpl.ambientSHLightCoefficients.value(light));
             break;
           case 'AMBIENT_CUBEMAP_LIGHT':
-            pass.material = this._ambientCubemapMat;
-            pass.material.set('lightColor', uTpl.ambientCubemapLightColor.value(light));
-            pass.material.set('lightCubemap', uTpl.ambientCubemapLightCubemap.value(light));
-            pass.material.set('brdfLookup', uTpl.ambientCubemapLightBRDFLookup.value(light));
+            passMaterial = this._ambientCubemapMat;
+            passMaterial.set('lightColor', uTpl.ambientCubemapLightColor.value(light));
+            passMaterial.set('lightCubemap', uTpl.ambientCubemapLightCubemap.value(light));
+            passMaterial.set('brdfLookup', uTpl.ambientCubemapLightBRDFLookup.value(light));
             break;
           case 'DIRECTIONAL_LIGHT':
             hasShadow = shadowMapPass && light.castShadow;
-            pass.material = this._directionalLightMat;
-            pass.material[hasShadow ? 'define' : 'undefine']('fragment', 'SHADOWMAP_ENABLED');
+            passMaterial = this._directionalLightMat;
+            passMaterial[hasShadow ? 'define' : 'undefine']('fragment', 'SHADOWMAP_ENABLED');
             if (hasShadow) {
-              pass.material.define(
+              passMaterial.define(
                 'fragment',
                 'SHADOW_CASCADE',
                 (light as DirectionalLight).shadowCascade
               );
             }
-            pass.material.set('lightColor', uTpl.directionalLightColor.value(light));
-            pass.material.set('lightDirection', uTpl.directionalLightDirection.value(light));
+            passMaterial.set('lightColor', uTpl.directionalLightColor.value(light));
+            passMaterial.set('lightDirection', uTpl.directionalLightDirection.value(light));
             break;
           default:
             // Unkonw light type
@@ -458,7 +432,6 @@ class DeferredRenderer extends Notifier {
           continue;
         }
 
-        const passMaterial = pass.material!;
         passMaterial.set('eyePosition', eyePosition);
         passMaterial.set('viewProjectionInv', viewProjectionInv.array);
         passMaterial.set('gBufferTexture1', gBuffer.getTargetTexture1());
@@ -475,6 +448,8 @@ class DeferredRenderer extends Notifier {
 
           passMaterial.set('lightShadowMapSize', light.shadowResolution);
         }
+        const pass = this._fullQuadPass;
+        pass.material = passMaterial;
 
         pass.renderQuad(renderer);
       }
@@ -595,9 +570,7 @@ class DeferredRenderer extends Notifier {
           if (!volumeMeshMap.get(light)) {
             volumeMeshMap.set(
               light,
-              new Mesh({
-                material: this._createLightPassMat(shader),
-                geometry: this._lightSphereGeo,
+              new Mesh(this._lightSphereGeo, this._createLightPassMat(shader), {
                 // Disable culling
                 // if light volume mesh intersect camera near plane
                 // We need mesh inside can still be rendered
@@ -613,9 +586,7 @@ class DeferredRenderer extends Notifier {
           if (!volumeMeshMap.get(light)) {
             volumeMeshMap.set(
               light,
-              new Mesh({
-                material: this._createLightPassMat(this._spotLightShader),
-                geometry: this._lightConeGeo,
+              new Mesh(this._lightConeGeo, this._createLightPassMat(this._spotLightShader), {
                 culling: false
               })
             );
@@ -629,9 +600,7 @@ class DeferredRenderer extends Notifier {
           if (!volumeMeshMap.get(light)) {
             volumeMeshMap.set(
               light,
-              new Mesh({
-                material: this._createLightPassMat(this._tubeLightShader),
-                geometry: this._lightCylinderGeo,
+              new Mesh(this._lightCylinderGeo, this._createLightPassMat(this._tubeLightShader), {
                 culling: false
               })
             );
