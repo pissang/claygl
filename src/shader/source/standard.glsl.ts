@@ -15,7 +15,7 @@ import {
   sharedLambertVertexUniforms
 } from './lambert.glsl';
 import { shadowMap } from './shadowmap.glsl';
-import { VIEWINVERSE } from './shared';
+import { TANGENT, VIEWINVERSE } from './shared';
 import {
   ACESToneMappingFunction,
   decodeHDRFunction,
@@ -39,7 +39,7 @@ export const standardVertex = new VertexShader({
   attributes: {
     ...sharedLambertVertexAttributes,
     texcoord2: attribute('vec2', 'TEXCOORD_1'),
-    tangent: attribute('vec4', 'TANGENT')
+    tangent: TANGENT()
   },
   varyings: {
     ...sharedLambertVaryings,

@@ -12,7 +12,7 @@ export const fullscreenQuadPassVertex = new VertexShader({
   },
   attributes: {
     pos: createAttribute('vec3', 'POSITION'),
-    uv: createAttribute('vec3', 'TEXCOORD_0')
+    uv: createAttribute('vec2', 'TEXCOORD_0')
   },
   varyings: {
     v_Texcoord: createVarying('vec2')

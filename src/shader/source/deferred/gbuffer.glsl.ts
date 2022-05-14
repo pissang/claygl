@@ -1,1 +1,313 @@
-export default "@export clay.deferred.gbuffer.vertex\nuniform mat4 worldViewProjection : WORLDVIEWPROJECTION;\nattribute vec3 position : POSITION;\n#if defined(SECOND_PASS) || defined(FIRST_PASS)\nattribute vec2 texcoord : TEXCOORD_0;\nuniform vec2 uvRepeat;\nuniform vec2 uvOffset;\nvarying vec2 v_Texcoord;\n#endif\n#ifdef FIRST_PASS\nuniform mat4 worldInverseTranspose : WORLDINVERSETRANSPOSE;\nuniform mat4 world : WORLD;\nvarying vec3 v_Normal;\nattribute vec3 normal : NORMAL;\nattribute vec4 tangent : TANGENT;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nvarying vec3 v_WorldPosition;\n#endif\n@import clay.chunk.skinning_header\n#ifdef THIRD_PASS\nuniform mat4 prevWorldViewProjection;\nvarying vec4 v_ViewPosition;\nvarying vec4 v_PrevViewPosition;\n#ifdef SKINNING\n#ifdef USE_SKIN_MATRICES_TEXTURE\nuniform sampler2D prevSkinMatricesTexture;\nmat4 getPrevSkinMatrix(float idx) {\n return getSkinMatrix(prevSkinMatricesTexture, idx);\n}\n#else\nuniform mat4 prevSkinMatrix[JOINT_COUNT];\nmat4 getPrevSkinMatrix(float idx) {\n return prevSkinMatrix[int(idx)];\n}\n#endif\n#endif\n#endif\nvoid main()\n{\n vec3 skinnedPosition = position;\n vec3 prevSkinnedPosition = position;\n#ifdef FIRST_PASS\n vec3 skinnedNormal = normal;\n vec3 skinnedTangent = tangent.xyz;\n bool hasTangent = dot(tangent, tangent) > 0.0;\n#endif\n#ifdef SKINNING\n @import clay.chunk.skin_matrix\n skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;\n #ifdef FIRST_PASS\n skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;\n if (hasTangent) {\n skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;\n }\n #endif\n #ifdef THIRD_PASS\n {\n mat4 prevSkinMatrixWS = getPrevSkinMatrix(joint.x) * weight.x;\n if (weight.y > 1e-4) { prevSkinMatrixWS += getPrevSkinMatrix(joint.y) * weight.y; }\n if (weight.z > 1e-4) { prevSkinMatrixWS += getPrevSkinMatrix(joint.z) * weight.z; }\n float weightW = 1.0-weight.x-weight.y-weight.z;\n if (weightW > 1e-4) { prevSkinMatrixWS += getPrevSkinMatrix(joint.w) * weightW; }\n prevSkinnedPosition = (prevSkinMatrixWS * vec4(position, 1.0)).xyz;\n }\n #endif\n#endif\n#if defined(SECOND_PASS) || defined(FIRST_PASS)\n v_Texcoord = texcoord * uvRepeat + uvOffset;\n#endif\n#ifdef FIRST_PASS\n v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);\n if (hasTangent) {\n v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);\n v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);\n }\n v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;\n#endif\n#ifdef THIRD_PASS\n v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);\n v_PrevViewPosition = prevWorldViewProjection * vec4(prevSkinnedPosition, 1.0);\n#endif\n gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);\n}\n@end\n@export clay.deferred.gbuffer1.fragment\nuniform mat4 viewInverse : VIEWINVERSE;\nuniform float glossiness;\nvarying vec2 v_Texcoord;\nvarying vec3 v_Normal;\nvarying vec3 v_WorldPosition;\nuniform sampler2D normalMap;\nuniform sampler2D diffuseMap;\nvarying vec3 v_Tangent;\nvarying vec3 v_Bitangent;\nuniform sampler2D roughGlossMap;\nuniform bool useRoughGlossMap;\nuniform bool useRoughness;\nuniform bool doubleSided;\nuniform float alphaCutoff: 0.0;\nuniform float alpha: 1.0;\nuniform int roughGlossChannel: 0;\nfloat indexingTexel(in vec4 texel, in int idx) {\n if (idx == 3) return texel.a;\n else if (idx == 1) return texel.g;\n else if (idx == 2) return texel.b;\n else return texel.r;\n}\nvoid main()\n{\n vec3 N = v_Normal;\n if (doubleSided) {\n vec3 eyePos = viewInverse[3].xyz;\n vec3 V = eyePos - v_WorldPosition;\n if (dot(N, V) < 0.0) {\n N = -N;\n }\n }\n if (alphaCutoff > 0.0) {\n float a = texture2D(diffuseMap, v_Texcoord).a * alpha;\n if (a < alphaCutoff) {\n discard;\n }\n }\n if (dot(v_Tangent, v_Tangent) > 0.0) {\n vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;\n if (dot(normalTexel, normalTexel) > 0.0) { N = normalTexel * 2.0 - 1.0;\n mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);\n N = normalize(tbn * N);\n }\n }\n gl_FragColor.rgb = (N + 1.0) * 0.5;\n float g = glossiness;\n if (useRoughGlossMap) {\n float g2 = indexingTexel(texture2D(roughGlossMap, v_Texcoord), roughGlossChannel);\n if (useRoughness) {\n g2 = 1.0 - g2;\n }\n g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);\n }\n gl_FragColor.a = g + 0.005;\n}\n@end\n@export clay.deferred.gbuffer2.fragment\nuniform sampler2D diffuseMap;\nuniform sampler2D metalnessMap;\nuniform vec3 color;\nuniform float metalness;\nuniform bool useMetalnessMap;\nuniform bool linear;\nuniform float alphaCutoff: 0.0;\nuniform float alpha: 1.0;\nvarying vec2 v_Texcoord;\n@import clay.util.srgb\nvoid main()\n{\n float m = metalness;\n if (useMetalnessMap) {\n vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);\n m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);\n }\n vec4 texel = texture2D(diffuseMap, v_Texcoord);\n if (linear) {\n texel = sRGBToLinear(texel);\n }\n if (alphaCutoff > 0.0) {\n float a = texel.a * alpha;\n if (a < alphaCutoff) {\n discard;\n }\n }\n gl_FragColor.rgb = texel.rgb * color;\n gl_FragColor.a = m + 0.005;\n}\n@end\n@export clay.deferred.gbuffer3.fragment\nuniform bool firstRender;\nvarying vec4 v_ViewPosition;\nvarying vec4 v_PrevViewPosition;\nvoid main()\n{\n vec2 a = v_ViewPosition.xy / v_ViewPosition.w;\n vec2 b = v_PrevViewPosition.xy / v_PrevViewPosition.w;\n if (firstRender) {\n gl_FragColor = vec4(0.0);\n }\n else {\n gl_FragColor = vec4((a - b) * 0.5 + 0.5, 0.0, 1.0);\n }\n}\n@end\n@export clay.deferred.gbuffer.debug\n@import clay.deferred.chunk.light_head\nuniform sampler2D gBufferTexture4;\nuniform int debug: 0;\nvoid main ()\n{\n @import clay.deferred.chunk.gbuffer_read\n if (debug == 0) {\n gl_FragColor = vec4(N, 1.0);\n }\n else if (debug == 1) {\n gl_FragColor = vec4(vec3(z), 1.0);\n }\n else if (debug == 2) {\n gl_FragColor = vec4(position, 1.0);\n }\n else if (debug == 3) {\n gl_FragColor = vec4(vec3(glossiness), 1.0);\n }\n else if (debug == 4) {\n gl_FragColor = vec4(vec3(metalness), 1.0);\n }\n else if (debug == 5) {\n gl_FragColor = vec4(albedo, 1.0);\n }\n else {\n vec4 color = texture2D(gBufferTexture4, uv);\n color.rg -= 0.5;\n color.rg *= 2.0;\n gl_FragColor = color;\n }\n}\n@end";
+import {
+  createArrayUniform,
+  createAttribute as attribute,
+  createSemanticUniform as semanticUniform,
+  createUniform as uniform,
+  createVarying as varying,
+  FragmentShader,
+  glsl,
+  VertexShader
+} from '../../../Shader';
+import {
+  NORMAL,
+  POSITION,
+  TANGENT,
+  TEXCOORD_0,
+  VIEWINVERSE,
+  WORLD,
+  WORLDINVERSETRANSPOSE,
+  WORLDVIEWPROJECTION
+} from '../shared';
+import { skinning, sRGBToLinearFunction } from '../util.glsl';
+import { gBufferRead } from './chunk.glsl';
+
+export const gBufferVertex = new VertexShader({
+  attributes: {
+    position: POSITION(),
+    texcoord: TEXCOORD_0(),
+    normal: NORMAL(),
+    tangent: TANGENT()
+  },
+  uniforms: {
+    worldViewProjection: WORLDVIEWPROJECTION(),
+    worldInverseTranspose: WORLDINVERSETRANSPOSE(),
+    world: WORLD(),
+    prevWorldViewProjection: uniform('mat4'),
+    prevSkinMatricesTexture: uniform('sampler2D'),
+    prevSkinMatrix: createArrayUniform('mat4', 'JOINT_COUNT'),
+    uvRepeat: uniform('vec2'),
+    uvOffset: uniform('vec2')
+  },
+  varyings: {
+    v_Texcoord: varying('vec2'),
+    v_Normal: varying('vec3'),
+    v_Tangent: varying('vec3'),
+    v_Bitangent: varying('vec3'),
+    v_WorldPosition: varying('vec3'),
+    v_ViewPosition: varying('vec4'),
+    v_PrevViewPosition: varying('vec4')
+  },
+  includes: [skinning],
+  main: glsl`
+#ifdef SKINNING
+  #ifdef USE_SKIN_MATRICES_TEXTURE
+mat4 getPrevSkinMatrix(float idx) {
+  return getSkinMatrix(prevSkinMatricesTexture, idx);
+}
+  #else
+mat4 getPrevSkinMatrix(float idx) {
+  return prevSkinMatrix[int(idx)];
+}
+  #endif
+#endif
+
+void main() {
+  vec3 skinnedPosition = position;
+  vec3 prevSkinnedPosition = position;
+
+#ifdef FIRST_PASS
+  vec3 skinnedNormal = normal;
+  vec3 skinnedTangent = tangent.xyz;
+  bool hasTangent = dot(tangent, tangent) > 0.0;
+#endif
+
+#ifdef SKINNING
+
+  ${skinning.main}
+
+  skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
+
+  #ifdef FIRST_PASS
+  // Upper skinMatrix
+  skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
+  if (hasTangent) {
+    skinnedTangent = (skinMatrixWS * vec4(tangent.xyz, 0.0)).xyz;
+  }
+  #endif
+
+  #ifdef THIRD_PASS
+  // Weighted Sum Skinning Matrix
+  // PENDING Must be assigned.
+  {
+    mat4 prevSkinMatrixWS = getPrevSkinMatrix(joint.x) * weight.x;
+    if (weight.y > 1e-4) { prevSkinMatrixWS += getPrevSkinMatrix(joint.y) * weight.y; }
+    if (weight.z > 1e-4) { prevSkinMatrixWS += getPrevSkinMatrix(joint.z) * weight.z; }
+    float weightW = 1.0-weight.x-weight.y-weight.z;
+    if (weightW > 1e-4) { prevSkinMatrixWS += getPrevSkinMatrix(joint.w) * weightW; }
+    prevSkinnedPosition = (prevSkinMatrixWS * vec4(position, 1.0)).xyz;
+  }
+  #endif
+
+#endif
+
+#if defined(SECOND_PASS) || defined(FIRST_PASS)
+  v_Texcoord = texcoord * uvRepeat + uvOffset;
+#endif
+
+#ifdef FIRST_PASS
+  v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
+
+  if (hasTangent) {
+    v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
+    v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
+  }
+  v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
+#endif
+
+#ifdef THIRD_PASS
+  v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
+  v_PrevViewPosition = prevWorldViewProjection * vec4(prevSkinnedPosition, 1.0);
+#endif
+
+  gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0);
+
+}`
+});
+
+/**
+ * First pass
+ * - R: normal.x
+ * - G: normal.y
+ * - B: normal.z
+ * - A: metalness
+ */
+export const gBuffer1Fragment = new FragmentShader({
+  uniforms: {
+    viewInverse: VIEWINVERSE(),
+    glossiness: uniform('float'),
+    normalMap: uniform('sampler2D'),
+    diffuseMap: uniform('sampler2D'),
+    roughGlossMap: uniform('sampler2D'),
+    useRoughGlossMap: uniform('bool'),
+    useRoughness: uniform('bool'),
+    doubleSided: uniform('bool'),
+    alphaCutoff: uniform('float', 0.0),
+    alpha: uniform('float', 1.0),
+    roughGlossChannel: uniform('int', 0)
+  },
+  main: glsl`
+float indexingTexel(in vec4 texel, in int idx) {
+  if (idx == 3) return texel.a;
+  else if (idx == 1) return texel.g;
+  else if (idx == 2) return texel.b;
+  else return texel.r;
+}
+
+void main() {
+
+  vec3 N = v_Normal;
+
+  if (doubleSided) {
+    vec3 eyePos = viewInverse[3].xyz;
+    vec3 V = eyePos - v_WorldPosition;
+    if (dot(N, V) < 0.0) {
+      N = -N;
+    }
+  }
+  if (alphaCutoff > 0.0) {
+    float a = texture2D(diffuseMap, v_Texcoord).a * alpha;
+    if (a < alphaCutoff) {
+      discard;
+    }
+  }
+
+  if (dot(v_Tangent, v_Tangent) > 0.0) {
+    vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;
+    if (dot(normalTexel, normalTexel) > 0.0) { // Valid normal map
+      N = normalTexel * 2.0 - 1.0;
+      mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
+      // FIXME Why need to normalize again?
+      N = normalize(tbn * N);
+    }
+  }
+
+  gl_FragColor.rgb = (N + 1.0) * 0.5;
+
+  // FIXME Have precision problem http://aras-p.info/texts/CompactNormalStorage.html
+  // N.z can be recovered from sqrt(1 - dot(N.xy, N.xy));
+  // gl_FragColor.rg = (N.xy + 1.0) * 0.5;
+
+  float g = glossiness;
+
+  if (useRoughGlossMap) {
+    float g2 = indexingTexel(texture2D(roughGlossMap, v_Texcoord), roughGlossChannel);
+    if (useRoughness) {
+      g2 = 1.0 - g2;
+    }
+    g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
+  }
+
+  // PENDING Alpha can't be zero.
+  gl_FragColor.a = g + 0.005;
+
+  // Pack sign of normal to metalness
+  // Add 0.001 to avoid m is 0
+  // gl_FragColor.a = sign(N.z) * (m + 0.001) * 0.5 + 0.5;
+}`
+});
+
+/**
+ * Second pass
+ * - R: albedo.r
+ * - G: albedo.g
+ * - B: albedo.b
+ * - A: metalness
+ */
+export const gBuffer2Fragment = new FragmentShader({
+  uniforms: {
+    diffuseMap: uniform('sampler2D'),
+    metalnessMap: uniform('sampler2D'),
+    color: uniform('vec3'),
+    metalness: uniform('float'),
+    useMetalnessMap: uniform('bool'),
+    linear: uniform('bool'),
+    alphaCutoff: uniform('float', 0.0),
+    alpha: uniform('float', 1.0)
+  },
+  main: glsl`
+${sRGBToLinearFunction()}
+void main()
+{
+  float m = metalness;
+
+  if (useMetalnessMap) {
+    vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);
+    m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);
+  }
+  vec4 texel = texture2D(diffuseMap, v_Texcoord);
+  if (linear) {
+    texel = sRGBToLinear(texel);
+  }
+  if (alphaCutoff > 0.0) {
+    float a = texel.a * alpha;
+    if (a < alphaCutoff) {
+      discard;
+    }
+  }
+
+  gl_FragColor.rgb = texel.rgb * color;
+
+  // PENDING Alpha can't be zero.
+  gl_FragColor.a = m + 0.005;
+}`
+});
+
+export const gBuffer3Fragment = new FragmentShader({
+  uniforms: {
+    firstRender: uniform('bool')
+  },
+  main: glsl`
+void main() {
+  vec2 a = v_ViewPosition.xy / v_ViewPosition.w;
+  vec2 b = v_PrevViewPosition.xy / v_PrevViewPosition.w;
+
+  if (firstRender) {
+    gl_FragColor = vec4(0.0);
+  }
+  else {
+    gl_FragColor = vec4((a - b) * 0.5 + 0.5, 0.0, 1.0);
+  }
+}`
+});
+
+export const gBufferDebugFragment = new FragmentShader({
+  uniforms: {
+    gBufferTexture4: uniform('sampler2D'),
+    /**
+     * DEBUG
+     * - 0: normal
+     * - 1: depth
+     * - 2: position
+     * - 3: glossiness
+     * - 4: metalness
+     * - 5: albedo
+     * - 6: velocity
+     */
+    debug: uniform('int', 0)
+  },
+  includes: [gBufferRead],
+  main: glsl`
+void main ()
+{
+  ${gBufferRead.main}
+
+  if (debug == 0) {
+    gl_FragColor = vec4(N, 1.0);
+  } else if (debug == 1) {
+    gl_FragColor = vec4(vec3(z), 1.0);
+  } else if (debug == 2) {
+    gl_FragColor = vec4(position, 1.0);
+  } else if (debug == 3) {
+    gl_FragColor = vec4(vec3(glossiness), 1.0);
+  } else if (debug == 4) {
+    gl_FragColor = vec4(vec3(metalness), 1.0);
+  } else if (debug == 5) {
+    gl_FragColor = vec4(albedo, 1.0);
+  } else {
+    vec4 color = texture2D(gBufferTexture4, uv);
+    color.rg -= 0.5;
+    color.rg *= 2.0;
+    gl_FragColor = color;
+  }
+}`
+});

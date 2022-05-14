@@ -151,6 +151,28 @@ class Material<
 
   constructor(shader: T, opts?: Partial<MaterialOpts>) {
     opts = opts || {};
+
+    this._shader = shader;
+    const uniforms = (this.uniforms = shader.createUniforms());
+
+    // Make sure uniforms are set in same order to avoid texture slot wrong
+    const enabledUniforms = (this._enabledUniforms = util.keys(uniforms).sort());
+    this._textureUniforms = enabledUniforms.filter((uniformName) => {
+      const type = uniforms[uniformName].type;
+      return type === 't' || type === 'tv';
+    });
+
+    this.vertexDefines = util.clone(shader.vertexDefines);
+    this.fragmentDefines = util.clone(shader.fragmentDefines);
+
+    const textureStatus = {} as Material<T>['_textureStatus'];
+    const shaderTextures = shader.textures;
+    for (const key in shaderTextures) {
+      (textureStatus as any)[key] = util.assign({}, shaderTextures[key]);
+    }
+
+    this._textureStatus = textureStatus;
+
     this.name = opts.name || '';
     this.depthTest = util.optional(opts.depthTest, true);
     this.depthMask = util.optional(opts.depthMask, true);
@@ -160,12 +182,6 @@ class Material<
 
     util.assign(this.vertexDefines, opts.vertexDefines);
     util.assign(this.fragmentDefines, opts.fragmentDefines);
-
-    this.uniforms = shader.createUniforms();
-    // Ignore if uniform can use in shader.
-    this._shader = shader;
-
-    this._init(shader);
   }
 
   get shader() {
@@ -229,29 +245,6 @@ class Material<
     if (uniform) {
       return uniform.value as T['uniformTpls'][K]['value'];
     }
-  }
-
-  private _init(shader: Shader) {
-    const uniforms = this.uniforms;
-    // Make sure uniforms are set in same order to avoid texture slot wrong
-    const enabledUniforms = (this._enabledUniforms = util.keys(uniforms).sort());
-    this._textureUniforms = enabledUniforms.filter((uniformName) => {
-      const type = uniforms[uniformName].type;
-      return type === 't' || type === 'tv';
-    });
-
-    this.vertexDefines = util.clone(shader.vertexDefines);
-    this.fragmentDefines = util.clone(shader.fragmentDefines);
-
-    const textureStatus = {} as Material<T>['_textureStatus'];
-    const shaderTextures = shader.textures;
-    for (const key in shaderTextures) {
-      (textureStatus as any)[key] = util.assign({}, shaderTextures[key]);
-    }
-
-    this._textureStatus = textureStatus;
-
-    this._programKey = '';
   }
 
   /**

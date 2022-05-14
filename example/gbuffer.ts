@@ -49,11 +49,9 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
       wrapS: constants.REPEAT,
       wrapT: constants.REPEAT
     });
-    tex
-      .load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png')
-      .onload(function () {
-        update();
-      });
+    tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png').onload(() => {
+      update();
+    });
     material[mapInfo[0]] = tex;
   });
 
@@ -107,5 +105,3 @@ const config: {
 const gui = new dat.GUI();
 
 gui.add(config, 'debugType', availableDebugTypes).onChange(update);
-
-update();

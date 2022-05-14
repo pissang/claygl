@@ -129,7 +129,7 @@ class Notifier {
    * @chainable
    */
   onload(action: Function, context?: any) {
-    return this.once('success', action, context);
+    return this.once('load', action, context);
   }
 
   /**

@@ -1,5 +1,4 @@
 import Texture2D from '../Texture2D';
-import Texture from '../Texture';
 import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
 import Shader from '../Shader';
@@ -8,18 +7,17 @@ import Matrix4 from '../math/Matrix4';
 import * as mat4 from '../glmatrix/mat4';
 import * as constants from '../core/constants';
 
-import gbufferEssl from '../shader/source/deferred/gbuffer.glsl';
-import chunkEssl from '../shader/source/deferred/chunk.glsl';
 import Renderer, { RenderableObject, RendererViewport } from '../Renderer';
 import Camera from '../Camera';
 import Scene from '../Scene';
 import { assign, optional } from '../core/util';
-import { importSharedShader } from '../shader/shared';
-
-importSharedShader();
-
-Shader.import(gbufferEssl);
-Shader.import(chunkEssl);
+import {
+  gBuffer1Fragment,
+  gBuffer2Fragment,
+  gBuffer3Fragment,
+  gBufferDebugFragment,
+  gBufferVertex
+} from '../shader/source/deferred/gbuffer.glsl';
 
 const renderableGBufferData = new WeakMap<
   RenderableObject,
@@ -223,11 +221,7 @@ class DeferredGBuffer {
 
   private _frameBuffer = new FrameBuffer();
 
-  private _gBufferMaterial1 = new Material({
-    shader: new Shader(
-      Shader.source('clay.deferred.gbuffer.vertex'),
-      Shader.source('clay.deferred.gbuffer1.fragment')
-    ),
+  private _gBufferMaterial1 = new Material(new Shader(gBufferVertex, gBuffer1Fragment), {
     vertexDefines: {
       FIRST_PASS: null
     },
@@ -235,11 +229,7 @@ class DeferredGBuffer {
       FIRST_PASS: null
     }
   });
-  private _gBufferMaterial2 = new Material({
-    shader: new Shader(
-      Shader.source('clay.deferred.gbuffer.vertex'),
-      Shader.source('clay.deferred.gbuffer2.fragment')
-    ),
+  private _gBufferMaterial2 = new Material(new Shader(gBufferVertex, gBuffer2Fragment), {
     vertexDefines: {
       SECOND_PASS: null
     },
@@ -247,11 +237,7 @@ class DeferredGBuffer {
       SECOND_PASS: null
     }
   });
-  private _gBufferMaterial3 = new Material({
-    shader: new Shader(
-      Shader.source('clay.deferred.gbuffer.vertex'),
-      Shader.source('clay.deferred.gbuffer3.fragment')
-    ),
+  private _gBufferMaterial3 = new Material(new Shader(gBufferVertex, gBuffer3Fragment), {
     vertexDefines: {
       THIRD_PASS: null
     },
@@ -260,7 +246,7 @@ class DeferredGBuffer {
     }
   });
 
-  private _debugPass = new FullscreenQuadPass(Shader.source('clay.deferred.gbuffer.debug'));
+  private _debugPass = new FullscreenQuadPass(gBufferDebugFragment);
 
   constructor(opts?: Partial<DeferredGBufferOpts>) {
     opts = opts || {};
@@ -423,7 +409,6 @@ class DeferredGBuffer {
       frameBuffer.bind(renderer);
 
       clearViewport();
-
       const gBufferMaterial1 = this._gBufferMaterial1;
       const passConfig = {
         getMaterial() {
@@ -614,13 +599,14 @@ class DeferredGBuffer {
     Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
 
     const debugPass = this._debugPass;
-    debugPass.set('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
-    debugPass.set('gBufferTexture1', this._gBufferTex1);
-    debugPass.set('gBufferTexture2', this._gBufferTex2);
-    debugPass.set('gBufferTexture3', this._gBufferTex3);
-    debugPass.set('gBufferTexture4', this._gBufferTex4);
-    debugPass.set('debug', debugTypes[type!]);
-    debugPass.set('viewProjectionInv', viewProjectionInv.array);
+    const debugPassMat = debugPass.material;
+    debugPassMat.set('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
+    debugPassMat.set('gBufferTexture1', this._gBufferTex1);
+    debugPassMat.set('gBufferTexture2', this._gBufferTex2);
+    debugPassMat.set('gBufferTexture3', this._gBufferTex3);
+    debugPassMat.set('gBufferTexture4', this._gBufferTex4);
+    debugPassMat.set('debug', debugTypes[type!]);
+    debugPassMat.set('viewProjectionInv', viewProjectionInv.array);
     debugPass.render(renderer);
 
     renderer.restoreViewport();

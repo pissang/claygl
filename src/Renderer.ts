@@ -1381,21 +1381,17 @@ class Renderer extends Notifier {
         );
       },
       getUniform(renderable, depthMaterial, symbol) {
+        const material = renderable.material;
         if (symbol === 'alphaMap') {
-          return renderable.material.get('diffuseMap');
+          return material.get('diffuseMap');
         } else if (symbol === 'alphaCutoff') {
-          if (
-            renderable.material.isDefined('fragment', 'ALPHA_TEST') &&
-            renderable.material.get('diffuseMap')
-          ) {
-            const alphaCutoff = renderable.material.get('alphaCutoff');
+          if (material.isDefined('fragment', 'ALPHA_TEST') && material.get('diffuseMap')) {
+            const alphaCutoff = material.get('alphaCutoff');
             return alphaCutoff || 0;
           }
           return 0;
-        } else if (symbol === 'uvRepeat') {
-          return renderable.material.get('uvRepeat');
-        } else if (symbol === 'uvOffset') {
-          return renderable.material.get('uvOffset');
+        } else if (symbol === 'uvRepeat' || symbol === 'uvOffset') {
+          return material.get(symbol);
         } else {
           return depthMaterial.get(symbol);
         }

@@ -13,9 +13,6 @@ import Matrix4 from '../math/Matrix4';
 import Vector3 from '../math/Vector3';
 import GBuffer from './GBuffer';
 
-import prezGlsl from '../shader/source/prez.glsl';
-import utilGlsl from '../shader/source/util.glsl';
-
 import lightvolumeGlsl from '../shader/source/deferred/lightvolume.glsl';
 // Light shaders
 import spotGlsl from '../shader/source/deferred/spot.glsl';
@@ -26,7 +23,6 @@ import ambientcubemapGlsl from '../shader/source/deferred/ambientcubemap.glsl';
 import pointGlsl from '../shader/source/deferred/point.glsl';
 import sphereGlsl from '../shader/source/deferred/sphere.glsl';
 import tubeGlsl from '../shader/source/deferred/tube.glsl';
-import outputGlsl from '../shader/source/compositor/output.glsl';
 import type ShadowMapPass from '../prePass/ShadowMap';
 import type Geometry from '../Geometry';
 import type Scene from '../Scene';
@@ -45,8 +41,6 @@ import PerspectiveCamera from '../camera/Perspective';
 import OrthographicCamera from '../camera/Orthographic';
 import * as constants from '../core/constants';
 
-Shader.import(prezGlsl);
-Shader.import(utilGlsl);
 Shader.import(lightvolumeGlsl);
 
 // Light shaders

@@ -1,1 +1,28 @@
-export default "@export clay.composite.output\n#define OUTPUT_ALPHA\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\n@import clay.util.rgbm\nvoid main()\n{\n vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));\n gl_FragColor.rgb = tex.rgb;\n#ifdef OUTPUT_ALPHA\n gl_FragColor.a = tex.a;\n#else\n gl_FragColor.a = 1.0;\n#endif\n gl_FragColor = encodeHDR(gl_FragColor);\n#ifdef PREMULTIPLY_ALPHA\n gl_FragColor.rgb *= gl_FragColor.a;\n#endif\n}\n@end";
+import { createUniform, FragmentShader, glsl } from '../../../Shader';
+import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+
+export const outputFragment = new FragmentShader({
+  defines: {
+    OUTPUT_ALPHA: null
+  },
+  uniforms: {
+    texture: createUniform('sampler2D')
+  },
+  main: glsl`
+${encodeHDRFunction()}
+${decodeHDRFunction()}
+void main() {
+  vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));
+
+#if !defined(OUTPUT_ALPHA)
+  tex.a = 1.0;
+#endif
+
+  tex = encodeHDR(tex);
+#ifdef PREMULTIPLY_ALPHA
+  tex.rgb *= tex.a;
+#endif
+  gl_FragColor = tex;
+}
+  `
+});

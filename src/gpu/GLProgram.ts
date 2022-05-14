@@ -1,4 +1,4 @@
-import { genGUID, keys } from '../core/util';
+import { assign, genGUID, keys } from '../core/util';
 import type Renderer from '../Renderer';
 import Shader, { UniformSemantic } from '../Shader';
 import type Texture from '../Texture';
@@ -318,6 +318,8 @@ class GLProgram {
     const vertexShader = _gl.createShader(constants.VERTEX_SHADER)!;
     const program = _gl.createProgram()!;
     const semanticsMap = shader.semanticsMap;
+
+    assign(this.semanticsMap, semanticsMap);
 
     _gl.shaderSource(vertexShader, vertexShaderCode);
     _gl.compileShader(vertexShader);

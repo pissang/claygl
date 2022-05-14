@@ -28,3 +28,6 @@ export function TEXCOORD_0() {
 export function NORMAL() {
   return attribute('vec3', 'NORMAL');
 }
+export function TANGENT() {
+  return attribute('vec4', 'TANGENT');
+}

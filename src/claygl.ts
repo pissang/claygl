@@ -103,7 +103,7 @@ export * as textureUtil from './util/texture';
 export { default as App3D } from './App3D';
 
 // Composite
-// export { default as FullscreenQuadPass } from './composite/Pass';
+export { default as FullscreenQuadPass } from './composite/Pass';
 // export { default as Compositor } from './composite/Compositor';
 // export { default as CompositeNode } from './composite/CompositeNode';
 // export { default as FilterCompositeNode } from './composite/FilterNode';
@@ -114,7 +114,7 @@ export { default as App3D } from './App3D';
 // export { default as registerBuiltinCompositeShaders } from './shader/registerBuiltinCompositeShaders';
 
 // Deferred renderer
-// export { default as DeferredGBuffer } from './deferred/GBuffer';
+export { default as DeferredGBuffer } from './deferred/GBuffer';
 // export { default as DeferredRenderer } from './deferred/Renderer';
 
 // Particles
