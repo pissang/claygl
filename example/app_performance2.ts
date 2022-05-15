@@ -1,4 +1,4 @@
-import { App3D, BasicShader, Mesh } from 'claygl';
+import { App3D, createBasicShader, Mesh } from 'claygl';
 import Stats from 'stats.js';
 const stats = new Stats();
 document.body.appendChild(stats.dom);
@@ -13,7 +13,7 @@ const distance = 20;
 const size = 10 / 2;
 const material = app.createMaterial({
   color: 'red',
-  shader: new BasicShader()
+  shader: createBasicShader()
 });
 const cubes: Mesh[] = [];
 for (let i = 0; i < cnt; ++i) {

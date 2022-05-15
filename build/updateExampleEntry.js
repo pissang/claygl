@@ -1,4 +1,4 @@
-const { writeFileSync } = require('fs');
+const { writeFileSync, existsSync } = require('fs');
 const glob = require('glob');
 const path = require('path');
 
@@ -11,9 +11,13 @@ const html = (strings, ...vars) => {
 };
 
 glob(path.resolve(__dirname, '../example/*.html'), async (err, files) => {
-  const fileNames = files
+  const testCases = files
     .map((file) => path.basename(file, '.html'))
-    .filter((file) => file !== 'index');
+    .filter((file) => file !== 'index')
+    .map((file) => ({
+      name: file,
+      isTS: existsSync(path.join(__dirname, `../example/${file}.ts`))
+    }));
 
   // prettier-ignore
   const tpl = html`
@@ -47,6 +51,16 @@ glob(path.resolve(__dirname, '../example/*.html'), async (err, files) => {
         margin: 0;
         font-size: 16px;
       }
+      .nav ul li a {
+        color: #444;
+        text-decoration: none;
+      }
+      .nav ul li.current {
+        background-color: #8d00be;
+      }
+      .nav ul li.current a {
+        color: #fff;
+      }
       .main {
         position: absolute;
         top: 0;
@@ -75,8 +89,8 @@ glob(path.resolve(__dirname, '../example/*.html'), async (err, files) => {
     <div class="container">
       <div class="nav">
         <ul>
-          ${fileNames.map((fileName) => html`
-            <li><a href="${fileName}.html" data-hash="${fileName}" target="viewport">${fileName}</a></li>`).join('\n')}
+          ${testCases.map((testCase) => html`
+            <li><a href="${testCase.name}.html" data-hash="${testCase.name}" target="viewport">${testCase.name}${testCase.isTS ? '(ts)' : ''}</a></li>`).join('\n')}
         </ul>
       </div>
       <div class="main">
@@ -98,14 +112,29 @@ glob(path.resolve(__dirname, '../example/*.html'), async (err, files) => {
         document.title = iframeDom.contentDocument.title;
       }
 
-      function updateFromHash() {
+      function updateFromHash(isFirst) {
         const testName = window.location.hash.slice(1);
         if (testName) {
           iframeDom.src = testName + '.html'
         }
+
+        !isFirst && Array.from(document.querySelectorAll('.nav a')).forEach(link => {
+          link.parentNode.classList.remove('current');
+        })
+        const current = document.querySelector('.nav a[data-hash=' + testName + ']');
+        if (current) {
+          current.parentNode.classList.add('current')
+          if (isFirst) {
+            setTimeout(() => {
+              current.scrollIntoView({
+                behavior: 'smooth'
+              });
+            }, 100)
+          }
+        }
       }
-      updateFromHash();
-      window.onhashchange = updateFromHash;
+      updateFromHash(true);
+      window.onhashchange = () => updateFromHash();
     </script>
   </body>
 </html>
