@@ -153,32 +153,6 @@ void main(){
 
 // TODO reduce shadow glsl code size.
 export const shadowMapFunction = createShaderFunction(glsl`
-#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)
-
-#ifdef SPOT_LIGHT_SHADOWMAP_COUNT
-uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];
-uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];
-uniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];
-#endif
-
-#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT
-#if defined(SHADOW_CASCADE)
-uniform sampler2D directionalLightShadowMaps[1];
-uniform mat4 directionalLightMatrices[SHADOW_CASCADE];
-uniform float directionalLightShadowMapSizes[1];
-uniform float shadowCascadeClipsNear[SHADOW_CASCADE];
-uniform float shadowCascadeClipsFar[SHADOW_CASCADE];
-#else
-uniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
-uniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
-uniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
-#endif
-#endif
-
-#ifdef POINT_LIGHT_SHADOWMAP_COUNT
-uniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT];
-#endif
-
 float tapShadowMap(sampler2D map, vec2 uv, float z) {
   vec4 tex = texture2D(map, uv);
   return step(z, decodeFloat(tex) * 2.0 - 1.0);
@@ -214,7 +188,6 @@ float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
 }
 
 float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset) {
-
   vec4 posInLightSpace = lightVPM * vec4(position, 1.0);
   posInLightSpace.xyz /= posInLightSpace.w;
   float z = posInLightSpace.z;
@@ -233,15 +206,41 @@ float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float te
   return computeShadowContrib(map, lightVPM, position, textureSize, vec2(1.0), vec2(0.0));
 }
 
-float computeShadowContribOmni(samplerCube map, vec3 direction, float range)
-{
+float computeShadowContribOmni(samplerCube map, vec3 direction, float range) {
   float dist = length(direction);
   vec4 shadowTex = textureCube(map, direction);
   return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);
 }
+
+#if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)
+
+#ifdef SPOT_LIGHT_SHADOWMAP_COUNT
+uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];
+uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];
+uniform float spotLightShadowMapSizes[SPOT_LIGHT_SHADOWMAP_COUNT];
+#endif
+
+#ifdef DIRECTIONAL_LIGHT_SHADOWMAP_COUNT
+#if defined(SHADOW_CASCADE)
+uniform sampler2D directionalLightShadowMaps[1];
+uniform mat4 directionalLightMatrices[SHADOW_CASCADE];
+uniform float directionalLightShadowMapSizes[1];
+uniform float shadowCascadeClipsNear[SHADOW_CASCADE];
+uniform float shadowCascadeClipsFar[SHADOW_CASCADE];
+#else
+uniform sampler2D directionalLightShadowMaps[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
+uniform mat4 directionalLightMatrices[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
+uniform float directionalLightShadowMapSizes[DIRECTIONAL_LIGHT_SHADOWMAP_COUNT];
+#endif
+#endif
+
+#ifdef POINT_LIGHT_SHADOWMAP_COUNT
+uniform samplerCube pointLightShadowMaps[POINT_LIGHT_SHADOWMAP_COUNT];
+#endif
+
 #if defined(SPOT_LIGHT_SHADOWMAP_COUNT)
 
-void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT] ) {
+void computeShadowOfSpotLights(vec3 position, inout float shadowContribs[SPOT_LIGHT_COUNT]) {
   float shadowContrib;
   for(int _idx_ = 0; _idx_ < SPOT_LIGHT_SHADOWMAP_COUNT; _idx_++) {{
     shadowContrib = computeShadowContrib(
