@@ -4,7 +4,7 @@ import {
   createSemanticUniform as semanticUniform,
   glsl
 } from '../../../Shader';
-import { encodeRGBMFunction } from '../util.glsl';
+import { decodeRGBMFunction } from '../util.glsl';
 import { gBufferReadMixin } from './chunk.glsl';
 
 export const deferredAmbientCubemapLightFragment = new FragmentShader({
@@ -18,7 +18,7 @@ export const deferredAmbientCubemapLightFragment = new FragmentShader({
   },
   includes: [gBufferReadMixin],
   main: glsl`
-${encodeRGBMFunction()}
+${decodeRGBMFunction()}
 
 void main()
 {
@@ -35,7 +35,7 @@ void main()
   vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;
   vec3 envWeight = specularColor * brdfParam.x + brdfParam.y;
 
-  vec3 envTexel = RGBMDecode(textureCubeLodEXT(lightCubemap, L, bias), 8.12);
+  vec3 envTexel = decodeRGBM(textureCubeLodEXT(lightCubemap, L, bias), 8.12);
   // TODO mix ?
   gl_FragColor.rgb = lightColor * envTexel * envWeight;
 

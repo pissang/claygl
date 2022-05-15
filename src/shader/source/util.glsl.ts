@@ -124,7 +124,7 @@ export const decodeRGBMFunction = createShaderFunction(
 vec3 ${FUNCTION_NAME_PLACEHOLDER}(vec4 rgbm, float range) {
   return range * rgbm.rgb * rgbm.a;
 }`,
-  'RGBMDecode'
+  'decodeRGBM'
 );
 
 /**
@@ -143,7 +143,7 @@ vec4 ${FUNCTION_NAME_PLACEHOLDER}(vec3 color, float range) {
   rgbm.rgb = color / rgbm.a;
   return rgbm;
 }`,
-  'RGBMEncode'
+  'encodeRGBM'
 );
 
 /**

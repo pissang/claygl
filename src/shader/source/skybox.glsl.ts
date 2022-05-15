@@ -38,6 +38,9 @@ void main() {
 
 export const skyboxFragment = new FragmentShader({
   name: 'skyboxFrag',
+  defines: {
+    PI: Math.PI
+  },
   uniforms: {
     viewInverse: VIEWINVERSE(),
     equirectangularMap: uniform('sampler2D'),

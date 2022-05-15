@@ -18,6 +18,8 @@ import { CLAMP_TO_EDGE } from '../core/constants';
 import { integrateBRDFFragment } from './shader/integrateBRDF.glsl';
 import { skyboxVertex } from '../shader/source/skybox.glsl';
 import { cubemapPrefilterFragment } from './shader/prefilter.glsl';
+import Mesh from '../Mesh';
+import CubeGeometry from '../geometry/Cube';
 
 const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
 
@@ -87,11 +89,14 @@ export function prefilterEnvironmentMap(
     });
     envMap = envCubemap;
   }
-  const skyEnv = new Skybox({
-    scene: dummyScene,
-    material: prefilterMaterial
-  });
-  skyEnv.material.set('environmentMap', envMap);
+  const mesh = new Mesh(
+    new CubeGeometry({
+      inside: true
+    }),
+    prefilterMaterial
+  );
+  dummyScene.add(mesh);
+  prefilterMaterial.set('environmentMap', envMap);
 
   const envMapPass = new EnvironmentMapPass({
     texture: prefilteredCubeMap
@@ -120,7 +125,7 @@ export function prefilterEnvironmentMap(
     prefilteredCubeMap.mipmaps[i] = {
       pixels: {} as TextureCubeOpts['pixels']
     };
-    skyEnv.material.set('roughness', i / (mipmapNum - 1));
+    prefilterMaterial.set('roughness', i / (mipmapNum - 1));
 
     // Tweak fov. TODO It will cause leaking on the edge in the latest chrome
     // http://the-witness.net/news/2012/02/seamless-cube-map-filtering/
@@ -173,7 +178,7 @@ export function prefilterEnvironmentMap(
 
   frameBuffer.dispose(renderer);
   renderTargetTmp.dispose(renderer);
-  skyEnv.dispose(renderer);
+  renderer.disposeScene(dummyScene);
   // Remove gpu resource allucated in renderer
   normalDistribution.dispose(renderer);
 

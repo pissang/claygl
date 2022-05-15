@@ -1,6 +1,6 @@
 import { createUniform as uniform, FragmentShader, glsl } from '../../Shader';
 import { VIEWINVERSE } from '../../shader/source/shared';
-import { decodeRGBMFunction, encodeRGBMFunction } from '../../shader/source/util.glsl';
+import { HDREncoderMixin } from '../../shader/source/util.glsl';
 
 export const cubemapPrefilterFragment = new FragmentShader({
   name: 'prefilterFrag',
@@ -15,11 +15,8 @@ export const cubemapPrefilterFragment = new FragmentShader({
     normalDistribution: uniform('sampler2D'),
     roughness: uniform('float')
   },
+  includes: [HDREncoderMixin],
   main: glsl`
-
-${encodeRGBMFunction()}
-${decodeRGBMFunction()}
-
 vec3 importanceSampleNormal(float i, float roughness, vec3 N) {
   vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;
 

@@ -8,6 +8,7 @@ import {
   textureUtil,
   Geometry,
   AmbientCubemapLight,
+  AmbientLight,
   StandardMaterial,
   Skybox,
   startTimeline
@@ -27,18 +28,22 @@ let suzanneGeometry: Geometry;
 loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
 
-  const cubemap = textureUtil.loadTextureSync(
-    'assets/textures/hdr/pisa.hdr',
-    {
+  textureUtil
+    .loadTexture('assets/textures/hdr/pisa.hdr', {
       exposure: 2
-    },
-    () => {
+    })
+    .then((cubemap) => {
       cubemap.flipY = false;
       const ambientCubemapLight = new AmbientCubemapLight({
         cubemap
       });
       ambientCubemapLight.prefilter(renderer);
       scene.add(ambientCubemapLight);
+
+      const ambientLight = new AmbientLight({
+        intensity: 0.5
+      });
+      scene.add(ambientLight);
 
       const skybox = new Skybox({
         scene: scene,
@@ -49,7 +54,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
 
       for (let i = 0; i < 10; i++) {
         const material = new StandardMaterial({
-          metalness: 1,
+          // metalness: 1
           roughness: i / 12
         });
         const mesh = new Mesh(suzanneGeometry, material);
@@ -59,8 +64,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
       }
 
       renderer.render(scene, camera);
-    }
-  );
+    });
 });
 
 const control = new OrbitControl({

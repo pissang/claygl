@@ -45,7 +45,6 @@ class Skybox extends Mesh<Material<ReturnType<typeof createSkyboxShader>>> {
   culling = false;
 
   private _targetScene?: Scene;
-  private _environmentMap?: TextureCube | Texture2D;
   private _dummyCamera = new PerspectiveCamera();
 
   constructor(opts?: Partial<SkyboxOpts>) {

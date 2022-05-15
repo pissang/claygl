@@ -29,7 +29,7 @@ ${endif}
 export const ambientSHLightHeader = createShaderFunction(`
 ${ifdef} AMBIENT_SH${_LIGHT_COUNT}
 ${uniformVec3} ${ambientSHLight}Color[AMBIENT_SH${_LIGHT_COUNT}];
-${uniformVec3} ${ambientSHLight}Coefficients[AMBIENT_SH${_LIGHT_COUNT}];
+${uniformVec3} ${ambientSHLight}Coefficients[AMBIENT_SH${_LIGHT_COUNT} * 9];
 ${calcAmbientSHLightFunction()}
 ${endif}
 `);
@@ -67,6 +67,7 @@ export const lightHeaderMixin = createShaderMixin({
   functions: [
     ambientLightHeader,
     ambientSHLightHeader,
+    ambientCubemapLightHeader,
     pointLightHeader,
     directionalLightHeader,
     spotLightHeader

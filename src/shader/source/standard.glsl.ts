@@ -109,7 +109,10 @@ export const standardFragment = new FragmentShader({
   uniforms: {
     ...sharedLambertFragmentUniforms,
     viewInverse: VIEWINVERSE(),
+    // Normal map
     normalMap: uniform('sampler2D'),
+    normalScale: uniform('float', 1),
+
     occlusionMap: uniform('sampler2D'),
     environmentMap: uniform('samplerCube'),
     environmentBoxMin: uniform('vec3'),
@@ -469,9 +472,9 @@ void main() {
   vec3 envTexel2;
   for(int _idx_ = 0; _idx_ < AMBIENT_CUBEMAP_LIGHT_COUNT; _idx_++) {{
   #ifdef SUPPORT_TEXTURE_LOD
-    envTexel2 = RGBMDecode(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 8.12);
+    envTexel2 = decodeRGBM(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 8.12);
   #else
-    envTexel2 = RGBMDecode(textureCube(ambientCubemapLightCubemap[_idx_], L), 8.12);
+    envTexel2 = decodeRGBM(textureCube(ambientCubemapLightCubemap[_idx_], L), 8.12);
   #endif
     // TODO mix ?
     outColor.rgb += ambientCubemapLightColor[_idx_] * envTexel2 * envWeight2;
