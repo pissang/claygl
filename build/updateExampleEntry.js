@@ -11,7 +11,9 @@ const html = (strings, ...vars) => {
 };
 
 glob(path.resolve(__dirname, '../example/*.html'), async (err, files) => {
-  const fileNames = files.map((file) => path.basename(file, '.html'));
+  const fileNames = files
+    .map((file) => path.basename(file, '.html'))
+    .filter((file) => file !== 'index');
 
   // prettier-ignore
   const tpl = html`
