@@ -1,4 +1,4 @@
-import { App3D, Vector3, BasicShader, OrbitControl } from 'claygl';
+import { App3D, Vector3, createBasicShader, OrbitControl } from 'claygl';
 
 const app = new App3D('#main', {
   graphic: {
@@ -24,7 +24,7 @@ pointLight2.castShadow = true;
 
 app.createSphere(
   {
-    shader: new BasicShader(),
+    shader: createBasicShader(),
     color: [0, 0, 1]
   },
   pointLight1
@@ -32,7 +32,7 @@ app.createSphere(
 
 app.createSphere(
   {
-    shader: new BasicShader(),
+    shader: createBasicShader(),
     color: [0, 1, 0]
   },
   pointLight2

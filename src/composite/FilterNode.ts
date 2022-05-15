@@ -14,7 +14,7 @@ import { FragmentShader } from '../Shader';
  * @example
  * const node = new clay.CompositeFilterNode({
  *   name: 'fxaa',
- *   shader: clay.Shader.source('clay.composite.fxaa'),
+ *   shader: FXAACompositeFragment,
  *   inputs: {
  *     texture: {
          node: 'scene',

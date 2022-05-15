@@ -11,12 +11,10 @@ import Geometry from '../Geometry';
 import Shader from '../Shader';
 import PerspectiveCamera from '../camera/Perspective';
 
-import outputEssl from './output.glsl';
 import { Color } from '../core/type';
 import type Renderer from '../Renderer';
 import type Texture2D from '../Texture2D';
-
-Shader.import(outputEssl);
+import { VRDistorterFragment, VRDistorterVertex } from './distorter';
 
 function lerp(a: number, b: number, t: number) {
   return a * (1 - t) + b * t;
@@ -28,21 +26,19 @@ class CardboardDistorter {
   private _mesh: Mesh;
   private _fakeCamera = new PerspectiveCamera();
   constructor() {
-    this._mesh = new Mesh({
-      geometry: new Geometry({
+    this._mesh = new Mesh(
+      new Geometry({
         dynamic: true
       }),
-      culling: false,
-      material: new Material({
+      new Material(new Shader(VRDistorterVertex, VRDistorterFragment), {
         // FIXME Why disable depthMask will be wrong
         // depthMask: false,
-        depthTest: false,
-        shader: new Shader({
-          vertex: Shader.source('clay.vr.disorter.output.vertex'),
-          fragment: Shader.source('clay.vr.disorter.output.fragment')
-        })
-      })
-    });
+        depthTest: false
+      }),
+      {
+        culling: false
+      }
+    );
   }
 
   render(renderer: Renderer, sourceTexture: Texture2D) {

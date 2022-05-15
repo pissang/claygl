@@ -107,12 +107,7 @@ interface Material extends Omit<MaterialOpts, 'shader'> {}
  *
  * Here is a basic example to create a standard material
 ```js
-const material = new clay.Material({
-    shader: new clay.Shader(
-        clay.Shader.source('clay.vertex'),
-        clay.Shader.source('clay.fragment')
-    )
-});
+const material = new clay.Material(createStandardShader());
 ```
  * @constructor clay.Material
  * @extends clay.core.Base
