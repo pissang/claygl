@@ -17,6 +17,8 @@ import {
   FullscreenQuadPass,
   Shader
 } from 'claygl';
+import { outputTextureFragment } from 'claygl/shaders';
+import * as Stats from 'stats.js';
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
@@ -117,14 +119,14 @@ const control = new OrbitControl({
   target: camera
 });
 
-const debugPass = new FullscreenQuadPass(Shader.source('clay.compositor.output'));
+const debugPass = new FullscreenQuadPass(outputTextureFragment);
 debugPass.material!.undefine('fragment', 'OUTPUT_ALPHA');
 startTimeline((deltaTime) => {
   control.update(deltaTime);
   deferredRenderer.render(renderer, scene, camera);
 
   // TODO
-  debugPass.setUniform('texture', (deferredRenderer as any)._lightAccumTex);
+  debugPass.material.set('texture', (deferredRenderer as any)._lightAccumTex);
 
   stats.update();
 });

@@ -1,7 +1,6 @@
-import { Renderer, FullscreenQuadPass, Shader, registerBuiltinCompositeShaders } from 'claygl';
+import { Renderer, FullscreenQuadPass, Shader } from 'claygl';
+import { outputTextureFragment } from 'claygl/shaders';
 import { parseRGBE } from '../src/util/hdr';
-
-registerBuiltinCompositeShaders(Shader);
 
 fetch('assets/textures/hdr/pisa.hdr')
   .then((response) => response.arrayBuffer())
@@ -11,7 +10,7 @@ fetch('assets/textures/hdr/pisa.hdr')
     const renderer = new Renderer({
       canvas: document.getElementById('Main') as HTMLCanvasElement
     });
-    const pass = new FullscreenQuadPass(Shader.source('clay.compositor.output'));
-    pass.setUniform('texture', texture);
+    const pass = new FullscreenQuadPass(outputTextureFragment);
+    pass.material.set('texture', texture);
     pass.render(renderer);
   });

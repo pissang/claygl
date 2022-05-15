@@ -31,7 +31,7 @@ ${kernelName}[10] = 0.06;
 ${kernelName}[11] = 0.03;
 ${kernelName}[12] = 0.02;`;
 
-export const blurCompositeFragment = new FragmentShader({
+export const gaussianBlurCompositeFragment = new FragmentShader({
   name: 'gaussianBlurFrag',
   uniforms: {
     /**

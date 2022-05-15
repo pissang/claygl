@@ -16,7 +16,7 @@ export {
 
 // Composite shaders.
 export { blendCompositeFragment } from './source/compositor/blend.glsl';
-export { blurCompositeFragment } from './source/compositor/blur.glsl';
+export { gaussianBlurCompositeFragment } from './source/compositor/blur.glsl';
 export { brightCompositeFragment } from './source/compositor/bright.glsl';
 export { colorAdjustCompositeFragment } from './source/compositor/coloradjust.glsl';
 export { composeCompositeFragment } from './source/compositor/compose.glsl';
@@ -30,4 +30,4 @@ export { upsampleCompositeFragemnt } from './source/compositor/upsample.glsl';
 export { vignetteCompositeFragment } from './source/compositor/vignette.glsl';
 
 export { fullscreenQuadPassVertex } from './source/compositor/vertex.glsl';
-export { outputFragment as identityCompositeFragment } from './source/compositor/output.glsl';
+export { outputFragment as outputTextureFragment } from './source/compositor/output.glsl';

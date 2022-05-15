@@ -40,7 +40,9 @@ import { FragmentShader } from '../Shader';
  *
  */
 
-class CompositeFilterNode<T extends FragmentShader<any, any, any>> extends CompositeNode {
+class CompositeFilterNode<
+  T extends FragmentShader<any, any, any> = FragmentShader<any, any, any>
+> extends CompositeNode {
   pass: FullscreenQuadPass<T>;
 
   // Example: { name: 2 }

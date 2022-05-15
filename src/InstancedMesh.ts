@@ -5,6 +5,8 @@ import { optional } from './core/util';
 import type ClayNode from './Node';
 import type Renderer from './Renderer';
 import type { AttributeSize, AttributeType, AttributeValue } from './GeometryBase';
+import Material from './Material';
+import Geometry from './Geometry';
 
 const tmpBoundingBox = new BoundingBox();
 
@@ -39,8 +41,8 @@ interface InstancedMeshOpts extends MeshOpts {
   instances: Instance[];
 }
 
-interface InstancedMesh extends InstancedMeshOpts {}
-class InstancedMesh extends Mesh {
+interface InstancedMesh<T extends Material = Material> extends InstancedMeshOpts {}
+class InstancedMesh<T extends Material = Material> extends Mesh<T> {
   instances: Instance[];
   instancedAttributes: Record<string, InstancedAttribute> = {};
 
@@ -48,8 +50,8 @@ class InstancedMesh extends Mesh {
   private _cache = new ClayCache();
   private _attributesSymbols: string[] = [];
 
-  constructor(opts?: Partial<InstancedMeshOpts>) {
-    super(opts);
+  constructor(geometry: Geometry, material: T, opts?: Partial<InstancedMeshOpts>) {
+    super(geometry, material, opts);
 
     this.instances = optional(opts && opts.instances, []);
     this.createInstancedAttribute('instanceMat1', 'float', 4, 1);

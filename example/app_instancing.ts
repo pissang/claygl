@@ -9,14 +9,16 @@ const app = new App3D('#main', {
 const camera = app.createCamera([0, 2, 5], [0, 0, 0]);
 
 // Create cube
-const cubeIntancedMesh = new InstancedMesh({
-  geometry: new CubeGeometry(),
-  material: app.createMaterial({
+const cubeIntancedMesh = new InstancedMesh(
+  new CubeGeometry(),
+  app.createMaterial({
     color: 'red'
   }),
-  frustumCulling: false,
-  instances: []
-});
+  {
+    frustumCulling: false,
+    instances: []
+  }
+);
 
 const mesh = cubeIntancedMesh;
 

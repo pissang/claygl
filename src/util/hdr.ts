@@ -99,7 +99,11 @@ function readColors(scan: number[][], buffer: Uint8Array, offset: number, xmax: 
 // http://www.graphics.cornell.edu/~bjw/rgbe.html
 // Blender source
 // http://radsite.lbl.gov/radiance/refer/Notes/picture_format.html
-export function parseRGBE(arrayBuffer: ArrayBuffer, texture?: Texture2D, exposure?: number) {
+export function parseRGBE(
+  arrayBuffer: ArrayBuffer,
+  texture?: Texture2D,
+  exposure?: number
+): Texture2D | undefined {
   if (exposure == null) {
     exposure = 0;
   }
@@ -152,7 +156,7 @@ export function parseRGBE(arrayBuffer: ArrayBuffer, texture?: Texture2D, exposur
   for (let y = 0; y < height; y++) {
     offset = readColors(scanline, data, offset, width);
     if (!offset) {
-      return null;
+      return;
     }
     for (let x = 0; x < width; x++) {
       rgbe2float(scanline[x], pixels, offset2, exposure);

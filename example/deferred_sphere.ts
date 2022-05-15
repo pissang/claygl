@@ -17,6 +17,7 @@ import {
   constants
 } from 'claygl';
 import Stats from 'stats.js';
+import { outputTextureFragment } from 'claygl/shaders';
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
@@ -119,7 +120,7 @@ const control = new OrbitControl({
   target: camera
 });
 
-const debugPass = new FullscreenQuadPass(Shader.source('clay.compositor.output'));
+const debugPass = new FullscreenQuadPass(outputTextureFragment);
 let elpasedTime = 0;
 // debugPass.material.undefine('fragment', 'OUTPUT_ALPHA');
 startTimeline((deltaTime) => {

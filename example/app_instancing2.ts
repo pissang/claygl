@@ -12,9 +12,7 @@ camera.far = 10000;
 // Load boombox model.
 app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf').then(function (result) {
   const instancedMeshes = result.meshes.map((mesh) => {
-    return new InstancedMesh({
-      geometry: mesh.geometry,
-      material: mesh.material,
+    return new InstancedMesh(mesh.geometry, mesh.material, {
       skeleton: mesh.skeleton,
       joints: mesh.joints,
       frustumCulling: false,

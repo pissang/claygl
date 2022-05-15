@@ -7,6 +7,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      'claygl/shaders': path.resolve(__dirname, '../src/shader/exports.ts'),
       claygl: path.resolve(__dirname, '../src/claygl.ts')
     }
   }
