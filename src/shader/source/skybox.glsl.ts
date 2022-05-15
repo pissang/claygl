@@ -12,7 +12,9 @@ import {
   ACESToneMappingFunction,
   decodeRGBMFunction,
   encodeRGBMFunction,
+  HDREncoderMixin,
   linearToSRGBFunction,
+  sRGBMixin,
   sRGBToLinearFunction
 } from './util.glsl';
 export const skyboxVertex = new VertexShader({
@@ -40,11 +42,8 @@ export const skyboxFragment = new FragmentShader({
     cubeMap: uniform('samplerCube'),
     lod: uniform('float', 0)
   },
+  includes: [HDREncoderMixin, sRGBMixin],
   main: glsl`
-${encodeRGBMFunction()}
-${decodeRGBMFunction()}
-${sRGBToLinearFunction()}
-${linearToSRGBFunction()}
 ${ACESToneMappingFunction()}
 
 void main()

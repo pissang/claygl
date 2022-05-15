@@ -4,18 +4,16 @@ import {
   createSemanticUniform as semanticUniform,
   glsl
 } from '../../../Shader';
-import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+import { HDREncoderMixin } from '../util.glsl';
 
-export const fxaa3CompositeFragment = new FragmentShader({
+export const FXAA3CompositeFragment = new FragmentShader({
   name: 'FXAA3Frag',
   uniforms: {
     texture: uniform('sampler2D'),
     viewport: semanticUniform('vec4', 'VIEWPORT')
   },
+  includes: [HDREncoderMixin],
   main: glsl`
-${encodeHDRFunction()}
-${decodeHDRFunction()}
-
 float FxaaLuma(vec4 rgba) { return rgba.y; }
 vec4 FxaaPixelShader(
   vec2 pos

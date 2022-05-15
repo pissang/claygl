@@ -246,7 +246,7 @@ export function createVarying<T extends NativeUniformType>(type: T) {
 }
 
 type ShaderFunctionLoose = (functionName?: string) => string;
-export interface ShaderChunkLoose {
+export interface ShaderMixinLoose {
   defines: Dict<ShaderDefineValue>;
   uniforms: Dict<ShaderUniformLoose>;
   attributes: Dict<ShaderAttributeLoose>;
@@ -279,7 +279,7 @@ export function createShaderFunction<T extends string>(code: string, defaultName
   return func;
 }
 
-export function createShaderChunk<
+export function createShaderMixin<
   TDefines extends Dict<ShaderDefineValue> = {},
   TUniforms extends Dict<ShaderUniformLoose> = {},
   TAttributes extends Dict<ShaderAttributeLoose> = {},
@@ -323,7 +323,7 @@ export function createShaderChunk<
 }
 
 type MergeChunk<
-  Chunks extends ShaderChunkLoose[],
+  Chunks extends ShaderMixinLoose[],
   P extends 'defines' | 'uniforms' | 'attributes' | 'varyings'
 > = UnionToIntersection<Chunks[number][P]>;
 
@@ -332,12 +332,12 @@ class StageShader<
   TUniforms extends Dict<ShaderUniformLoose> = Dict<ShaderUniformLoose>,
   TAttributes extends Dict<ShaderAttributeLoose> = Dict<ShaderAttributeLoose>,
   TVaryings extends Dict<ShaderVaringLoose> = Dict<ShaderVaringLoose>,
-  TChunks extends ShaderChunkLoose[] = ShaderChunkLoose[]
+  TMixins extends ShaderMixinLoose[] = ShaderMixinLoose[]
 > {
-  readonly defines!: TDefines & MergeChunk<TChunks, 'defines'>;
-  readonly uniforms!: TUniforms & MergeChunk<TChunks, 'uniforms'>;
-  readonly attributes!: TAttributes & MergeChunk<TChunks, 'attributes'>;
-  readonly varyings!: TVaryings & MergeChunk<TChunks, 'varyings'>;
+  readonly defines!: TDefines & MergeChunk<TMixins, 'defines'>;
+  readonly uniforms!: TUniforms & MergeChunk<TMixins, 'uniforms'>;
+  readonly attributes!: TAttributes & MergeChunk<TMixins, 'attributes'>;
+  readonly varyings!: TVaryings & MergeChunk<TMixins, 'varyings'>;
   readonly functions!: ShaderFunctionLoose[];
   readonly main: string;
 
@@ -347,7 +347,7 @@ class StageShader<
     uniforms?: TUniforms;
     attributes?: TAttributes;
     varyings?: TVaryings;
-    includes?: TChunks;
+    includes?: TMixins;
     main: string;
   }) {
     options = assign(
@@ -363,13 +363,13 @@ class StageShader<
       },
       options
     );
-    const includes = options.includes || ([] as any as TChunks);
+    const includes = options.includes || ([] as any as TMixins);
     (['defines', 'uniforms', 'attributes', 'varyings'] as const).forEach((prop) => {
       // @ts-ignore we are sure the readonly property is inited in the constructor here.
       const target = (this[prop] = {});
       assign(target, options[prop]);
-      includes.forEach((chunk) => {
-        assign(target, chunk[prop]);
+      includes.forEach((mixin) => {
+        assign(target, mixin[prop]);
       });
     });
     this.functions = ([] as any as ShaderFunctionLoose[]).concat(
@@ -384,17 +384,17 @@ export class VertexShader<
   TUniforms extends Dict<ShaderUniformLoose> = Dict<ShaderUniformLoose>,
   TAttributes extends Dict<ShaderAttributeLoose> = Dict<ShaderAttributeLoose>,
   TVaryings extends Dict<ShaderVaringLoose> = Dict<ShaderVaringLoose>,
-  TChunks extends ShaderChunkLoose[] = ShaderChunkLoose[]
-> extends StageShader<TDefines, TUniforms, TAttributes, TVaryings, TChunks> {
+  TMixins extends ShaderMixinLoose[] = ShaderMixinLoose[]
+> extends StageShader<TDefines, TUniforms, TAttributes, TVaryings, TMixins> {
   constructor(options: {
     defines?: TDefines;
     uniforms?: TUniforms;
     attributes?: TAttributes;
     varyings?: TVaryings;
     /**
-     * uniform, defines, attributes, varyings，functions in chunks will be merged automatically.
+     * uniform, defines, attributes, varyings，functions in mixins will be merged automatically.
      */
-    includes?: TChunks;
+    includes?: TMixins;
     main: string;
   }) {
     super(options);
@@ -404,17 +404,17 @@ export class VertexShader<
 export class FragmentShader<
   TDefines extends Dict<ShaderDefineValue> = Dict<ShaderDefineValue>,
   TUniforms extends Dict<ShaderUniformLoose> = Dict<ShaderUniformLoose>,
-  TChunks extends ShaderChunkLoose[] = ShaderChunkLoose[]
+  TMixins extends ShaderMixinLoose[] = ShaderMixinLoose[]
   // TVaryings extends Dict<ShaderVaringLoose> = Dict<ShaderVaringLoose>
-> extends StageShader<TDefines, TUniforms, never, never, TChunks> {
+> extends StageShader<TDefines, TUniforms, never, never, TMixins> {
   constructor(options: {
     name?: string;
     defines?: TDefines;
     uniforms?: TUniforms;
     /**
-     * uniform, defines, attributes, varyings，functions in chunks will be merged automatically.
+     * uniform, defines, attributes, varyings，functions in mixins will be merged automatically.
      */
-    includes?: TChunks;
+    includes?: TMixins;
     // varyings will be shared from vertex
     // varyings?: TVaryings;
     main: string;

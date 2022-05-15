@@ -1,10 +1,5 @@
 import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
-import {
-  ACESToneMappingFunction,
-  decodeHDRFunction,
-  encodeHDRFunction,
-  linearToSRGBFunction
-} from '../util.glsl';
+import { ACESToneMappingFunction, HDREncoderMixin, sRGBMixin } from '../util.glsl';
 
 // vec3 uncharted2ToneMap(vec3 x)
 // {
@@ -65,11 +60,8 @@ export const composeCompositeFragment = new FragmentShader({
     bloomIntensity: uniform('float', 0.25),
     lensflareIntensity: uniform('float', 1)
   },
-
+  includes: [HDREncoderMixin, sRGBMixin],
   main: glsl`
-${linearToSRGBFunction()}
-${decodeHDRFunction()}
-${encodeHDRFunction()}
 ${ACESToneMappingFunction()}
 
 float eyeAdaption(float fLum) {

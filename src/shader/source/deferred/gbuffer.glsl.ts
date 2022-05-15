@@ -18,8 +18,8 @@ import {
   WORLDINVERSETRANSPOSE,
   WORLDVIEWPROJECTION
 } from '../shared';
-import { skinning, sRGBToLinearFunction } from '../util.glsl';
-import { gBufferRead } from './chunk.glsl';
+import { skinningMixin, sRGBMixin } from '../util.glsl';
+import { gBufferReadMixin } from './chunk.glsl';
 
 export const gBufferVertex = new VertexShader({
   attributes: {
@@ -47,7 +47,7 @@ export const gBufferVertex = new VertexShader({
     v_ViewPosition: varying('vec4'),
     v_PrevViewPosition: varying('vec4')
   },
-  includes: [skinning],
+  includes: [skinningMixin],
   main: glsl`
 #ifdef SKINNING
   #ifdef USE_SKIN_MATRICES_TEXTURE
@@ -73,7 +73,7 @@ void main() {
 
 #ifdef SKINNING
 
-  ${skinning.main}
+  ${skinningMixin.main}
 
   skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 
@@ -224,8 +224,8 @@ export const gBuffer2Fragment = new FragmentShader({
     alphaCutoff: uniform('float', 0.0),
     alpha: uniform('float', 1.0)
   },
+  includes: [sRGBMixin],
   main: glsl`
-${sRGBToLinearFunction()}
 void main()
 {
   float m = metalness;
@@ -285,11 +285,11 @@ export const gBufferDebugFragment = new FragmentShader({
      */
     debug: uniform('int', 0)
   },
-  includes: [gBufferRead],
+  includes: [gBufferReadMixin],
   main: glsl`
 void main ()
 {
-  ${gBufferRead.main}
+  ${gBufferReadMixin.main}
 
   if (debug == 0) {
     gl_FragColor = vec4(N, 1.0);

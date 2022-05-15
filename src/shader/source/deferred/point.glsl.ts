@@ -5,9 +5,9 @@ import {
   glsl,
   createArrayUniform as arrayUniform
 } from '../../../Shader';
-import { shadowMap } from '../shadowmap.glsl';
-import { lightAttenuation } from '../util.glsl';
-import { gBufferRead, lightEquationFunction } from './chunk.glsl';
+import { shadowMapMixin } from '../shadowmap.glsl';
+import { lightAttenuationMixin } from '../util.glsl';
+import { gBufferReadMixin, lightEquationFunction } from './chunk.glsl';
 
 export const pointLightFragment = new FragmentShader({
   uniforms: {
@@ -18,14 +18,14 @@ export const pointLightFragment = new FragmentShader({
     lightShadowMap: uniform('samplerCube'),
     lightShadowMapSize: uniform('float')
   },
-  includes: [shadowMap, gBufferRead, lightAttenuation],
+  includes: [shadowMapMixin, gBufferReadMixin, lightAttenuationMixin],
   main: glsl`
 
 ${lightEquationFunction()}
 
 void main()
 {
-  ${gBufferRead.main}
+  ${gBufferReadMixin.main}
 
   vec3 L = lightPosition - position;
   vec3 V = normalize(eyePosition - position);

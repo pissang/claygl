@@ -1,5 +1,5 @@
 import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
-import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+import { HDREncoderMixin } from '../util.glsl';
 
 export const upsampleCompositeFragemnt = new FragmentShader({
   name: 'upsampleFrag',
@@ -11,10 +11,8 @@ export const upsampleCompositeFragemnt = new FragmentShader({
     textureSize: uniform('vec2', [512, 512]),
     sampleScale: uniform('float', 0.5)
   },
+  includes: [HDREncoderMixin],
   main: glsl`
-${encodeHDRFunction()}
-${decodeHDRFunction()}
-
 void main() {
 #ifdef HIGH_QUALITY
   // 9-tap bilinear upsampler (tent filter)

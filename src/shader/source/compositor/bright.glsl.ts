@@ -1,5 +1,5 @@
 import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
-import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+import { HDREncoderMixin } from '../util.glsl';
 
 export const brightCompositeFragment = new FragmentShader({
   name: 'brightFrag',
@@ -11,10 +11,8 @@ export const brightCompositeFragment = new FragmentShader({
 
     textureSize: uniform('vec2', [512, 512])
   },
-
+  includes: [HDREncoderMixin],
   main: glsl`
-${encodeHDRFunction()}
-${decodeHDRFunction()}
 const vec3 lumWeight = vec3(0.2125, 0.7154, 0.0721);
 
 // 3-tap median filter

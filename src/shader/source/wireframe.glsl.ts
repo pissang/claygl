@@ -8,7 +8,7 @@ import {
   VertexShader
 } from '../../Shader';
 import { POSITION, WORLD, WORLDVIEWPROJECTION } from './shared';
-import { edgeFactorFunction, instancing, skinning } from './util.glsl';
+import { floatEncoderMixin, instancingMixin, skinningMixin } from './util.glsl';
 export const wireframeVertex = new VertexShader({
   uniforms: {
     world: WORLD(),
@@ -22,17 +22,17 @@ export const wireframeVertex = new VertexShader({
     v_WorldPosition: varying('vec3'),
     v_Barycentric: varying('vec3')
   },
-  includes: [skinning, instancing],
+  includes: [skinningMixin, instancingMixin],
   main: glsl`
 void main() {
 
   vec3 skinnedPosition = position;
 #ifdef SKINNING
-  ${skinning.main}
+  ${skinningMixin.main}
   skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 #endif
 #ifdef INSTANCING
-  ${instancing.main}
+  ${instancingMixin.main}
   skinnedPosition = instanceMat * skinnedPosition;
 #endif
   gl_Position = worldViewProjection * vec4(skinnedPosition, 1.0 );
@@ -46,10 +46,8 @@ export const wireframeFragment = new FragmentShader({
     alpha: uniform('float', 1),
     lineWidth: uniform('float', 0)
   },
+  includes: [floatEncoderMixin],
   main: glsl`
-
-${edgeFactorFunction()}
-
 void main() {
   gl_FragColor.rgb = color;
   gl_FragColor.a = (1.0-edgeFactor(lineWidth)) * alpha;

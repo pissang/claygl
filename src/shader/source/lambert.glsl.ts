@@ -6,19 +6,18 @@ import {
   FragmentShader
 } from '../../Shader';
 import { sharedBasicFragmentUniforms, sharedBasicVertexAttributes } from './basic.glsl';
-import { lightHeader } from './header/light.glsl';
-import { shadowMap } from './shadowmap.glsl';
+import { lightHeaderMixin } from './header/light.glsl';
+import { shadowMapMixin } from './shadowmap.glsl';
 import { NORMAL, WORLD, WORLDINVERSETRANSPOSE, WORLDVIEWPROJECTION } from './shared';
 import {
-  instancing,
-  logDepthVertex,
-  skinning,
-  edgeFactorFunction,
-  logDepthFragment,
+  instancingMixin,
+  logDepthVertexMixin,
+  skinningMixin,
+  logDepthFragmentMixin,
   ACESToneMappingFunction,
-  encodeHDRFunction,
-  decodeHDRFunction,
-  lightAttenuation
+  lightAttenuationMixin,
+  wireframeMixin,
+  HDREncoderMixin
 } from './util.glsl';
 
 export const sharedLambertVertexUniforms = {
@@ -58,7 +57,7 @@ export const lambertVertex = new VertexShader({
     ...sharedLambertVaryings
   },
 
-  includes: [skinning, instancing, logDepthVertex],
+  includes: [skinningMixin, instancingMixin, logDepthVertexMixin],
 
   main: glsl`
 void main() {
@@ -67,7 +66,7 @@ void main() {
 
 #ifdef SKINNING
 
-  ${skinning.main}
+  ${skinningMixin.main}
 
   skinnedPosition = skinMatrixWS * skinnedPosition;
   // Upper 3x3 of skinMatrix is orthogonal
@@ -75,7 +74,7 @@ void main() {
 #endif
 
 #ifdef INSTANCING
-  ${instancing.main}
+  ${instancingMixin.main}
   skinnedPosition = instanceMat * skinnedPosition;
   skinnedNormal = instanceMat * skinnedNormal;
 #endif
@@ -92,7 +91,7 @@ void main() {
   v_Color = a_Color;
 #endif
 
-  ${logDepthVertex.main}
+  ${logDepthVertexMixin.main}
 }`
 });
 
@@ -103,11 +102,15 @@ export const lambertFragment = new FragmentShader({
   uniforms: {
     ...sharedLambertFragmentUniforms
   },
-  includes: [lightHeader, logDepthFragment, shadowMap, lightAttenuation],
+  includes: [
+    lightHeaderMixin,
+    logDepthFragmentMixin,
+    shadowMapMixin,
+    lightAttenuationMixin,
+    wireframeMixin,
+    HDREncoderMixin
+  ],
   main: glsl`
-${edgeFactorFunction()}
-${encodeHDRFunction()}
-${decodeHDRFunction()}
 ${ACESToneMappingFunction()}
 
 void main() {
@@ -268,6 +271,6 @@ void main() {
 
   gl_FragColor = encodeHDR(gl_FragColor);
 
-  ${logDepthFragment.main}
+  ${logDepthFragmentMixin.main}
 }`
 });

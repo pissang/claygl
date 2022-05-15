@@ -1,5 +1,5 @@
 import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
-import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+import { HDREncoderMixin } from '../util.glsl';
 
 const weightShader = 'const vec3 w = vec3(0.2125, 0.7154, 0.0721);';
 
@@ -23,12 +23,10 @@ export const logLumCompositeFragment = new FragmentShader({
   uniforms: {
     texture: uniform('sampler2D')
   },
+  includes: [HDREncoderMixin],
   main: glsl`
 
 ${weightShader}
-
-${encodeHDRFunction()}
-${decodeHDRFunction()}
 
 void main() {
   vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));
@@ -45,10 +43,8 @@ export const lumAdaptionCompositeFragment = new FragmentShader({
     currentLum: uniform('sampler2D'),
     frameTime: uniform('float', 0.02)
   },
+  includes: [HDREncoderMixin],
   main: glsl`
-${encodeHDRFunction()}
-${decodeHDRFunction()}
-
 void main() {
   float fAdaptedLum = decodeHDR(texture2D(adaptedLum, vec2(0.5, 0.5))).r;
   float fCurrentLum = exp(encodeHDR(texture2D(currentLum, vec2(0.5, 0.5))).r);

@@ -1,6 +1,6 @@
 import { createUniform, FragmentShader, glsl, VertexShader } from '../Shader';
 import { POSITION, WORLDVIEWPROJECTION } from '../shader/source/shared';
-import { skinning } from '../shader/source/util.glsl';
+import { skinningMixin } from '../shader/source/util.glsl';
 
 export const colorVertex = new VertexShader({
   uniforms: {
@@ -9,13 +9,13 @@ export const colorVertex = new VertexShader({
   attributes: {
     position: POSITION()
   },
-  includes: [skinning],
+  includes: [skinningMixin],
   main: glsl`
 void main(){
   vec3 skinnedPosition = position;
 
   #ifdef SKINNING
-  ${skinning.main}
+  ${skinningMixin.main}
   skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
   #endif
 

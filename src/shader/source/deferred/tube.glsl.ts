@@ -5,8 +5,8 @@ import {
   glsl,
   createArrayUniform as arrayUniform
 } from '../../../Shader';
-import { lightAttenuation } from '../util.glsl';
-import { gBufferRead, lightEquationFunction } from './chunk.glsl';
+import { lightAttenuationMixin } from '../util.glsl';
+import { gBufferReadMixin, lightEquationFunction } from './chunk.glsl';
 
 export const tubeLightFragment = new FragmentShader({
   uniforms: {
@@ -16,11 +16,11 @@ export const tubeLightFragment = new FragmentShader({
     lightExtend: uniform('vec3'),
     eyePosition: uniform('vec3')
   },
-  includes: [gBufferRead, lightAttenuation],
+  includes: [gBufferReadMixin, lightAttenuationMixin],
   main: glsl`
 ${lightEquationFunction()}
 void main() {
-  ${gBufferRead.main}
+  ${gBufferReadMixin.main}
 
   vec3 L = lightPosition - position;
 

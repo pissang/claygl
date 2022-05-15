@@ -10,7 +10,12 @@ import {
   FragmentShader
 } from '../../Shader';
 import { POSITION, TEXCOORD_0, WORLDVIEWPROJECTION } from './shared';
-import { instancing, logDepthFragment, logDepthVertex, skinning } from './util.glsl';
+import {
+  instancingMixin,
+  logDepthFragmentMixin,
+  logDepthVertexMixin,
+  skinningMixin
+} from './util.glsl';
 /**
  * Prez vertex shader
  */
@@ -30,25 +35,25 @@ export const preZVertex = new VertexShader({
     pos: POSITION(),
     uv: TEXCOORD_0()
   },
-  includes: [skinning, logDepthVertex, instancing],
+  includes: [skinningMixin, logDepthVertexMixin, instancingMixin],
 
   main: glsl`
 void main() {
   vec4 P = vec4(pos, 1.0);
 
 #ifdef SKINNING
-  ${skinning.main}
+  ${skinningMixin.main}
   P = skinMatrixWS * P;
 #endif
 
 #ifdef INSTANCING
-  ${instancing.main}
+  ${instancingMixin.main}
   P = instanceMat * P;
 #endif
   gl_Position = WVP * P;
   v_Texcoord = uv * uvRepeat + uvOffset;
 
-  ${logDepthVertex.main}
+  ${logDepthVertexMixin.main}
 }`
 });
 
@@ -59,7 +64,7 @@ export const preZFragment = new FragmentShader({
   uniforms: {
     alphaMap: uniform('sampler2D'),
     alphaCutoff: uniform('float', 0),
-    ...logDepthFragment.uniforms
+    ...logDepthFragmentMixin.uniforms
   },
   // Varyings will be shared from vertex
   main: glsl`
@@ -71,6 +76,6 @@ void main() {
   }
   gl_FragColor = vec4(0.0,0.0,0.0,1.0);
 
-  ${logDepthFragment.main}
+  ${logDepthFragmentMixin.main}
 }`
 });

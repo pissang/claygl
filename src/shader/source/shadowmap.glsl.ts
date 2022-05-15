@@ -5,11 +5,16 @@ import {
   createVarying as varying,
   FragmentShader,
   createShaderFunction,
-  createShaderChunk,
+  createShaderMixin,
   createArrayUniform
 } from '../../Shader';
 import { POSITION, TEXCOORD_0, WORLD, WORLDVIEWPROJECTION } from './shared';
-import { decodeFloatFunction, encodeFloatFunction, instancing, skinning } from './util.glsl';
+import {
+  decodeFloatFunction,
+  floatEncoderMixin,
+  instancingMixin,
+  skinningMixin
+} from './util.glsl';
 
 export const shadowMapDepthVertex = new VertexShader({
   uniforms: {
@@ -25,18 +30,18 @@ export const shadowMapDepthVertex = new VertexShader({
     v_ViewPosition: varying('vec4'),
     v_Texcoord: varying('vec2')
   },
-  includes: [skinning, instancing],
+  includes: [skinningMixin, instancingMixin],
 
   main: glsl`
 void main(){
   vec4 P = vec4(position, 1.0);
 #ifdef SKINNING
-  ${skinning.main}
+  ${skinningMixin.main}
   P = skinMatrixWS * P;
 #endif
 
 #ifdef INSTANCING
-  ${instancing.main}
+  ${instancingMixin.main}
   P = instanceMat * P;
 #endif
 
@@ -54,8 +59,8 @@ export const shadowMapDepthFragment = new FragmentShader({
     alphaCutoff: uniform('float', 0.0),
     alphaMap: uniform('sampler2D')
   },
+  includes: [floatEncoderMixin],
   main: glsl`
-${encodeFloatFunction()}
 
 void main(){
   // Whats the difference between gl_FragCoord.z and this v_ViewPosition
@@ -85,8 +90,8 @@ export const shadowMapDepthDebugFragment = new FragmentShader({
   uniforms: {
     depthMap: uniform('sampler2D')
   },
+  includes: [floatEncoderMixin],
   main: glsl`
-${decodeFloatFunction()}
 void main() {
     vec4 tex = texture2D(depthMap, v_Texcoord);
 #ifdef USE_VSM
@@ -109,17 +114,17 @@ export const shadowMapDistanceVertex = new VertexShader({
   varyings: {
     v_WorldPosition: varying('vec3')
   },
-  includes: [skinning],
+  includes: [skinningMixin],
   main: glsl`
 void main (){
   vec4 P = vec4(position, 1.0);
 #ifdef SKINNING
-  ${skinning.main}
+  ${skinningMixin.main}
   P = skinMatrixWS * P;
 #endif
 
 #ifdef INSTANCING
-  ${instancing.main}
+  ${instancingMixin.main}
   P = instanceMat * P;
 #endif
   gl_Position = worldViewProjection * P;
@@ -132,8 +137,8 @@ export const shadowMapDistanceFragment = new FragmentShader({
     lightPosition: uniform('vec3'),
     range: uniform('float', 100)
   },
+  includes: [floatEncoderMixin],
   main: glsl`
-${encodeFloatFunction()}
 void main(){
     float dist = distance(lightPosition, v_WorldPosition);
     dist = dist / range;
@@ -143,8 +148,6 @@ void main(){
 
 // TODO reduce shadow glsl code size.
 export const shadowMapFunction = createShaderFunction(glsl`
-${decodeFloatFunction()}
-
 #if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)
 
 #ifdef SPOT_LIGHT_SHADOWMAP_COUNT
@@ -321,10 +324,10 @@ void computeShadowOfPointLights(vec3 position, inout float shadowContribs[POINT_
 #endif
 `);
 
-export const shadowMap = createShaderChunk({
+export const shadowMapMixin = createShaderMixin({
   uniforms: {
     shadowEnabled: uniform('bool', 1),
     pcfKernel: createArrayUniform('vec2', 'PCF_KERNEL_SIZE')
   },
-  functions: [shadowMapFunction]
+  functions: [decodeFloatFunction, shadowMapFunction]
 });

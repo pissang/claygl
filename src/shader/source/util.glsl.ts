@@ -1,5 +1,5 @@
 import {
-  createShaderChunk,
+  createShaderMixin,
   glsl,
   createVarying as varying,
   createUniform as uniform,
@@ -19,7 +19,7 @@ import {
 /**
  * Random in GLSL
  */
-export const random = createShaderFunction(
+export const randomFunction = createShaderFunction(
   glsl`
 highp float ${FUNCTION_NAME_PLACEHOLDER}(vec2 uv) {
   const highp float a = 12.9898, b = 78.233, c = 43758.5453;
@@ -53,7 +53,7 @@ float ${FUNCTION_NAME_PLACEHOLDER}(float dist, float range) {
   'lightAttenuation'
 );
 
-export const lightAttenuation = createShaderChunk({
+export const lightAttenuationMixin = createShaderMixin({
   uniforms: lightAttenuationUniforms,
   functions: [lightAttenuationFunction]
 });
@@ -77,6 +77,10 @@ float ${FUNCTION_NAME_PLACEHOLDER}(float width) {
 #endif`,
   'edgeFactor'
 );
+
+export const wireframeMixin = createShaderMixin({
+  functions: [edgeFactorFunction]
+});
 
 /**
  * Encode float value into rgba ubyte value.
@@ -106,6 +110,10 @@ float ${FUNCTION_NAME_PLACEHOLDER}(const in vec4 color) {
 }`,
   'decodeFloat'
 );
+
+export const floatEncoderMixin = createShaderMixin({
+  functions: [encodeFloatFunction, decodeFloatFunction]
+});
 
 /**
  * Decode RGBM to HDR
@@ -169,6 +177,13 @@ vec4 ${FUNCTION_NAME_PLACEHOLDER}(vec4 color) {
 );
 
 /**
+ * Mixin for RGBM encode and decode.
+ */
+export const HDREncoderMixin = createShaderMixin({
+  functions: [encodeRGBMFunction, decodeRGBMFunction, encodeHDRFunction, decodeHDRFunction]
+});
+
+/**
  * sRGB helpers. Convert sRGB to Linear and Linear to sRGB
  */
 export const sRGBToLinearFunction = createShaderFunction(
@@ -186,10 +201,14 @@ vec4 ${FUNCTION_NAME_PLACEHOLDER}(in vec4 value) {
   'linearTosRGB'
 );
 
+export const sRGBMixin = createShaderMixin({
+  functions: [sRGBToLinearFunction, linearToSRGBFunction]
+});
+
 /**
  * Skinning helpers.
  */
-export const skinning = createShaderChunk({
+export const skinningMixin = createShaderMixin({
   attributes: {
     weight: attribute('vec3', 'WEIGHT'),
     joint: attribute('vec4', 'JOINT')
@@ -244,7 +263,7 @@ if (weightW > 1e-4) {
 }`
 });
 
-export const instancing = createShaderChunk({
+export const instancingMixin = createShaderMixin({
   attributes: {
     instanceMat1: attribute('vec4'),
     instanceMat2: attribute('vec4'),
@@ -323,7 +342,7 @@ vec3 ${FUNCTION_NAME_PLACEHOLDER}(vec3 color) {
 /**
  * Log depth helper in vertex shader
  */
-export const logDepthVertex = createShaderChunk({
+export const logDepthVertexMixin = createShaderMixin({
   varyings: {
     v_FragDepth: varying('float')
   },
@@ -344,7 +363,7 @@ export const logDepthVertex = createShaderChunk({
 /**
  * Log depth helper in fragment shader
  */
-export const logDepthFragment = createShaderChunk({
+export const logDepthFragmentMixin = createShaderMixin({
   uniforms: {
     logDepthBufFC: uniform('float', 0, 'LOG_DEPTH_BUFFER_FC')
   },

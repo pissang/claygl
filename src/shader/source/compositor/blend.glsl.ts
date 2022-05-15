@@ -1,5 +1,5 @@
 import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
-import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+import { HDREncoderMixin } from '../util.glsl';
 
 export const blendCompositeFragment = new FragmentShader({
   name: 'blendFrag',
@@ -17,11 +17,8 @@ export const blendCompositeFragment = new FragmentShader({
     texture6: uniform('sampler2D'),
     weight6: uniform('float', 1.0)
   },
+  includes: [HDREncoderMixin],
   main: glsl`
-
-${encodeHDRFunction()}
-${decodeHDRFunction()}
-
 void main()
 {
   vec4 tex = vec4(0.0);

@@ -7,28 +7,26 @@ import {
   FragmentShader,
   createSemanticUniform
 } from '../../Shader';
-import { lightHeader } from './header/light.glsl';
+import { lightHeaderMixin } from './header/light.glsl';
 import {
   sharedLambertFragmentUniforms,
   sharedLambertVaryings,
   sharedLambertVertexAttributes,
   sharedLambertVertexUniforms
 } from './lambert.glsl';
-import { shadowMap } from './shadowmap.glsl';
+import { shadowMapMixin } from './shadowmap.glsl';
 import { TANGENT, VIEWINVERSE } from './shared';
 import {
   ACESToneMappingFunction,
-  decodeHDRFunction,
-  encodeHDRFunction,
-  edgeFactorFunction,
-  instancing,
-  linearToSRGBFunction,
-  logDepthFragment,
-  logDepthVertex,
+  instancingMixin,
+  logDepthFragmentMixin,
+  logDepthVertexMixin,
   parallaxCorrectFunction,
-  skinning,
-  sRGBToLinearFunction,
-  lightAttenuation
+  skinningMixin,
+  lightAttenuationMixin,
+  wireframeMixin,
+  HDREncoderMixin,
+  sRGBMixin
 } from './util.glsl';
 
 export const standardVertex = new VertexShader({
@@ -47,7 +45,7 @@ export const standardVertex = new VertexShader({
     v_Texcoord2: varying('vec2'),
     v_Color: varying('vec4')
   },
-  includes: [lightHeader, skinning, instancing, logDepthVertex],
+  includes: [lightHeaderMixin, skinningMixin, instancingMixin, logDepthVertexMixin],
 
   main: glsl`
 void main() {
@@ -56,7 +54,7 @@ void main() {
   vec4 skinnedTangent = vec4(tangent.xyz, 0);
 #ifdef SKINNING
 
-  ${skinning.main}
+  ${skinningMixin.main}
 
   skinnedPosition = skinMatrixWS * skinnedPosition;
   // Upper 3x3 of skinMatrix is orthogonal
@@ -65,7 +63,7 @@ void main() {
 #endif
 
 #ifdef INSTANCING
-  ${instancing.main}
+  ${instancingMixin.main}
 
   skinnedPosition = instanceMat * skinnedPosition;
   skinnedNormal = instanceMat * skinnedNormal;
@@ -93,7 +91,7 @@ void main() {
   v_Texcoord2 = texcoord2;
 #endif
 
-  ${logDepthVertex.main}
+  ${logDepthVertexMixin.main}
 }`
 });
 
@@ -145,15 +143,18 @@ export const standardFragment = new FragmentShader({
     parallaxMinLayers: uniform('float', 5),
     parallaxOcclusionMap: uniform('sampler2D')
   },
-  includes: [lightHeader, logDepthFragment, shadowMap, lightAttenuation],
+  includes: [
+    lightHeaderMixin,
+    logDepthFragmentMixin,
+    shadowMapMixin,
+    lightAttenuationMixin,
+    wireframeMixin,
+    HDREncoderMixin,
+    sRGBMixin
+  ],
 
   main: glsl`
 ${ACESToneMappingFunction()}
-${edgeFactorFunction()}
-${decodeHDRFunction()}
-${encodeHDRFunction()}
-${sRGBToLinearFunction()}
-${linearToSRGBFunction()}
 ${parallaxCorrectFunction()}
 
 float G_Smith(float g, float ndv, float ndl)
@@ -546,6 +547,6 @@ void main() {
 #endif
   gl_FragColor = encodeHDR(outColor);
 
-  ${logDepthFragment.main}
+  ${logDepthFragmentMixin.main}
 }`
 });

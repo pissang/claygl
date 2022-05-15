@@ -1,5 +1,5 @@
 import { createUniform, FragmentShader, glsl } from '../../../Shader';
-import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+import { HDREncoderMixin } from '../util.glsl';
 
 export const outputFragment = new FragmentShader({
   defines: {
@@ -8,9 +8,8 @@ export const outputFragment = new FragmentShader({
   uniforms: {
     texture: createUniform('sampler2D')
   },
+  includes: [HDREncoderMixin],
   main: glsl`
-${encodeHDRFunction()}
-${decodeHDRFunction()}
 void main() {
   vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));
 

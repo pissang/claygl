@@ -5,8 +5,8 @@ import {
   glsl,
   createArrayUniform as arrayUniform
 } from '../../../Shader';
-import { shadowMap } from '../shadowmap.glsl';
-import { gBufferRead, lightEquationFunction } from './chunk.glsl';
+import { shadowMapMixin } from '../shadowmap.glsl';
+import { gBufferReadMixin, lightEquationFunction } from './chunk.glsl';
 
 export const directionalLightFragment = new FragmentShader({
   uniforms: {
@@ -19,14 +19,14 @@ export const directionalLightFragment = new FragmentShader({
     shadowCascadeClipsNear: arrayUniform('float', 'SHADOW_CASCADE'),
     shadowCascadeClipsFar: arrayUniform('float', 'SHADOW_CASCADE')
   },
-  includes: [shadowMap, gBufferRead],
+  includes: [shadowMapMixin, gBufferReadMixin],
   main: glsl`
 
 ${lightEquationFunction()}
 
 void main()
 {
-  ${gBufferRead.main}
+  ${gBufferReadMixin.main}
 
   vec3 L = -normalize(lightDirection);
   vec3 V = normalize(eyePosition - position);

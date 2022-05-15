@@ -1,5 +1,5 @@
 import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
-import { clampSampleFunction, decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+import { clampSampleFunction, HDREncoderMixin } from '../util.glsl';
 
 export const downsampleCompositeFragment = new FragmentShader({
   name: 'downSampleFrag',
@@ -7,9 +7,8 @@ export const downsampleCompositeFragment = new FragmentShader({
     texture: uniform('sampler2D'),
     textureSize: uniform('vec2', [512, 512])
   },
+  includes: [HDREncoderMixin],
   main: glsl`
-${encodeHDRFunction()}
-${decodeHDRFunction()}
 ${clampSampleFunction()}
 float brightness(vec3 c) {
   return max(max(c.r, c.g), c.b);

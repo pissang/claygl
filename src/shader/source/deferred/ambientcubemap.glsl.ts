@@ -5,7 +5,7 @@ import {
   glsl
 } from '../../../Shader';
 import { encodeRGBMFunction } from '../util.glsl';
-import { gBufferRead } from './chunk.glsl';
+import { gBufferReadMixin } from './chunk.glsl';
 
 export const ambientCubemapLightFragment = new FragmentShader({
   uniforms: {
@@ -15,13 +15,13 @@ export const ambientCubemapLightFragment = new FragmentShader({
 
     eyePosition: uniform('vec3')
   },
-  includes: [gBufferRead],
+  includes: [gBufferReadMixin],
   main: glsl`
 ${encodeRGBMFunction()}
 
 void main()
 {
-  ${gBufferRead.main}
+  ${gBufferReadMixin.main}
 
   vec3 V = normalize(eyePosition - position);
   vec3 L = reflect(-V, N);

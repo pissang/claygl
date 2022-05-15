@@ -1,4 +1,4 @@
-import { createShaderChunk, createShaderFunction } from '../../../Shader';
+import { createShaderMixin, createShaderFunction } from '../../../Shader';
 import { calcAmbientSHLightFunction } from './calcAmbientSHLight.glsl';
 
 const uniform = `uniform`;
@@ -63,7 +63,7 @@ ${uniformVec3} ${spotLight}Color[SPOT${_LIGHT_COUNT}];
 ${endif}
 `);
 
-export const lightHeader = createShaderChunk({
+export const lightHeaderMixin = createShaderMixin({
   functions: [
     ambientLightHeader,
     ambientSHLightHeader,

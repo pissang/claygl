@@ -1,8 +1,8 @@
 import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
-import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+import { HDREncoderMixin } from '../util.glsl';
 
 export const lensflareCompositeFragment = new FragmentShader({
-  name: 'lensflareFrag'
+  name: 'lensflareFrag',
   defines: {
     SAMPLE_NUMBER: 8
   },
@@ -14,10 +14,8 @@ export const lensflareCompositeFragment = new FragmentShader({
     haloWidth: uniform('float', 0.4),
     distortion: uniform('float', 1.0)
   },
+  includes: [HDREncoderMixin],
   main: glsl`
-${encodeHDRFunction()}
-${decodeHDRFunction()}
-
 vec4 textureDistorted(
   in vec2 texcoord,
   in vec2 direction,

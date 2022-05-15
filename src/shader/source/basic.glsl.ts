@@ -13,12 +13,15 @@ import {
   decodeHDRFunction,
   edgeFactorFunction,
   encodeHDRFunction,
-  instancing,
+  instancingMixin,
   linearToSRGBFunction,
-  logDepthFragment,
-  logDepthVertex,
-  skinning,
-  sRGBToLinearFunction
+  logDepthFragmentMixin,
+  logDepthVertexMixin,
+  HDREncoderMixin,
+  skinningMixin,
+  sRGBMixin,
+  sRGBToLinearFunction,
+  wireframeMixin
 } from './util.glsl';
 
 export const sharedBasicVertexAttributes = {
@@ -42,7 +45,7 @@ export const basicVertex = new VertexShader({
     v_Barycentric: varying('vec3'),
     v_Color: varying('vec4')
   },
-  includes: [skinning, instancing, logDepthVertex, skinning],
+  includes: [skinningMixin, instancingMixin, logDepthVertexMixin, skinningMixin],
 
   main: glsl`
 void main()
@@ -50,12 +53,12 @@ void main()
   vec4 skinnedPosition = vec4(position, 1.0);
 
 #ifdef SKINNING
-  ${skinning.main}
+  ${skinningMixin.main}
   skinnedPosition = skinMatrixWS * skinnedPosition;
 #endif
 
 #ifdef INSTANCING
-  ${instancing.main}
+  ${instancingMixin.main}
   skinnedPosition = instanceMat * skinnedPosition;
 #endif
 
@@ -68,7 +71,7 @@ void main()
   v_Color = a_Color;
 #endif
 
-  ${logDepthVertex.main}
+  ${logDepthVertexMixin.main}
 }`
 });
 
@@ -90,16 +93,11 @@ export const basicFragment = new FragmentShader({
     ...sharedBasicFragmentUniforms
   },
 
-  includes: [logDepthFragment],
+  includes: [wireframeMixin, HDREncoderMixin, sRGBMixin],
 
   main: glsl`
 
 ${ACESToneMappingFunction()}
-${edgeFactorFunction()}
-${encodeHDRFunction()}
-${decodeHDRFunction()}
-${sRGBToLinearFunction()}
-${linearToSRGBFunction()}
 
 void main() {
   gl_FragColor = vec4(color, alpha);
@@ -146,7 +144,7 @@ void main() {
 
   gl_FragColor = encodeHDR(gl_FragColor);
 
-  ${logDepthFragment.main}
+  ${logDepthFragmentMixin.main}
 
 }
   `

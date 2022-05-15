@@ -1,5 +1,5 @@
 import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
-import { clampSampleFunction, decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+import { clampSampleFunction, HDREncoderMixin } from '../util.glsl';
 
 const defaultGaussianKernelName = `gaussianKernel`;
 
@@ -46,9 +46,8 @@ export const blurCompositeFragment = new FragmentShader({
      */
     blurDir: uniform('float', 0.0)
   },
+  includes: [HDREncoderMixin],
   main: glsl`
-${encodeHDRFunction()}
-${decodeHDRFunction()}
 ${clampSampleFunction()}
 
 void main (void)

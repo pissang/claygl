@@ -4,23 +4,19 @@ import {
   createSemanticUniform as semanticUniform,
   glsl
 } from '../../../Shader';
-import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+import { HDREncoderMixin } from '../util.glsl';
 
-export const fxaaCompositeFragment = new FragmentShader({
+export const FXAACompositeFragment = new FragmentShader({
   name: 'FXAAFrag',
   uniforms: {
     texture: uniform('sampler2D'),
     viewport: semanticUniform('vec4', 'VIEWPORT')
   },
-
+  includes: [HDREncoderMixin],
   main: glsl`
 #define FXAA_REDUCE_MIN   (1.0/128.0)
 #define FXAA_REDUCE_MUL   (1.0/8.0)
 #define FXAA_SPAN_MAX     8.0
-
-${encodeHDRFunction()}
-${decodeHDRFunction()}
-
 void main() {
   vec2 resolution = 1.0 / viewport.zw;
   vec3 rgbNW = decodeHDR(texture2D(texture, v_Texcoord + vec2(-1.0, -1.0) * resolution)).xyz;

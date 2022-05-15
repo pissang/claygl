@@ -3,7 +3,7 @@ import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader'
 /**
  * LUT in the LDR color space.
  */
-export const lutCompositeFragment = new FragmentShader({
+export const LUTCompositeFragment = new FragmentShader({
   name: 'LUTFrag',
   uniforms: {
     texture: uniform('sampler2D'),

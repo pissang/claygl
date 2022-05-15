@@ -1,12 +1,12 @@
 import {
   createSemanticUniform as semanticUniform,
-  createShaderChunk,
+  createShaderMixin,
   createShaderFunction,
   createUniform as uniform,
   glsl
 } from '../../../Shader';
 
-export const gBufferRead = createShaderChunk({
+export const gBufferReadMixin = createShaderMixin({
   uniforms: {
     gBufferTexture1: uniform('sampler2D'),
     gBufferTexture2: uniform('sampler2D'),

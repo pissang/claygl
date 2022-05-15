@@ -5,8 +5,8 @@ import {
   glsl,
   createArrayUniform as arrayUniform
 } from '../../../Shader';
-import { lightAttenuation } from '../util.glsl';
-import { gBufferRead, lightEquationFunction } from './chunk.glsl';
+import { lightAttenuationMixin } from '../util.glsl';
+import { gBufferReadMixin, lightEquationFunction } from './chunk.glsl';
 
 export const sphereLightFragment = new FragmentShader({
   uniforms: {
@@ -16,13 +16,13 @@ export const sphereLightFragment = new FragmentShader({
     lightRadius: uniform('float'),
     eyePosition: uniform('vec3')
   },
-  includes: [gBufferRead, lightAttenuation],
+  includes: [gBufferReadMixin, lightAttenuationMixin],
   main: glsl`
 ${lightEquationFunction()}
 
 void main()
 {
-  ${gBufferRead.main}
+  ${gBufferReadMixin.main}
   vec3 L = lightPosition - position;
 
   vec3 V = normalize(eyePosition - position);
