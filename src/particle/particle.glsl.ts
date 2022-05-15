@@ -12,6 +12,7 @@ import {
 } from '../Shader';
 
 export const particleVertex = new VertexShader({
+  name: 'particleVertex',
   uniforms: {
     worldView: semanticUniform('mat4', 'WORLDVIEW'),
     projection: semanticUniform('mat4', 'PROJECTION')
@@ -48,6 +49,7 @@ void main() {
 });
 
 export const particleFragment = new FragmentShader({
+  name: 'particleFrag',
   uniforms: {
     sprite: uniform('sampler2D'),
     gradient: uniform('sampler2D'),

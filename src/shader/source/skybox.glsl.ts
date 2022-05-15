@@ -18,6 +18,7 @@ import {
   sRGBToLinearFunction
 } from './util.glsl';
 export const skyboxVertex = new VertexShader({
+  name: 'skyboxVertex',
   uniforms: {
     world: WORLD(),
     worldViewProjection: WORLDVIEWPROJECTION()
@@ -36,6 +37,7 @@ void main() {
 });
 
 export const skyboxFragment = new FragmentShader({
+  name: 'skyboxFrag',
   uniforms: {
     viewInverse: VIEWINVERSE(),
     equirectangularMap: uniform('sampler2D'),

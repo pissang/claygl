@@ -17,6 +17,7 @@ import {
 } from './util.glsl';
 
 export const shadowMapDepthVertex = new VertexShader({
+  name: 'shadowDepthVertex',
   uniforms: {
     worldViewProjection: WORLDVIEWPROJECTION(),
     uvRepeat: uniform('vec2', [1, 1]),
@@ -53,6 +54,7 @@ void main(){
 });
 
 export const shadowMapDepthFragment = new FragmentShader({
+  name: 'shadowDepthFrag',
   uniforms: {
     bias: uniform('float', 0.001),
     slopeScale: uniform('float', 1.0),
@@ -87,6 +89,7 @@ void main(){
 });
 
 export const shadowMapDepthDebugFragment = new FragmentShader({
+  name: 'shadowDepthDebugFrag',
   uniforms: {
     depthMap: uniform('sampler2D')
   },
@@ -104,6 +107,7 @@ void main() {
 });
 
 export const shadowMapDistanceVertex = new VertexShader({
+  name: 'shadowDistVertex',
   uniforms: {
     worldViewProjection: WORLDVIEWPROJECTION(),
     world: WORLD()
@@ -133,6 +137,7 @@ void main (){
 });
 
 export const shadowMapDistanceFragment = new FragmentShader({
+  name: 'shadowDistFrag',
   uniforms: {
     lightPosition: uniform('vec3'),
     range: uniform('float', 100)

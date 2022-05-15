@@ -32,6 +32,7 @@ export const sharedBasicVertexAttributes = {
 };
 
 export const basicVertex = new VertexShader({
+  name: 'basicVertex',
   attributes: {
     ...sharedBasicVertexAttributes
   },
@@ -86,6 +87,7 @@ export const sharedBasicFragmentUniforms = {
 };
 
 export const basicFragment = new FragmentShader({
+  name: 'basicFrag',
   defines: {
     DIFFUSEMAP_ALPHA_ALPHA: null
   },

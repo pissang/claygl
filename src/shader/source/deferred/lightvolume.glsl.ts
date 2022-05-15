@@ -2,6 +2,7 @@ import { createVarying, glsl, VertexShader } from '../../../Shader';
 import { POSITION, WORLDVIEWPROJECTION } from '../shared';
 
 export const lightVolumeVertex = new VertexShader({
+  name: 'lightVolumeVertex',
   uniforms: {
     worldViewProjection: WORLDVIEWPROJECTION()
   },

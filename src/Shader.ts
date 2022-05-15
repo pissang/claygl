@@ -387,6 +387,7 @@ export class VertexShader<
   TMixins extends ShaderMixinLoose[] = ShaderMixinLoose[]
 > extends StageShader<TDefines, TUniforms, TAttributes, TVaryings, TMixins> {
   constructor(options: {
+    name?: string;
     defines?: TDefines;
     uniforms?: TUniforms;
     attributes?: TAttributes;

@@ -8,7 +8,8 @@ import {
 import { lightAttenuationMixin } from '../util.glsl';
 import { gBufferReadMixin, lightEquationFunction } from './chunk.glsl';
 
-export const sphereLightFragment = new FragmentShader({
+export const deferredSphereLightFragment = new FragmentShader({
+  name: 'deferredSphereFrag',
   uniforms: {
     lightPosition: uniform('vec3'),
     lightColor: uniform('vec3'),

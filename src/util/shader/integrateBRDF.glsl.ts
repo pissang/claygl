@@ -1,6 +1,7 @@
 import { createUniform, FragmentShader, glsl } from '../../Shader';
 
 export const integrateBRDFFragment = new FragmentShader({
+  name: 'integrateBRDFFrag',
   defines: {
     SAMPLE_NUMBER: 1024,
     PI: Math.PI

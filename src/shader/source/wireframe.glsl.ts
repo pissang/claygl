@@ -10,6 +10,7 @@ import {
 import { POSITION, WORLD, WORLDVIEWPROJECTION } from './shared';
 import { floatEncoderMixin, instancingMixin, skinningMixin } from './util.glsl';
 export const wireframeVertex = new VertexShader({
+  name: 'wireframeVertex',
   uniforms: {
     world: WORLD(),
     worldViewProjection: WORLDVIEWPROJECTION()
@@ -41,6 +42,7 @@ void main() {
 });
 
 export const wireframeFragment = new FragmentShader({
+  name: 'wireframeFrag',
   uniforms: {
     color: uniform('rgb', [0, 0, 0]),
     alpha: uniform('float', 1),

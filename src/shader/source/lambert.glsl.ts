@@ -45,6 +45,7 @@ export const sharedLambertFragmentUniforms = {
 };
 
 export const lambertVertex = new VertexShader({
+  name: 'lambertVertex',
   uniforms: {
     ...sharedLambertVertexUniforms
   },
@@ -96,6 +97,7 @@ void main() {
 });
 
 export const lambertFragment = new FragmentShader({
+  name: 'basicFrag',
   defines: {
     DIFFUSEMAP_ALPHA_ALPHA: null
   },

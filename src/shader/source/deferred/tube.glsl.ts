@@ -8,7 +8,8 @@ import {
 import { lightAttenuationMixin } from '../util.glsl';
 import { gBufferReadMixin, lightEquationFunction } from './chunk.glsl';
 
-export const tubeLightFragment = new FragmentShader({
+export const deferredTubeLightFragment = new FragmentShader({
+  name: 'deferredTubeFrag',
   uniforms: {
     lightPosition: uniform('vec3'),
     lightColor: uniform('vec3'),

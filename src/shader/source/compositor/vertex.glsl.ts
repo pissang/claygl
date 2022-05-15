@@ -7,6 +7,7 @@ import {
 } from '../../../Shader';
 
 export const fullscreenQuadPassVertex = new VertexShader({
+  name: 'fullQuadVertex',
   uniforms: {
     WVP: createSemanticUniform('mat4', 'WORLDVIEWPROJECTION')
   },

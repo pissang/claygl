@@ -7,7 +7,8 @@ import {
 import { encodeRGBMFunction } from '../util.glsl';
 import { gBufferReadMixin } from './chunk.glsl';
 
-export const ambientCubemapLightFragment = new FragmentShader({
+export const deferredAmbientCubemapLightFragment = new FragmentShader({
+  name: 'deferredAmbientCubemapFrag',
   uniforms: {
     lightColor: uniform('vec3'),
     lightCubemap: uniform('samplerCube'),

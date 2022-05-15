@@ -2,7 +2,8 @@ import { createUniform as uniform, FragmentShader, glsl } from '../../Shader';
 import { VIEWINVERSE } from '../../shader/source/shared';
 import { decodeRGBMFunction, encodeRGBMFunction } from '../../shader/source/util.glsl';
 
-export const prefilterFragment = new FragmentShader({
+export const cubemapPrefilterFragment = new FragmentShader({
+  name: 'prefilterFrag',
   defines: {
     SHADER_NAME: 'prefilter',
     SAMPLE_NUMBER: 1024,

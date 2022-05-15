@@ -8,7 +8,8 @@ import {
 import { shadowMapMixin } from '../shadowmap.glsl';
 import { gBufferReadMixin, lightEquationFunction } from './chunk.glsl';
 
-export const directionalLightFragment = new FragmentShader({
+export const deferredDirectionalLightFragment = new FragmentShader({
+  name: 'deferredDirectionalFrag',
   uniforms: {
     lightDirection: uniform('vec3'),
     lightColor: uniform('vec3'),

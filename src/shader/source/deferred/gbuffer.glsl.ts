@@ -22,6 +22,7 @@ import { skinningMixin, sRGBMixin } from '../util.glsl';
 import { gBufferReadMixin } from './chunk.glsl';
 
 export const gBufferVertex = new VertexShader({
+  name: 'gBufferVertex',
   attributes: {
     position: POSITION(),
     texcoord: TEXCOORD_0(),
@@ -132,6 +133,7 @@ void main() {
  * - A: metalness
  */
 export const gBuffer1Fragment = new FragmentShader({
+  name: 'gBuffer1Frag',
   uniforms: {
     viewInverse: VIEWINVERSE(),
     glossiness: uniform('float'),
@@ -214,6 +216,7 @@ void main() {
  * - A: metalness
  */
 export const gBuffer2Fragment = new FragmentShader({
+  name: 'gBuffer2Frag',
   uniforms: {
     diffuseMap: uniform('sampler2D'),
     metalnessMap: uniform('sampler2D'),
@@ -252,7 +255,11 @@ void main()
 }`
 });
 
+/**
+ * Velocity
+ */
 export const gBuffer3Fragment = new FragmentShader({
+  name: 'gBuffer3Frag',
   uniforms: {
     firstRender: uniform('bool')
   },
@@ -271,6 +278,7 @@ void main() {
 });
 
 export const gBufferDebugFragment = new FragmentShader({
+  name: 'gBufferDebugFrag',
   uniforms: {
     gBufferTexture4: uniform('sampler2D'),
     /**

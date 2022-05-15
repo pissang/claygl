@@ -9,7 +9,8 @@ import { shadowMapMixin } from '../shadowmap.glsl';
 import { lightAttenuationMixin } from '../util.glsl';
 import { gBufferReadMixin, lightEquationFunction } from './chunk.glsl';
 
-export const pointLightFragment = new FragmentShader({
+export const deferredPointLightFragment = new FragmentShader({
+  name: 'deferredPointFrag',
   uniforms: {
     lightPosition: uniform('vec3'),
     lightColor: uniform('vec3'),

@@ -17,7 +17,7 @@ import Renderer from '../Renderer';
 import { CLAMP_TO_EDGE } from '../core/constants';
 import { integrateBRDFFragment } from './shader/integrateBRDF.glsl';
 import { skyboxVertex } from '../shader/source/skybox.glsl';
-import { prefilterFragment } from './shader/prefilter.glsl';
+import { cubemapPrefilterFragment } from './shader/prefilter.glsl';
 
 const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
 
@@ -65,7 +65,7 @@ export function prefilterEnvironmentMap(
   const size = Math.min(width, height);
   const mipmapNum = Math.log(size) / Math.log(2) + 1;
 
-  const prefilterMaterial = new Material(new Shader(skyboxVertex, prefilterFragment));
+  const prefilterMaterial = new Material(new Shader(skyboxVertex, cubemapPrefilterFragment));
   prefilterMaterial.set('normalDistribution', normalDistribution);
 
   textureOpts.encodeRGBM && prefilterMaterial.define('fragment', 'RGBM_ENCODE');

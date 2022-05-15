@@ -6,7 +6,8 @@ import {
   createArrayUniform as arrayUniform
 } from '../../../Shader';
 
-export const ambientSHLightFragment = new FragmentShader({
+export const deferredAmbientSHLightFragment = new FragmentShader({
+  name: 'deferredAmbientSHFrag',
   uniforms: {
     gBufferTexture1: uniform('sampler2D'),
     gBufferTexture3: uniform('sampler2D'),

@@ -30,6 +30,7 @@ import {
 } from './util.glsl';
 
 export const standardVertex = new VertexShader({
+  name: 'standardVertex',
   uniforms: {
     ...sharedLambertVertexUniforms
   },
@@ -96,6 +97,7 @@ void main() {
 });
 
 export const standardFragment = new FragmentShader({
+  name: 'standardFrag',
   defines: {
     PI: Math.PI,
     GLOSSINESS_CHANNEL: 0,

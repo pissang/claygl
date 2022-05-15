@@ -32,16 +32,16 @@ import OrthographicCamera from '../camera/Orthographic';
 import * as constants from '../core/constants';
 import { preZFragment, preZVertex } from '../shader/source/prez.glsl';
 import { outputFragment } from '../shader/source/compositor/output.glsl';
-import { directionalLightFragment } from '../shader/source/deferred/directional.glsl';
+import { deferredDirectionalLightFragment } from '../shader/source/deferred/directional.glsl';
 import { fullscreenQuadPassVertex } from '../shader/source/compositor/vertex.glsl';
 import { lightVolumeVertex } from '../shader/source/deferred/lightvolume.glsl';
-import { ambientLightFragment } from '../shader/source/deferred/ambient.glsl';
-import { ambientSHLightFragment } from '../shader/source/deferred/ambientsh.glsl';
-import { ambientCubemapLightFragment } from '../shader/source/deferred/ambientcubemap.glsl';
-import { spotLightFragment } from '../shader/source/deferred/spot.glsl';
-import { pointLightFragment } from '../shader/source/deferred/point.glsl';
-import { sphereLightFragment } from '../shader/source/deferred/sphere.glsl';
-import { tubeLightFragment } from '../shader/source/deferred/tube.glsl';
+import { deferredAmbientLightFragment } from '../shader/source/deferred/ambient.glsl';
+import { deferredAmbientSHLightFragment } from '../shader/source/deferred/ambientsh.glsl';
+import { deferredAmbientCubemapLightFragment } from '../shader/source/deferred/ambientcubemap.glsl';
+import { deferredSpotLightFragment } from '../shader/source/deferred/spot.glsl';
+import { deferredPointLightFragment } from '../shader/source/deferred/point.glsl';
+import { deferredSphereLightFragment } from '../shader/source/deferred/sphere.glsl';
+import { deferredTubeLightFragment } from '../shader/source/deferred/tube.glsl';
 
 const worldView = new Matrix4();
 const preZMaterial = new Material(new Shader(preZVertex, preZFragment));
@@ -114,7 +114,10 @@ class DeferredRenderer extends Notifier {
 
   constructor() {
     super();
-    const directionalLightShader = new Shader(fullscreenQuadPassVertex, directionalLightFragment);
+    const directionalLightShader = new Shader(
+      fullscreenQuadPassVertex,
+      deferredDirectionalLightFragment
+    );
 
     const lightAccumulateBlendFunc = function (gl: WebGLRenderingContext) {
       gl.blendEquation(gl.FUNC_ADD);
@@ -151,20 +154,20 @@ class DeferredRenderer extends Notifier {
     this._directionalLightMat = this._createLightPassMat(directionalLightShader);
 
     this._ambientMat = this._createLightPassMat(
-      new Shader(fullscreenQuadPassVertex, ambientLightFragment)
+      new Shader(fullscreenQuadPassVertex, deferredAmbientLightFragment)
     );
     this._ambientSHMat = this._createLightPassMat(
-      new Shader(fullscreenQuadPassVertex, ambientSHLightFragment)
+      new Shader(fullscreenQuadPassVertex, deferredAmbientSHLightFragment)
     );
     this._ambientCubemapMat = this._createLightPassMat(
-      new Shader(fullscreenQuadPassVertex, ambientCubemapLightFragment)
+      new Shader(fullscreenQuadPassVertex, deferredAmbientCubemapLightFragment)
     );
 
-    this._spotLightShader = new Shader(lightVolumeVertex, spotLightFragment);
-    this._pointLightShader = new Shader(lightVolumeVertex, pointLightFragment);
+    this._spotLightShader = new Shader(lightVolumeVertex, deferredSpotLightFragment);
+    this._pointLightShader = new Shader(lightVolumeVertex, deferredPointLightFragment);
 
-    this._sphereLightShader = new Shader(lightVolumeVertex, sphereLightFragment);
-    this._tubeLightShader = new Shader(lightVolumeVertex, tubeLightFragment);
+    this._sphereLightShader = new Shader(lightVolumeVertex, deferredSphereLightFragment);
+    this._tubeLightShader = new Shader(lightVolumeVertex, deferredTubeLightFragment);
 
     this._lightConeGeo = coneGeo;
     this._lightCylinderGeo = cylinderGeo;

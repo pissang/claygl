@@ -20,9 +20,7 @@ import {
  * Prez vertex shader
  */
 export const preZVertex = new VertexShader({
-  defines: {
-    SHADER_NAME: 'prez'
-  },
+  name: 'prezVertex',
   varyings: {
     v_Texcoord: varying('vec2')
   },
@@ -61,6 +59,7 @@ void main() {
  * Prez fragment shader
  */
 export const preZFragment = new FragmentShader({
+  name: 'prezFrag',
   uniforms: {
     alphaMap: uniform('sampler2D'),
     alphaCutoff: uniform('float', 0),

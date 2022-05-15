@@ -5,7 +5,8 @@ import {
   glsl
 } from '../../../Shader';
 
-export const ambientLightFragment = new FragmentShader({
+export const deferredAmbientLightFragment = new FragmentShader({
+  name: 'deferredAmbientFrag',
   uniforms: {
     gBufferTexture1: uniform('sampler2D'),
     gBufferTexture3: uniform('sampler2D'),

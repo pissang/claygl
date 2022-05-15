@@ -3,6 +3,7 @@ import { POSITION, WORLDVIEWPROJECTION } from '../shader/source/shared';
 import { skinningMixin } from '../shader/source/util.glsl';
 
 export const colorVertex = new VertexShader({
+  name: 'colorVertex',
   uniforms: {
     worldViewProjection: WORLDVIEWPROJECTION()
   },
@@ -24,6 +25,7 @@ void main(){
 });
 
 export const colorFragment = new FragmentShader({
+  name: 'colorFrag',
   uniforms: {
     color: createUniform('rgba', [1, 1, 1, 1])
   },
