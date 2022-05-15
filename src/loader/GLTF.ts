@@ -1096,14 +1096,14 @@ function parseMeshes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpt
       const mesh = new Mesh(geometry, material, {
         mode:
           [
-            Mesh.POINTS,
-            Mesh.LINES,
-            Mesh.LINE_LOOP,
-            Mesh.LINE_STRIP,
-            Mesh.TRIANGLES,
-            Mesh.TRIANGLE_STRIP,
-            Mesh.TRIANGLE_FAN
-          ][primitiveInfo.mode] || Mesh.TRIANGLES,
+            constants.POINTS,
+            constants.LINES,
+            constants.LINE_LOOP,
+            constants.LINE_STRIP,
+            constants.TRIANGLES,
+            constants.TRIANGLE_STRIP,
+            constants.TRIANGLE_FAN
+          ][primitiveInfo.mode] || constants.TRIANGLES,
         ignoreGBuffer: material.transparent
       });
       if (materialInfo != null) {

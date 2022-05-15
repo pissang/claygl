@@ -48,19 +48,5 @@ class Mesh<T extends Material = Material> extends Renderable<T> {
     }
     return mesh;
   }
-
-  static POINTS = constants.POINTS;
-  static LINES = constants.LINES;
-  static LINE_LOOP = constants.LINE_LOOP;
-  static LINE_STRIP = constants.LINE_STRIP;
-  static TRIANGLES = constants.TRIANGLES;
-  static TRIANGLE_STRIP = constants.TRIANGLE_STRIP;
-  static TRIANGLE_FAN = constants.TRIANGLE_FAN;
-
-  static BACK = constants.BACK;
-  static FRONT = constants.FRONT;
-  static FRONT_AND_BACK = constants.FRONT_AND_BACK;
-  static CW = constants.CW;
-  static CCW = constants.CCW;
 }
 export default Mesh;

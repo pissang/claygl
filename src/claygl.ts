@@ -118,6 +118,6 @@ export { default as DeferredGBuffer } from './deferred/GBuffer';
 export { default as DeferredRenderer } from './deferred/Renderer';
 
 // Particles
-// export { default as ParticleEmitter } from './particle/Emitter';
-// export { default as ParticleRenderable } from './particle/ParticleRenderable';
-// export { default as ForceField } from './particle/ForceField';
+export { default as ParticleEmitter } from './particle/Emitter';
+export { default as ParticleRenderable } from './particle/ParticleRenderable';
+export { default as ForceField } from './particle/ForceField';

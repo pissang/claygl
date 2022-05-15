@@ -1,1 +1,72 @@
-export default "@export clay.particle.vertex\nuniform mat4 worldView : WORLDVIEW;\nuniform mat4 projection : PROJECTION;\nattribute vec3 position : POSITION;\nattribute vec3 normal : NORMAL;\n#ifdef UV_ANIMATION\nattribute vec2 texcoord0 : TEXCOORD_0;\nattribute vec2 texcoord1 : TEXCOORD_1;\nvarying vec2 v_Uv0;\nvarying vec2 v_Uv1;\n#endif\nvarying float v_Age;\nvoid main() {\n v_Age = normal.x;\n float rotation = normal.y;\n vec4 worldViewPosition = worldView * vec4(position, 1.0);\n gl_Position = projection * worldViewPosition;\n float w = gl_Position.w;\n gl_PointSize = normal.z * projection[0].x / w;\n #ifdef UV_ANIMATION\n v_Uv0 = texcoord0;\n v_Uv1 = texcoord1;\n #endif\n}\n@end\n@export clay.particle.fragment\nuniform sampler2D sprite;\nuniform sampler2D gradient;\nuniform vec3 color : [1.0, 1.0, 1.0];\nuniform float alpha : 1.0;\nvarying float v_Age;\n#ifdef UV_ANIMATION\nvarying vec2 v_Uv0;\nvarying vec2 v_Uv1;\n#endif\nvoid main() {\n vec4 color = vec4(color, alpha);\n #ifdef SPRITE_ENABLED\n #ifdef UV_ANIMATION\n color *= texture2D(sprite, mix(v_Uv0, v_Uv1, gl_PointCoord));\n #else\n color *= texture2D(sprite, gl_PointCoord);\n #endif\n #endif\n #ifdef GRADIENT_ENABLED\n color *= texture2D(gradient, vec2(v_Age, 0.5));\n #endif\n gl_FragColor = color;\n}\n@end";
+import {
+  VertexShader,
+  FragmentShader,
+  glsl,
+  createVarying as varying,
+  createUniform as uniform,
+  createArrayUniform as arrayUniform,
+  createAttribute as attribute,
+  createShaderFunction,
+  FUNCTION_NAME_PLACEHOLDER,
+  createSemanticUniform as semanticUniform
+} from '../Shader';
+
+export const particleVertex = new VertexShader({
+  uniforms: {
+    worldView: semanticUniform('mat4', 'WORLDVIEW'),
+    projection: semanticUniform('mat4', 'PROJECTION')
+  },
+
+  attributes: {
+    position: attribute('vec3', 'POSITION'),
+    normal: attribute('vec3', 'NORMAL'),
+    texcoord0: attribute('vec2', 'TEXCOORD_0'),
+    texcoord1: attribute('vec2', 'TEXCOORD_1')
+  },
+
+  varyings: {
+    v_Uv0: varying('vec2'),
+    v_Uv1: varying('vec2'),
+    v_Age: varying('float')
+  },
+  main: glsl`
+void main() {
+  v_Age = normal.x;
+  float rotation = normal.y;
+
+  vec4 worldViewPosition = worldView * vec4(position, 1.0);
+  gl_Position = projection * worldViewPosition;
+  float w = gl_Position.w;
+  // TODO
+  gl_PointSize = normal.z * projection[0].x / w;
+
+#ifdef UV_ANIMATION
+  v_Uv0 = texcoord0;
+  v_Uv1 = texcoord1;
+#endif
+}`
+});
+
+export const particleFragment = new FragmentShader({
+  uniforms: {
+    sprite: uniform('sampler2D'),
+    gradient: uniform('sampler2D'),
+    color: uniform('vec3', [1.0, 1.0, 1.0]),
+    alpha: uniform('float', 1.0)
+  },
+  main: glsl`
+void main() {
+  vec4 color = vec4(color, alpha);
+#ifdef SPRITE_ENABLED
+  #ifdef UV_ANIMATION
+  color *= texture2D(sprite, mix(v_Uv0, v_Uv1, gl_PointCoord));
+  #else
+  color *= texture2D(sprite, gl_PointCoord);
+  #endif
+#endif
+#ifdef GRADIENT_ENABLED
+  color *= texture2D(gradient, vec2(v_Age, 0.5));
+#endif
+  gl_FragColor = color;
+}`
+});

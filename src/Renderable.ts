@@ -32,9 +32,9 @@ export interface RenderableOpts extends ClayNodeOpts {
   /**
    * Specify which side of polygon will be culled.
    * Possible values:
-   *  + {@link clay.Renderable.BACK}
-   *  + {@link clay.Renderable.FRONT}
-   *  + {@link clay.Renderable.FRONT_AND_BACK}
+   *  + {@link clay.constants.BACK}
+   *  + {@link clay.constants.FRONT}
+   *  + {@link clay.constants.FRONT_AND_BACK}
    * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/cullFace
    */
   cullFace: GLEnum;
@@ -42,8 +42,8 @@ export interface RenderableOpts extends ClayNodeOpts {
   /**
    * Specify which side is front face.
    * Possible values:
-   *  + {@link clay.Renderable.CW}
-   *  + {@link clay.Renderable.CCW}
+   *  + {@link clay.constants.CW}
+   *  + {@link clay.constants.CCW}
    * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/frontFace
    */
   frontFace: GLEnum;
@@ -96,6 +96,8 @@ const properties = [
 interface Renderable<T extends Material = Material> extends RenderableOpts {}
 class Renderable<T extends Material = Material> extends ClayNode {
   geometry: Geometry;
+  // TODO should be readonly?
+  // type will be useless if material is changed.
   material: T;
   /**
    * Bounding box of renderable
@@ -180,19 +182,6 @@ class Renderable<T extends Material = Material> extends ClayNode {
 
     return renderable;
   }
-
-  static POINTS = constants.POINTS;
-  static LINES = constants.LINES;
-  static LINE_LOOP = constants.LINE_LOOP;
-  static LINE_STRIP = constants.LINE_STRIP;
-  static TRIANGLES = constants.TRIANGLES;
-  static TRIANGLE_STRIP = constants.TRIANGLE_STRIP;
-  static TRIANGLE_FAN = constants.TRIANGLE_FAN;
-  static BACK = constants.BACK;
-  static FRONT = constants.FRONT;
-  static FRONT_AND_BACK = constants.FRONT_AND_BACK;
-  static CW = constants.CW;
-  static CCW = constants.CCW;
 }
 
 const proto = Renderable.prototype;

@@ -25,51 +25,51 @@ export interface TextureOpts {
   /**
    * Texel data type.
    * Possible values:
-   *  + {@link clay.Texture.UNSIGNED_BYTE}
-   *  + {@link clay.Texture.HALF_FLOAT}
-   *  + {@link clay.Texture.FLOAT}
-   *  + {@link clay.Texture.UNSIGNED_INT_24_8_WEBGL}
-   *  + {@link clay.Texture.UNSIGNED_INT}
+   *  + {@link clay.constants.UNSIGNED_BYTE}
+   *  + {@link clay.constants.HALF_FLOAT}
+   *  + {@link clay.constants.FLOAT}
+   *  + {@link clay.constants.UNSIGNED_INT_24_8_WEBGL}
+   *  + {@link clay.constants.UNSIGNED_INT}
    */
   type: GLEnum;
   /**
    * Format of texel data
    * Possible values:
-   *  + {@link clay.Texture.RGBA}
-   *  + {@link clay.Texture.DEPTH_COMPONENT}
-   *  + {@link clay.Texture.DEPTH_STENCIL}
+   *  + {@link clay.constants.RGBA}
+   *  + {@link clay.constants.DEPTH_COMPONENT}
+   *  + {@link clay.constants.DEPTH_STENCIL}
    */
   format: GLEnum;
   /**
    * Texture wrap. Default to be REPEAT.
    * Possible values:
-   *  + {@link clay.Texture.CLAMP_TO_EDGE}
-   *  + {@link clay.Texture.REPEAT}
-   *  + {@link clay.Texture.MIRRORED_REPEAT}
+   *  + {@link clay.constants.CLAMP_TO_EDGE}
+   *  + {@link clay.constants.REPEAT}
+   *  + {@link clay.constants.MIRRORED_REPEAT}
    */
   wrapS: GLEnum;
   /**
    * Texture wrap. Default to be REPEAT.
    * Possible values:
-   *  + {@link clay.Texture.CLAMP_TO_EDGE}
-   *  + {@link clay.Texture.REPEAT}
-   *  + {@link clay.Texture.MIRRORED_REPEAT}
+   *  + {@link clay.constants.CLAMP_TO_EDGE}
+   *  + {@link clay.constants.REPEAT}
+   *  + {@link clay.constants.MIRRORED_REPEAT}
    */
   wrapT: GLEnum;
   /**
    * Possible values:
-   *  + {@link clay.Texture.NEAREST}
-   *  + {@link clay.Texture.LINEAR}
-   *  + {@link clay.Texture.NEAREST_MIPMAP_NEAREST}
-   *  + {@link clay.Texture.LINEAR_MIPMAP_NEAREST}
-   *  + {@link clay.Texture.NEAREST_MIPMAP_LINEAR}
-   *  + {@link clay.Texture.LINEAR_MIPMAP_LINEAR}
+   *  + {@link clay.constants.NEAREST}
+   *  + {@link clay.constants.LINEAR}
+   *  + {@link clay.constants.NEAREST_MIPMAP_NEAREST}
+   *  + {@link clay.constants.LINEAR_MIPMAP_NEAREST}
+   *  + {@link clay.constants.NEAREST_MIPMAP_LINEAR}
+   *  + {@link clay.constants.LINEAR_MIPMAP_LINEAR}
    */
   minFilter: GLEnum;
   /**
    * Possible values:
-   *  + {@link clay.Texture.NEAREST}
-   *  + {@link clay.Texture.LINEAR}
+   *  + {@link clay.constants.NEAREST}
+   *  + {@link clay.constants.LINEAR}
    */
   magFilter: GLEnum;
   /**
@@ -266,19 +266,20 @@ abstract class Texture extends Notifier {
 }
 
 // Default values.
-Texture.prototype.type = constants.UNSIGNED_BYTE;
-Texture.prototype.format = constants.RGBA;
-Texture.prototype.wrapS = constants.REPEAT;
-Texture.prototype.wrapT = constants.REPEAT;
-Texture.prototype.minFilter = constants.LINEAR_MIPMAP_LINEAR;
-Texture.prototype.magFilter = constants.LINEAR;
-Texture.prototype.useMipmap = true;
-Texture.prototype.anisotropic = 1;
-Texture.prototype.flipY = true;
-Texture.prototype.sRGB = true;
-Texture.prototype.unpackAlignment = 4;
-Texture.prototype.premultiplyAlpha = false;
-Texture.prototype.dynamic = false;
-Texture.prototype.NPOT = false;
+const proto = Texture.prototype;
+proto.type = constants.UNSIGNED_BYTE;
+proto.format = constants.RGBA;
+proto.wrapS = constants.REPEAT;
+proto.wrapT = constants.REPEAT;
+proto.minFilter = constants.LINEAR_MIPMAP_LINEAR;
+proto.magFilter = constants.LINEAR;
+proto.useMipmap = true;
+proto.anisotropic = 1;
+proto.flipY = true;
+proto.sRGB = true;
+proto.unpackAlignment = 4;
+proto.premultiplyAlpha = false;
+proto.dynamic = false;
+proto.NPOT = false;
 
 export default Texture;

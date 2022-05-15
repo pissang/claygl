@@ -6,7 +6,7 @@ import {
   Scene,
   Material,
   Geometry,
-  BasicShader,
+  createBasicShader,
   Mesh,
   loadGLTF,
   PerspectiveCamera,
@@ -16,7 +16,8 @@ import {
   AmbientLight,
   PlaneGeometry,
   StandardMaterial,
-  startTimeline
+  startTimeline,
+  constants
 } from 'claygl';
 
 function createSkeletonDebugScene(skeleton: Skeleton) {
@@ -24,7 +25,7 @@ function createSkeletonDebugScene(skeleton: Skeleton) {
   const sphereGeo = new SphereGeometry({
     radius: 0.1
   });
-  const sphereMat = new Material(new BasicShader());
+  const sphereMat = new Material(createBasicShader());
   sphereMat.set('color', [0.3, 0.3, 0.3]);
 
   const updates: (() => void)[] = [];
@@ -38,7 +39,7 @@ function createSkeletonDebugScene(skeleton: Skeleton) {
     const lineGeoVertices = lineGeo.attributes.position;
     lineGeoVertices.fromArray([0, 0, 0, 0, 0, 0]);
     const line = new Mesh(lineGeo, sphereMat, {
-      mode: Mesh.LINES,
+      mode: constants.LINES,
       lineWidth: 2
     });
     scene.add(line);

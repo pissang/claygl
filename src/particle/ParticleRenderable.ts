@@ -4,18 +4,15 @@ import Geometry from '../Geometry';
 import Material from '../Material';
 import Shader from '../Shader';
 
-import particleEssl from './particle.glsl';
 import ParticleEmitter from './Emitter';
 import ParticleField from './Field';
 import Particle from './Particle';
 import { assign, optional } from '../core/util';
 import Renderer from '../Renderer';
-Shader.import(particleEssl);
+import * as constants from '../core/constants';
+import { particleFragment, particleVertex } from './particle.glsl';
 
-const particleShader = new Shader(
-  Shader.source('clay.particle.vertex'),
-  Shader.source('clay.particle.fragment')
-);
+const particleShader = new Shader(particleVertex, particleFragment);
 
 interface ParticleRenderableOpts extends RenderableOpts {
   loop: boolean;
@@ -62,7 +59,7 @@ interface ParticleRenderableOpts extends RenderableOpts {
  */
 interface ParticleRenderable extends ParticleRenderableOpts {}
 class ParticleRenderable extends Renderable {
-  mode = Renderable.POINTS;
+  mode = constants.POINTS;
 
   ignorePicking = true;
 
@@ -78,23 +75,20 @@ class ParticleRenderable extends Renderable {
   private _particles: Particle[] = [];
 
   constructor(opts?: Partial<ParticleRenderableOpts>) {
-    super(opts);
-    opts = opts || {};
-
-    assign(this, opts);
-    this.geometry = new Geometry({
-      dynamic: true
-    });
-
-    if (!opts.material) {
-      this.material = new Material({
-        shader: particleShader,
+    super(
+      new Geometry({
+        dynamic: true
+      }),
+      new Material(particleShader, {
         transparent: true,
         depthMask: false
-      });
+      }),
+      opts
+    );
 
-      this.material.enableTexture('sprite');
-    }
+    assign(this, opts);
+
+    this.material.enableTexture('sprite');
 
     opts = opts || {};
     this.loop = optional(opts.loop, true);
@@ -207,20 +201,21 @@ class ParticleRenderable extends Renderable {
     const animRepeat = this.spriteAnimationRepeat;
     const nUvAnimFrame = animTileY * animTileX * animRepeat;
     const hasUvAnimation = nUvAnimFrame > 1;
-    let positions = geometry.attributes.position.value;
+    const attributes = geometry.attributes;
+    let positions = attributes.position.value;
     // Put particle status in normal
-    let normals = geometry.attributes.normal.value!;
-    let uvs = geometry.attributes.texcoord0.value!;
-    let uvs2 = geometry.attributes.texcoord1.value!;
+    let normals = attributes.normal.value!;
+    let uvs = attributes.texcoord0.value!;
+    let uvs2 = attributes.texcoord1.value!;
 
     const len = this._particles.length;
     if (!positions || positions.length !== len * 3) {
       // TODO Optimize
-      positions = geometry.attributes.position.value = new Float32Array(len * 3);
-      normals = geometry.attributes.normal.value = new Float32Array(len * 3);
+      positions = attributes.position.value = new Float32Array(len * 3);
+      normals = attributes.normal.value = new Float32Array(len * 3);
       if (hasUvAnimation) {
-        uvs = geometry.attributes.texcoord0.value = new Float32Array(len * 2);
-        uvs2 = geometry.attributes.texcoord1.value = new Float32Array(len * 2);
+        uvs = attributes.texcoord0.value = new Float32Array(len * 2);
+        uvs2 = attributes.texcoord1.value = new Float32Array(len * 2);
       }
     }
 
@@ -276,9 +271,8 @@ class ParticleRenderable extends Renderable {
    * @return {clay.particle.ParticleRenderable}
    */
   clone() {
-    const particleRenderable = new ParticleRenderable({
-      material: this.material
-    });
+    const particleRenderable = new ParticleRenderable();
+    particleRenderable.material = this.material;
     particleRenderable.loop = this.loop;
     particleRenderable.duration = this.duration;
     particleRenderable.oneshot = this.oneshot;
