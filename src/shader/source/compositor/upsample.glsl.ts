@@ -1,1 +1,51 @@
-export default "\n@export clay.composite.upsample\n#define HIGH_QUALITY\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\nuniform float sampleScale: 0.5;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\n@import clay.util.clamp_sample\nvoid main()\n{\n#ifdef HIGH_QUALITY\n vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;\n vec4 s;\n s = decodeHDR(clampSample(texture, v_Texcoord - d.xy));\n s += decodeHDR(clampSample(texture, v_Texcoord - d.wy)) * 2.0;\n s += decodeHDR(clampSample(texture, v_Texcoord - d.zy));\n s += decodeHDR(clampSample(texture, v_Texcoord + d.zw)) * 2.0;\n s += decodeHDR(clampSample(texture, v_Texcoord )) * 4.0;\n s += decodeHDR(clampSample(texture, v_Texcoord + d.xw)) * 2.0;\n s += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n s += decodeHDR(clampSample(texture, v_Texcoord + d.wy)) * 2.0;\n s += decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n gl_FragColor = encodeHDR(s / 16.0);\n#else\n vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;\n vec4 s;\n s = decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n s += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n s += decodeHDR(clampSample(texture, v_Texcoord + d.xw));\n s += decodeHDR(clampSample(texture, v_Texcoord + d.zw));\n gl_FragColor = encodeHDR(s / 4.0);\n#endif\n}\n@end";
+import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
+import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+
+export const upsampleCompositeFragemnt = new FragmentShader({
+  name: 'upsampleFrag',
+  defines: {
+    HIGH_QUALITY: null
+  },
+  uniforms: {
+    texture: uniform('sampler2D'),
+    textureSize: uniform('vec2', [512, 512]),
+    sampleScale: uniform('float', 0.5)
+  },
+  main: glsl`
+${encodeHDRFunction()}
+${decodeHDRFunction()}
+
+void main() {
+#ifdef HIGH_QUALITY
+  // 9-tap bilinear upsampler (tent filter)
+  vec4 d = vec4(1.0, 1.0, -1.0, 0.0) / textureSize.xyxy * sampleScale;
+
+  vec4 s;
+  s  = decodeHDR(clampSample(texture, v_Texcoord - d.xy));
+  s += decodeHDR(clampSample(texture, v_Texcoord - d.wy)) * 2.0;
+  s += decodeHDR(clampSample(texture, v_Texcoord - d.zy));
+
+  s += decodeHDR(clampSample(texture, v_Texcoord + d.zw)) * 2.0;
+  s += decodeHDR(clampSample(texture, v_Texcoord       )) * 4.0;
+  s += decodeHDR(clampSample(texture, v_Texcoord + d.xw)) * 2.0;
+
+  s += decodeHDR(clampSample(texture, v_Texcoord + d.zy));
+  s += decodeHDR(clampSample(texture, v_Texcoord + d.wy)) * 2.0;
+  s += decodeHDR(clampSample(texture, v_Texcoord + d.xy));
+
+  gl_FragColor = encodeHDR(s / 16.0);
+#else
+  // 4-tap bilinear upsampler
+  vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;
+
+  vec4 s;
+  s  = decodeHDR(clampSample(texture, v_Texcoord + d.xy));
+  s += decodeHDR(clampSample(texture, v_Texcoord + d.zy));
+  s += decodeHDR(clampSample(texture, v_Texcoord + d.xw));
+  s += decodeHDR(clampSample(texture, v_Texcoord + d.zw));
+
+  gl_FragColor = encodeHDR(s / 4.0);
+#endif
+}
+  `
+});

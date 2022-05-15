@@ -1,1 +1,49 @@
-export default "@export clay.composite.downsample\nuniform sampler2D texture;\nuniform vec2 textureSize : [512, 512];\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\nfloat brightness(vec3 c)\n{\n return max(max(c.r, c.g), c.b);\n}\n@import clay.util.clamp_sample\nvoid main()\n{\n vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;\n#ifdef ANTI_FLICKER\n vec3 s1 = decodeHDR(clampSample(texture, v_Texcoord + d.xy)).rgb;\n vec3 s2 = decodeHDR(clampSample(texture, v_Texcoord + d.zy)).rgb;\n vec3 s3 = decodeHDR(clampSample(texture, v_Texcoord + d.xw)).rgb;\n vec3 s4 = decodeHDR(clampSample(texture, v_Texcoord + d.zw)).rgb;\n float s1w = 1.0 / (brightness(s1) + 1.0);\n float s2w = 1.0 / (brightness(s2) + 1.0);\n float s3w = 1.0 / (brightness(s3) + 1.0);\n float s4w = 1.0 / (brightness(s4) + 1.0);\n float oneDivideSum = 1.0 / (s1w + s2w + s3w + s4w);\n vec4 color = vec4(\n (s1 * s1w + s2 * s2w + s3 * s3w + s4 * s4w) * oneDivideSum,\n 1.0\n );\n#else\n vec4 color = decodeHDR(clampSample(texture, v_Texcoord + d.xy));\n color += decodeHDR(clampSample(texture, v_Texcoord + d.zy));\n color += decodeHDR(clampSample(texture, v_Texcoord + d.xw));\n color += decodeHDR(clampSample(texture, v_Texcoord + d.zw));\n color *= 0.25;\n#endif\n gl_FragColor = encodeHDR(color);\n}\n@end";
+import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
+import { clampSampleFunction, decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+
+export const downsampleCompositeFragment = new FragmentShader({
+  name: 'downSampleFrag',
+  uniforms: {
+    texture: uniform('sampler2D'),
+    textureSize: uniform('vec2', [512, 512])
+  },
+  main: glsl`
+${encodeHDRFunction()}
+${decodeHDRFunction()}
+${clampSampleFunction()}
+float brightness(vec3 c) {
+  return max(max(c.r, c.g), c.b);
+}
+void main() {
+  vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;
+
+#ifdef ANTI_FLICKER
+  // https://github.com/keijiro/KinoBloom/blob/master/Assets/Kino/Bloom/Shader/Bloom.cginc#L96
+  // TODO
+  vec3 s1 = decodeHDR(clampSample(texture, v_Texcoord + d.xy)).rgb;
+  vec3 s2 = decodeHDR(clampSample(texture, v_Texcoord + d.zy)).rgb;
+  vec3 s3 = decodeHDR(clampSample(texture, v_Texcoord + d.xw)).rgb;
+  vec3 s4 = decodeHDR(clampSample(texture, v_Texcoord + d.zw)).rgb;
+
+  // Karis's luma weighted average (using brightness instead of luma)
+  float s1w = 1.0 / (brightness(s1) + 1.0);
+  float s2w = 1.0 / (brightness(s2) + 1.0);
+  float s3w = 1.0 / (brightness(s3) + 1.0);
+  float s4w = 1.0 / (brightness(s4) + 1.0);
+  float oneDivideSum = 1.0 / (s1w + s2w + s3w + s4w);
+
+  vec4 color = vec4(
+    (s1 * s1w + s2 * s2w + s3 * s3w + s4 * s4w) * oneDivideSum,
+    1.0
+  );
+#else
+  vec4 color = decodeHDR(clampSample(texture, v_Texcoord + d.xy));
+  color += decodeHDR(clampSample(texture, v_Texcoord + d.zy));
+  color += decodeHDR(clampSample(texture, v_Texcoord + d.xw));
+  color += decodeHDR(clampSample(texture, v_Texcoord + d.zw));
+  color *= 0.25;
+#endif
+
+  gl_FragColor = encodeHDR(color);
+}`
+});

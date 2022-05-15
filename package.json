@@ -10,9 +10,9 @@
     "name": "Yi Shen",
     "url": "https://github.com/pissang"
   },
-  "module": "lib/claygl.js",
+  "module": "index.js",
   "main": "dist/claygl.js",
-  "types": "index.d.ts",
+  "jsdelivr": "dist/claygl.min.js",
   "sideEffects": false,
   "scripts": {
     "build": "npx rollup -c && npx terser dist/claygl.js -c -m > dist/claygl.min.js",

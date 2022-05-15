@@ -1,1 +1,77 @@
-export default "@export clay.composite.kernel.gaussian_9\nfloat gaussianKernel[9];\ngaussianKernel[0] = 0.07;\ngaussianKernel[1] = 0.09;\ngaussianKernel[2] = 0.12;\ngaussianKernel[3] = 0.14;\ngaussianKernel[4] = 0.16;\ngaussianKernel[5] = 0.14;\ngaussianKernel[6] = 0.12;\ngaussianKernel[7] = 0.09;\ngaussianKernel[8] = 0.07;\n@end\n@export clay.composite.kernel.gaussian_13\nfloat gaussianKernel[13];\ngaussianKernel[0] = 0.02;\ngaussianKernel[1] = 0.03;\ngaussianKernel[2] = 0.06;\ngaussianKernel[3] = 0.08;\ngaussianKernel[4] = 0.11;\ngaussianKernel[5] = 0.13;\ngaussianKernel[6] = 0.14;\ngaussianKernel[7] = 0.13;\ngaussianKernel[8] = 0.11;\ngaussianKernel[9] = 0.08;\ngaussianKernel[10] = 0.06;\ngaussianKernel[11] = 0.03;\ngaussianKernel[12] = 0.02;\n@end\n@export clay.composite.gaussian_blur\n#define SHADER_NAME gaussian_blur\nuniform sampler2D texture;varying vec2 v_Texcoord;\nuniform float blurSize : 2.0;\nuniform vec2 textureSize : [512.0, 512.0];\nuniform float blurDir : 0.0;\n@import clay.util.rgbm\n@import clay.util.clamp_sample\nvoid main (void)\n{\n @import clay.composite.kernel.gaussian_9\n vec2 off = blurSize / textureSize;\n off *= vec2(1.0 - blurDir, blurDir);\n vec4 sum = vec4(0.0);\n float weightAll = 0.0;\n for (int i = 0; i < 9; i++) {\n float w = gaussianKernel[i];\n vec4 texel = decodeHDR(clampSample(texture, v_Texcoord + float(i - 4) * off));\n sum += texel * w;\n weightAll += w;\n }\n gl_FragColor = encodeHDR(sum / max(weightAll, 0.01));\n}\n@end\n";
+import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
+import { clampSampleFunction, decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+
+const defaultGaussianKernelName = `gaussianKernel`;
+
+export const gaussianKernel9 = (kernelName: string = defaultGaussianKernelName) => glsl`
+float ${kernelName}[9];
+${kernelName}[0] = 0.07;
+${kernelName}[1] = 0.09;
+${kernelName}[2] = 0.12;
+${kernelName}[3] = 0.14;
+${kernelName}[4] = 0.16;
+${kernelName}[5] = 0.14;
+${kernelName}[6] = 0.12;
+${kernelName}[7] = 0.09;
+${kernelName}[8] = 0.07;`;
+
+export const gaussianKernel13 = (kernelName: string = defaultGaussianKernelName) => glsl`
+float ${kernelName}[13];
+${kernelName}[0] = 0.02;
+${kernelName}[1] = 0.03;
+${kernelName}[2] = 0.06;
+${kernelName}[3] = 0.08;
+${kernelName}[4] = 0.11;
+${kernelName}[5] = 0.13;
+${kernelName}[6] = 0.14;
+${kernelName}[7] = 0.13;
+${kernelName}[8] = 0.11;
+${kernelName}[9] = 0.08;
+${kernelName}[10] = 0.06;
+${kernelName}[11] = 0.03;
+${kernelName}[12] = 0.02;`;
+
+export const blurCompositeFragment = new FragmentShader({
+  name: 'gaussianBlurFrag',
+  uniforms: {
+    /**
+     * the texture with the scene you want to blur
+     */
+    texture: uniform('sampler2D'),
+
+    blurSize: uniform('float', 2.0),
+    textureSize: uniform('vec2', [512.0, 512.0]),
+    /**
+     * 0.0 is horizontal, 1.0 is vertical
+     */
+    blurDir: uniform('float', 0.0)
+  },
+  main: glsl`
+${encodeHDRFunction()}
+${decodeHDRFunction()}
+${clampSampleFunction()}
+
+void main (void)
+{
+  ${gaussianKernel9()}
+
+  vec2 off = blurSize / textureSize;
+  off *= vec2(1.0 - blurDir, blurDir);
+
+  vec4 sum = vec4(0.0);
+  float weightAll = 0.0;
+
+    // blur in y (horizontal)
+  for (int i = 0; i < 9; i++) {
+    float w = gaussianKernel[i];
+    // Premultiplied Alpha
+    vec4 texel = decodeHDR(clampSample(texture, v_Texcoord + float(i - 4) * off));
+    // TODO alpha blend?
+    sum += texel * w;
+    weightAll += w;
+  }
+  gl_FragColor = encodeHDR(sum / max(weightAll, 0.01));
+}
+
+  `
+});

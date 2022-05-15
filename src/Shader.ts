@@ -342,6 +342,7 @@ class StageShader<
   readonly main: string;
 
   constructor(options: {
+    name?: string;
     defines?: TDefines;
     uniforms?: TUniforms;
     attributes?: TAttributes;
@@ -349,6 +350,19 @@ class StageShader<
     includes?: TChunks;
     main: string;
   }) {
+    options = assign(
+      {
+        defines: options.name
+          ? assign(
+              {
+                SHADER_NAME: options.name
+              },
+              options.defines
+            )
+          : options.defines
+      },
+      options
+    );
     const includes = options.includes || ([] as any as TChunks);
     (['defines', 'uniforms', 'attributes', 'varyings'] as const).forEach((prop) => {
       // @ts-ignore we are sure the readonly property is inited in the constructor here.
@@ -394,6 +408,7 @@ export class FragmentShader<
   // TVaryings extends Dict<ShaderVaringLoose> = Dict<ShaderVaringLoose>
 > extends StageShader<TDefines, TUniforms, never, never, TChunks> {
   constructor(options: {
+    name?: string;
     defines?: TDefines;
     uniforms?: TUniforms;
     /**

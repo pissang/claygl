@@ -5,7 +5,6 @@ import type Renderer from './Renderer';
 import type Material from './Material';
 import type Geometry from './Geometry';
 import { GLEnum } from './core/type';
-import GeometryBase from './GeometryBase';
 
 export interface RenderableOpts extends ClayNodeOpts {
   mode: number;
@@ -130,7 +129,6 @@ class Renderable<T extends Material = Material> extends ClayNode {
    * @return {boolean}
    */
   isRenderable(): boolean {
-    // TODO Shader ?
     return !!(
       this.geometry &&
       this.material &&
@@ -142,13 +140,11 @@ class Renderable<T extends Material = Material> extends ClayNode {
 
   /**
    * Before render hook
-   * @type {Function}
    */
   beforeRender(renderer: Renderer) {}
 
   /**
    * Before render hook
-   * @type {Function}
    */
   afterRender(renderer: Renderer) {}
 

@@ -1,1 +1,59 @@
-export default "@export clay.composite.hdr.log_lum\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\n@import clay.util.rgbm\nvoid main()\n{\n vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));\n float luminance = dot(tex.rgb, w);\n luminance = log(luminance + 0.001);\n gl_FragColor = encodeHDR(vec4(vec3(luminance), 1.0));\n}\n@end\n@export clay.composite.hdr.lum_adaption\nvarying vec2 v_Texcoord;\nuniform sampler2D adaptedLum;\nuniform sampler2D currentLum;\nuniform float frameTime : 0.02;\n@import clay.util.rgbm\nvoid main()\n{\n float fAdaptedLum = decodeHDR(texture2D(adaptedLum, vec2(0.5, 0.5))).r;\n float fCurrentLum = exp(encodeHDR(texture2D(currentLum, vec2(0.5, 0.5))).r);\n fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 30.0 * frameTime));\n gl_FragColor = encodeHDR(vec4(vec3(fAdaptedLum), 1.0));\n}\n@end\n@export clay.composite.lum\nvarying vec2 v_Texcoord;\nuniform sampler2D texture;\nconst vec3 w = vec3(0.2125, 0.7154, 0.0721);\nvoid main()\n{\n vec4 tex = texture2D( texture, v_Texcoord );\n float luminance = dot(tex.rgb, w);\n gl_FragColor = vec4(vec3(luminance), 1.0);\n}\n@end";
+import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
+import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+
+const weightShader = 'const vec3 w = vec3(0.2125, 0.7154, 0.0721);';
+
+export const lumCompositeFragment = new FragmentShader({
+  name: 'lumFrag',
+  uniforms: {
+    texture: uniform('sampler2D')
+  },
+  main: glsl`
+${weightShader}
+void main() {
+  vec4 tex = texture2D(texture, v_Texcoord);
+  float luminance = dot(tex.rgb, w);
+  gl_FragColor = vec4(vec3(luminance), 1.0);
+}
+  `
+});
+
+export const logLumCompositeFragment = new FragmentShader({
+  name: 'logLumFrag',
+  uniforms: {
+    texture: uniform('sampler2D')
+  },
+  main: glsl`
+
+${weightShader}
+
+${encodeHDRFunction()}
+${decodeHDRFunction()}
+
+void main() {
+  vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));
+  float luminance = dot(tex.rgb, w);
+  luminance = log(luminance + 0.001);
+  gl_FragColor = encodeHDR(vec4(vec3(luminance), 1.0));
+}`
+});
+
+export const lumAdaptionCompositeFragment = new FragmentShader({
+  name: 'lumAdaptionFrag',
+  uniforms: {
+    adaptedLum: uniform('sampler2D'),
+    currentLum: uniform('sampler2D'),
+    frameTime: uniform('float', 0.02)
+  },
+  main: glsl`
+${encodeHDRFunction()}
+${decodeHDRFunction()}
+
+void main() {
+  float fAdaptedLum = decodeHDR(texture2D(adaptedLum, vec2(0.5, 0.5))).r;
+  float fCurrentLum = exp(encodeHDR(texture2D(currentLum, vec2(0.5, 0.5))).r);
+
+  fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 30.0 * frameTime));
+  gl_FragColor = encodeHDR(vec4(vec3(fAdaptedLum), 1.0));
+}`
+});

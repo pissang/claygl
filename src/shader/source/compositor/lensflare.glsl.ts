@@ -1,1 +1,63 @@
-export default "@export clay.composite.lensflare\n#define SAMPLE_NUMBER 8\nuniform sampler2D texture;\nuniform sampler2D lenscolor;\nuniform vec2 textureSize : [512, 512];\nuniform float dispersal : 0.3;\nuniform float haloWidth : 0.4;\nuniform float distortion : 1.0;\nvarying vec2 v_Texcoord;\n@import clay.util.rgbm\nvec4 textureDistorted(\n in vec2 texcoord,\n in vec2 direction,\n in vec3 distortion\n) {\n return vec4(\n decodeHDR(texture2D(texture, texcoord + direction * distortion.r)).r,\n decodeHDR(texture2D(texture, texcoord + direction * distortion.g)).g,\n decodeHDR(texture2D(texture, texcoord + direction * distortion.b)).b,\n 1.0\n );\n}\nvoid main()\n{\n vec2 texcoord = -v_Texcoord + vec2(1.0); vec2 textureOffset = 1.0 / textureSize;\n vec2 ghostVec = (vec2(0.5) - texcoord) * dispersal;\n vec2 haloVec = normalize(ghostVec) * haloWidth;\n vec3 distortion = vec3(-textureOffset.x * distortion, 0.0, textureOffset.x * distortion);\n vec4 result = vec4(0.0);\n for (int i = 0; i < SAMPLE_NUMBER; i++)\n {\n vec2 offset = fract(texcoord + ghostVec * float(i));\n float weight = length(vec2(0.5) - offset) / length(vec2(0.5));\n weight = pow(1.0 - weight, 10.0);\n result += textureDistorted(offset, normalize(ghostVec), distortion) * weight;\n }\n result *= texture2D(lenscolor, vec2(length(vec2(0.5) - texcoord)) / length(vec2(0.5)));\n float weight = length(vec2(0.5) - fract(texcoord + haloVec)) / length(vec2(0.5));\n weight = pow(1.0 - weight, 10.0);\n vec2 offset = fract(texcoord + haloVec);\n result += textureDistorted(offset, normalize(ghostVec), distortion) * weight;\n gl_FragColor = result;\n}\n@end";
+import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader';
+import { decodeHDRFunction, encodeHDRFunction } from '../util.glsl';
+
+export const lensflareCompositeFragment = new FragmentShader({
+  name: 'lensflareFrag'
+  defines: {
+    SAMPLE_NUMBER: 8
+  },
+  uniforms: {
+    texture: uniform('sampler2D'),
+    lenscolor: uniform('sampler2D'),
+    textureSize: uniform('vec2', [512, 512]),
+    dispersal: uniform('float', 0.3),
+    haloWidth: uniform('float', 0.4),
+    distortion: uniform('float', 1.0)
+  },
+  main: glsl`
+${encodeHDRFunction()}
+${decodeHDRFunction()}
+
+vec4 textureDistorted(
+  in vec2 texcoord,
+  in vec2 direction,
+  in vec3 distortion
+) {
+  return vec4(
+    decodeHDR(texture2D(texture, texcoord + direction * distortion.r)).r,
+    decodeHDR(texture2D(texture, texcoord + direction * distortion.g)).g,
+    decodeHDR(texture2D(texture, texcoord + direction * distortion.b)).b,
+    1.0
+  );
+}
+
+void main()
+{
+  vec2 texcoord = -v_Texcoord + vec2(1.0); // Flip texcoords
+  vec2 textureOffset = 1.0 / textureSize;
+
+  vec2 ghostVec = (vec2(0.5) - texcoord) * dispersal;
+  vec2 haloVec = normalize(ghostVec) * haloWidth;
+
+  vec3 distortion = vec3(-textureOffset.x * distortion, 0.0, textureOffset.x * distortion);
+  //Sample ghost
+  vec4 result = vec4(0.0);
+  for (int i = 0; i < SAMPLE_NUMBER; i++) {
+    vec2 offset = fract(texcoord + ghostVec * float(i));
+
+    float weight = length(vec2(0.5) - offset) / length(vec2(0.5));
+    weight = pow(1.0 - weight, 10.0);
+
+    result += textureDistorted(offset, normalize(ghostVec), distortion) * weight;
+  }
+
+  result *= texture2D(lenscolor, vec2(length(vec2(0.5) - texcoord)) / length(vec2(0.5)));
+  //Sample halo
+  float weight = length(vec2(0.5) - fract(texcoord + haloVec)) / length(vec2(0.5));
+  weight = pow(1.0 - weight, 10.0);
+  vec2 offset = fract(texcoord + haloVec);
+  result += textureDistorted(offset, normalize(ghostVec), distortion) * weight;
+
+  gl_FragColor = result;
+}`
+});
