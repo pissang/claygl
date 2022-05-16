@@ -1,8 +1,15 @@
 import * as vec3 from './glmatrix/vec3';
 import * as mat4 from './glmatrix/mat4';
 import BoundingBox from './math/BoundingBox';
-import GeometryBase, { AttributeValue, GeometryAttribute, GeometryBaseOpts } from './GeometryBase';
+import GeometryBase, {
+  AttributeSize,
+  AttributeType,
+  AttributeValue,
+  GeometryAttribute,
+  GeometryBaseOpts
+} from './GeometryBase';
 import type Matrix4 from './math/Matrix4';
+import { AttributeSemantic } from './Shader';
 
 export interface GeometryOpts extends GeometryBaseOpts {}
 
@@ -103,16 +110,24 @@ class Geometry extends GeometryBase {
   };
   constructor(opts?: Partial<GeometryOpts>) {
     super(opts);
-
-    this.createAttribute('position', 'float', 3, 'POSITION');
-    this.createAttribute('texcoord0', 'float', 2, 'TEXCOORD_0');
-    this.createAttribute('texcoord1', 'float', 2, 'TEXCOORD_1');
-    this.createAttribute('normal', 'float', 3, 'NORMAL');
-    this.createAttribute('tangent', 'float', 4, 'TANGENT');
-    this.createAttribute('color', 'float', 4, 'COLOR');
-    this.createAttribute('weight', 'float', 3, 'WEIGHT');
-    this.createAttribute('joint', 'float', 4, 'JOINT');
-    this.createAttribute('barycentric', 'float', 3);
+    [
+      ['position', 'float', 3, 'POSITION'],
+      ['normal', 'float', 3, 'NORMAL'],
+      ['texcoord0', 'float', 2, 'TEXCOORD_0'],
+      ['color', 'float', 4, 'COLOR'],
+      ['tangent', 'float', 4, 'TANGENT'],
+      ['weight', 'float', 3, 'WEIGHT'],
+      ['joint', 'float', 4, 'JOINT'],
+      ['barycentric', 'float', 3],
+      ['texcoord1', 'float', 2, 'TEXCOORD_1']
+    ].forEach(([name, type, size, semantic]) => {
+      this.createAttribute(
+        name as string,
+        type as AttributeType,
+        size as AttributeSize,
+        semantic as AttributeSemantic
+      );
+    });
   }
   /**
    * Update boundingBox of Geometry

@@ -54,8 +54,6 @@ class GLBuffers {
   private _indicesBuffer?: GLIndicesBuffer;
   private _geometry: GeometryBase;
 
-  private _instancedBuffer?: GLAttributeBuffer[];
-
   private _vao?: any;
   private _vaoExt?: any;
 
@@ -103,6 +101,7 @@ class GLBuffers {
           // TODO: Use BufferSubData?
           gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
           gl.bufferData(gl.ARRAY_BUFFER, attribute.value as Float32Array, DRAW);
+          attribute.__dirty = false;
         }
 
         attributeBuffers[k] = new GLAttributeBuffer(
@@ -130,6 +129,7 @@ class GLBuffers {
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geometry.indices!, DRAW);
     }
+    geometry.__indicesDirty = false;
   }
 
   bindToProgram(gl: WebGLRenderingContext, program: GLProgram) {
@@ -175,7 +175,7 @@ class GLBuffers {
 
       gl.bindBuffer(constants.ARRAY_BUFFER, buffer);
       gl.vertexAttribPointer(attrIndex, size, glType, false, 0, 0);
-      if (i >= enabledAttributeCount) {
+      if (attrIndex >= enabledAttributeCount) {
         gl.enableVertexAttribArray(attrIndex);
       }
       attrIndex++;
@@ -197,11 +197,11 @@ class GLBuffers {
     // }
   }
 
-  unbind(gl: WebGLRenderingContext) {
-    // if (this._vao) {
-    //   this._vaoExt.bindVertexArrayOES(null);
-    // }
-  }
+  // unbind(gl: WebGLRenderingContext) {
+  //   if (this._vao) {
+  //     this._vaoExt.bindVertexArrayOES(null);
+  //   }
+  // }
 
   /**
    * Dispose geometry data in GL context.
@@ -209,9 +209,8 @@ class GLBuffers {
   dispose(gl: WebGLRenderingContext) {
     const attributeBuffers = this._attributeBuffers;
     const indicesBuffer = this._indicesBuffer;
-    for (let k = 0; k < attributeBuffers.length; k++) {
-      gl.deleteBuffer(attributeBuffers[k].buffer);
-    }
+
+    attributeBuffers && attributeBuffers.forEach((buffer) => gl.deleteBuffer(buffer.buffer));
 
     if (indicesBuffer) {
       gl.deleteBuffer(indicesBuffer);

@@ -2,11 +2,6 @@ import { GLRenderer, GeometryBase, Shader, glsl, setCanvasSize } from 'claygl';
 
 const { uniform, attribute } = Shader;
 
-const TRIANGLE_POSITIONS = [
-  [-0.5, -0.5, 0],
-  [0.5, -0.5, 0],
-  [0, 0.5, 0]
-];
 const canvas = document.getElementById('main') as HTMLCanvasElement;
 setCanvasSize(canvas, 400, 400);
 const gl = canvas.getContext('webgl')!;
@@ -15,7 +10,11 @@ const renderer = new GLRenderer(gl);
 
 const geometry = new GeometryBase();
 geometry.createAttribute('position', 'float', 3, 'POSITION');
-geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
+geometry.attributes.position.fromArray([
+  [-0.5, -0.5, 0],
+  [0.5, -0.5, 0],
+  [0, 0.5, 0]
+]);
 
 const vs = new Shader.Vertex({
   attributes: {
@@ -38,30 +37,19 @@ void main() {
 });
 
 const shader = new Shader(vs, fs);
-const material = {
-  shader,
-  uniforms: shader.createUniforms()
-};
+const uniforms = shader.createUniforms();
 
-renderer.render([
-  {
-    geometry,
-    material
-  }
-]);
-
-const colors = [
-  [1, 0, 0],
-  [0, 0, 1]
-];
 let idx = 0;
-setInterval(() => {
-  idx = 1 - idx;
-  material.uniforms.color.value = colors[idx] as [number, number, number];
+function render() {
+  uniforms.color.value = idx ? [1, 0, 0] : [0, 0, 1];
   renderer.render([
     {
       geometry,
-      material
+      material: { shader, uniforms }
     }
   ]);
-}, 1000);
+  idx = 1 - idx;
+}
+
+setInterval(render, 500);
+render();

@@ -116,79 +116,31 @@ export class GeometryAttribute<TSize extends AttributeSize = AttributeSize> {
           this.value![target] = this.value![source];
         };
         break;
-      case 2:
+      default:
         this.get = function (this: GeometryAttribute<TSize>, idx: number, out: number[]) {
           const arr = this.value!;
-          out[0] = arr[idx * 2];
-          out[1] = arr[idx * 2 + 1];
+          idx *= size;
+          for (let i = 0; i < size; i++) {
+            out[i] = arr[idx + i];
+          }
           return out;
         } as any;
         this.set = function (this: GeometryAttribute<TSize>, idx: number, val: number[]) {
           const arr = this.value!;
-          arr[idx * 2] = val[0];
-          arr[idx * 2 + 1] = val[1];
+          idx *= size;
+          for (let i = 0; i < size; i++) {
+            arr[idx + i] = val[i];
+          }
         } as any;
         this.copy = function (target, source) {
           const arr = this.value!;
-          source *= 2;
-          target *= 2;
-          arr[target] = arr[source];
-          arr[target + 1] = arr[source + 1];
+          source *= size;
+          target *= size;
+          for (let i = 0; i < size; i++) {
+            arr[target + i] = arr[source + i];
+          }
         };
         break;
-      case 3:
-        this.get = function (this: GeometryAttribute<TSize>, idx: number, out: number[]) {
-          const idx3 = idx * 3;
-          const arr = this.value!;
-          out[0] = arr[idx3];
-          out[1] = arr[idx3 + 1];
-          out[2] = arr[idx3 + 2];
-          return out;
-        } as any;
-        this.set = function (this: GeometryAttribute<TSize>, idx: number, val: number[]) {
-          const idx3 = idx * 3;
-          const arr = this.value!;
-          arr[idx3] = val[0];
-          arr[idx3 + 1] = val[1];
-          arr[idx3 + 2] = val[2];
-        } as any;
-        this.copy = function (target, source) {
-          const arr = this.value!;
-          source *= 3;
-          target *= 3;
-          arr[target] = arr[source];
-          arr[target + 1] = arr[source + 1];
-          arr[target + 2] = arr[source + 2];
-        };
-        break;
-      default: // 4
-        this.get = function (this: GeometryAttribute<TSize>, idx: number, out: number[]) {
-          const arr = this.value!;
-          const idx4 = idx * 4;
-          out[0] = arr[idx4];
-          out[1] = arr[idx4 + 1];
-          out[2] = arr[idx4 + 2];
-          out[3] = arr[idx4 + 3];
-          return out;
-        } as any;
-        this.set = function (this: GeometryAttribute<TSize>, idx: number, val: number[]) {
-          const arr = this.value!;
-          const idx4 = idx * 4;
-          arr[idx4] = val[0];
-          arr[idx4 + 1] = val[1];
-          arr[idx4 + 2] = val[2];
-          arr[idx4 + 3] = val[3];
-        } as any;
-        this.copy = function (target, source) {
-          const arr = this.value!;
-          source *= 4;
-          target *= 4;
-          // copyWithin is extremely slow
-          arr[target] = arr[source];
-          arr[target + 1] = arr[source + 1];
-          arr[target + 2] = arr[source + 2];
-          arr[target + 3] = arr[source + 3];
-        };
     }
   }
   /**

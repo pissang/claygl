@@ -41,6 +41,8 @@ class GLProgram {
 
   private _program?: WebGLProgram;
 
+  private _cachedAttribLoc: Record<string, number> = {};
+
   // Error message
   __error?: string;
 
@@ -209,6 +211,15 @@ class GLProgram {
     }
     gl.bindAttribLocation(program!, index, symbol);
     return true;
+  }
+
+  getAttributeLocation(gl: WebGLRenderingContext, name: string) {
+    const cachedAttribLoc = this._cachedAttribLoc;
+    let location = cachedAttribLoc[name];
+    if (location === undefined) {
+      location = cachedAttribLoc[name] = gl.getAttribLocation(this._program!, name);
+    }
+    return location;
   }
 
   buildProgram(

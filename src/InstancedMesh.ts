@@ -9,16 +9,8 @@ import Geometry from './Geometry';
 
 const tmpBoundingBox = new BoundingBox();
 
-export interface InstancedAttributeBuffer {
-  type: AttributeType;
-  symbol: string;
-  divisor: number;
-  size: number;
-  buffer: WebGLBuffer;
-}
-
 interface InstancedAttribute {
-  symbol: string;
+  name: string;
   type: AttributeType;
   size: AttributeSize;
   divisor: number;
@@ -46,9 +38,9 @@ class InstancedMesh<T extends Material = Material> extends Mesh<T> {
   instancedAttributes: Record<string, InstancedAttribute> = {};
 
   boundingBox?: BoundingBox;
-  private _attributesSymbols: string[] = [];
+  private _attributesNames: string[] = [];
 
-  private __dirty: boolean = true;
+  __dirty: boolean = true;
 
   constructor(geometry: Geometry, material: T, opts?: Partial<InstancedMeshOpts>) {
     super(geometry, material, opts);
@@ -67,73 +59,39 @@ class InstancedMesh<T extends Material = Material> extends Mesh<T> {
     return this.instances.length;
   }
 
-  removeAttribute(symbol: string) {
-    const idx = this._attributesSymbols.indexOf(symbol);
+  removeAttribute(name: string) {
+    const idx = this._attributesNames.indexOf(name);
     if (idx >= 0) {
-      this._attributesSymbols.splice(idx, 1);
+      this._attributesNames.splice(idx, 1);
     }
-    delete this.instancedAttributes[symbol];
+    delete this.instancedAttributes[name];
   }
 
   createInstancedAttribute(
-    symbol: string,
+    name: string,
     type: AttributeType,
     size: AttributeSize,
     divisor: number
   ) {
-    if (this.instancedAttributes[symbol]) {
+    if (this.instancedAttributes[name]) {
       return;
     }
-    this.instancedAttributes[symbol] = {
-      symbol: symbol,
-      type: type,
-      size: size,
+    this.instancedAttributes[name] = {
+      name,
+      type,
+      size,
       divisor: divisor == null ? 1 : divisor
     };
 
-    this._attributesSymbols.push(symbol);
+    this._attributesNames.push(name);
   }
 
-  getInstancedAttributesBuffers(renderer: Renderer) {
-    const cache = this._cache;
-
-    cache.use(renderer.__uid__);
-
-    const buffers: InstancedAttributeBuffer[] = cache.get('buffers') || [];
-
-    if (cache.isDirty('dirty')) {
-      const gl = renderer.gl;
-
-      for (let i = 0; i < this._attributesSymbols.length; i++) {
-        const attr = this.instancedAttributes[this._attributesSymbols[i]];
-
-        let bufferObj = buffers[i];
-        if (!bufferObj) {
-          bufferObj = {
-            buffer: gl.createBuffer()
-          } as InstancedAttributeBuffer;
-          buffers[i] = bufferObj;
-        }
-        bufferObj.symbol = attr.symbol;
-        bufferObj.divisor = attr.divisor;
-        bufferObj.size = attr.size;
-        bufferObj.type = attr.type;
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, bufferObj.buffer);
-        // TODO Type
-        gl.bufferData(gl.ARRAY_BUFFER, attr.value as any as ArrayBufferView, gl.DYNAMIC_DRAW);
-      }
-
-      cache.fresh('dirty');
-
-      cache.put('buffers', buffers);
-    }
-
-    return buffers;
+  getInstancedAttributes() {
+    return this._attributesNames;
   }
 
   update() {
-    Mesh.prototype.update.call(this);
+    super.update();
 
     const arraySize = this.getInstanceCount() * 4;
     const instancedAttributes = this.instancedAttributes;

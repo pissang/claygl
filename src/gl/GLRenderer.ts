@@ -15,9 +15,10 @@ import type FrameBuffer from '../FrameBuffer';
 import Texture2D from '../Texture2D';
 import GLTexture from './GLTexture';
 import TextureCube from '../TextureCube';
-import GLBuffers from './GLBuffers';
+import GLBuffers, { GLIndicesBuffer } from './GLBuffers';
 import * as constants from '../core/constants';
 import Shader, { ShaderDefineValue, ShaderPrecision } from '../Shader';
+import GLInstancedBuffers from './GLInstancedBuffers';
 
 const errorShader: Record<string, boolean> = {};
 
@@ -25,7 +26,7 @@ function defaultGetMaterial(renderable: RenderableObject) {
   return renderable.material;
 }
 function defaultGetUniform(renderable: RenderableObject, material: MaterialObject, symbol: string) {
-  return material.uniforms[symbol].value;
+  return material.uniforms![symbol].value;
 }
 function defaultIsMaterialChanged(
   renderable: RenderableObject,
@@ -161,7 +162,8 @@ class GLRenderer {
   private _glext: GLExtension;
 
   private _glTextureMap = new WeakMap<Texture, GLTexture>();
-  private _glBufferMap = new WeakMap<GeometryBase, GLBuffers>();
+  private _glBuffersMap = new WeakMap<GeometryBase, GLBuffers>();
+  private _glInstancedBufferMap = new WeakMap<InstancedMesh, GLInstancedBuffers>();
 
   throwError: boolean;
 
@@ -209,7 +211,7 @@ class GLRenderer {
     // Some common builtin uniforms
     const gl = this.gl;
 
-    let prevMaterial: Material | undefined;
+    let prevMaterial: MaterialObject | undefined;
     let prevProgram: GLProgram | undefined;
     let prevRenderable: RenderableObject | undefined;
 
@@ -318,9 +320,11 @@ class GLRenderer {
       // TODO Not update skeleton in each renderable.
       this._updateSkeleton(renderable as Mesh, program, materialTakesTextureSlot!);
       if (drawIDChanged) {
-        let buffers = this._glBufferMap.get(geometry);
+        const glBuffersMap = this._glBuffersMap;
+        let buffers = glBuffersMap.get(geometry);
         if (!buffers) {
           buffers = new GLBuffers(geometry);
+          glBuffersMap.set(geometry, buffers);
         }
         buffers.bindToProgram(gl, program);
         currentBuffers = buffers;
@@ -388,6 +392,7 @@ class GLRenderer {
     }
     if (texture.__dirty) {
       glTexture.update(this.gl, this._glext);
+      texture.__dirty = false;
     }
     return glTexture;
   }
@@ -420,7 +425,7 @@ class GLRenderer {
           object.__uid__,
           object.joints
         );
-        program.useTextureSlot(gl, skinMatricesTexture, slot);
+        program.useTextureSlot(gl, this._getGLTexture(skinMatricesTexture), slot);
         program.set(gl, '1i', 'skinMatricesTexture', slot);
         program.set(gl, '1f', 'skinMatricesTextureSize', skinMatricesTexture.width);
       } else {
@@ -440,22 +445,25 @@ class GLRenderer {
       glDrawMode = 0x0004;
     }
 
-    let ext = null;
+    let instancedExt = null;
     const isInstanced = renderable.isInstancedMesh && renderable.isInstancedMesh();
     if (isInstanced) {
-      ext = glext.getExtension('ANGLE_instanced_arrays');
-      if (!ext) {
+      instancedExt = glext.getExtension('ANGLE_instanced_arrays');
+      if (!instancedExt) {
         console.warn('Device not support ANGLE_instanced_arrays extension');
         return;
       }
     }
 
-    let instancedAttrLocations: {
-      location: number;
-      enabled: boolean;
-    }[];
+    let instancedAttrLocations: number[] | undefined;
     if (isInstanced) {
-      instancedAttrLocations = this._bindInstancedAttributes(renderable, program, ext);
+      const instancedBufferMap = this._glInstancedBufferMap;
+      let buffer = instancedBufferMap.get(renderable as InstancedMesh);
+      if (!buffer) {
+        buffer = new GLInstancedBuffers(renderable as InstancedMesh);
+        instancedBufferMap.set(renderable as InstancedMesh, buffer);
+      }
+      instancedAttrLocations = buffer.bindToProgram(this.gl, program, instancedExt);
     }
 
     const indicesBuffer = buffer.getIndicesBuffer();
@@ -466,7 +474,7 @@ class GLRenderer {
       const indicesType = useUintExt ? constants.UNSIGNED_INT : constants.UNSIGNED_SHORT;
 
       if (isInstanced) {
-        ext.drawElementsInstancedANGLE(
+        instancedExt.drawElementsInstancedANGLE(
           glDrawMode,
           indicesBuffer.count,
           indicesType,
@@ -478,7 +486,7 @@ class GLRenderer {
       }
     } else {
       if (isInstanced) {
-        ext.drawArraysInstancedANGLE(
+        instancedExt.drawArraysInstancedANGLE(
           glDrawMode,
           0,
           geometry.vertexCount,
@@ -491,46 +499,12 @@ class GLRenderer {
       }
     }
 
-    if (isInstanced) {
-      for (let i = 0; i < instancedAttrLocations!.length; i++) {
-        if (!instancedAttrLocations![i].enabled) {
-          _gl.disableVertexAttribArray(instancedAttrLocations![i].location);
-        }
-        ext.vertexAttribDivisorANGLE(instancedAttrLocations![i].location, 0);
+    if (instancedAttrLocations) {
+      for (let i = 0; i < instancedAttrLocations.length; i++) {
+        _gl.disableVertexAttribArray(instancedAttrLocations[i]);
+        instancedExt.vertexAttribDivisorANGLE(instancedAttrLocations[i], 0);
       }
     }
-  }
-
-  private _bindInstancedAttributes(renderable: InstancedMesh, program: GLProgram, ext: any) {
-    const gl = this.gl;
-    const instancedBuffers = renderable.getInstancedAttributesBuffers(this);
-    const locations: {
-      location: number;
-      enabled: boolean;
-    }[] = [];
-
-    for (let i = 0; i < instancedBuffers.length; i++) {
-      const bufferObj = instancedBuffers[i];
-      const location = program.getAttribLocation(gl, bufferObj.symbol);
-      if (location < 0) {
-        continue;
-      }
-
-      const glType = attributeBufferTypeMap[bufferObj.type] || constants.FLOAT;
-      const isEnabled = program.isAttribEnabled(gl, location);
-      if (!program.isAttribEnabled(gl, location)) {
-        gl.enableVertexAttribArray(location);
-      }
-      locations.push({
-        location: location,
-        enabled: isEnabled
-      });
-      gl.bindBuffer(constants.ARRAY_BUFFER, bufferObj.buffer);
-      gl.vertexAttribPointer(location, bufferObj.size, glType, false, 0, 0);
-      ext.vertexAttribDivisorANGLE(location, bufferObj.divisor);
-    }
-
-    return locations;
   }
 
   private _getBlankTexture() {
@@ -567,7 +541,11 @@ class GLRenderer {
       : enabledUniforms.filter(
           (uniformName) => uniforms[uniformName].type === 't' || uniforms[uniformName].type === 'tv'
         );
-    const placeholderTexture = this._getBlankTexture();
+    const placeholderTexture = this._getGLTexture(this._getBlankTexture());
+
+    const getGLTexture = (texture: Texture) => {
+      return texture.isRenderable() ? this._getGLTexture(texture) : placeholderTexture;
+    };
 
     for (let u = 0; u < textureUniforms.length; u++) {
       const symbol = textureUniforms[u];
@@ -575,17 +553,15 @@ class GLRenderer {
       const uniformType = uniforms[symbol].type;
       if (uniformType === 't' && uniformValue) {
         // Reset slot
-        uniformValue.__slot = -1;
+        getGLTexture(uniformValue).slot = -1;
       } else if (uniformType === 'tv') {
         for (let i = 0; i < uniformValue.length; i++) {
           if (uniformValue[i]) {
-            uniformValue[i].__slot = -1;
+            getGLTexture(uniformValue[i]).slot = -1;
           }
         }
       }
     }
-
-    placeholderTexture.__slot = -1;
 
     // Set uniforms
     for (let u = 0; u < enabledUniforms.length; u++) {
@@ -633,7 +609,7 @@ class GLRenderer {
           const res = program.set(gl, '1i', symbol, slot);
           if (res) {
             // Texture uniform is enabled
-            program.takeCurrentTextureSlot(gl, uniformValue as Texture);
+            program.takeCurrentTextureSlot(gl, getGLTexture(uniformValue));
             uniformValue.__slot = slot;
           }
         }
@@ -653,15 +629,15 @@ class GLRenderer {
 
           const arr = [];
           for (let i = 0; i < uniformValue.length; i++) {
-            const texture = uniformValue[i] as Texture;
+            const texture = getGLTexture(uniformValue[i]);
 
-            if (texture.__slot < 0) {
+            if (texture.slot < 0) {
               const slot = program.currentTextureSlot();
               arr.push(slot);
               program.takeCurrentTextureSlot(gl, texture);
-              texture.__slot = slot;
+              texture.slot = slot;
             } else {
-              arr.push(texture.__slot);
+              arr.push(texture.slot);
             }
           }
 
@@ -684,7 +660,7 @@ class GLRenderer {
    * @param {clay.Geometry} geometry
    */
   disposeGeometry(geometry: GeometryBase) {
-    const buffers = this._glBufferMap.get(geometry);
+    const buffers = this._glBuffersMap.get(geometry);
     buffers && buffers.dispose(this.gl);
   }
 
@@ -703,6 +679,13 @@ class GLRenderer {
    */
   disposeFrameBuffer(frameBuffer: FrameBuffer) {
     frameBuffer.dispose(this);
+  }
+
+  disposeInstancedMesh(mesh: InstancedMesh) {
+    const buffers = this._glInstancedBufferMap.get(mesh as InstancedMesh);
+    if (buffers) {
+      buffers.dispose(this.gl);
+    }
   }
 }
 
