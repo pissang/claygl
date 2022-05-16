@@ -124,3 +124,6 @@ export { default as DeferredRenderer } from './deferred/Renderer';
 export { default as ParticleEmitter } from './particle/Emitter';
 export { default as ParticleRenderable } from './particle/ParticleRenderable';
 export { default as ForceField } from './particle/ForceField';
+
+// Some useful types
+// export { RenderHooks, RenderableObject, MaterialObject };

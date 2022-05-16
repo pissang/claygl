@@ -1,4 +1,4 @@
-import { GLRenderer, GeometryBase, Material, Shader, glsl, setCanvasSize } from 'claygl';
+import { GLRenderer, GeometryBase, Shader, glsl, setCanvasSize } from 'claygl';
 
 const { uniform, attribute } = Shader;
 
@@ -28,7 +28,7 @@ void main() {
 });
 const fs = new Shader.Fragment({
   uniforms: {
-    color: uniform('rgb', 'red')
+    color: uniform('rgb', [1, 0, 0])
   },
   main: glsl`
 void main() {
@@ -37,7 +37,11 @@ void main() {
 `
 });
 
-const material = new Material(new Shader(vs, fs));
+const shader = new Shader(vs, fs);
+const material = {
+  shader,
+  uniforms: shader.createUniforms()
+};
 
 renderer.render([
   {
@@ -45,3 +49,19 @@ renderer.render([
     material
   }
 ]);
+
+const colors = [
+  [1, 0, 0],
+  [0, 0, 1]
+];
+let idx = 0;
+setInterval(() => {
+  idx = 1 - idx;
+  material.uniforms.color.value = colors[idx] as [number, number, number];
+  renderer.render([
+    {
+      geometry,
+      material
+    }
+  ]);
+}, 1000);

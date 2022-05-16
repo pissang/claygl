@@ -7,16 +7,7 @@ import Shader, {
   VertexShader,
   FragmentShader
 } from './Shader';
-import Texture from './Texture';
-
-type MaterialUniformValue =
-  | number
-  | string
-  | ArrayLike<number>
-  | Texture
-  | ArrayLike<number>[]
-  | Texture[]
-  | number[];
+import { defaultGetMaterialProgramKey } from './gl/ProgramManager';
 
 const programKeyCache: Record<string, string> = {};
 
@@ -38,23 +29,10 @@ function getProgramKey(
   fragmentDefines: Record<string, ShaderDefineValue>,
   enabledTextures: string[]
 ) {
-  enabledTextures.sort();
-  const defineStr = [];
-  for (let i = 0; i < enabledTextures.length; i++) {
-    const symbol = enabledTextures[i];
-    defineStr.push(symbol);
-  }
-  const key =
-    getDefineCode(vertexDefines) +
-    '\n' +
-    getDefineCode(fragmentDefines) +
-    '\n' +
-    defineStr.join('\n');
-
+  const key = defaultGetMaterialProgramKey(vertexDefines, fragmentDefines, enabledTextures);
   if (programKeyCache[key]) {
     return programKeyCache[key];
   }
-
   const id = util.genGUID() + '';
   programKeyCache[key] = id;
   return id;
@@ -173,7 +151,7 @@ class Material<
     this.depthMask = util.optional(opts.depthMask, true);
     this.blend = opts.blend;
     this.transparent = opts.transparent || false;
-    this.precision = opts.precision || 'highp';
+    this.precision = opts.precision || 'mediump';
 
     util.assign(this.vertexDefines, opts.vertexDefines);
     util.assign(this.fragmentDefines, opts.fragmentDefines);

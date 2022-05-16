@@ -3,12 +3,12 @@
 // TODO struct uniform
 // TODO createUniform can be assigned to varying and attributes.
 
-import { parseToFloat } from './core/color';
+// import { parseToFloat } from './core/color';
 import { Dict, UnionToIntersection } from './core/type';
 import { assign, genGUID, isString, keys } from './core/util';
 import { mat2, mat3, mat4, vec2, vec3, vec4 } from './glmatrix';
 import Texture2D from './Texture2D';
-import TextureCube, { cubeTargets } from './TextureCube';
+import TextureCube from './TextureCube';
 
 export type ShaderDefineValue = boolean | string | number | undefined | null;
 export type ShaderPrecision = 'highp' | 'lowp' | 'mediump';
@@ -198,11 +198,12 @@ type ShaderVaringLoose = {
 export function createUniform<
   T extends NativeUniformType,
   S extends MatrixSemantic | UniformSemantic
->(type: T, value?: NativeUniformValueMap[T], semantic?: S) {
+  // don't support string color to be default value.
+  // Avoid including color as core module.
+>(type: T, value?: Exclude<NativeUniformValueMap[T], string>, semantic?: S) {
   return {
     type,
-    // TODO, omit undefined here?
-    value,
+    value: value as NativeUniformValueMap[T],
     semantic
   };
 }
@@ -571,7 +572,7 @@ export class Shader<
       };
     });
 
-    return uniforms;
+    return uniforms as Shader<V, F>['uniformTpls'];
   }
 
   constructor(vert: V, frag: F) {
@@ -620,11 +621,13 @@ export class Shader<
             matrixSemantics.push(uniformSemantic as MatrixSemantic);
           }
         }
-        // TODO
-        (materialUniformObj as any).value =
-          (uniformType === 'rgb' || uniformType === 'rgba') && isString(uniformValue)
-            ? parseToFloat(uniformValue)
-            : uniformValue;
+        // don't support string color to be default value.
+        // Avoid including color as core module.
+        // (materialUniformObj as any).value =
+        //   (uniformType === 'rgb' || uniformType === 'rgba') && isString(uniformValue)
+        //     ? parseToFloat(uniformValue)
+        //     : uniformValue;
+        (materialUniformObj as any).value = uniformValue;
 
         (uniformsTpls as any)[uniformName] = materialUniformObj;
       });

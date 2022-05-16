@@ -9,7 +9,7 @@ import Mesh from '../Mesh';
 import Skeleton from '../Skeleton';
 import GLProgram from './GLProgram';
 import ProgramManager from './ProgramManager';
-import { genGUID, optional } from '../core/util';
+import { genGUID, keys, optional } from '../core/util';
 import type Texture from '../Texture';
 import type FrameBuffer from '../FrameBuffer';
 import Texture2D from '../Texture2D';
@@ -17,20 +17,21 @@ import GLTexture from './GLTexture';
 import TextureCube from '../TextureCube';
 import GLBuffers from './GLBuffers';
 import * as constants from '../core/constants';
+import Shader, { ShaderDefineValue, ShaderPrecision } from '../Shader';
 
 const errorShader: Record<string, boolean> = {};
 
 function defaultGetMaterial(renderable: RenderableObject) {
   return renderable.material;
 }
-function defaultGetUniform(renderable: RenderableObject, material: Material, symbol: string) {
+function defaultGetUniform(renderable: RenderableObject, material: MaterialObject, symbol: string) {
   return material.uniforms[symbol].value;
 }
 function defaultIsMaterialChanged(
   renderable: RenderableObject,
   prevRenderable: RenderableObject,
-  material: Material,
-  prevMaterial: Material
+  material: MaterialObject,
+  prevMaterial: MaterialObject
 ) {
   return material !== prevMaterial;
 }
@@ -39,12 +40,37 @@ function defaultIfRender() {
 }
 
 function noop() {}
+
+/**
+ * A very basic material that is used in renderPass
+ */
+export interface MaterialObject {
+  shader: Shader;
+  uniforms?: Shader['uniformTpls'];
+
+  depthTest?: boolean;
+  depthMask?: boolean;
+  transparent?: boolean;
+
+  blend?: (gl: WebGLRenderingContext) => void;
+
+  precision?: ShaderPrecision;
+
+  vertexDefines?: Record<string, ShaderDefineValue>;
+  fragmentDefines?: Record<string, ShaderDefineValue>;
+
+  getEnabledUniforms?(): string[];
+  getTextureUniforms?(): string[];
+
+  getEnabledTextures?(): string[];
+  getProgramKey?(): string;
+}
 /**
  * A very basic renderable that is used in renderPass
  */
 export interface RenderableObject {
   geometry: GeometryBase;
-  material: Material;
+  material: MaterialObject;
   mode?: GLEnum;
   lightGroup?: number;
   worldTransform?: Matrix4;
@@ -69,26 +95,29 @@ export interface ExtendedRenderableObject extends RenderableObject {
   renderOrder: number;
 }
 
-export interface RenderHooks<T extends RenderableObject = RenderableObject> {
+export interface RenderHooks<
+  T extends RenderableObject = RenderableObject,
+  S extends MaterialObject = MaterialObject
+> {
   ifRender?(renderable: T): boolean;
   /**
    * Get material of renderable
    */
-  getMaterial?(renderable: T): Material;
+  getMaterial?(renderable: T): MaterialObject;
 
   /**
    * Get uniform from material
    */
-  getUniform?(renderable: T, material: Material, symbol: string): any;
+  getUniform?(renderable: T, material: S, symbol: string): any;
 
   /**
    * Get common shader header code in shader for program.
    */
-  getShaderDefineCode?(renderable: T, material: Material): string;
+  getShaderDefineCode?(renderable: T, material: S): string;
   /**
    * Get extra key for program
    */
-  getProgramKey?(renderable: T, material: Material): string;
+  getProgramKey?(renderable: T, material: S): string;
   /**
    * Set common uniforms once for each program
    */
@@ -98,18 +127,22 @@ export interface RenderHooks<T extends RenderableObject = RenderableObject> {
    * Set uniforms for each program.
    * Uniform in material will be set automatically
    */
-  renderableChanged?(renderable: T, material: Material, program: GLProgram): void;
+  renderableChanged?(renderable: T, material: S, program: GLProgram): void;
 
   isMaterialChanged?(
     renderable: T,
     prevRenderable: T,
-    material: Material,
-    prevMaterial: Material
+    material: MaterialObject,
+    prevMaterial: MaterialObject
   ): boolean;
 
   sortCompare?: (a: T & ExtendedRenderableObject, b: T & ExtendedRenderableObject) => number;
 
-  beforeRender?: (renderable: T, material: Material, prevMaterial: Material | undefined) => void;
+  beforeRender?: (
+    renderable: T,
+    material: MaterialObject,
+    prevMaterial: MaterialObject | undefined
+  ) => void;
   afterRender?: (renderable: T) => void;
 }
 
@@ -234,7 +267,7 @@ class GLRenderer {
         }
         if (material.depthMask !== depthMask) {
           depthMask = material.depthMask;
-          gl.depthMask(depthMask);
+          gl.depthMask(depthMask || false);
         }
         if (material.transparent !== transparent) {
           transparent = material.transparent;
@@ -511,10 +544,10 @@ class GLRenderer {
 
   private _bindMaterial(
     renderable: RenderableObject,
-    material: Material,
+    material: MaterialObject,
     program: GLProgram,
     prevRenderable: RenderableObject | undefined,
-    prevMaterial: Material | undefined,
+    prevMaterial: MaterialObject | undefined,
     prevProgram: GLProgram | undefined,
     getUniformValue: RenderHooks['getUniform']
   ) {
@@ -524,15 +557,22 @@ class GLRenderer {
     // May use shader of other material if shader code are same
     const sameProgram = prevProgram === program;
 
+    const uniforms = material.uniforms || {};
     const currentTextureSlot = program.currentTextureSlot();
-    const enabledUniforms = material.getEnabledUniforms();
-    const textureUniforms = material.getTextureUniforms();
+    const enabledUniforms = material.getEnabledUniforms
+      ? material.getEnabledUniforms()
+      : keys(uniforms);
+    const textureUniforms = material.getTextureUniforms
+      ? material.getTextureUniforms()
+      : enabledUniforms.filter(
+          (uniformName) => uniforms[uniformName].type === 't' || uniforms[uniformName].type === 'tv'
+        );
     const placeholderTexture = this._getBlankTexture();
 
     for (let u = 0; u < textureUniforms.length; u++) {
       const symbol = textureUniforms[u];
       const uniformValue = getUniformValue!(renderable, material, symbol);
-      const uniformType = material.uniforms[symbol].type;
+      const uniformType = uniforms[symbol].type;
       if (uniformType === 't' && uniformValue) {
         // Reset slot
         uniformValue.__slot = -1;
@@ -550,7 +590,7 @@ class GLRenderer {
     // Set uniforms
     for (let u = 0; u < enabledUniforms.length; u++) {
       const symbol = enabledUniforms[u];
-      const uniform = material.uniforms[symbol];
+      const uniform = material.uniforms![symbol];
       let uniformValue = getUniformValue!(renderable, material, symbol);
       const uniformType = uniform.type;
       const isTexture = uniformType === 't';

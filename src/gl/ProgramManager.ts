@@ -1,7 +1,8 @@
+import { keys } from '../core/util';
 import Material from '../Material';
 import { ShaderDefineValue, ShaderPrecision } from '../Shader';
 import GLProgram from './GLProgram';
-import GLRenderer, { RenderableObject } from './GLRenderer';
+import GLRenderer, { MaterialObject, RenderableObject } from './GLRenderer';
 
 // const loopRegex =
 //   /for\s*?\(int\s*?_idx_\s*=\s*([\w-]+);\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
@@ -100,6 +101,33 @@ function getPrecisionCode(precision: ShaderPrecision) {
   );
 }
 
+function defaultGetEnabledTextures(material: Material) {
+  const uniforms = material.uniforms;
+  return keys(uniforms).filter(
+    (uniformName) => uniforms[uniformName].type === 't' || uniforms[uniformName].type === 'tv'
+  );
+}
+
+export function defaultGetMaterialProgramKey(
+  vertexDefines: Record<string, ShaderDefineValue>,
+  fragmentDefines: Record<string, ShaderDefineValue>,
+  enabledTextures: string[]
+) {
+  enabledTextures.sort();
+  const defineStr = [];
+  for (let i = 0; i < enabledTextures.length; i++) {
+    const symbol = enabledTextures[i];
+    defineStr.push(symbol);
+  }
+  return (
+    getDefineCode(vertexDefines) +
+    '\n' +
+    getDefineCode(fragmentDefines) +
+    '\n' +
+    defineStr.join('\n')
+  );
+}
+
 class ProgramManager {
   private _renderer: GLRenderer;
   private _cache: Record<string, GLProgram> = {};
@@ -109,7 +137,7 @@ class ProgramManager {
 
   getProgram(
     renderable: RenderableObject,
-    material: Material,
+    material: MaterialObject,
     extraKey: string,
     extraDefineCode: string
   ) {
@@ -118,8 +146,17 @@ class ProgramManager {
 
     const isSkinnedMesh = renderable.isSkinnedMesh && renderable.isSkinnedMesh();
     const isInstancedMesh = renderable.isInstancedMesh && renderable.isInstancedMesh();
+    const enabledTextures = material.getEnabledTextures ? material.getEnabledTextures() : [];
     const shader = material.shader!;
-    let key = 's' + material.shader!.shaderID + 'm' + material.getProgramKey();
+    const vertexDefines = material.vertexDefines || {};
+    const fragmentDefines = material.fragmentDefines || {};
+    let key =
+      's' +
+      material.shader!.shaderID +
+      'm' +
+      (material.getProgramKey
+        ? material.getProgramKey()
+        : defaultGetMaterialProgramKey(vertexDefines, fragmentDefines, enabledTextures));
     if (isSkinnedMesh) {
       key += ',sk' + renderable.joints.length;
     }
@@ -136,7 +173,6 @@ class ProgramManager {
     }
 
     const _gl = renderer.gl;
-    const enabledTextures = material.getEnabledTextures();
     let commonDefineCode = '';
     if (isSkinnedMesh) {
       const skinDefines: Record<string, ShaderDefineValue> = {
@@ -157,10 +193,9 @@ class ProgramManager {
     }
     // TODO Optimize key generation
     // VERTEX
-    let vertexDefineStr = commonDefineCode + getDefineCode(material.vertexDefines, enabledTextures);
+    let vertexDefineStr = commonDefineCode + getDefineCode(vertexDefines, enabledTextures);
     // FRAGMENT
-    let fragmentDefineStr =
-      commonDefineCode + getDefineCode(material.fragmentDefines, enabledTextures);
+    let fragmentDefineStr = commonDefineCode + getDefineCode(fragmentDefines, enabledTextures);
 
     const extensions = [
       ['OES_standard_derivatives', 'STANDARD_DERIVATIVES'],
@@ -181,7 +216,7 @@ class ProgramManager {
     const fragmentCode =
       getExtensionCode(extensions) +
       '\n' +
-      getPrecisionCode(material.precision) +
+      getPrecisionCode(material.precision || 'mediump') +
       '\n' +
       fragmentDefineStr +
       '\n' +

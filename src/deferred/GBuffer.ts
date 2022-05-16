@@ -441,7 +441,7 @@ class DeferredGBuffer {
         isMaterialChanged: isMaterialChanged,
         sortCompare: Renderer.opaqueSortCompare
       };
-      renderer._renderPass(gBufferRenderList, camera, passConfig);
+      renderer._renderPass(gBufferRenderList, passConfig);
     }
 
     if (enableTargetTexture4) {
@@ -545,7 +545,7 @@ class DeferredGBuffer {
         sortCompare: Renderer.opaqueSortCompare
       };
 
-      renderer._renderPass(gBufferRenderList, camera, passConfig);
+      renderer.renderPass(gBufferRenderList, passConfig);
     }
 
     renderer.bindSceneRendering();

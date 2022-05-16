@@ -1,6 +1,5 @@
-import { assign, genGUID, keys } from '../core/util';
+import { assign, genGUID } from '../core/util';
 import Shader, { AttributeSemantic, UniformSemantic } from '../Shader';
-import type Texture from '../Texture';
 import * as constants from '../core/constants';
 import GLTexture from './GLTexture';
 
@@ -37,7 +36,6 @@ class GLProgram {
   vertexCode: string = '';
   fragmentCode: string = '';
 
-  private _attrLocations: Record<string, number> = {};
   private _uniformLocations: Record<string, WebGLUniformLocation> = {};
   private _textureSlot: number = 0;
 
