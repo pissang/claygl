@@ -20,11 +20,10 @@ class FrameBuffer {
 
   private _textures: Record<
     string,
-    | {
-        texture: Texture;
-        target: GLEnum;
-      }
-    | undefined
+    {
+      texture: Texture;
+      target: GLEnum;
+    }
   > = {};
   private _boundRenderer?: Renderer;
 
@@ -98,7 +97,7 @@ class FrameBuffer {
    */
   unbind(renderer: Renderer) {
     // Remove status record on renderer
-    renderer.__currentFrameBuffer = undefined;
+    renderer.setFrameBuffer(undefined);
 
     this._boundRenderer = undefined;
 
@@ -151,6 +150,12 @@ class FrameBuffer {
         boundRenderer.setViewport(0, 0, texture.width, texture.height, 1);
       }
     }
+
+    const textures = this._textures;
+    textures[attachment] = {
+      texture,
+      target
+    };
   }
 
   /**
