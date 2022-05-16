@@ -22,9 +22,6 @@ class GLFrameBuffer {
   // Attached textures
   private _textures: Record<string, GLTexture> = {};
 
-  private _width: number;
-  private _height: number;
-
   constructor(frambuffer: FrameBuffer) {
     this._fb = frambuffer;
   }
