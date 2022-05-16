@@ -1,4 +1,3 @@
-import { constants } from '../claygl';
 import GLExtension from './GLExtension';
 import { GLEnum } from '../core/type';
 import vendor from '../core/vendor';
@@ -17,6 +16,7 @@ import Texture2D from '../Texture2D';
 import GLTexture from './GLTexture';
 import TextureCube from '../TextureCube';
 import GLBuffers from './GLBuffers';
+import * as constants from '../core/constants';
 
 const errorShader: Record<string, boolean> = {};
 

@@ -1,8 +1,8 @@
-import { constants } from '../claygl';
 import GeometryBase, { AttributeSize, AttributeType } from '../GeometryBase';
 import { AttributeSemantic } from '../Shader';
 import GLExtension from './GLExtension';
 import GLProgram from './GLProgram';
+import * as constants from '../core/constants';
 
 const enabledAttributesMap = new WeakMap<WebGLRenderingContext, number>();
 
