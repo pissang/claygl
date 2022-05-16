@@ -594,7 +594,7 @@ class Renderer extends Notifier {
             const matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose!];
             mat4.transpose(matrix, matrixNoTranspose);
           }
-          program.set(gl, semanticInfo.type, semanticInfo.symbol, matrix);
+          program.set(gl, semanticInfo.type, semanticInfo.name, matrix);
         }
 
         // TODO

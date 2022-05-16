@@ -185,7 +185,7 @@ class GLProgram {
   setSemanticUniform(_gl: WebGLRenderingContext, semantic: string, val: any) {
     const semanticInfo = this.semanticsMap[semantic as UniformSemantic];
     if (semanticInfo) {
-      return this.set(_gl, semanticInfo.type, semanticInfo.symbol, val);
+      return this.set(_gl, semanticInfo.type, semanticInfo.name, val);
     }
     return false;
   }
@@ -207,7 +207,7 @@ class GLProgram {
     }
     if (semantic) {
       const semanticInfo = this.semanticsMap[semantic as AttributeSemantic];
-      symbol = (semanticInfo && semanticInfo.symbol)!;
+      symbol = (semanticInfo && semanticInfo.name)!;
     }
     gl.bindAttribLocation(program!, index, symbol);
     return true;

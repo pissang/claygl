@@ -533,13 +533,13 @@ export class Shader<
     Record<
       AttributeSemantic,
       {
-        symbol: string;
+        name: string;
       }
     > &
       Record<
         MatrixSemantic | UniformSemantic,
         {
-          symbol: string;
+          name: string;
           type: MaterialUniformType;
           isTranspose?: boolean;
           isInverse?: boolean;
@@ -599,7 +599,7 @@ export class Shader<
           };
         }
         const materialUniformObj = {
-          symbol: uniformName,
+          name: uniformName,
           type: (uniformTypeMap[uniformType] + (uniform.array ? 'v' : '')) as MaterialUniformType
         };
 
@@ -642,7 +642,7 @@ export class Shader<
       const semantic = attr.semantic;
       if (semantic) {
         semanticsMap[semantic] = {
-          symbol: attrName
+          name: attrName
         };
       }
       attributes[attrName] = {
