@@ -1,4 +1,4 @@
-import { assign, genGUID } from '../core/util';
+import { assign, genGUID, keys } from '../core/util';
 import Shader, { AttributeSemantic, UniformSemantic } from '../Shader';
 import * as constants from '../core/constants';
 import GLTexture from './GLTexture';
@@ -190,34 +190,26 @@ class GLProgram {
     return false;
   }
 
-  bindAttributeLocation(
+  getAttributeLocation(
     gl: WebGLRenderingContext,
-    index: number,
     attribBuffer: {
       name: string;
       semantic?: AttributeSemantic;
     }
   ) {
-    const program = this._program;
+    const cachedAttribLoc = this._cachedAttribLoc;
+
     const semantic = attribBuffer.semantic;
     let symbol = attribBuffer.name;
-    if (!this.attributes[symbol]) {
-      // Not exists in this shader.
-      return;
-    }
+
     if (semantic) {
       const semanticInfo = this.semanticsMap[semantic as AttributeSemantic];
       symbol = (semanticInfo && semanticInfo.name)!;
     }
-    gl.bindAttribLocation(program!, index, symbol);
-    return true;
-  }
 
-  getAttributeLocation(gl: WebGLRenderingContext, name: string) {
-    const cachedAttribLoc = this._cachedAttribLoc;
-    let location = cachedAttribLoc[name];
+    let location = cachedAttribLoc[symbol];
     if (location === undefined) {
-      location = cachedAttribLoc[name] = gl.getAttribLocation(this._program!, name);
+      location = cachedAttribLoc[symbol] = gl.getAttribLocation(this._program!, symbol);
     }
     return location;
   }
@@ -243,7 +235,15 @@ class GLProgram {
 
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
-
+    // Force the position bind to location 0;
+    // Must bindAttribLocation before link program.
+    const POSITION = shader.semanticsMap.POSITION;
+    if (POSITION) {
+      gl.bindAttribLocation(program, 0, POSITION.name);
+    } else {
+      // Else choose an attribute and bind to location 0;
+      gl.bindAttribLocation(program, 0, keys(this.attributes)[0]);
+    }
     gl.linkProgram(program);
 
     gl.deleteShader(vertexShader);

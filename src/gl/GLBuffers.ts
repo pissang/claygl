@@ -158,35 +158,37 @@ class GLBuffers {
     //   vaoExt.bindVertexArrayOES(vao.vao);
     // }
 
-    const enabledAttributeCount = enabledAttributesMap.get(gl) || 0;
-
-    let attrIndex = 0;
+    const prevMaxLocation = enabledAttributesMap.get(gl) || 0;
+    let maxLocation = 0;
     // Always bind attribute location
     for (let i = 0; i < attributeBuffersLen; i++) {
-      const successed = program.bindAttributeLocation(gl, attrIndex, attributeBuffers[i]);
-      if (!successed) {
+      const attributeBufferInfo = attributeBuffers[i];
+      const location = program.getAttributeLocation(gl, attributeBufferInfo);
+      // Will be -1 if not found
+      if (location == null || location == -1) {
         continue;
       }
 
-      const attributeBufferInfo = attributeBuffers[i];
       const buffer = attributeBufferInfo.buffer;
       const size = attributeBufferInfo.size;
       const glType = attributeBufferTypeMap[attributeBufferInfo.type] || constants.FLOAT;
 
       gl.bindBuffer(constants.ARRAY_BUFFER, buffer);
-      gl.vertexAttribPointer(attrIndex, size, glType, false, 0, 0);
-      if (attrIndex >= enabledAttributeCount) {
-        gl.enableVertexAttribArray(attrIndex);
+      gl.vertexAttribPointer(location, size, glType, false, 0, 0);
+      if (location >= prevMaxLocation) {
+        gl.enableVertexAttribArray(location);
       }
-      attrIndex++;
+      if (location > maxLocation) {
+        maxLocation = location;
+      }
     }
 
     // Disable unused attribute
-    for (let i = attrIndex; i < enabledAttributeCount; i++) {
+    for (let i = maxLocation; i < prevMaxLocation; i++) {
       gl.disableVertexAttribArray(i);
     }
 
-    enabledAttributesMap.set(gl, attrIndex);
+    enabledAttributesMap.set(gl, maxLocation);
 
     // Binding buffers
     // if (needsBindBuffer) {
