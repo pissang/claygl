@@ -1,4 +1,3 @@
-import ClayCache from './core/Cache';
 import Ray from './math/Ray';
 import { genGUID, keys } from './core/util';
 import { Vec3Array } from './glmatrix/common';
@@ -6,9 +5,9 @@ import { Vec3Array } from './glmatrix/common';
 import type Renderer from './Renderer';
 import type Camera from './Camera';
 import type Renderable from './Renderable';
-import type Vector2 from './math/Vector2';
 import type BoundingBox from './math/BoundingBox';
 import type { Intersection } from './picking/rayPicking';
+import { AttributeSemantic } from './Shader';
 
 export type AttributeType = 'byte' | 'ubyte' | 'short' | 'ushort' | 'float';
 export type AttributeSize = 1 | 2 | 3 | 4;
@@ -27,10 +26,6 @@ function getArrayCtorByType(type: AttributeType) {
       float: Float32Array
     }[type] || Float32Array
   );
-}
-
-function makeAttrKey(attrName: string) {
-  return 'attr_' + attrName;
 }
 
 function is2DArray(array: ArrayLike<number> | number[][]): array is number[][] {
@@ -86,7 +81,12 @@ export class GeometryAttribute<TSize extends AttributeSize = AttributeSize> {
    * ```
    * will use the attribute value with semantic POSITION in geometry, no matter what name it used.
    */
-  semantic?: string;
+  semantic?: AttributeSemantic;
+
+  /**
+   * If attributes needs update buffer
+   */
+  __dirty?: boolean = true;
 
   /**
    * Value of the attribute.
@@ -96,7 +96,7 @@ export class GeometryAttribute<TSize extends AttributeSize = AttributeSize> {
   get: TSize extends 1 ? AttributeNumberGetter : AttributeArrayGetter;
   set: TSize extends 1 ? AttributeNumberSetter : AttributeArraySetter;
   copy: (source: number, target: number) => void;
-  constructor(name: string, type: AttributeType, size: TSize, semantic?: string) {
+  constructor(name: string, type: AttributeType, size: TSize, semantic?: AttributeSemantic) {
     this.name = name;
     this.type = type;
     this.size = size;
@@ -242,42 +242,6 @@ export class GeometryAttribute<TSize extends AttributeSize = AttributeSize> {
   }
 }
 
-export class AttributeBuffer {
-  readonly name: string;
-  readonly type: AttributeType;
-  readonly buffer: WebGLBuffer;
-  readonly size: AttributeSize;
-  readonly semantic?: string;
-
-  // To be set in mesh
-  // symbol in the shader
-  // Needs remove flag
-  symbol: string = '';
-  needsRemove = false;
-
-  constructor(
-    name: string,
-    type: AttributeType,
-    buffer: WebGLBuffer,
-    size: AttributeSize,
-    semantic?: string
-  ) {
-    this.name = name;
-    this.type = type;
-    this.buffer = buffer;
-    this.size = size;
-    this.semantic = semantic;
-  }
-}
-
-export class IndicesBuffer {
-  buffer: WebGLBuffer;
-  count: number = 0;
-  constructor(buffer: WebGLBuffer) {
-    this.buffer = buffer;
-  }
-}
-
 export interface GeometryBaseOpts {
   name: string;
   /**
@@ -337,9 +301,10 @@ class GeometryBase {
    */
   pickByRay?: (ray: Ray, renderable: Renderable, out: Intersection[]) => boolean;
 
-  protected _cache = new ClayCache();
   private _attributeList: string[];
   private _enabledAttributes?: string[];
+
+  __indicesDirty: boolean = true;
 
   constructor(opts?: Partial<GeometryBaseOpts>) {
     opts = opts || {};
@@ -377,22 +342,35 @@ class GeometryBase {
     }
     this.dirtyIndices();
     this._enabledAttributes = undefined;
-
-    this._cache.dirty('any');
   }
   /**
    * Mark the indices needs to update.
    */
   dirtyIndices() {
-    this._cache.dirtyAll('indices');
+    this.__indicesDirty = true;
   }
   /**
    * Mark the attributes needs to update.
    * @param {string} [attrName]
    */
   dirtyAttribute(attrName: string) {
-    this._cache.dirtyAll(makeAttrKey(attrName));
-    this._cache.dirtyAll('attributes');
+    const attr = this.attributes[attrName];
+    attr && (attr.__dirty = true);
+  }
+  /**
+   * Is any of attributes dirty.
+   */
+  isAttributesDirty() {
+    if (!this._enabledAttributes) {
+      return true;
+    }
+    const enabledAttributes = this.getEnabledAttributes();
+    for (let i = 0; i < enabledAttributes.length; i++) {
+      if (this.attributes[enabledAttributes[i]].__dirty) {
+        return true;
+      }
+    }
+    return false;
   }
   /**
    * Get indices of triangle at given index.
@@ -464,7 +442,7 @@ class GeometryBase {
     name: string,
     type: AttributeType,
     size: T,
-    semantic?: string
+    semantic?: AttributeSemantic
   ) {
     const attrib = new GeometryAttribute<T>(name, type, size, semantic);
     if (this.attributes[name]) {
@@ -527,152 +505,6 @@ class GeometryBase {
     this._enabledAttributes = result;
 
     return result;
-  }
-
-  getBufferChunks(renderer: Renderer) {
-    const cache = this._cache;
-    cache.use(renderer.__uid__);
-    const isAttributesDirty = cache.isDirty('attributes');
-    const isIndicesDirty = cache.isDirty('indices');
-    if (isAttributesDirty || isIndicesDirty) {
-      this._updateBuffer(renderer.gl, isAttributesDirty, isIndicesDirty);
-      const enabledAttributes = this.getEnabledAttributes();
-      for (let i = 0; i < enabledAttributes.length; i++) {
-        cache.fresh(makeAttrKey(enabledAttributes[i]));
-      }
-      cache.fresh('attributes');
-      cache.fresh('indices');
-    }
-    cache.fresh('any');
-    return cache.get('chunks');
-  }
-
-  private _updateBuffer(
-    gl: WebGLRenderingContext,
-    isAttributesDirty: boolean,
-    isIndicesDirty: boolean
-  ) {
-    const cache = this._cache;
-    let chunks = cache.get('chunks');
-    let firstUpdate = false;
-    if (!chunks) {
-      chunks = [];
-      // Intialize
-      chunks[0] = {
-        attributeBuffers: [],
-        indicesBuffer: null
-      };
-      cache.put('chunks', chunks);
-      firstUpdate = true;
-    }
-
-    const chunk = chunks[0];
-    const attributeBuffers = chunk.attributeBuffers;
-    let indicesBuffer = chunk.indicesBuffer;
-
-    if (isAttributesDirty || firstUpdate) {
-      const attributeList = this.getEnabledAttributes();
-
-      const attributeBufferMap: Record<string, AttributeBuffer> = {};
-      if (!firstUpdate) {
-        for (let i = 0; i < attributeBuffers.length; i++) {
-          attributeBufferMap[attributeBuffers[i].name] = attributeBuffers[i];
-        }
-      }
-      let k;
-      // FIXME If some attributes removed
-      for (k = 0; k < attributeList.length; k++) {
-        const name = attributeList[k];
-        const attribute = this.attributes[name];
-
-        let bufferInfo;
-
-        if (!firstUpdate) {
-          bufferInfo = attributeBufferMap[name];
-        }
-        let buffer: WebGLBuffer;
-        if (bufferInfo) {
-          buffer = bufferInfo.buffer;
-        } else {
-          buffer = gl.createBuffer()!;
-        }
-        if (cache.isDirty(makeAttrKey(name))) {
-          // Only update when they are dirty.
-          // TODO: Use BufferSubData?
-          gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-          gl.bufferData(
-            gl.ARRAY_BUFFER,
-            attribute.value as Float32Array,
-            this.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW
-          );
-        }
-
-        attributeBuffers[k] = new AttributeBuffer(
-          name,
-          attribute.type,
-          buffer,
-          attribute.size,
-          attribute.semantic
-        );
-      }
-      // Remove unused attributes buffers.
-      // PENDING
-      for (let i = k; i < attributeBuffers.length; i++) {
-        gl.deleteBuffer(attributeBuffers[i].buffer);
-      }
-      attributeBuffers.length = k;
-    }
-
-    if (this.isUseIndices() && (isIndicesDirty || firstUpdate)) {
-      if (!indicesBuffer) {
-        indicesBuffer = new IndicesBuffer(gl.createBuffer()!);
-        chunk.indicesBuffer = indicesBuffer;
-      }
-      indicesBuffer.count = this.indices!.length;
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-      gl.bufferData(
-        gl.ELEMENT_ARRAY_BUFFER,
-        this.indices!,
-        this.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW
-      );
-    }
-  }
-
-  /**
-   * Dispose geometry data in GL context.
-   */
-  dispose(renderer: Renderer) {
-    const cache = this._cache;
-
-    cache.use(renderer.__uid__);
-    const chunks = cache.get('chunks');
-    if (chunks) {
-      for (let c = 0; c < chunks.length; c++) {
-        const chunk = chunks[c];
-
-        for (let k = 0; k < chunk.attributeBuffers.length; k++) {
-          const attribs = chunk.attributeBuffers[k];
-          renderer.gl.deleteBuffer(attribs.buffer);
-        }
-
-        if (chunk.indicesBuffer) {
-          renderer.gl.deleteBuffer(chunk.indicesBuffer.buffer);
-        }
-      }
-    }
-
-    const vaoCache = renderer.__getGeometryVaoCache(this);
-    if (vaoCache) {
-      const vaoExt = renderer.getGLExtension('OES_vertex_array_object');
-      for (const id in vaoCache) {
-        const vao = vaoCache[id].vao;
-        if (vao) {
-          vaoExt.deleteVertexArrayOES(vao);
-        }
-      }
-    }
-    renderer.__removeGeometryVaoCache(this);
-    cache.deleteContext(renderer.__uid__);
   }
 }
 export default GeometryBase;

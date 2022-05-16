@@ -21,11 +21,8 @@ const EXTENSION_LIST = [
   'ANGLE_instanced_arrays'
 ] as const;
 
-const PARAMETER_NAMES = ['MAX_TEXTURE_SIZE', 'MAX_CUBE_MAP_TEXTURE_SIZE'];
-
-class GLInfo {
+class GLExtension {
   private _extensions: Record<string, any> = {};
-  private _parameters: Record<string, any> = {};
   gl: WebGLRenderingContext;
 
   constructor(gl: WebGLRenderingContext) {
@@ -35,11 +32,6 @@ class GLInfo {
       const extName = EXTENSION_LIST[i];
       this._createExtension(extName);
     }
-    // Get parameters
-    for (let i = 0; i < PARAMETER_NAMES.length; i++) {
-      const name = PARAMETER_NAMES[i];
-      this._parameters[name] = gl.getParameter((gl as any)[name]);
-    }
   }
 
   getExtension(name: string) {
@@ -47,10 +39,6 @@ class GLInfo {
       this._createExtension(name);
     }
     return this._extensions[name];
-  }
-
-  getParameter(name: string) {
-    return this._parameters[name];
   }
 
   private _createExtension(name: string) {
@@ -68,4 +56,4 @@ class GLInfo {
   }
 }
 
-export default GLInfo;
+export default GLExtension;

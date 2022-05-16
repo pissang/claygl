@@ -474,7 +474,7 @@ class ShadowMapPass extends Notifier {
       );
 
       const renderList = scene.updateRenderList(lightCamera);
-      renderer.renderPass(renderList.opaque, lightCamera, passConfig);
+      renderer._renderPass(renderList.opaque, lightCamera, passConfig);
 
       const matrix = new Matrix4();
       matrix.copy(lightCamera.viewMatrix).multiplyLeft(lightCamera.projectionMatrix);
@@ -519,7 +519,7 @@ class ShadowMapPass extends Notifier {
     };
 
     const renderList = scene.updateRenderList(lightCamera);
-    renderer.renderPass(renderList.opaque, lightCamera, passConfig);
+    renderer._renderPass(renderList.opaque, lightCamera, passConfig);
 
     this._frameBuffer.unbind(renderer);
 
@@ -628,7 +628,7 @@ class ShadowMapPass extends Notifier {
       this._frameBuffer.bind(renderer);
       _gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
 
-      renderer.renderPass(renderListEachSide[target], camera, passConfig);
+      renderer._renderPass(renderListEachSide[target], camera, passConfig);
     }
 
     this._frameBuffer.unbind(renderer);

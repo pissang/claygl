@@ -4,6 +4,7 @@ gh-pages
 .idea
 example/unit
 example/bundle
+example/dist
 /coverage
 /doc
 /lib

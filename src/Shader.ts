@@ -5,7 +5,7 @@
 
 import { parseToFloat } from './core/color';
 import { Dict, UnionToIntersection } from './core/type';
-import { assign, isString, keys } from './core/util';
+import { assign, genGUID, isString, keys } from './core/util';
 import { mat2, mat3, mat4, vec2, vec3, vec4 } from './glmatrix';
 import Texture2D from './Texture2D';
 import TextureCube, { cubeTargets } from './TextureCube';
@@ -483,6 +483,18 @@ function cloneUniformVal(type: MaterialUniformType, val: any) {
   return val;
 }
 
+const shaderIDCache: Record<string, string> = {};
+
+function getShaderID(vertex: string, fragment: string) {
+  const key = 'vertex:' + vertex + 'fragment:' + fragment;
+  if (shaderIDCache[key]) {
+    return shaderIDCache[key];
+  }
+  const id = genGUID() + '';
+  shaderIDCache[key] = id;
+
+  return id;
+}
 export class Shader<
   V extends VertexShader = VertexShader,
   F extends FragmentShader = FragmentShader
@@ -539,6 +551,12 @@ export class Shader<
 
   readonly vertex: string;
   readonly fragment: string;
+
+  private readonly _shaderID: string;
+
+  get shaderID() {
+    return this._shaderID;
+  }
 
   // Create a new uniform copy for material
   createUniforms() {
@@ -637,13 +655,15 @@ export class Shader<
     this.matrixSemantics = matrixSemantics;
     this.attributes = attributes;
 
-    this.vertex = composeShaderString(vert);
+    const vertex = (this.vertex = composeShaderString(vert));
     // Force sharing varyings between vert and frag.
-    this.fragment = composeShaderString(
+    const fragment = (this.fragment = composeShaderString(
       assign({}, frag, {
         varyings: vert.varyings
       })
-    );
+    ));
+
+    this._shaderID = getShaderID(vertex, fragment);
   }
 
   static uniform = createUniform;

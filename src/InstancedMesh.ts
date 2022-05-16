@@ -1,5 +1,4 @@
 import Mesh, { MeshOpts } from './Mesh';
-import ClayCache from './core/Cache';
 import BoundingBox from './math/BoundingBox';
 import { optional } from './core/util';
 import type ClayNode from './Node';
@@ -47,8 +46,9 @@ class InstancedMesh<T extends Material = Material> extends Mesh<T> {
   instancedAttributes: Record<string, InstancedAttribute> = {};
 
   boundingBox?: BoundingBox;
-  private _cache = new ClayCache();
   private _attributesSymbols: string[] = [];
+
+  private __dirty: boolean = true;
 
   constructor(geometry: Geometry, material: T, opts?: Partial<InstancedMeshOpts>) {
     super(geometry, material, opts);
@@ -191,7 +191,7 @@ class InstancedMesh<T extends Material = Material> extends Mesh<T> {
       }
     }
 
-    this._cache.dirty('dirty');
+    this.__dirty = true;
   }
 }
 

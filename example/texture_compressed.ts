@@ -9,6 +9,7 @@ import {
   Texture2D,
   constants
 } from 'claygl';
+import { fullscreenQuadPassVertex, outputTextureFragment } from 'claygl/shaders';
 
 import { parse as parseKTX } from '../src/util/ktx';
 
@@ -16,17 +17,12 @@ const canvas = document.querySelector('canvas')!;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const shader = new Shader(
-  Shader.source('clay.compositor.vertex'),
-  Shader.source('clay.compositor.output')
-);
+const shader = new Shader(fullscreenQuadPassVertex, outputTextureFragment);
 const planeGeo = new PlaneGeometry();
 function createRect(texture: Texture2D, x: number, y: number, width: number, height: number) {
-  const mat = new Material({ shader });
+  const mat = new Material(shader);
   mat.set('texture', texture);
-  const mesh = new Mesh({
-    geometry: planeGeo,
-    material: mat,
+  const mesh = new Mesh(planeGeo, mat, {
     culling: false
   });
   const sx = width / canvas.width;

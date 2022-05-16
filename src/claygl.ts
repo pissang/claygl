@@ -1,3 +1,4 @@
+import { setCanvasSize } from './core/util';
 import Timeline from './Timeline';
 
 // Core
@@ -15,6 +16,8 @@ export { default as Joint } from './Joint';
 export { default as FrameBuffer } from './FrameBuffer';
 export { default as Scene } from './Scene';
 
+export { default as GLRenderer } from './gl/GLRenderer';
+
 export { default as StandardMaterial } from './StandardMaterial';
 
 export { Timeline };
@@ -30,6 +33,8 @@ export function startTimeline(onframe?: (deltaTime: number) => void) {
   }
   return timeline;
 }
+
+export { setCanvasSize };
 
 export * as constants from './core/constants';
 

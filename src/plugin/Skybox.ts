@@ -146,7 +146,7 @@ class Skybox extends Mesh<Material<ReturnType<typeof createSkyboxShader>>> {
     } else {
       material.undefine('fragment', 'LOD');
     }
-    renderer.renderPass([this], dummyCamera);
+    renderer._renderPass([this], dummyCamera);
   }
 
   static getSceneSkybox(scene: Scene) {

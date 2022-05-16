@@ -6,6 +6,7 @@ interface Vendor {
   supportWebGL: () => boolean;
   requestAnimationFrame: (cb: () => void) => void;
   createCanvas: () => HTMLCanvasElement;
+  createBlankCanvas: (color: string) => HTMLCanvasElement;
   createImage: () => HTMLImageElement;
   request: {
     get: typeof get;
@@ -66,6 +67,16 @@ vendor.addEventListener = function (dom, type, func, useCapture) {
 
 vendor.removeEventListener = function (dom, type, func) {
   dom.removeEventListener(type, func);
+};
+
+vendor.createBlankCanvas = function (color: string) {
+  const canvas = vendor.createCanvas();
+  canvas.width = 1;
+  canvas.height = 1;
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, 1, 1);
+  return canvas;
 };
 
 export default vendor;

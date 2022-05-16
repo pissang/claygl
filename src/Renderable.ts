@@ -141,12 +141,12 @@ class Renderable<T extends Material = Material> extends ClayNode {
   /**
    * Before render hook
    */
-  beforeRender(renderer: Renderer) {}
+  beforeRender() {}
 
   /**
    * Before render hook
    */
-  afterRender(renderer: Renderer) {}
+  afterRender() {}
 
   getBoundingBox(filter: GetBoundingBoxFilter, out?: BoundingBox): BoundingBox {
     out = super.getBoundingBox.call(this, filter, out);

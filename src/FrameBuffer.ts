@@ -1,6 +1,5 @@
 import Texture from './Texture';
 import * as constants from './core/constants';
-import ClayCache from './core/Cache';
 import type Renderer from './Renderer';
 import { GLEnum } from './core/type';
 

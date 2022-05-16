@@ -3,9 +3,7 @@
  * TODO mapping
  */
 import * as constants from './core/constants';
-import ClayCache from './core/Cache';
 import Notifier from './core/Notifier';
-import Renderer from './Renderer';
 import { isPowerOfTwo } from './math/util';
 import { GLEnum } from './core/type';
 import { assign } from './core/util';
@@ -106,14 +104,13 @@ export interface TextureOpts {
    * Dynamic option for texture like video
    */
   dynamic: boolean;
-
-  NPOT: boolean;
 }
 interface Texture extends Omit<TextureOpts, 'width' | 'height'> {}
 abstract class Texture extends Notifier {
-  protected _cache = new ClayCache();
   protected _width: number = 512;
   protected _height: number = 512;
+
+  __dirty = true;
 
   textureType: string = '';
 
@@ -136,98 +133,11 @@ abstract class Texture extends Notifier {
     this._height = value;
   }
 
-  getWebGLTexture(renderer: Renderer) {
-    const _gl = renderer.gl;
-    const cache = this._cache;
-    cache.use(renderer.__uid__);
-
-    if (cache.miss('webgl_texture')) {
-      // In a new gl context, create new texture and set dirty true
-      cache.put('webgl_texture', _gl.createTexture());
-    }
-    if (this.dynamic) {
-      this.update(renderer);
-    } else if (cache.isDirty()) {
-      this.update(renderer);
-      cache.fresh();
-    }
-
-    return cache.get('webgl_texture');
-  }
-
-  bind(renderer: Renderer) {}
-  unbind(renderer: Renderer) {}
-
   /**
    * Mark texture is dirty and update in the next frame
    */
   dirty() {
-    if (this._cache) {
-      this._cache.dirtyAll();
-    }
-  }
-
-  update(renderer: Renderer) {}
-
-  // Update the common parameters of texture
-  updateCommon(renderer: Renderer) {
-    const _gl = renderer.gl;
-    _gl.pixelStorei(constants.UNPACK_FLIP_Y_WEBGL, this.flipY);
-    _gl.pixelStorei(constants.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha);
-    _gl.pixelStorei(constants.UNPACK_ALIGNMENT, this.unpackAlignment);
-
-    // Use of none-power of two texture
-    // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
-    if (this.format === constants.DEPTH_COMPONENT) {
-      this.useMipmap = false;
-    }
-
-    const sRGBExt = renderer.getGLExtension('EXT_sRGB');
-    // Fallback
-    if (this.format === constants.SRGB_EXT && !sRGBExt) {
-      this.format = constants.RGB;
-    }
-    if (this.format === constants.SRGB_ALPHA_EXT && !sRGBExt) {
-      this.format = constants.RGBA;
-    }
-
-    this.NPOT = !this.isPowerOfTwo();
-  }
-
-  getAvailableWrapS() {
-    if (this.NPOT) {
-      return constants.CLAMP_TO_EDGE;
-    }
-    return this.wrapS;
-  }
-  getAvailableWrapT() {
-    if (this.NPOT) {
-      return constants.CLAMP_TO_EDGE;
-    }
-    return this.wrapT;
-  }
-  getAvailableMinFilter() {
-    const minFilter = this.minFilter;
-    if (this.NPOT || !this.useMipmap) {
-      if (
-        minFilter === constants.NEAREST_MIPMAP_NEAREST ||
-        minFilter === constants.NEAREST_MIPMAP_LINEAR
-      ) {
-        return constants.NEAREST;
-      } else if (
-        minFilter === constants.LINEAR_MIPMAP_LINEAR ||
-        minFilter === constants.LINEAR_MIPMAP_NEAREST
-      ) {
-        return constants.LINEAR;
-      } else {
-        return minFilter;
-      }
-    } else {
-      return minFilter;
-    }
-  }
-  getAvailableMagFilter() {
-    return this.magFilter;
+    return this.__dirty;
   }
 
   nextHighestPowerOfTwo(x: number) {
@@ -237,20 +147,7 @@ abstract class Texture extends Notifier {
     }
     return x + 1;
   }
-  /**
-   * @param  {clay.Renderer} renderer
-   */
-  dispose(renderer: Renderer) {
-    const cache = this._cache;
 
-    cache.use(renderer.__uid__);
-
-    const webglTexture = cache.get('webgl_texture');
-    if (webglTexture) {
-      renderer.gl.deleteTexture(webglTexture);
-    }
-    cache.deleteContext(renderer.__uid__);
-  }
   /**
    * Test if image of texture is valid and loaded.
    */
@@ -280,6 +177,5 @@ proto.sRGB = true;
 proto.unpackAlignment = 4;
 proto.premultiplyAlpha = false;
 proto.dynamic = false;
-proto.NPOT = false;
 
 export default Texture;

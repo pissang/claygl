@@ -1,3 +1,5 @@
+import vendor from './vendor';
+
 let guid = 0;
 
 const ArrayProto = Array.prototype;
@@ -150,3 +152,21 @@ export function keys(obj?: any): string[] {
 }
 
 export const assign = Object.assign;
+
+export function setCanvasSize(
+  canvas: HTMLCanvasElement,
+  width: number,
+  height: number,
+  pixelRatio?: number
+) {
+  const style = canvas.style;
+  // http://www.khronos.org/webgl/wiki/HandlingHighDPI
+  // set the display size of the canvas.
+  if (style) {
+    style.width = width + 'px';
+    style.height = height + 'px';
+  }
+  // set the size of the drawingBuffer
+  canvas.width = width * (pixelRatio || 1);
+  canvas.height = height * (pixelRatio || 1);
+}

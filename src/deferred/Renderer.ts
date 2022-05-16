@@ -55,8 +55,6 @@ interface LightShadowInfo {
   lightMatrices: mat4.Mat4Array[];
 }
 
-const volumeMeshMap = new WeakMap<Light, Mesh>();
-const lightShadowInfosMap = new WeakMap<Light, LightShadowInfo>();
 /**
  * Deferred renderer
  */
@@ -111,6 +109,9 @@ class DeferredRenderer extends Notifier {
 
   private _outputPass = new FullscreenQuadPass(outputFragment);
   private _createLightPassMat: (shader: Shader) => Material;
+
+  private _volumeMeshMap = new WeakMap<Light, Mesh>();
+  private _lightShadowInfosMap = new WeakMap<Light, LightShadowInfo>();
 
   constructor() {
     super();
@@ -341,7 +342,7 @@ class DeferredRenderer extends Notifier {
 
       const uTpl = light.uniformTemplates!;
 
-      const volumeMesh = light.volumeMesh || volumeMeshMap.get(light);
+      const volumeMesh = light.volumeMesh || this._volumeMeshMap.get(light);
 
       if (volumeMesh) {
         const material = volumeMesh.material;
@@ -443,7 +444,7 @@ class DeferredRenderer extends Notifier {
 
         // TODO
         if (shadowMapPass && light.castShadow) {
-          const lightShadowInfo = lightShadowInfosMap.get(light)!;
+          const lightShadowInfo = this._lightShadowInfosMap.get(light)!;
           passMaterial.set('lightShadowMap', lightShadowInfo.shadowMap);
           passMaterial.set('lightMatrices', lightShadowInfo.lightMatrices);
           passMaterial.set('shadowCascadeClipsNear', lightShadowInfo.cascadeClipsNear);
@@ -474,7 +475,7 @@ class DeferredRenderer extends Notifier {
   ) {
     for (let i = 0; i < scene.lights.length; i++) {
       const light = scene.lights[i] as DeferredLight;
-      const volumeMesh = light.volumeMesh || volumeMeshMap.get(light)!;
+      const volumeMesh = light.volumeMesh || this._volumeMeshMap.get(light)!;
       if (!light.castShadow || light.invisible) {
         continue;
       }
@@ -539,6 +540,7 @@ class DeferredRenderer extends Notifier {
       cascadeClipsFar.reverse();
       lightMatrices.reverse();
 
+      const lightShadowInfosMap = this._lightShadowInfosMap;
       const lightShadowInfo = lightShadowInfosMap.get(light) || ({} as LightShadowInfo);
       lightShadowInfo.cascadeClipsNear = cascadeClipsNear;
       lightShadowInfo.cascadeClipsFar = cascadeClipsFar;
@@ -560,6 +562,7 @@ class DeferredRenderer extends Notifier {
     let r;
     let aspect;
     let range;
+    const volumeMeshMap = this._volumeMeshMap;
     if (light.volumeMesh) {
       volumeMesh = light.volumeMesh;
     } else {
@@ -647,7 +650,7 @@ class DeferredRenderer extends Notifier {
       // depthMask must be enabled before clear DEPTH_BUFFER
       gl.clear(gl.DEPTH_BUFFER_BIT);
 
-      renderer.renderPass([volumeMesh], camera, {
+      renderer._renderPass([volumeMesh], camera, {
         getMaterial: getPreZMaterial
       });
 
@@ -655,7 +658,7 @@ class DeferredRenderer extends Notifier {
       gl.colorMask(true, true, true, true);
 
       volumeMesh.material.depthMask = true;
-      renderer.renderPass([volumeMesh], camera);
+      renderer._renderPass([volumeMesh], camera);
     }
 
     gl.depthFunc(gl.LESS);

@@ -423,7 +423,7 @@ class DeferredGBuffer {
         sortCompare: Renderer.opaqueSortCompare
       };
       // FIXME Use MRT if possible
-      renderer.renderPass(gBufferRenderList, camera, passConfig);
+      renderer._renderPass(gBufferRenderList, camera, passConfig);
     }
     if (enableTargetTexture3) {
       // Pass 2
@@ -441,7 +441,7 @@ class DeferredGBuffer {
         isMaterialChanged: isMaterialChanged,
         sortCompare: Renderer.opaqueSortCompare
       };
-      renderer.renderPass(gBufferRenderList, camera, passConfig);
+      renderer._renderPass(gBufferRenderList, camera, passConfig);
     }
 
     if (enableTargetTexture4) {
@@ -545,7 +545,7 @@ class DeferredGBuffer {
         sortCompare: Renderer.opaqueSortCompare
       };
 
-      renderer.renderPass(gBufferRenderList, camera, passConfig);
+      renderer._renderPass(gBufferRenderList, camera, passConfig);
     }
 
     renderer.bindSceneRendering();

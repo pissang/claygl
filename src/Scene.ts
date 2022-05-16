@@ -11,7 +11,7 @@ import type Material from './Material';
 import Mesh from './Mesh';
 import { MaterialUniform, MaterialUniformType } from './Shader';
 import Renderer from './Renderer';
-import GLProgram from './gpu/GLProgram';
+import GLProgram from './gl/GLProgram';
 import Skybox from './plugin/Skybox';
 
 const IDENTITY = mat4.create();

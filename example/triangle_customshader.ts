@@ -1,4 +1,4 @@
-import { Renderer, GeometryBase, Material, Shader, glsl } from 'claygl';
+import { GLRenderer, GeometryBase, Material, Shader, glsl, setCanvasSize } from 'claygl';
 
 const { uniform, attribute } = Shader;
 
@@ -7,8 +7,11 @@ const TRIANGLE_POSITIONS = [
   [0.5, -0.5, 0],
   [0, 0.5, 0]
 ];
-const renderer = new Renderer({ canvas: document.getElementById('main') as HTMLCanvasElement });
-renderer.resize(400, 400);
+const canvas = document.getElementById('main') as HTMLCanvasElement;
+setCanvasSize(canvas, 400, 400);
+const gl = canvas.getContext('webgl')!;
+gl.viewport(0, 0, 400, 400);
+const renderer = new GLRenderer(gl);
 
 const geometry = new GeometryBase();
 geometry.createAttribute('position', 'float', 3, 'POSITION');
@@ -36,7 +39,7 @@ void main() {
 
 const material = new Material(new Shader(vs, fs));
 
-renderer.renderPass([
+renderer.render([
   {
     geometry,
     material

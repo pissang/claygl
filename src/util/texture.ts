@@ -1,5 +1,5 @@
 import Texture2D from '../Texture2D';
-import TextureCube, { CubeTarget } from '../TextureCube';
+import TextureCube from '../TextureCube';
 import vendor from '../core/vendor';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
 import Skybox from '../plugin/Skybox';
@@ -306,16 +306,7 @@ export function createChessboard(size: number, unitSize: number, color1: string,
  * @return {clay.Texture2D}
  */
 export function createBlank(color: string) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1;
-  canvas.height = 1;
-  const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, 1, 1);
-
-  const texture = new Texture2D({
-    image: canvas
+  return new Texture2D({
+    image: vendor.createBlankCanvas(color)
   });
-
-  return texture;
 }

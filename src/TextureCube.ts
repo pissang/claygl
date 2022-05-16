@@ -11,7 +11,7 @@ const isPowerOfTwo = mathUtil.isPowerOfTwo;
 export const cubeTargets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
 export type CubeTarget = 'px' | 'nx' | 'py' | 'ny' | 'pz' | 'nz';
 
-interface TextureCubeData {
+export interface TextureCubeData {
   image?: Record<CubeTarget, TextureImageSource>;
   /**
    * Pixels data. Will be ignored if image is set.
@@ -95,134 +95,6 @@ class TextureCube extends Texture {
       }
       this._height = value;
     }
-  }
-
-  update(renderer: Renderer) {
-    const _gl = renderer.gl;
-    _gl.bindTexture(constants.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
-
-    this.updateCommon(renderer);
-
-    const glFormat = this.format;
-    const mipmaps = this.mipmaps;
-    let glType = this.type;
-    const len = mipmaps && mipmaps.length;
-
-    _gl.texParameteri(
-      constants.TEXTURE_CUBE_MAP,
-      constants.TEXTURE_WRAP_S,
-      this.getAvailableWrapS()
-    );
-    _gl.texParameteri(
-      constants.TEXTURE_CUBE_MAP,
-      constants.TEXTURE_WRAP_T,
-      this.getAvailableWrapT()
-    );
-
-    _gl.texParameteri(
-      constants.TEXTURE_CUBE_MAP,
-      constants.TEXTURE_MAG_FILTER,
-      this.getAvailableMagFilter()
-    );
-    _gl.texParameteri(
-      constants.TEXTURE_CUBE_MAP,
-      constants.TEXTURE_MIN_FILTER,
-      this.getAvailableMinFilter()
-    );
-
-    const anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
-    if (anisotropicExt && this.anisotropic > 1) {
-      _gl.texParameterf(
-        constants.TEXTURE_CUBE_MAP,
-        anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT,
-        this.anisotropic
-      );
-    }
-
-    // Fallback to float type if browser don't have half float extension
-    if (glType === 36193) {
-      const halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
-      if (!halfFloatExt) {
-        glType = constants.FLOAT;
-      }
-    }
-
-    if (len) {
-      let width = this.width;
-      let height = this.height;
-      for (let i = 0; i < len; i++) {
-        const mipmap = mipmaps[i];
-        this._updateTextureData(_gl, mipmap, i, width, height, glFormat, glType);
-        width /= 2;
-        height /= 2;
-      }
-    } else {
-      this._updateTextureData(_gl, this, 0, this.width, this.height, glFormat, glType);
-
-      if (!this.NPOT && this.useMipmap) {
-        _gl.generateMipmap(constants.TEXTURE_CUBE_MAP);
-      }
-    }
-
-    _gl.bindTexture(constants.TEXTURE_CUBE_MAP, null);
-  }
-
-  _updateTextureData(
-    _gl: WebGLRenderingContext,
-    data: TextureCubeData,
-    level: number,
-    width: number,
-    height: number,
-    glFormat: GLEnum,
-    glType: GLEnum
-  ) {
-    for (let i = 0; i < 6; i++) {
-      const target = cubeTargets[i];
-      const img = data.image && data.image[target];
-      const pixels = data.pixels && data.pixels[target];
-      if (img) {
-        _gl.texImage2D(
-          constants.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-          level,
-          glFormat,
-          glFormat,
-          glType,
-          img
-        );
-      } else {
-        _gl.texImage2D(
-          constants.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-          level,
-          glFormat,
-          width,
-          height,
-          0,
-          glFormat,
-          glType,
-          pixels || null
-        );
-      }
-    }
-  }
-
-  /**
-   * @param  {clay.Renderer} renderer
-   * @memberOf clay.TextureCube.prototype
-   */
-  generateMipmap(renderer: Renderer) {
-    const _gl = renderer.gl;
-    if (this.useMipmap && !this.NPOT) {
-      _gl.bindTexture(constants.TEXTURE_CUBE_MAP, this._cache.get('webgl_texture'));
-      _gl.generateMipmap(constants.TEXTURE_CUBE_MAP);
-    }
-  }
-
-  bind(renderer: Renderer) {
-    renderer.gl.bindTexture(renderer.gl.TEXTURE_CUBE_MAP, this.getWebGLTexture(renderer));
-  }
-
-  unbind(renderer: Renderer) {
-    renderer.gl.bindTexture(renderer.gl.TEXTURE_CUBE_MAP, null);
   }
 
   // Overwrite the isPowerOfTwo method

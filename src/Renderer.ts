@@ -1,187 +1,35 @@
 // TODO Resources like shader, texture, geometry reference management
 // Trace and find out which shader, texture, geometry can be destroyed
 import Notifier from './core/Notifier';
-import GLInfo from './core/GLInfo';
 import * as constants from './core/constants';
 import vendor from './core/vendor';
 
 import Material from './Material';
 import Vector2 from './math/Vector2';
-import ProgramManager from './gpu/ProgramManager';
 
 // Light header
-import Shader, { AttributeSemantic, BASIC_MATRIX_SEMANTICS, MatrixSemantic } from './Shader';
+import Shader, { BASIC_MATRIX_SEMANTICS, MatrixSemantic } from './Shader';
 
 import * as mat4 from './glmatrix/mat4';
 import * as vec3 from './glmatrix/vec3';
 import type Renderable from './Renderable';
-import GeometryBase, { AttributeBuffer, IndicesBuffer } from './GeometryBase';
 import type FrameBuffer from './FrameBuffer';
 import type Scene from './Scene';
 import { Color, GLEnum } from './core/type';
-import { genGUID, optional } from './core/util';
+import { assign, genGUID, optional, setCanvasSize } from './core/util';
 import type Camera from './Camera';
-import type Texture from './Texture';
 import type ClayNode from './Node';
-import GLProgram from './gpu/GLProgram';
-import type InstancedMesh from './InstancedMesh';
-import type Mesh from './Mesh';
-import type Skeleton from './Skeleton';
-import Matrix4 from './math/Matrix4';
-import PerspectiveCamera from './camera/Perspective';
+import GLProgram from './gl/GLProgram';
+import type PerspectiveCamera from './camera/Perspective';
 import { preZFragment, preZVertex } from './shader/source/prez.glsl';
+import GLRenderer, {
+  ExtendedRenderableObject,
+  RenderableObject,
+  RenderHooks
+} from './gl/GLRenderer';
 
 const mat4Create = mat4.create;
 
-const errorShader: Record<string, boolean> = {};
-
-function defaultGetMaterial(renderable: Renderable) {
-  return renderable.material;
-}
-function defaultGetUniform(renderable: Renderable, material: Material, symbol: string) {
-  return material.uniforms[symbol].value;
-}
-function defaultIsMaterialChanged(
-  renderable: Renderable,
-  prevRenderable: Renderable,
-  material: Material,
-  prevMaterial: Material
-) {
-  return material !== prevMaterial;
-}
-function defaultIfRender() {
-  return true;
-}
-
-function noop() {}
-
-const attributeBufferTypeMap = {
-  float: constants.FLOAT,
-  byte: constants.BYTE,
-  ubyte: constants.UNSIGNED_BYTE,
-  short: constants.SHORT,
-  ushort: constants.UNSIGNED_SHORT
-};
-
-class VertexArrayObject {
-  vao?: any;
-  availableAttributes: AttributeBuffer[];
-  availableAttributeSymbols: string[];
-  indicesBuffer: IndicesBuffer;
-
-  constructor(
-    availableAttributes: AttributeBuffer[],
-    availableAttributeSymbols: string[],
-    indicesBuffer: IndicesBuffer
-  ) {
-    this.availableAttributes = availableAttributes;
-    this.availableAttributeSymbols = availableAttributeSymbols;
-    this.indicesBuffer = indicesBuffer;
-  }
-}
-
-const vaoMap = new WeakMap<GeometryBase, Record<string, VertexArrayObject>>();
-
-function createPlaceHolderTexture() {
-  let blankCanvas: HTMLCanvasElement;
-  let webglTexture: WebGLTexture;
-
-  return {
-    __slot: -1,
-
-    bind(renderer: Renderer) {
-      if (!blankCanvas) {
-        // TODO Environment not support createCanvas.
-        blankCanvas = vendor.createCanvas();
-        blankCanvas.width = blankCanvas.height = 1;
-        blankCanvas.getContext('2d');
-      }
-
-      const gl = renderer.gl;
-      const firstBind = !webglTexture;
-      if (firstBind) {
-        webglTexture = gl.createTexture()!;
-      }
-      gl.bindTexture(constants.TEXTURE_2D, webglTexture);
-      if (firstBind) {
-        gl.texImage2D(
-          constants.TEXTURE_2D,
-          0,
-          constants.RGBA,
-          constants.RGBA,
-          constants.UNSIGNED_BYTE,
-          blankCanvas
-        );
-      }
-    },
-    unbind(renderer: Renderer) {
-      renderer.gl.bindTexture(constants.TEXTURE_2D, null);
-    },
-    isRenderable() {
-      return true;
-    }
-  };
-}
-
-/**
- * A very basic renderable that is used in renderPass
- */
-export interface RenderableObject {
-  geometry: GeometryBase;
-  material: Material;
-  mode?: GLEnum;
-  lightGroup?: number;
-  worldTransform?: Matrix4;
-
-  cullFace?: GLEnum;
-  frontFace?: GLEnum;
-
-  culling?: boolean;
-  ignorePreZ?: boolean;
-
-  isSkinnedMesh?(): this is Mesh & { skeleton: Skeleton };
-  isInstancedMesh?(): this is InstancedMesh;
-
-  beforeRender?(renderer: Renderer): void;
-  afterRender?(renderer: Renderer): void;
-}
-
-interface ExtendedRenderableObject extends RenderableObject {
-  __program: GLProgram;
-  // Depth for transparent list sorting
-  __depth: number;
-  renderOrder: number;
-}
-
-export interface RenderPassConfig<T extends RenderableObject = RenderableObject> {
-  ifRender?(renderable: T): boolean;
-  /**
-   * Get material of renderable
-   */
-  getMaterial?(renderable: T): Material;
-
-  /**
-   * Get uniform from material
-   */
-  getUniform?(renderable: T, material: Material, symbol: string): any;
-
-  isMaterialChanged?(
-    renderable: T,
-    prevRenderable: T,
-    material: Material,
-    prevMaterial: Material
-  ): boolean;
-
-  sortCompare?: (a: T & ExtendedRenderableObject, b: T & ExtendedRenderableObject) => number;
-
-  beforeRender?: (
-    renderer: Renderer,
-    renderable: T,
-    material: Material,
-    prevMaterial: Material | undefined
-  ) => void;
-  afterRender?: (renderer: Renderer, renderable: T) => void;
-}
 interface ExtendedWebGLRenderingContext extends WebGLRenderingContext {
   targetRenderer: Renderer;
 }
@@ -263,10 +111,7 @@ export interface RendererOpts {
 }
 
 interface Renderer
-  extends Pick<
-    RendererOpts,
-    'canvas' | 'clearColor' | 'clearBit' | 'logDepthBuffer' | 'throwError'
-  > {}
+  extends Pick<RendererOpts, 'canvas' | 'clearColor' | 'clearBit' | 'logDepthBuffer'> {}
 /**
  * @constructor clay.Renderer
  * @extends clay.core.Base
@@ -307,11 +152,6 @@ class Renderer extends Notifier {
    */
   viewport = {} as RendererViewport;
 
-  /**
-   * Max joint number
-   */
-  maxJointNumber = 20;
-
   // Set by FrameBuffer#bind
   __currentFrameBuffer?: FrameBuffer;
 
@@ -321,18 +161,9 @@ class Renderer extends Notifier {
     clearColor: Color;
   }[] = [];
 
-  private _sceneRendering?: Scene;
-
-  private _glinfo: GLInfo;
-
-  private _placeholderTexture: {
-    bind(renderer: Renderer): void;
-    unbind(renderer: Renderer): void;
-    __slot: number;
-  };
   private _prezMaterial?: Material;
 
-  private _programMgr: ProgramManager;
+  private _glRenderer: GLRenderer;
 
   constructor(opts?: Partial<RendererOpts>) {
     super();
@@ -349,18 +180,19 @@ class Renderer extends Notifier {
         preserveDrawingBuffer: optional(opts.preserveDrawingBuffer, false)
       };
 
-      this.gl = canvas.getContext('webgl', webglOpts) as ExtendedWebGLRenderingContext;
+      const gl = (this.gl = canvas.getContext('webgl', webglOpts) as ExtendedWebGLRenderingContext);
 
       if (!this.gl) {
         throw new Error();
       }
 
-      this._glinfo = new GLInfo(this.gl);
-
-      if (this.gl.targetRenderer) {
+      if (gl.targetRenderer) {
         console.error('Already created a renderer');
       }
-      this.gl.targetRenderer = this;
+      gl.targetRenderer = this;
+      this._glRenderer = new GLRenderer(gl, {
+        throwError: opts.throwError
+      });
 
       this._width = opts.width || canvas.width || 100;
       this._height = opts.height || canvas.height || 100;
@@ -371,16 +203,10 @@ class Renderer extends Notifier {
       throw 'Error creating WebGL Context ' + e;
     }
 
-    this.throwError = optional(opts.throwError, true);
     this.logDepthBuffer = opts.logDepthBuffer || false;
     this.clearColor = opts.clearColor || [0.0, 0.0, 0.0, 0.0];
     // gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT
     this.clearBit = opts.clearBit || 17664;
-
-    // Init managers
-    this._programMgr = new ProgramManager(this);
-
-    this._placeholderTexture = createPlaceHolderTexture();
   }
   /**
    * Resize the canvas
@@ -389,18 +215,9 @@ class Renderer extends Notifier {
    */
   resize(width?: number, height?: number) {
     const canvas = this.canvas;
-    // http://www.khronos.org/webgl/wiki/HandlingHighDPI
-    // set the display size of the canvas.
     const dpr = this._devicePixelRatio;
     if (width != null) {
-      if (canvas.style) {
-        canvas.style.width = width + 'px';
-        canvas.style.height = height + 'px';
-      }
-      // set the size of the drawingBuffer
-      canvas.width = width * dpr;
-      canvas.height = height! * dpr;
-
+      setCanvasSize(canvas, width, height!, dpr);
       this._width = width;
       this._height = height!;
     } else {
@@ -454,24 +271,6 @@ class Renderer extends Notifier {
   }
 
   /**
-   * Get WebGL extension
-   * @param {string} name
-   * @return {object}
-   */
-  getGLExtension(name: string) {
-    return this._glinfo.getExtension(name);
-  }
-
-  /**
-   * Get WebGL parameter
-   * @param {string} name
-   * @return {*}
-   */
-  getGLParameter(name: string) {
-    return this._glinfo.getParameter(name);
-  }
-
-  /**
    * Set rendering viewport
    * @param {number|Object} x
    * @param {number} [y]
@@ -511,7 +310,7 @@ class Renderer extends Notifier {
     }
     dpr = dpr || this._devicePixelRatio;
 
-    this.gl.viewport(x * dpr, y! * dpr, width! * dpr, height! * dpr);
+    this._glRenderer.setViewport(x, y!, width!, height!, dpr!);
     // Use a fresh new object, not write property.
     this.viewport = {
       x,
@@ -558,10 +357,6 @@ class Renderer extends Notifier {
       this.clearColor = opt.clearColor;
       this.clearBit = opt.clearBit;
     }
-  }
-
-  bindSceneRendering(scene?: Scene) {
-    this._sceneRendering = scene;
   }
 
   /**
@@ -624,8 +419,6 @@ class Renderer extends Notifier {
     camera.update();
     const renderList = scene.updateRenderList(camera, true);
 
-    this._sceneRendering = scene;
-
     const opaqueList = renderList.opaque;
     const transparentList = renderList.transparent;
     const sceneMaterial = scene.material;
@@ -651,113 +444,35 @@ class Renderer extends Notifier {
     }
 
     // Render opaque list
-    this.renderPass(opaqueList, camera, {
-      getMaterial(renderable) {
-        return sceneMaterial || renderable.material;
+    this.renderPass(
+      opaqueList,
+      camera,
+      {
+        getMaterial(renderable) {
+          return sceneMaterial || renderable.material;
+        },
+        sortCompare: Renderer.opaqueSortCompare
       },
-      sortCompare: Renderer.opaqueSortCompare
-    });
+      scene
+    );
 
-    this.renderPass(transparentList, camera, {
-      getMaterial(renderable) {
-        return sceneMaterial || renderable.material;
+    this.renderPass(
+      transparentList,
+      camera,
+      {
+        getMaterial(renderable) {
+          return sceneMaterial || renderable.material;
+        },
+        sortCompare: Renderer.transparentSortCompare
       },
-      sortCompare: Renderer.transparentSortCompare
-    });
+      scene
+    );
 
     scene.trigger('afterrender', this, scene, camera, renderList);
-
-    // Cleanup
-    this._sceneRendering = undefined;
   }
 
-  getProgram(renderable: RenderableObject, renderMaterial: Material, scene: Scene) {
-    renderMaterial = renderMaterial || renderable.material;
-    return this._programMgr.getProgram(renderable, renderMaterial, scene);
-  }
-
-  validateProgram(program: GLProgram) {
-    if (program.__error) {
-      const errorMsg = program.__error;
-      if (errorShader[program.__uid__]) {
-        return;
-      }
-      errorShader[program.__uid__] = true;
-
-      if (this.throwError) {
-        throw new Error(errorMsg);
-      } else {
-        this.trigger('error', errorMsg);
-      }
-    }
-  }
-
-  updatePrograms(list: RenderableObject[], scene: Scene, passConfig: RenderPassConfig) {
-    const getMaterial = (passConfig && passConfig.getMaterial) || defaultGetMaterial;
-    scene = scene || null;
-    for (let i = 0; i < list.length; i++) {
-      const renderable = list[i];
-      const renderMaterial = getMaterial.call(this, renderable);
-      if (i > 0) {
-        const prevRenderable = list[i - 1];
-        const prevJointsLen = (prevRenderable as Mesh).joints
-          ? (prevRenderable as Mesh).joints.length
-          : 0;
-        const jointsLen = (renderable as Mesh).joints ? (renderable as Mesh).joints.length : 0;
-        // Keep program not change if joints, material, lightGroup are same of two renderables.
-        if (
-          jointsLen === prevJointsLen &&
-          renderable.material === prevRenderable.material &&
-          renderable.lightGroup === prevRenderable.lightGroup
-        ) {
-          (renderable as ExtendedRenderableObject).__program = (
-            prevRenderable as ExtendedRenderableObject
-          ).__program;
-          continue;
-        }
-      }
-
-      const program = this._programMgr.getProgram(renderable, renderMaterial, scene);
-
-      this.validateProgram(program);
-
-      (renderable as ExtendedRenderableObject).__program = program;
-    }
-  }
-
-  /**
-   * Render a single renderable list in camera in sequence
-   * @param {clay.Renderable[]} list List of all renderables.
-   * @param {clay.Camera} [camera] Camera provide view matrix and porjection matrix. It can be null.
-   * @param {Object} [passConfig]
-   * @param {Function} [passConfig.getMaterial] Get renderable material.
-   * @param {Function} [passConfig.getUniform] Get material uniform value.
-   * @param {Function} [passConfig.isMaterialChanged] If material changed.
-   * @param {Function} [passConfig.beforeRender] Before render each renderable.
-   * @param {Function} [passConfig.afterRender] After render each renderable
-   * @param {Function} [passConfig.ifRender] If render the renderable.
-   * @param {Function} [passConfig.sortCompare] Sort compare function.
-   * @return {IRenderInfo}
-   */
-  renderPass(list: RenderableObject[], camera?: Camera, passConfig?: RenderPassConfig) {
-    this.trigger('beforerenderpass', this, list, camera, passConfig);
-
-    passConfig = passConfig || {};
-    passConfig.getMaterial = passConfig.getMaterial || defaultGetMaterial;
-    passConfig.getUniform = passConfig.getUniform || defaultGetUniform;
-    // PENDING Better solution?
-    passConfig.isMaterialChanged = passConfig.isMaterialChanged || defaultIsMaterialChanged;
-    passConfig.beforeRender = passConfig.beforeRender || noop;
-    passConfig.afterRender = passConfig.afterRender || noop;
-
-    const ifRenderObject = passConfig.ifRender || defaultIfRender;
-
-    this.updatePrograms(list, this._sceneRendering!, passConfig);
-    if (passConfig.sortCompare) {
-      (list as ExtendedRenderableObject[]).sort(passConfig.sortCompare);
-    }
-
-    // Some common builtin uniforms
+  renderPass(list: RenderableObject[], camera?: Camera, passConfig?: RenderHooks, scene?: Scene) {
+    let worldM: mat4.Mat4Array;
     const viewport = this.viewport;
     const vDpr = viewport.devicePixelRatio;
     const viewportUniform = [
@@ -767,12 +482,15 @@ class Renderer extends Notifier {
       viewport.height * vDpr
     ];
     const windowDpr = this._devicePixelRatio;
-    const windowSizeUniform = this.__currentFrameBuffer
-      ? [this.__currentFrameBuffer.getTextureWidth(), this.__currentFrameBuffer.getTextureHeight()]
+    const currentFrameBuffer = this.__currentFrameBuffer;
+    const windowSizeUniform = currentFrameBuffer
+      ? [currentFrameBuffer.getTextureWidth(), currentFrameBuffer.getTextureHeight()]
       : [this._width * windowDpr, this._height * windowDpr];
     // DEPRECATED
     const viewportSizeUniform = [viewportUniform[2], viewportUniform[3]];
     const time = Date.now();
+    const gl = this.gl;
+    const logDepthBuffer = this.logDepthBuffer;
 
     // Calculate view and projection matrix
     if (camera) {
@@ -788,167 +506,86 @@ class Renderer extends Notifier {
     mat4.invert(matrices.PROJECTIONINVERSE, matrices.PROJECTION);
     mat4.invert(matrices.VIEWPROJECTIONINVERSE, matrices.VIEWPROJECTION);
 
-    const _gl = this.gl;
-    const scene = this._sceneRendering;
-
-    let prevMaterial: Material | undefined;
-    let prevProgram: GLProgram | undefined;
-    let prevRenderable: RenderableObject | undefined;
-
-    // Status
-    let depthTest: boolean | undefined, depthMask: boolean | undefined;
-    let culling: boolean | undefined, cullFace: GLEnum | undefined, frontFace: GLEnum | undefined;
-    let transparent: boolean | undefined;
-    let drawID: string | undefined;
-    let currentVAO: VertexArrayObject | undefined;
-    let materialTakesTextureSlot: number | undefined;
-
-    // const vaoExt = this.getGLExtension('OES_vertex_array_object');
-    // not use vaoExt, some platforms may mess it up.
-    let vaoExt: any;
-
-    for (let i = 0; i < list.length; i++) {
-      const renderable = list[i];
-      const isSceneNode = renderable.worldTransform != null;
-      let worldM: mat4.Mat4Array;
-
-      if (!ifRenderObject(renderable)) {
-        continue;
-      }
-
-      // Skinned mesh will transformed to joint space. Ignore the mesh transform
-      if (isSceneNode) {
-        worldM =
-          renderable.isSkinnedMesh && renderable.isSkinnedMesh()
-            ? // TODO
-              renderable.offsetMatrix
-              ? renderable.offsetMatrix.array
-              : IDENTITY_MATRIX
-            : renderable.worldTransform!.array;
-      }
-      const geometry = renderable.geometry;
-      const material = passConfig.getMaterial.call(this, renderable);
-
-      let program = (renderable as ExtendedRenderableObject).__program;
-
-      // If has error in shader and program is invalid
-      if (!program.isValid()) {
-        continue;
-      }
-
-      const shader = material.shader!;
-
-      const currentDrawID = geometry.__uid__ + '-' + program.__uid__;
-      const drawIDChanged = currentDrawID !== drawID;
-      drawID = currentDrawID;
-      if (drawIDChanged && vaoExt) {
-        // TODO Seems need to be bound to null immediately (or before bind another program?) if vao is changed
-        vaoExt.bindVertexArrayOES(null);
-      }
-      if (isSceneNode) {
-        mat4.copy(matrices.WORLD, worldM!);
-        mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION, worldM!);
-        mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW, worldM!);
-        if (shader.semanticsMap.WORLDINVERSE || shader.semanticsMap.WORLDINVERSETRANSPOSE) {
-          mat4.invert(matrices.WORLDINVERSE, worldM!);
+    let prevProgram: GLProgram;
+    const renderHooksForScene: RenderHooks = {
+      getProgramKey: (renderable) => {
+        let key = (scene && scene.getProgramKey(renderable.lightGroup || 0)) || '';
+        if (this.logDepthBuffer) {
+          key += ',ld';
         }
-        if (shader.semanticsMap.WORLDVIEWINVERSE || shader.semanticsMap.WORLDVIEWINVERSETRANSPOSE) {
-          mat4.invert(matrices.WORLDVIEWINVERSE, matrices.WORLDVIEW);
+        return key;
+      },
+      getShaderDefineCode: (renderable) => {
+        const lightsNumbers = scene ? scene.getLightsNumbers(renderable.lightGroup || 0) : {};
+        const commonDefineCode: string[] = [];
+        if (lightsNumbers) {
+          for (const lightType in lightsNumbers) {
+            const count = lightsNumbers[lightType];
+            if (count > 0) {
+              commonDefineCode.push('#define ' + lightType.toUpperCase() + '_COUNT ' + count);
+            }
+          }
         }
-        if (
-          shader.semanticsMap.WORLDVIEWPROJECTIONINVERSE ||
-          shader.semanticsMap.WORLDVIEWPROJECTIONINVERSETRANSPOSE
-        ) {
-          mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
+        if (this.logDepthBuffer) {
+          commonDefineCode.push('#define LOG_DEPTH');
         }
-      }
-
-      // Before render hook
-      renderable.beforeRender && renderable.beforeRender(this);
-      passConfig.beforeRender(this, renderable, material, prevMaterial);
-
-      const programChanged = program !== prevProgram;
-      if (programChanged) {
-        // Set lights number
-        program.bind(this);
+        return commonDefineCode.join('\n');
+      },
+      programChanged: (program) => {
         // Set some common uniforms
-        program.setUniformOfSemantic(_gl, 'VIEWPORT', viewportUniform);
-        program.setUniformOfSemantic(_gl, 'WINDOW_SIZE', windowSizeUniform);
+        program.setSemanticUniform(gl, 'VIEWPORT', viewportUniform);
+        program.setSemanticUniform(gl, 'WINDOW_SIZE', windowSizeUniform);
         if (camera) {
-          program.setUniformOfSemantic(_gl, 'NEAR', (camera as PerspectiveCamera).near);
-          program.setUniformOfSemantic(_gl, 'FAR', (camera as PerspectiveCamera).far);
+          program.setSemanticUniform(gl, 'NEAR', (camera as PerspectiveCamera).near);
+          program.setSemanticUniform(gl, 'FAR', (camera as PerspectiveCamera).far);
 
-          if (this.logDepthBuffer) {
-            // TODO Semantic?
-            program.setUniformOfSemantic(
-              _gl,
+          if (logDepthBuffer) {
+            program.setSemanticUniform(
+              gl,
               'LOG_DEPTH_BUFFER_FC',
               2.0 / (Math.log((camera as PerspectiveCamera).far + 1.0) / Math.LN2)
             );
           }
         }
-        program.setUniformOfSemantic(_gl, 'DEVICEPIXELRATIO', vDpr);
-        program.setUniformOfSemantic(_gl, 'TIME', time);
+        program.setSemanticUniform(gl, 'DEVICEPIXELRATIO', vDpr);
+        program.setSemanticUniform(gl, 'TIME', time);
         // DEPRECATED
-        program.setUniformOfSemantic(_gl, 'VIEWPORT_SIZE', viewportSizeUniform);
-
-        // Set lights uniforms
-        // TODO needs optimized
-        if (scene) {
-          scene.setLightUniforms(program, renderable.lightGroup!, this);
-        }
-      } else {
-        program = prevProgram!;
-      }
-
-      // Program changes also needs reset the materials.
-      if (
-        programChanged ||
-        passConfig.isMaterialChanged(renderable, prevRenderable!, material, prevMaterial!)
-      ) {
-        if (material.depthTest !== depthTest) {
-          material.depthTest ? _gl.enable(constants.DEPTH_TEST) : _gl.disable(constants.DEPTH_TEST);
-          depthTest = material.depthTest;
-        }
-        if (material.depthMask !== depthMask) {
-          _gl.depthMask(material.depthMask);
-          depthMask = material.depthMask;
-        }
-        if (material.transparent !== transparent) {
-          material.transparent ? _gl.enable(constants.BLEND) : _gl.disable(constants.BLEND);
-          transparent = material.transparent;
-        }
-        // TODO cache blending
-        if (material.transparent) {
-          if (material.blend) {
-            material.blend(_gl);
-          } else {
-            // Default blend function
-            _gl.blendEquationSeparate(constants.FUNC_ADD, constants.FUNC_ADD);
-            _gl.blendFuncSeparate(
-              constants.SRC_ALPHA,
-              constants.ONE_MINUS_SRC_ALPHA,
-              constants.ONE,
-              constants.ONE_MINUS_SRC_ALPHA
-            );
+        program.setSemanticUniform(gl, 'VIEWPORT_SIZE', viewportSizeUniform);
+      },
+      renderableChanged: (renderable, material, program) => {
+        const isSceneNode = renderable.worldTransform != null;
+        const shader = material.shader;
+        if (isSceneNode) {
+          // Skinned mesh will transformed to joint space. Ignore the mesh transform
+          worldM =
+            renderable.isSkinnedMesh && renderable.isSkinnedMesh()
+              ? // TODO
+                renderable.offsetMatrix
+                ? renderable.offsetMatrix.array
+                : IDENTITY_MATRIX
+              : renderable.worldTransform!.array;
+          mat4.copy(matrices.WORLD, worldM!);
+          mat4.multiply(matrices.WORLDVIEWPROJECTION, matrices.VIEWPROJECTION, worldM!);
+          mat4.multiplyAffine(matrices.WORLDVIEW, matrices.VIEW, worldM!);
+          if (shader.semanticsMap.WORLDINVERSE || shader.semanticsMap.WORLDINVERSETRANSPOSE) {
+            mat4.invert(matrices.WORLDINVERSE, worldM!);
+          }
+          if (
+            shader.semanticsMap.WORLDVIEWINVERSE ||
+            shader.semanticsMap.WORLDVIEWINVERSETRANSPOSE
+          ) {
+            mat4.invert(matrices.WORLDVIEWINVERSE, matrices.WORLDVIEW);
+          }
+          if (
+            shader.semanticsMap.WORLDVIEWPROJECTIONINVERSE ||
+            shader.semanticsMap.WORLDVIEWPROJECTIONINVERSETRANSPOSE
+          ) {
+            mat4.invert(matrices.WORLDVIEWPROJECTIONINVERSE, matrices.WORLDVIEWPROJECTION);
           }
         }
 
-        materialTakesTextureSlot = this._bindMaterial(
-          renderable,
-          material,
-          program,
-          prevRenderable,
-          prevMaterial,
-          prevProgram,
-          passConfig.getUniform
-        );
-        prevMaterial = material;
-      }
+        const matrixSemanticKeys = shader.matrixSemantics;
 
-      const matrixSemanticKeys = shader.matrixSemantics;
-
-      if (isSceneNode) {
         for (let k = 0; k < matrixSemanticKeys.length; k++) {
           const semantic = matrixSemanticKeys[k];
           const semanticInfo = shader.semanticsMap[semantic]!;
@@ -957,399 +594,26 @@ class Renderer extends Notifier {
             const matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose!];
             mat4.transpose(matrix, matrixNoTranspose);
           }
-          program.set(_gl, semanticInfo.type, semanticInfo.symbol, matrix);
+          program.set(gl, semanticInfo.type, semanticInfo.symbol, matrix);
+        }
+
+        // TODO
+        if (scene && prevProgram !== program) {
+          // Only set when program changed
+          scene.setLightUniforms(program, renderable.lightGroup!, this);
+          prevProgram = program;
         }
       }
-
-      if (renderable.cullFace !== cullFace) {
-        cullFace = renderable.cullFace;
-        _gl.cullFace(cullFace!);
-      }
-      if (renderable.frontFace !== frontFace) {
-        frontFace = renderable.frontFace;
-        _gl.frontFace(frontFace!);
-      }
-      if (renderable.culling !== culling) {
-        culling = renderable.culling;
-        culling ? _gl.enable(constants.CULL_FACE) : _gl.disable(constants.CULL_FACE);
-      }
-      // TODO Not update skeleton in each renderable.
-      this._updateSkeleton(renderable as Mesh, program, materialTakesTextureSlot!);
-      if (drawIDChanged) {
-        currentVAO = this._bindVAO(vaoExt, shader, geometry, program);
-      }
-      this._renderObject(renderable, currentVAO!, program);
-
-      // After render hook
-      passConfig.afterRender(this, renderable);
-      renderable.afterRender && renderable.afterRender(this);
-
-      prevProgram = program;
-      prevRenderable = renderable;
-    }
-
-    // TODO Seems need to be bound to null immediately if vao is changed?
-    if (vaoExt) {
-      vaoExt.bindVertexArrayOES(null);
-    }
-
-    this.trigger('afterrenderpass', this, list, camera, passConfig);
+    };
+    this._glRenderer.render(list, assign(renderHooksForScene, passConfig));
   }
 
   getMaxJointNumber() {
-    return this.maxJointNumber;
+    return this._glRenderer.maxJointNumber;
   }
 
-  _updateSkeleton(object: Mesh, program: GLProgram, slot: number) {
-    const _gl = this.gl;
-    const skeleton = object.skeleton;
-    // Set pose matrices of skinned mesh
-    if (skeleton) {
-      // TODO Update before culling.
-      skeleton.update();
-      if (object.joints.length > this.getMaxJointNumber()) {
-        const skinMatricesTexture = skeleton.getSubSkinMatricesTexture(
-          object.__uid__,
-          object.joints
-        );
-        program.useTextureSlot(this, skinMatricesTexture, slot);
-        program.set(_gl, '1i', 'skinMatricesTexture', slot);
-        program.set(_gl, '1f', 'skinMatricesTextureSize', skinMatricesTexture.width);
-      } else {
-        const skinMatricesArray = skeleton.getSubSkinMatrices(object.__uid__, object.joints);
-        program.set(_gl, 'm4v', 'skinMatrix', skinMatricesArray);
-      }
-    }
-  }
-
-  _renderObject(renderable: RenderableObject, vao: VertexArrayObject, program: GLProgram) {
-    const _gl = this.gl;
-    const geometry = renderable.geometry;
-
-    let glDrawMode = renderable.mode;
-    if (glDrawMode == null) {
-      glDrawMode = 0x0004;
-    }
-
-    let ext = null;
-    const isInstanced = renderable.isInstancedMesh && renderable.isInstancedMesh();
-    if (isInstanced) {
-      ext = this.getGLExtension('ANGLE_instanced_arrays');
-      if (!ext) {
-        console.warn('Device not support ANGLE_instanced_arrays extension');
-        return;
-      }
-    }
-
-    let instancedAttrLocations: {
-      location: number;
-      enabled: boolean;
-    }[];
-    if (isInstanced) {
-      instancedAttrLocations = this._bindInstancedAttributes(renderable, program, ext);
-    }
-
-    if (vao.indicesBuffer) {
-      const uintExt = this.getGLExtension('OES_element_index_uint');
-      const useUintExt = uintExt && geometry.indices instanceof Uint32Array;
-      const indicesType = useUintExt ? constants.UNSIGNED_INT : constants.UNSIGNED_SHORT;
-
-      if (isInstanced) {
-        ext.drawElementsInstancedANGLE(
-          glDrawMode,
-          vao.indicesBuffer.count,
-          indicesType,
-          0,
-          renderable.getInstanceCount()
-        );
-      } else {
-        _gl.drawElements(glDrawMode, vao.indicesBuffer.count, indicesType, 0);
-      }
-    } else {
-      if (isInstanced) {
-        ext.drawArraysInstancedANGLE(
-          glDrawMode,
-          0,
-          geometry.vertexCount,
-          renderable.getInstanceCount()
-        );
-      } else {
-        // FIXME Use vertex number in buffer
-        // vertexCount may get the wrong value when geometry forget to mark dirty after update
-        _gl.drawArrays(glDrawMode, 0, geometry.vertexCount);
-      }
-    }
-
-    if (isInstanced) {
-      for (let i = 0; i < instancedAttrLocations!.length; i++) {
-        if (!instancedAttrLocations![i].enabled) {
-          _gl.disableVertexAttribArray(instancedAttrLocations![i].location);
-        }
-        ext.vertexAttribDivisorANGLE(instancedAttrLocations![i].location, 0);
-      }
-    }
-  }
-
-  _bindInstancedAttributes(renderable: InstancedMesh, program: GLProgram, ext: any) {
-    const _gl = this.gl;
-    const instancedBuffers = renderable.getInstancedAttributesBuffers(this);
-    const locations: {
-      location: number;
-      enabled: boolean;
-    }[] = [];
-
-    for (let i = 0; i < instancedBuffers.length; i++) {
-      const bufferObj = instancedBuffers[i];
-      const location = program.getAttribLocation(_gl, bufferObj.symbol);
-      if (location < 0) {
-        continue;
-      }
-
-      const glType = attributeBufferTypeMap[bufferObj.type] || constants.FLOAT;
-      const isEnabled = program.isAttribEnabled(this, location);
-      if (!program.isAttribEnabled(this, location)) {
-        _gl.enableVertexAttribArray(location);
-      }
-      locations.push({
-        location: location,
-        enabled: isEnabled
-      });
-      _gl.bindBuffer(constants.ARRAY_BUFFER, bufferObj.buffer);
-      _gl.vertexAttribPointer(location, bufferObj.size, glType, false, 0, 0);
-      ext.vertexAttribDivisorANGLE(location, bufferObj.divisor);
-    }
-
-    return locations;
-  }
-
-  _bindMaterial(
-    renderable: RenderableObject,
-    material: Material,
-    program: GLProgram,
-    prevRenderable: RenderableObject | undefined,
-    prevMaterial: Material | undefined,
-    prevProgram: GLProgram | undefined,
-    getUniformValue: RenderPassConfig['getUniform']
-  ) {
-    const _gl = this.gl;
-    // PENDING Same texture in different material take different slot?
-
-    // May use shader of other material if shader code are same
-    const sameProgram = prevProgram === program;
-
-    const currentTextureSlot = program.currentTextureSlot();
-    const enabledUniforms = material.getEnabledUniforms();
-    const textureUniforms = material.getTextureUniforms();
-    const placeholderTexture = this._placeholderTexture;
-
-    for (let u = 0; u < textureUniforms.length; u++) {
-      const symbol = textureUniforms[u];
-      const uniformValue = getUniformValue!(renderable, material, symbol);
-      const uniformType = material.uniforms[symbol].type;
-      // Not use `instanceof` to determine if a value is texture in Material#bind.
-      // Use type instead, in some case texture may be in different namespaces.
-      // TODO Duck type validate.
-      if (uniformType === 't' && uniformValue) {
-        // Reset slot
-        uniformValue.__slot = -1;
-      } else if (uniformType === 'tv') {
-        for (let i = 0; i < uniformValue.length; i++) {
-          if (uniformValue[i]) {
-            uniformValue[i].__slot = -1;
-          }
-        }
-      }
-    }
-
-    placeholderTexture.__slot = -1;
-
-    // Set uniforms
-    for (let u = 0; u < enabledUniforms.length; u++) {
-      const symbol = enabledUniforms[u];
-      const uniform = material.uniforms[symbol];
-      let uniformValue = getUniformValue!(renderable, material, symbol);
-      const uniformType = uniform.type;
-      const isTexture = uniformType === 't';
-
-      if (isTexture) {
-        if (!uniformValue || !uniformValue.isRenderable()) {
-          uniformValue = placeholderTexture;
-        }
-      }
-      // PENDING
-      // When binding two materials with the same shader
-      // Many uniforms will be be set twice even if they have the same value
-      // So add a evaluation to see if the uniform is really needed to be set
-      if (prevMaterial && sameProgram) {
-        let prevUniformValue = getUniformValue!(prevRenderable!, prevMaterial, symbol);
-        if (isTexture) {
-          if (!prevUniformValue || !prevUniformValue.isRenderable()) {
-            prevUniformValue = placeholderTexture;
-          }
-        }
-
-        if (prevUniformValue === uniformValue) {
-          if (isTexture) {
-            // Still take the slot to make sure same texture in different materials have same slot.
-            program.takeCurrentTextureSlot(this);
-          } else if (uniformType === 'tv' && uniformValue) {
-            for (let i = 0; i < uniformValue.length; i++) {
-              program.takeCurrentTextureSlot(this);
-            }
-          }
-          continue;
-        }
-      }
-
-      if (uniformValue == null) {
-        continue;
-      } else if (isTexture) {
-        if (uniformValue.__slot < 0) {
-          const slot = program.currentTextureSlot();
-          const res = program.set(_gl, '1i', symbol, slot);
-          if (res) {
-            // Texture uniform is enabled
-            program.takeCurrentTextureSlot(this, uniformValue);
-            uniformValue.__slot = slot;
-          }
-        }
-        // Multiple uniform use same texture..
-        else {
-          program.set(_gl, '1i', symbol, uniformValue.__slot);
-        }
-      } else if (Array.isArray(uniformValue)) {
-        if (uniformValue.length === 0) {
-          continue;
-        }
-        // Texture Array
-        if (uniformType === 'tv') {
-          if (!program.hasUniform(symbol)) {
-            continue;
-          }
-
-          const arr = [];
-          for (let i = 0; i < uniformValue.length; i++) {
-            const texture = uniformValue[i];
-
-            if (texture.__slot < 0) {
-              const slot = program.currentTextureSlot();
-              arr.push(slot);
-              program.takeCurrentTextureSlot(this, texture);
-              texture.__slot = slot;
-            } else {
-              arr.push(texture.__slot);
-            }
-          }
-
-          program.set(_gl, '1iv', symbol, arr);
-        } else {
-          program.set(_gl, uniform.type, symbol, uniformValue);
-        }
-      } else {
-        program.set(_gl, uniform.type, symbol, uniformValue);
-      }
-    }
-    const newSlot = program.currentTextureSlot();
-    // Texture slot maybe used out of material.
-    program.resetTextureSlot(currentTextureSlot);
-    return newSlot;
-  }
-
-  _bindVAO(
-    vaoExt: any,
-    shader: Shader,
-    geometry: GeometryBase,
-    program: GLProgram
-  ): VertexArrayObject | undefined {
-    const isStatic = !geometry.dynamic;
-    const _gl = this.gl;
-
-    const vaoId = this.__uid__ + '-' + program.__uid__;
-    let geometryVaos = vaoMap.get(geometry);
-    let vao = geometryVaos && geometryVaos[vaoId];
-    if (!vao) {
-      const chunks = geometry.getBufferChunks(this);
-      if (!chunks || !chunks.length) {
-        // Empty mesh
-        return;
-      }
-      const chunk = chunks[0];
-      const attributeBuffers = chunk.attributeBuffers;
-      const indicesBuffer = chunk.indicesBuffer;
-
-      const availableAttributes = [];
-      const availableAttributeSymbols = [];
-      for (let a = 0; a < attributeBuffers.length; a++) {
-        const attributeBufferInfo = attributeBuffers[a];
-        const name = attributeBufferInfo.name;
-        const semantic = attributeBufferInfo.semantic;
-        let symbol;
-        if (semantic) {
-          const semanticInfo = shader.semanticsMap[semantic as AttributeSemantic];
-          symbol = semanticInfo && semanticInfo.symbol;
-        } else {
-          symbol = name;
-        }
-        if (symbol && program.attributes[symbol]) {
-          availableAttributes.push(attributeBufferInfo);
-          availableAttributeSymbols.push(symbol);
-        }
-      }
-
-      vao = new VertexArrayObject(availableAttributes, availableAttributeSymbols, indicesBuffer);
-
-      if (isStatic) {
-        geometryVaos = geometryVaos || {};
-        geometryVaos[vaoId] = vao;
-        vaoMap.set(geometry, geometryVaos);
-      }
-    }
-
-    let needsBindAttributes = true;
-
-    // Create vertex object array cost a lot
-    // So we don't use it on the dynamic object
-    if (vaoExt && isStatic) {
-      // Use vertex array object
-      // http://blog.tojicode.com/2012/10/oesvertexarrayobject-extension.html
-      if (vao.vao == null) {
-        vao.vao = vaoExt.createVertexArrayOES();
-      } else {
-        needsBindAttributes = false;
-      }
-      vaoExt.bindVertexArrayOES(vao.vao);
-    }
-
-    const availableAttributes = vao.availableAttributes;
-    const indicesBuffer = vao.indicesBuffer;
-
-    if (needsBindAttributes) {
-      const locationList = program.enableAttributes(
-        this,
-        vao.availableAttributeSymbols,
-        vaoExt && isStatic && vao
-      );
-      // Setting attributes;
-      for (let a = 0; a < availableAttributes.length; a++) {
-        const location = locationList[a];
-        if (location === -1) {
-          continue;
-        }
-        const attributeBufferInfo = availableAttributes[a];
-        const buffer = attributeBufferInfo.buffer;
-        const size = attributeBufferInfo.size;
-        const glType = attributeBufferTypeMap[attributeBufferInfo.type] || constants.FLOAT;
-
-        _gl.bindBuffer(constants.ARRAY_BUFFER, buffer);
-        _gl.vertexAttribPointer(location, size, glType, false, 0, 0);
-      }
-
-      if (geometry.isUseIndices()) {
-        _gl.bindBuffer(constants.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-      }
-    }
-
-    return vao;
+  setMaxJointNumber(val: number) {
+    this._glRenderer.maxJointNumber = val;
   }
 
   renderPreZ(list: RenderableObject[], scene: Scene, camera: Camera) {
@@ -1428,10 +692,11 @@ class Renderer extends Notifier {
       parent.remove(root);
     }
     const disposedMap: Record<string, boolean> = {};
+    const glRenderer = this._glRenderer;
     root.traverse((node) => {
       const material = (node as Renderable).material;
       if ((node as Renderable).geometry && disposeGeometry) {
-        (node as Renderable).geometry.dispose(this);
+        this._glRenderer.disposeGeometry((node as Renderable).geometry);
       }
       if (disposeTexture && material && !disposedMap[material.__uid__]) {
         const textureUniforms = material.getTextureUniforms();
@@ -1443,11 +708,11 @@ class Renderer extends Notifier {
             continue;
           }
           if (uniformType === 't') {
-            val.dispose && val.dispose(this);
+            glRenderer.disposeTexture(val);
           } else if (uniformType === 'tv') {
             for (let k = 0; k < val.length; k++) {
               if (val[k]) {
-                val[k].dispose && val[k].dispose(this);
+                glRenderer.disposeTexture(val[k]);
               }
             }
           }
@@ -1455,51 +720,9 @@ class Renderer extends Notifier {
         disposedMap[material.__uid__] = true;
       }
       // Particle system and AmbientCubemap light need to dispose
-      if (node.dispose) {
-        node.dispose(this);
-      }
+      node.dispose && node.dispose(this);
     });
   }
-
-  /**
-   * Dispose given geometry
-   * @param {clay.Geometry} geometry
-   */
-  disposeGeometry(geometry: GeometryBase) {
-    geometry.dispose(this);
-  }
-
-  /**
-   * @todo
-   * @deprecated
-   */
-  __getGeometryVaoCache(geometry: GeometryBase) {
-    return vaoMap.get(geometry);
-  }
-  /**
-   * @todo
-   * @deprecated
-   */
-  __removeGeometryVaoCache(geometry: GeometryBase) {
-    return vaoMap.delete(geometry);
-  }
-
-  /**
-   * Dispose given texture
-   * @param {clay.Texture} texture
-   */
-  disposeTexture(texture: Texture) {
-    texture.dispose(this);
-  }
-
-  /**
-   * Dispose given frame buffer
-   * @param {clay.FrameBuffer} frameBuffer
-   */
-  disposeFrameBuffer(frameBuffer: FrameBuffer) {
-    frameBuffer.dispose(this);
-  }
-
   /**
    * Dispose renderer
    */
@@ -1590,13 +813,15 @@ class Renderer extends Notifier {
   static DEPTH_BUFFER_BIT = constants.DEPTH_BUFFER_BIT;
   static STENCIL_BUFFER_BIT = constants.STENCIL_BUFFER_BIT;
 }
-const IDENTITY_MATRIX = mat4Create();
+
+const IDENTITY_MATRIX = mat4.create();
 const matrices = {} as Record<MatrixSemantic, mat4.Mat4Array>;
 // Temporary variables
 BASIC_MATRIX_SEMANTICS.forEach((semantic) => {
-  matrices[semantic] = mat4Create();
-  matrices[`${semantic}INVERSE`] = mat4Create();
-  matrices[`${semantic}TRANSPOSE`] = mat4Create();
-  matrices[`${semantic}INVERSETRANSPOSE`] = mat4Create();
+  matrices[semantic] = mat4.create();
+  matrices[`${semantic}INVERSE`] = mat4.create();
+  matrices[`${semantic}TRANSPOSE`] = mat4.create();
+  matrices[`${semantic}INVERSETRANSPOSE`] = mat4.create();
 });
+
 export default Renderer;

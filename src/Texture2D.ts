@@ -2,28 +2,8 @@ import Texture, { TextureImageSource, TextureOpts, TexturePixelSource } from './
 import * as constants from './core/constants';
 import vendor from './core/vendor';
 import Renderer from './Renderer';
-import { GLEnum } from './core/type';
 
-function nearestPowerOfTwo(val: number) {
-  return Math.pow(2, Math.round(Math.log(val) / Math.LN2));
-}
-function convertTextureToPowerOfTwo(
-  texture: Texture2D,
-  canvas?: HTMLCanvasElement
-): HTMLCanvasElement {
-  // const canvas = document.createElement('canvas');
-  const width = nearestPowerOfTwo(texture.width);
-  const height = nearestPowerOfTwo(texture.height);
-  canvas = canvas || document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d')!;
-  ctx.drawImage(texture.image!, 0, 0, width, height);
-
-  return canvas;
-}
-
-interface Texture2DData {
+export interface Texture2DData {
   image?: TextureImageSource;
   /**
    * Pixels data. Will be ignored if image is set.
@@ -68,7 +48,6 @@ class Texture2D extends Texture {
   readonly textureType = 'texture2D';
 
   private _image?: TextureImageSource;
-  private _potCanvas?: HTMLCanvasElement;
 
   constructor(opts?: Partial<Texture2DOpts>) {
     super(opts);
@@ -116,173 +95,12 @@ class Texture2D extends Texture {
     }
   }
 
-  update(renderer: Renderer) {
-    const gl = renderer.gl;
-    gl.bindTexture(constants.TEXTURE_2D, this._cache.get('webgl_texture'));
-
-    this.updateCommon(renderer);
-
-    const glFormat = this.format;
-    const mipmaps = this.mipmaps || [];
-    let glType = this.type;
-
-    // Convert to pot is only available when using image/canvas/video element.
-    const convertToPOT = !!(
-      this.convertToPOT &&
-      !mipmaps.length &&
-      this.image &&
-      (this.wrapS === constants.REPEAT || this.wrapT === constants.REPEAT) &&
-      this.NPOT
-    );
-
-    gl.texParameteri(
-      constants.TEXTURE_2D,
-      constants.TEXTURE_WRAP_S,
-      convertToPOT ? this.wrapS : this.getAvailableWrapS()
-    );
-    gl.texParameteri(
-      constants.TEXTURE_2D,
-      constants.TEXTURE_WRAP_T,
-      convertToPOT ? this.wrapT : this.getAvailableWrapT()
-    );
-
-    gl.texParameteri(
-      constants.TEXTURE_2D,
-      constants.TEXTURE_MAG_FILTER,
-      convertToPOT ? this.magFilter : this.getAvailableMagFilter()
-    );
-    gl.texParameteri(
-      constants.TEXTURE_2D,
-      constants.TEXTURE_MIN_FILTER,
-      convertToPOT ? this.minFilter : this.getAvailableMinFilter()
-    );
-
-    const anisotropicExt = renderer.getGLExtension('EXT_texture_filter_anisotropic');
-    if (anisotropicExt && this.anisotropic > 1) {
-      gl.texParameterf(
-        constants.TEXTURE_2D,
-        anisotropicExt.TEXTURE_MAX_ANISOTROPY_EXT,
-        this.anisotropic
-      );
-    }
-
-    // Fallback to float type if browser don't have half float extension
-    if (glType === 36193) {
-      const halfFloatExt = renderer.getGLExtension('OES_texture_half_float');
-      if (!halfFloatExt) {
-        glType = constants.FLOAT;
-      }
-    }
-
-    if (mipmaps.length) {
-      let width = this.width;
-      let height = this.height;
-      for (let i = 0; i < mipmaps.length; i++) {
-        const mipmap = mipmaps[i];
-        this._updateTextureData(gl, mipmap, i, width, height, glFormat, glType, false);
-        width = Math.max(width / 2, 1);
-        height = Math.max(height / 2, 1);
-      }
-    } else {
-      this._updateTextureData(gl, this, 0, this.width, this.height, glFormat, glType, convertToPOT);
-
-      if (this.useMipmap && (!this.NPOT || convertToPOT)) {
-        gl.generateMipmap(constants.TEXTURE_2D);
-      }
-    }
-
-    gl.bindTexture(constants.TEXTURE_2D, null);
-  }
-
-  _updateTextureData(
-    gl: WebGLRenderingContext,
-    data: Texture2DData,
-    level: number,
-    width: number,
-    height: number,
-    glFormat: GLEnum,
-    glType: GLEnum,
-    convertToPOT?: boolean
-  ) {
-    if (data.image) {
-      let imgData = data.image;
-      if (convertToPOT) {
-        this._potCanvas = convertTextureToPowerOfTwo(this, this._potCanvas);
-        imgData = this._potCanvas;
-      }
-      gl.texImage2D(constants.TEXTURE_2D, level, glFormat, glFormat, glType, imgData);
-    } else {
-      // Can be used as a blank texture when writing render to texture(RTT)
-      if (
-        // S3TC
-        (glFormat <= constants.COMPRESSED_RGBA_S3TC_DXT5_EXT &&
-          glFormat >= constants.COMPRESSED_RGB_S3TC_DXT1_EXT) ||
-        // ETC
-        glFormat === constants.COMPRESSED_RGB_ETC1_WEBGL ||
-        // PVRTC
-        (glFormat >= constants.COMPRESSED_RGB_PVRTC_4BPPV1_IMG &&
-          glFormat <= constants.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG) ||
-        // ATC
-        glFormat === constants.COMPRESSED_RGB_ATC_WEBGL ||
-        glFormat === constants.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL ||
-        glFormat === constants.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL
-      ) {
-        if (data.pixels) {
-          gl.compressedTexImage2D(
-            constants.TEXTURE_2D,
-            level,
-            glFormat,
-            width,
-            height,
-            0,
-            data.pixels
-          );
-        } else {
-          console.error(`Format ${glFormat} should have pixels data.`);
-        }
-      } else {
-        // Is a render target if pixels is null
-        gl.texImage2D(
-          constants.TEXTURE_2D,
-          level,
-          glFormat,
-          width,
-          height,
-          0,
-          glFormat,
-          glType,
-          data.pixels || null
-        );
-      }
-    }
-  }
-
-  /**
-   * @param  {clay.Renderer} renderer
-   * @memberOf clay.Texture2D.prototype
-   */
-  generateMipmap(renderer: Renderer) {
-    const gl = renderer.gl;
-    if (this.useMipmap && !this.NPOT) {
-      gl.bindTexture(constants.TEXTURE_2D, this._cache.get('webgl_texture'));
-      gl.generateMipmap(constants.TEXTURE_2D);
-    }
-  }
-
   isRenderable() {
     if (this.image) {
       return this.image.width > 0 && this.image.height > 0;
     } else {
       return !!(this.width && this.height);
     }
-  }
-
-  bind(renderer: Renderer) {
-    renderer.gl.bindTexture(constants.TEXTURE_2D, this.getWebGLTexture(renderer));
-  }
-
-  unbind(renderer: Renderer) {
-    renderer.gl.bindTexture(constants.TEXTURE_2D, null);
   }
 
   load(src: string, crossOrigin?: string) {

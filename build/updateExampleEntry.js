@@ -54,6 +54,7 @@ glob(path.resolve(__dirname, '../example/*.html'), async (err, files) => {
       .nav ul li a {
         color: #444;
         text-decoration: none;
+        display: block
       }
       .nav ul li.current {
         background-color: #8d00be;
