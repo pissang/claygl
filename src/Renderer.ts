@@ -152,9 +152,6 @@ class Renderer extends Notifier {
    */
   viewport = {} as RendererViewport;
 
-  // Set by FrameBuffer#bind
-  __currentFrameBuffer?: FrameBuffer;
-
   private _viewportStack: RendererViewport[] = [];
   private _clearStack: {
     clearBit: GLEnum;
@@ -359,6 +356,10 @@ class Renderer extends Notifier {
     }
   }
 
+  setFrameBuffer(frameBuffer?: FrameBuffer) {
+    this._glRenderer.setFrameBuffer(frameBuffer);
+  }
+
   /**
    * Render the scene in camera to the screen or binded offline framebuffer
    * @param  {clay.Scene}       scene
@@ -471,7 +472,12 @@ class Renderer extends Notifier {
     scene.trigger('afterrender', this, scene, camera, renderList);
   }
 
-  renderPass(list: RenderableObject[], camera?: Camera, passConfig?: RenderHooks, scene?: Scene) {
+  renderPass(
+    list: RenderableObject<Material>[],
+    camera?: Camera,
+    passConfig?: RenderHooks<RenderableObject<Material>>,
+    scene?: Scene
+  ) {
     let worldM: mat4.Mat4Array;
     const viewport = this.viewport;
     const vDpr = viewport.devicePixelRatio;
@@ -482,7 +488,7 @@ class Renderer extends Notifier {
       viewport.height * vDpr
     ];
     const windowDpr = this._devicePixelRatio;
-    const currentFrameBuffer = this.__currentFrameBuffer;
+    const currentFrameBuffer = this._glRenderer.getFrameBuffer();
     const windowSizeUniform = currentFrameBuffer
       ? [currentFrameBuffer.getTextureWidth(), currentFrameBuffer.getTextureHeight()]
       : [this._width * windowDpr, this._height * windowDpr];
@@ -616,7 +622,7 @@ class Renderer extends Notifier {
     this._glRenderer.maxJointNumber = val;
   }
 
-  renderPreZ(list: RenderableObject[], scene: Scene, camera: Camera) {
+  renderPreZ(list: RenderableObject<Material>[], scene: Scene, camera: Camera) {
     const _gl = this.gl;
     const preZPassMaterial =
       this._prezMaterial || new Material(new Shader(preZVertex, preZFragment));
@@ -769,7 +775,7 @@ class Renderer extends Notifier {
         if (x.material === y.material) {
           return x.geometry.__uid__ - y.geometry.__uid__;
         }
-        return x.material.__uid__ - y.material.__uid__;
+        return x.material.__uid__! - y.material.__uid__!;
       }
       if (x.__program && y.__program) {
         return x.__program.__uid__ - y.__program.__uid__;
@@ -795,7 +801,7 @@ class Renderer extends Notifier {
           if (x.material === y.material) {
             return x.geometry.__uid__ - y.geometry.__uid__;
           }
-          return x.material.__uid__ - y.material.__uid__;
+          return x.material.__uid__! - y.material.__uid__!;
         }
         if (x.__program && y.__program) {
           return x.__program.__uid__ - y.__program.__uid__;

@@ -65,14 +65,14 @@ class GLTexture {
   }
 
   bind(gl: WebGLRenderingContext) {
-    gl.bindTexture(this._getBindTarget(), this._getWebGLIns(gl));
+    gl.bindTexture(this.getBindTarget(), this.getWebGLTexture(gl));
   }
 
   unbind(gl: WebGLRenderingContext) {
-    gl.bindTexture(this._getBindTarget(), null);
+    gl.bindTexture(this.getBindTarget(), null);
   }
 
-  private _getWebGLIns(gl: WebGLRenderingContext): WebGLTexture {
+  getWebGLTexture(gl: WebGLRenderingContext): WebGLTexture {
     return this._webglIns || (this._webglIns = gl.createTexture()!);
   }
 
@@ -303,7 +303,7 @@ class GLTexture {
     }
   }
 
-  private _getBindTarget() {
+  getBindTarget() {
     return this._texture.textureType === 'texture2D'
       ? constants.TEXTURE_2D
       : constants.TEXTURE_CUBE_MAP;
@@ -311,10 +311,11 @@ class GLTexture {
 
   generateMipmap(gl: WebGLRenderingContext) {
     const texture = this._texture;
-    const bindTarget = this._getBindTarget();
+    const bindTarget = this.getBindTarget();
     if (texture.useMipmap && !texture.isPowerOfTwo()) {
-      gl.bindTexture(bindTarget, this._getWebGLIns(gl));
+      gl.bindTexture(bindTarget, this.getWebGLTexture(gl));
       gl.generateMipmap(bindTarget);
+      gl.bindTexture(bindTarget, null);
     }
   }
 

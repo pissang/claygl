@@ -202,7 +202,7 @@ class ProgramManager {
       ['EXT_shader_texture_lod', 'TEXTURE_LOD'],
       ['EXT_frag_depth', 'FRAG_DEPTH']
     ].filter(function (ext) {
-      return renderer.getGLExtension(ext[0]) != null;
+      return renderer.getWebGLExtension(ext[0]) != null;
     });
 
     for (let i = 0; i < extensions.length; i++) {

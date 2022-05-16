@@ -11,14 +11,15 @@ import GLProgram from './GLProgram';
 import ProgramManager from './ProgramManager';
 import { genGUID, keys, optional } from '../core/util';
 import type Texture from '../Texture';
-import type FrameBuffer from '../FrameBuffer';
+import FrameBuffer from '../FrameBuffer';
 import Texture2D from '../Texture2D';
 import GLTexture from './GLTexture';
 import TextureCube from '../TextureCube';
-import GLBuffers, { GLIndicesBuffer } from './GLBuffers';
+import GLBuffers from './GLBuffers';
 import * as constants from '../core/constants';
 import Shader, { ShaderDefineValue, ShaderPrecision } from '../Shader';
 import GLInstancedBuffers from './GLInstancedBuffers';
+import GLFrameBuffer from './GLFrameBuffer';
 
 const errorShader: Record<string, boolean> = {};
 
@@ -46,6 +47,8 @@ function noop() {}
  * A very basic material that is used in renderPass
  */
 export interface MaterialObject {
+  __uid__?: number;
+
   shader: Shader;
   uniforms?: Shader['uniformTpls'];
 
@@ -69,9 +72,9 @@ export interface MaterialObject {
 /**
  * A very basic renderable that is used in renderPass
  */
-export interface RenderableObject {
+export interface RenderableObject<T extends MaterialObject = MaterialObject> {
   geometry: GeometryBase;
-  material: MaterialObject;
+  material: T;
   mode?: GLEnum;
   lightGroup?: number;
   worldTransform?: Matrix4;
@@ -89,17 +92,15 @@ export interface RenderableObject {
   afterRender?(): void;
 }
 
-export interface ExtendedRenderableObject extends RenderableObject {
+export interface ExtendedRenderableObject<T extends MaterialObject = MaterialObject>
+  extends RenderableObject<T> {
   __program: GLProgram;
   // Depth for transparent list sorting
   __depth: number;
   renderOrder: number;
 }
 
-export interface RenderHooks<
-  T extends RenderableObject = RenderableObject,
-  S extends MaterialObject = MaterialObject
-> {
+export interface RenderHooks<T extends RenderableObject = RenderableObject> {
   ifRender?(renderable: T): boolean;
   /**
    * Get material of renderable
@@ -109,16 +110,16 @@ export interface RenderHooks<
   /**
    * Get uniform from material
    */
-  getUniform?(renderable: T, material: S, symbol: string): any;
+  getUniform?(renderable: T, material: T['material'], symbol: string): any;
 
   /**
    * Get common shader header code in shader for program.
    */
-  getShaderDefineCode?(renderable: T, material: S): string;
+  getShaderDefineCode?(renderable: T, material: T['material']): string;
   /**
    * Get extra key for program
    */
-  getProgramKey?(renderable: T, material: S): string;
+  getProgramKey?(renderable: T, material: T['material']): string;
   /**
    * Set common uniforms once for each program
    */
@@ -128,7 +129,7 @@ export interface RenderHooks<
    * Set uniforms for each program.
    * Uniform in material will be set automatically
    */
-  renderableChanged?(renderable: T, material: S, program: GLProgram): void;
+  renderableChanged?(renderable: T, material: T['material'], program: GLProgram): void;
 
   isMaterialChanged?(
     renderable: T,
@@ -164,6 +165,9 @@ class GLRenderer {
   private _glTextureMap = new WeakMap<Texture, GLTexture>();
   private _glBuffersMap = new WeakMap<GeometryBase, GLBuffers>();
   private _glInstancedBufferMap = new WeakMap<InstancedMesh, GLInstancedBuffers>();
+  private _glFrameBufferMap = new WeakMap<FrameBuffer, GLFrameBuffer>();
+
+  private _framebuffer?: FrameBuffer;
 
   throwError: boolean;
 
@@ -185,6 +189,36 @@ class GLRenderer {
 
   setViewport(x: number, y: number, width: number, height: number, dpr: number) {
     this.gl.viewport(x * dpr, y * dpr, width * dpr, height * dpr);
+  }
+
+  setFrameBuffer(frameBuffer?: FrameBuffer) {
+    const prevFrameBuffer = this._framebuffer;
+    const glFrameBufferMap = this._glFrameBufferMap;
+    if (prevFrameBuffer) {
+      if (frameBuffer) {
+        console.error('Already bound to a framebuffer. Unbind it firstly.');
+        return;
+      } else {
+        // Unbind
+        const prevGLFrameBuffer = glFrameBufferMap.get(prevFrameBuffer);
+        prevGLFrameBuffer && prevGLFrameBuffer.unbind(this.gl);
+      }
+    }
+    if (frameBuffer) {
+      let glFrameBuffer = glFrameBufferMap.get(frameBuffer);
+      if (!glFrameBuffer) {
+        glFrameBuffer = new GLFrameBuffer(frameBuffer);
+        glFrameBufferMap.set(frameBuffer, glFrameBuffer);
+      }
+      glFrameBuffer.bind(this.gl, {
+        getGLTexture: (texture) => this._getGLTexture(texture)
+      });
+    }
+    this._framebuffer = frameBuffer;
+  }
+
+  getFrameBuffer() {
+    return this._framebuffer;
   }
 
   /**
@@ -379,7 +413,7 @@ class GLRenderer {
     }
   }
 
-  getGLExtension(extName: string) {
+  getWebGLExtension(extName: string) {
     return this._glext.getExtension(extName);
   }
 
@@ -657,30 +691,34 @@ class GLRenderer {
 
   /**
    * Dispose given geometry
-   * @param {clay.Geometry} geometry
+   * @param geometry
    */
   disposeGeometry(geometry: GeometryBase) {
-    const buffers = this._glBuffersMap.get(geometry);
-    buffers && buffers.dispose(this.gl);
+    const glBuffers = this._glBuffersMap.get(geometry);
+    glBuffers && glBuffers.dispose(this.gl);
   }
 
   /**
    * Dispose given texture
-   * @param {clay.Texture} texture
+   * @param texture
    */
   disposeTexture(texture: Texture) {
-    const textures = this._glTextureMap.get(texture);
-    textures && textures.dispose(this.gl);
+    const glTexture = this._glTextureMap.get(texture);
+    glTexture && glTexture.dispose(this.gl);
   }
 
   /**
    * Dispose given frame buffer
-   * @param {clay.FrameBuffer} frameBuffer
+   * @param frameBuffer
    */
   disposeFrameBuffer(frameBuffer: FrameBuffer) {
-    frameBuffer.dispose(this);
+    const glFramebuffer = this._glFrameBufferMap.get(frameBuffer);
+    glFramebuffer && glFramebuffer.dispose(this.gl);
   }
 
+  /**
+   * Dispose instanced mesh
+   */
   disposeInstancedMesh(mesh: InstancedMesh) {
     const buffers = this._glInstancedBufferMap.get(mesh as InstancedMesh);
     if (buffers) {
