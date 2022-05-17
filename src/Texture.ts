@@ -137,7 +137,7 @@ abstract class Texture extends Notifier {
    * Mark texture is dirty and update in the next frame
    */
   dirty() {
-    return this.__dirty;
+    this.__dirty = true;
   }
 
   nextHighestPowerOfTwo(x: number) {
