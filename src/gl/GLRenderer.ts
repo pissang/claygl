@@ -3,13 +3,13 @@ import { GLEnum } from '../core/type';
 import vendor from '../core/vendor';
 import GeometryBase from '../GeometryBase';
 import InstancedMesh from '../InstancedMesh';
-import Material from '../Material';
+import Material, { GeneralMaterialUniformObject } from '../Material';
 import type { Matrix4 } from '../math';
 import Mesh from '../Mesh';
 import Skeleton from '../Skeleton';
 import GLProgram from './GLProgram';
 import ProgramManager from './ProgramManager';
-import { genGUID, keys, optional } from '../core/util';
+import { genGUID, isArray, keys, optional } from '../core/util';
 import type Texture from '../Texture';
 import FrameBuffer from '../FrameBuffer';
 import Texture2D from '../Texture2D';
@@ -76,7 +76,7 @@ export interface RenderableObject<T extends MaterialObject = MaterialObject> {
   geometry: GeometryBase;
   material: T;
   mode?: GLEnum;
-  lightGroup?: number;
+  lightGroup: number;
   worldTransform?: Matrix4;
 
   cullFace?: GLEnum;
@@ -110,7 +110,18 @@ export interface RenderHooks<T extends RenderableObject = RenderableObject> {
   /**
    * Get uniform from material
    */
-  getUniform?(renderable: T, material: T['material'], symbol: string): any;
+  getMaterialUniform?(renderable: T, material: T['material'], symbol: string): any;
+
+  /**
+   * Get common uniforms to bind.
+   * Renderable that trigger programs changed.
+   */
+  getCommonUniforms?(
+    renderable: T
+  ):
+    | Record<string, GeneralMaterialUniformObject>
+    | undefined
+    | Record<string, GeneralMaterialUniformObject>[];
 
   /**
    * Get common shader header code in shader for program.
@@ -196,7 +207,10 @@ class GLRenderer {
     const glFrameBufferMap = this._glFrameBufferMap;
     if (prevFrameBuffer) {
       if (frameBuffer) {
-        console.error('Already bound to a framebuffer. Unbind it firstly.');
+        // TODO is this check necessary?
+        if (frameBuffer !== prevFrameBuffer) {
+          console.error('Already bound to a framebuffer. Unbind it firstly.');
+        }
         return;
       } else {
         // Unbind
@@ -229,7 +243,7 @@ class GLRenderer {
   render(list: RenderableObject[], renderHooks?: RenderHooks) {
     renderHooks = renderHooks || {};
     renderHooks.getMaterial = renderHooks.getMaterial || defaultGetMaterial;
-    renderHooks.getUniform = renderHooks.getUniform || defaultGetUniform;
+    renderHooks.getMaterialUniform = renderHooks.getMaterialUniform || defaultGetUniform;
     // PENDING Better solution?
     renderHooks.isMaterialChanged = renderHooks.isMaterialChanged || defaultIsMaterialChanged;
     renderHooks.beforeRender = renderHooks.beforeRender || noop;
@@ -286,8 +300,16 @@ class GLRenderer {
       if (programChanged) {
         // Set lights number
         program.bind(gl);
-
         renderHooks.programChanged && renderHooks.programChanged(program);
+        const commonUniforms =
+          renderHooks.getCommonUniforms && renderHooks.getCommonUniforms(renderable);
+        if (isArray(commonUniforms)) {
+          for (let i = 0; i < commonUniforms.length; i++) {
+            this._setCommonUniforms(program, commonUniforms[i]);
+          }
+        } else if (commonUniforms) {
+          this._setCommonUniforms(program, commonUniforms);
+        }
       } else {
         program = prevProgram!;
       }
@@ -332,7 +354,7 @@ class GLRenderer {
           prevRenderable,
           prevMaterial,
           prevProgram,
-          renderHooks.getUniform
+          renderHooks.getMaterialUniform
         );
         prevMaterial = material;
       }
@@ -479,7 +501,7 @@ class GLRenderer {
       glDrawMode = 0x0004;
     }
 
-    let instancedExt = null;
+    let instancedExt;
     const isInstanced = renderable.isInstancedMesh && renderable.isInstancedMesh();
     if (isInstanced) {
       instancedExt = glext.getExtension('ANGLE_instanced_arrays');
@@ -550,6 +572,32 @@ class GLRenderer {
     );
   }
 
+  private _setCommonUniforms(
+    program: GLProgram,
+    uniforms: Record<string, GeneralMaterialUniformObject>
+  ) {
+    const gl = this.gl;
+    for (const symbol in uniforms) {
+      const lu = uniforms[symbol];
+      if (!program.hasUniform(symbol)) {
+        continue;
+      }
+      if (lu.type === 't') {
+        program.set(gl, '1i', symbol, program.takeTextureSlot(gl, this._getGLTexture(lu.value)));
+      } else if (lu.type === 'tv') {
+        const texSlots = [];
+        for (let i = 0; i < lu.value.length; i++) {
+          const texture = lu.value[i];
+          const slot = program.takeTextureSlot(gl, this._getGLTexture(texture));
+          texSlots.push(slot);
+        }
+        program.set(gl, '1iv', symbol, texSlots);
+      } else {
+        program.set(gl, lu.type, symbol, lu.value);
+      }
+    }
+  }
+
   private _bindMaterial(
     renderable: RenderableObject,
     material: MaterialObject,
@@ -557,7 +605,7 @@ class GLRenderer {
     prevRenderable: RenderableObject | undefined,
     prevMaterial: MaterialObject | undefined,
     prevProgram: GLProgram | undefined,
-    getUniformValue: RenderHooks['getUniform']
+    getUniformValue: RenderHooks['getMaterialUniform']
   ) {
     const gl = this.gl;
     // PENDING Same texture in different material take different slot?
@@ -610,30 +658,6 @@ class GLRenderer {
           uniformValue = placeholderTexture;
         }
       }
-      // PENDING
-      // When binding two materials with the same shader
-      // Many uniforms will be be set twice even if they have the same value
-      // So add a evaluation to see if the uniform is really needed to be set
-      if (prevMaterial && sameProgram) {
-        let prevUniformValue = getUniformValue!(prevRenderable!, prevMaterial, symbol);
-        if (isTexture) {
-          if (!prevUniformValue || !prevUniformValue.isRenderable()) {
-            prevUniformValue = placeholderTexture;
-          }
-        }
-
-        if (prevUniformValue === uniformValue) {
-          if (isTexture) {
-            // Still take the slot to make sure same texture in different materials have same slot.
-            program.takeCurrentTextureSlot(gl);
-          } else if (uniformType === 'tv' && uniformValue) {
-            for (let i = 0; i < uniformValue.length; i++) {
-              program.takeCurrentTextureSlot(gl);
-            }
-          }
-          continue;
-        }
-      }
 
       if (uniformValue == null) {
         continue;
@@ -644,7 +668,7 @@ class GLRenderer {
           const res = program.set(gl, '1i', symbol, slot);
           if (res) {
             // Texture uniform is enabled
-            program.takeCurrentTextureSlot(gl, glTexture);
+            program.takeTextureSlot(gl, glTexture);
             glTexture.slot = slot;
           }
         }
@@ -652,7 +676,7 @@ class GLRenderer {
         else {
           program.set(gl, '1i', symbol, glTexture.slot);
         }
-      } else if (Array.isArray(uniformValue)) {
+      } else if (isArray(uniformValue)) {
         if (uniformValue.length === 0) {
           continue;
         }
@@ -669,7 +693,7 @@ class GLRenderer {
             if (glTexture.slot < 0) {
               const slot = program.currentTextureSlot();
               arr.push(slot);
-              program.takeCurrentTextureSlot(gl, glTexture);
+              program.takeTextureSlot(gl, glTexture);
               glTexture.slot = slot;
             } else {
               arr.push(glTexture.slot);

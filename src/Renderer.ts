@@ -27,6 +27,9 @@ import GLRenderer, {
   RenderableObject,
   RenderHooks
 } from './gl/GLRenderer';
+import Texture from './Texture';
+import InstancedMesh from './InstancedMesh';
+import GeometryBase from './GeometryBase';
 
 const mat4Create = mat4.create;
 
@@ -512,7 +515,6 @@ class Renderer extends Notifier {
     mat4.invert(matrices.PROJECTIONINVERSE, matrices.PROJECTION);
     mat4.invert(matrices.VIEWPROJECTIONINVERSE, matrices.VIEWPROJECTION);
 
-    let prevProgram: GLProgram;
     const renderHooksForScene: RenderHooks = {
       getProgramKey: (renderable) => {
         let key = (scene && scene.getProgramKey(renderable.lightGroup || 0)) || '';
@@ -558,6 +560,9 @@ class Renderer extends Notifier {
         // DEPRECATED
         program.setSemanticUniform(gl, 'VIEWPORT_SIZE', viewportSizeUniform);
       },
+      getCommonUniforms: (renderable) => {
+        return scene && scene.getLightUniforms(renderable.lightGroup);
+      },
       renderableChanged: (renderable, material, program) => {
         const isSceneNode = renderable.worldTransform != null;
         const shader = material.shader;
@@ -602,13 +607,6 @@ class Renderer extends Notifier {
           }
           program.set(gl, semanticInfo.type, semanticInfo.name, matrix);
         }
-
-        // TODO
-        if (scene && prevProgram !== program) {
-          // Only set when program changed
-          scene.setLightUniforms(program, renderable.lightGroup!, this);
-          prevProgram = program;
-        }
       }
     };
     this._glRenderer.render(list, assign(renderHooksForScene, passConfig));
@@ -650,7 +648,7 @@ class Renderer extends Notifier {
           (matA.get('alphaCutoff') || 0) !== (matB.get('alphaCutoff') || 0)
         );
       },
-      getUniform(renderable, depthMaterial, symbol) {
+      getMaterialUniform(renderable, depthMaterial, symbol) {
         const material = renderable.material;
         if (symbol === 'alphaMap') {
           return material.get('diffuseMap');
@@ -704,6 +702,10 @@ class Renderer extends Notifier {
       if ((node as Renderable).geometry && disposeGeometry) {
         this._glRenderer.disposeGeometry((node as Renderable).geometry);
       }
+      // Pending more check?
+      if ((node as InstancedMesh).instancedAttributes) {
+        this.disposeInstancedMesh(node as InstancedMesh);
+      }
       if (disposeTexture && material && !disposedMap[material.__uid__]) {
         const textureUniforms = material.getTextureUniforms();
         for (let u = 0; u < textureUniforms.length; u++) {
@@ -728,6 +730,19 @@ class Renderer extends Notifier {
       // Particle system and AmbientCubemap light need to dispose
       node.dispose && node.dispose(this);
     });
+  }
+
+  disposeTexture(texture: Texture) {
+    this._glRenderer.disposeTexture(texture);
+  }
+  disposeGeometry(geometry: GeometryBase) {
+    this._glRenderer.disposeGeometry(geometry);
+  }
+  disposeFrameBuffer(frameBuffer: FrameBuffer) {
+    this._glRenderer.disposeFrameBuffer(frameBuffer);
+  }
+  disposeInstancedMesh(mesh: InstancedMesh) {
+    this._glRenderer.disposeInstancedMesh(mesh);
   }
   /**
    * Dispose renderer

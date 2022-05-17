@@ -860,11 +860,11 @@ class App3D extends Notifier {
     const camera = new CameraCtor();
     if (position instanceof Vector3) {
       camera.position.copy(position);
-    } else if (Array.isArray(position)) {
+    } else if (util.isArray(position)) {
       camera.position.setArray(position);
     }
 
-    if (Array.isArray(target)) {
+    if (util.isArray(target)) {
       target = new Vector3(target[0], target[1], target[2]);
     }
     if (target instanceof Vector3) {

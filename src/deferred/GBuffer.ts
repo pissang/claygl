@@ -265,17 +265,10 @@ class DeferredGBuffer {
     if (this._gBufferTex1.width === width && this._gBufferTex1.height === height) {
       return;
     }
-    this._gBufferTex1.width = width;
-    this._gBufferTex1.height = height;
-
-    this._gBufferTex2.width = width;
-    this._gBufferTex2.height = height;
-
-    this._gBufferTex3.width = width;
-    this._gBufferTex3.height = height;
-
-    this._gBufferTex4.width = width;
-    this._gBufferTex4.height = height;
+    this._gBufferTex1.resize(width, height);
+    this._gBufferTex2.resize(width, height);
+    this._gBufferTex3.resize(width, height);
+    this._gBufferTex4.resize(width, height);
   }
 
   // TODO is dpr needed?
@@ -401,16 +394,15 @@ class DeferredGBuffer {
       return renderable.material !== prevRenderable.material;
     }
 
+    frameBuffer.bind(renderer);
     // PENDING, scene.boundingBoxLastFrame needs be updated if have shadow
-    renderer.bindSceneRendering(scene);
     if (enableTargetTexture1) {
       // Pass 1
       frameBuffer.attach(opts.targetTexture1 || this._gBufferTex1);
-      frameBuffer.bind(renderer);
 
       clearViewport();
       const gBufferMaterial1 = this._gBufferMaterial1;
-      const passConfig = {
+      const renderHooks = {
         getMaterial() {
           return gBufferMaterial1;
         },
@@ -423,17 +415,16 @@ class DeferredGBuffer {
         sortCompare: Renderer.opaqueSortCompare
       };
       // FIXME Use MRT if possible
-      renderer._renderPass(gBufferRenderList, camera, passConfig);
+      renderer.renderPass(gBufferRenderList, camera, renderHooks, scene);
     }
     if (enableTargetTexture3) {
       // Pass 2
       frameBuffer.attach(opts.targetTexture3 || this._gBufferTex3);
-      frameBuffer.bind(renderer);
 
       clearViewport();
 
       const gBufferMaterial2 = this._gBufferMaterial2;
-      const passConfig = {
+      const renderHooks = {
         getMaterial() {
           return gBufferMaterial2;
         },
@@ -441,11 +432,10 @@ class DeferredGBuffer {
         isMaterialChanged: isMaterialChanged,
         sortCompare: Renderer.opaqueSortCompare
       };
-      renderer._renderPass(gBufferRenderList, passConfig);
+      renderer.renderPass(gBufferRenderList, camera, renderHooks, scene);
     }
 
     if (enableTargetTexture4) {
-      frameBuffer.bind(renderer);
       frameBuffer.attach(opts.targetTexture4 || this._gBufferTex4);
 
       clearViewport();
@@ -457,11 +447,11 @@ class DeferredGBuffer {
       const gBufferMaterial3 = this._gBufferMaterial3;
       const cameraViewProj = mat4.create();
       mat4.multiply(cameraViewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
-      const passConfig = {
+      const renderHooks = {
         getMaterial() {
           return gBufferMaterial3;
         },
-        afterRender(renderer: Renderer, renderable: RenderableObject) {
+        afterRender(renderable: RenderableObject) {
           let gbufferData = renderableGBufferData.get(renderable);
           if (!gbufferData) {
             gbufferData = {};
@@ -545,10 +535,9 @@ class DeferredGBuffer {
         sortCompare: Renderer.opaqueSortCompare
       };
 
-      renderer.renderPass(gBufferRenderList, passConfig);
+      renderer.renderPass(gBufferRenderList, camera, renderHooks, scene);
     }
 
-    renderer.bindSceneRendering();
     frameBuffer.unbind(renderer);
   }
 
@@ -664,15 +653,17 @@ class DeferredGBuffer {
    * @param  {clay.Renderer} renderer
    */
   dispose(renderer: Renderer) {
-    this._gBufferTex1.dispose(renderer);
-    this._gBufferTex2.dispose(renderer);
-    this._gBufferTex3.dispose(renderer);
-
-    this._defaultNormalMap.dispose(renderer);
-    this._defaultRoughnessMap.dispose(renderer);
-    this._defaultMetalnessMap.dispose(renderer);
-    this._defaultDiffuseMap.dispose(renderer);
-    this._frameBuffer.dispose(renderer);
+    [
+      this._gBufferTex1,
+      this._gBufferTex2,
+      this._gBufferTex3,
+      this._gBufferTex4,
+      this._defaultDiffuseMap,
+      this._defaultNormalMap,
+      this._defaultRoughnessMap,
+      this._defaultMetalnessMap
+    ].forEach((texture) => renderer.disposeTexture(texture));
+    renderer.disposeFrameBuffer(this._frameBuffer);
   }
 }
 

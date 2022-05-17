@@ -125,7 +125,7 @@ export function isNumber(value: any): value is number {
 export function clone<T>(obj: T): T {
   if (!isObject(obj)) {
     return obj;
-  } else if (Array.isArray(obj)) {
+  } else if (isArray(obj)) {
     return obj.slice() as unknown as T;
   } else if (isArrayLike(obj)) {
     // is typed array
@@ -170,3 +170,5 @@ export function setCanvasSize(
   canvas.width = width * (pixelRatio || 1);
   canvas.height = height * (pixelRatio || 1);
 }
+
+export const isArray = Array.isArray;

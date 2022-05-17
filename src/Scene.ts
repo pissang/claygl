@@ -13,6 +13,7 @@ import { MaterialUniform, MaterialUniformType } from './Shader';
 import Renderer from './Renderer';
 import GLProgram from './gl/GLProgram';
 import Skybox from './plugin/Skybox';
+import Texture from './Texture';
 
 const IDENTITY = mat4.create();
 const WORLDVIEW = mat4.create();
@@ -39,30 +40,6 @@ function getProgramKey(lightNumbers: Record<string, number>) {
   const id = util.genGUID() + '';
   programKeyCache[key] = id;
   return id;
-}
-
-function setUniforms(
-  uniforms: Record<string, MaterialUniform>,
-  program: GLProgram,
-  gl: WebGLRenderingContext
-) {
-  for (const symbol in uniforms) {
-    const lu = uniforms[symbol];
-    if (lu.type === 'tv') {
-      if (!program.hasUniform(symbol)) {
-        continue;
-      }
-      const texSlots = [];
-      for (let i = 0; i < lu.value.length; i++) {
-        const texture = lu.value[i];
-        const slot = program.takeCurrentTextureSlot(gl, texture);
-        texSlots.push(slot);
-      }
-      program.set(gl, '1iv', symbol, texSlots);
-    } else {
-      program.set(gl, lu.type, symbol, lu.value);
-    }
-  }
 }
 
 export class RenderList {
@@ -519,10 +496,8 @@ class Scene extends ClayNode {
     return this._lightProgramKeys[lightGroup];
   }
 
-  setLightUniforms(program: GLProgram, lightGroup: number, renderer: Renderer) {
-    setUniforms(this._lightUniforms[lightGroup], program, renderer.gl);
-    // Set shadows
-    setUniforms(this.shadowUniforms, program, renderer.gl);
+  getLightUniforms(lightGroup: number) {
+    return [this._lightUniforms[lightGroup], this.shadowUniforms];
   }
 
   /**

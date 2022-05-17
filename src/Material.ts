@@ -5,9 +5,11 @@ import Shader, {
   ShaderPrecision,
   ShaderType,
   VertexShader,
-  FragmentShader
+  FragmentShader,
+  MaterialUniformType
 } from './Shader';
 import { defaultGetMaterialProgramKey } from './gl/ProgramManager';
+import Texture from './Texture';
 
 const programKeyCache: Record<string, string> = {};
 
@@ -70,6 +72,20 @@ export interface MaterialOpts {
   vertexDefines: Record<string, ShaderDefineValue>;
   fragmentDefines: Record<string, ShaderDefineValue>;
 }
+
+export type GeneralMaterialUniformObject =
+  | {
+      type: 't';
+      value: Texture;
+    }
+  | {
+      type: 'tv';
+      value: Texture[];
+    }
+  | {
+      type: Exclude<MaterialUniformType, 't' | 'tv'>;
+      value: any;
+    };
 
 type UniformValueRecord<T extends Shader['uniformTpls']> = {
   [key in keyof T]?: T[key]['value'];
@@ -346,7 +362,7 @@ class Material<
    * @param  {string} symbol
    */
   enableTexture(symbol: keyof PickTextureUniforms<T['uniformTpls']>) {
-    if (Array.isArray(symbol)) {
+    if (util.isArray(symbol)) {
       for (let i = 0; i < symbol.length; i++) {
         this.enableTexture(symbol[i]);
       }
@@ -378,7 +394,7 @@ class Material<
    * @param  {string} symbol
    */
   disableTexture(symbol: keyof PickTextureUniforms<T['uniformTpls']>) {
-    if (Array.isArray(symbol)) {
+    if (util.isArray(symbol)) {
       for (let i = 0; i < symbol.length; i++) {
         this.disableTexture(symbol[i]);
       }

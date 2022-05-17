@@ -12,11 +12,8 @@ import Texture2D from '../Texture2D';
 import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
 import PerspectiveCamera from '../camera/Perspective';
 import OrthoCamera from '../camera/Orthographic';
-
 import TexturePool from '../composite/TexturePool';
-
 import * as mat4 from '../glmatrix/mat4';
-
 import type Renderable from '../Renderable';
 import { Notifier } from '../core';
 import Scene from '../Scene';
@@ -37,21 +34,19 @@ import {
 import { RenderHooks } from '../gl/GLRenderer';
 
 function getDepthMaterialUniform(renderable: Renderable, depthMaterial: Material, symbol: string) {
+  const material = renderable.material;
   if (symbol === 'alphaMap') {
-    return renderable.material.get('diffuseMap');
+    return material.get('diffuseMap');
   } else if (symbol === 'alphaCutoff') {
-    if (
-      renderable.material.isDefined('fragment', 'ALPHA_TEST') &&
-      renderable.material.get('diffuseMap')
-    ) {
-      const alphaCutoff = renderable.material.get('alphaCutoff');
+    if (material.isDefined('fragment', 'ALPHA_TEST') && material.get('diffuseMap')) {
+      const alphaCutoff = material.get('alphaCutoff');
       return alphaCutoff || 0;
     }
     return 0;
   } else if (symbol === 'uvRepeat') {
-    return renderable.material.get('uvRepeat');
+    return material.get('uvRepeat');
   } else if (symbol === 'uvOffset') {
-    return renderable.material.get('uvOffset');
+    return material.get('uvOffset');
   } else {
     return depthMaterial.get(symbol);
   }
@@ -380,7 +375,7 @@ class ShadowMapPass extends Notifier {
         return (renderable as Renderable).shadowDepthMaterial || defaultShadowMaterial;
       },
       isMaterialChanged: isDepthMaterialChanged,
-      getUniform: getDepthMaterialUniform,
+      getMaterialUniform: getDepthMaterialUniform,
       ifRender(renderable) {
         return (renderable as Renderable).castShadow;
       },
@@ -500,9 +495,10 @@ class ShadowMapPass extends Notifier {
     const texture = this._getTexture(light);
     const lightCamera = this._getSpotLightCamera(light);
     const _gl = renderer.gl;
+    const frameBuffer = this._frameBuffer;
 
-    this._frameBuffer.attach(texture);
-    this._frameBuffer.bind(renderer);
+    frameBuffer.attach(texture);
+    frameBuffer.bind(renderer);
 
     _gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
 
@@ -512,7 +508,7 @@ class ShadowMapPass extends Notifier {
         return (renderable as Renderable).shadowDepthMaterial || defaultShadowMaterial;
       },
       isMaterialChanged: isDepthMaterialChanged,
-      getUniform: getDepthMaterialUniform,
+      getMaterialUniform: getDepthMaterialUniform,
       ifRender(renderable) {
         return (renderable as Renderable).castShadow;
       },
@@ -522,7 +518,7 @@ class ShadowMapPass extends Notifier {
     const renderList = scene.updateRenderList(lightCamera);
     renderer.renderPass(renderList.opaque, lightCamera, passConfig);
 
-    this._frameBuffer.unbind(renderer);
+    frameBuffer.unbind(renderer);
 
     const matrix = new Matrix4();
     matrix.copy(lightCamera.worldTransform).invert().multiplyLeft(lightCamera.projectionMatrix);
@@ -546,9 +542,10 @@ class ShadowMapPass extends Notifier {
       getMaterial(renderable) {
         return (renderable as Renderable).shadowDepthMaterial || defaultShadowMaterial;
       },
-      getUniform: getDepthMaterialUniform,
+      getMaterialUniform: getDepthMaterialUniform,
       sortCompare: Renderer.opaqueSortCompare
     };
+    const frameBuffer = this._frameBuffer;
 
     const renderListEachSide: Record<CubeTarget, Renderable[]> = {
       px: [],
@@ -621,18 +618,18 @@ class ShadowMapPass extends Notifier {
       const target = cubeTargets[i];
       const camera = this._getPointLightCamera(light, target);
 
-      this._frameBuffer.attach(
+      frameBuffer.attach(
         texture,
         constants.COLOR_ATTACHMENT0,
         constants.TEXTURE_CUBE_MAP_POSITIVE_X + i
       );
-      this._frameBuffer.bind(renderer);
+      frameBuffer.bind(renderer);
       _gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
 
       renderer.renderPass(renderListEachSide[target], camera, passConfig);
     }
 
-    this._frameBuffer.unbind(renderer);
+    frameBuffer.unbind(renderer);
   }
 
   _getDepthMaterial(light: Light) {
@@ -807,11 +804,11 @@ class ShadowMapPass extends Notifier {
   // PENDING Renderer or WebGLRenderingContext
   dispose(renderer: Renderer) {
     if (this._frameBuffer) {
-      this._frameBuffer.dispose(renderer);
+      renderer.disposeFrameBuffer(this._frameBuffer);
     }
 
     for (const name in this._textures) {
-      this._textures[name].dispose(renderer);
+      renderer.disposeTexture(this._textures[name]);
     }
 
     this._texturePool.clear(renderer);

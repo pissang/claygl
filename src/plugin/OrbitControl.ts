@@ -10,7 +10,7 @@ import type { vec3 } from '../glmatrix';
 import type { AnimationEasing } from '../animation/easing';
 import type ProceduralKeyframeAnimator from '../animation/ProceduralKeyframeAnimator';
 import OrthographicCamera from '../camera/Orthographic';
-import { assign } from '../core/util';
+import { assign, isArray } from '../core/util';
 
 const addEvent = vendor.addEventListener;
 const removeEvent = vendor.removeEventListener;
@@ -22,7 +22,7 @@ const MOUSE_BUTTON_KEY_MAP = {
 };
 
 function convertToArray(val: number | number[]): number[] {
-  if (!Array.isArray(val)) {
+  if (!isArray(val)) {
     val = [val, val];
   }
   return val;

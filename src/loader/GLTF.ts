@@ -701,7 +701,7 @@ function KHRCommonMaterialToStandard(
   let diffuseProp = uniforms.diffuse;
   if (diffuseProp) {
     // Color
-    if (Array.isArray(diffuseProp)) {
+    if (util.isArray(diffuseProp)) {
       diffuseProp = diffuseProp.slice(0, 3);
       isStandardMaterial
         ? ((material as StandardMaterial).color = diffuseProp)
@@ -716,7 +716,7 @@ function KHRCommonMaterialToStandard(
   let emissionProp = uniforms.emission;
   if (emissionProp != null) {
     // Color
-    if (Array.isArray(emissionProp)) {
+    if (util.isArray(emissionProp)) {
       emissionProp = emissionProp.slice(0, 3);
       isStandardMaterial
         ? ((material as StandardMaterial).emission = emissionProp)

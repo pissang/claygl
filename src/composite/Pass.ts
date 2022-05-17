@@ -6,7 +6,7 @@ import Mesh from '../Mesh';
 import * as constants from '../core/constants';
 import { fullscreenQuadPassVertex } from '../shader/source/compositor/vertex.glsl';
 import { GLEnum } from '../core/type';
-import { optional } from '../core/util';
+import { isArray, optional } from '../core/util';
 import type Renderer from '../Renderer';
 import type FrameBuffer from '../FrameBuffer';
 import type Texture2D from '../Texture2D';
@@ -115,7 +115,7 @@ class FullscreenQuadPass<
       clearBit = clearBit | constants.COLOR_BUFFER_BIT;
       _gl.colorMask(true, true, true, true);
       const cc = this.clearColor;
-      if (Array.isArray(cc)) {
+      if (isArray(cc)) {
         _gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
       }
     }

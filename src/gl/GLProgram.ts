@@ -1,4 +1,4 @@
-import { assign, genGUID, keys } from '../core/util';
+import { assign, genGUID, isArray, keys } from '../core/util';
 import Shader, { AttributeSemantic, UniformSemantic } from '../Shader';
 import * as constants from '../core/constants';
 import GLTexture from './GLTexture';
@@ -43,16 +43,20 @@ class GLProgram {
 
   private _cachedAttribLoc: Record<string, number> = {};
 
+  private _valueCache: Record<string, any> = {};
+
   // Error message
   __error?: string;
 
   constructor() {}
 
   bind(gl: WebGLRenderingContext) {
+    // Reset texture slot
     this._textureSlot = 0;
     if (this._program) {
       gl.useProgram(this._program);
     }
+    this._valueCache = {};
   }
 
   isValid() {
@@ -79,7 +83,7 @@ class GLProgram {
     this._textureSlot = slot || 0;
   }
 
-  takeCurrentTextureSlot(gl: WebGLRenderingContext, texture?: GLTexture) {
+  takeTextureSlot(gl: WebGLRenderingContext, texture?: GLTexture) {
     const textureSlot = this._textureSlot;
     this.useTextureSlot(gl, texture, textureSlot);
     this._textureSlot++;
@@ -89,10 +93,18 @@ class GLProgram {
   set(_gl: WebGLRenderingContext, type: string, symbol: string, value: any) {
     const locationMap = this._uniformLocations;
     const location = locationMap[symbol];
+    const valueCache = this._valueCache;
     // Uniform is not existed in the shader
     if (location == null) {
       return false;
     }
+
+    const prevVal = valueCache[symbol];
+    // Only compare the instance because we assume the value is immutable during the rendering pass.
+    if (prevVal === value) {
+      return;
+    }
+    valueCache[symbol] = prevVal;
 
     switch (type) {
       case 'm4':
@@ -163,7 +175,7 @@ class GLProgram {
         break;
       case 'm4v':
         // Raw value
-        if (Array.isArray(value) && Array.isArray(value[0])) {
+        if (isArray(value) && isArray(value[0])) {
           const array = new Float32Array(value.length * 16);
           let cursor = 0;
           for (let i = 0; i < value.length; i++) {

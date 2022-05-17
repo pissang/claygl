@@ -148,6 +148,11 @@ abstract class Texture extends Notifier {
     return x + 1;
   }
 
+  resize(width: number, height: number) {
+    this._width = width;
+    this._height = height;
+  }
+
   /**
    * Test if image of texture is valid and loaded.
    */

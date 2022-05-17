@@ -52,6 +52,7 @@ class GLFrameBuffer {
     });
 
     let depthAttached = false;
+    let renderBufferDetached = false;
 
     let width: number | undefined;
     let height: number | undefined;
@@ -69,10 +70,10 @@ class GLFrameBuffer {
 
       if (+attachment === DEPTH_ATTACHMENT || +attachment === DEPTH_STENCIL_ATTACHMENT) {
         depthAttached = true;
-        // Detach the original render buffer.
         if (webglRenderBuffer) {
+          // Detach from renderbuffer before attach to depth texture
           gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, null);
-          gl.deleteRenderbuffer(webglRenderBuffer);
+          renderBufferDetached = true;
         }
       }
 
@@ -95,6 +96,15 @@ class GLFrameBuffer {
       }
 
       gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, webglRenderBuffer);
+    } else if (webglRenderBuffer) {
+      gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, null);
+      renderBufferDetached = true;
+    }
+
+    // Delete the render buffer.
+    if (renderBufferDetached) {
+      gl.deleteRenderbuffer(webglRenderBuffer!);
+      this._webglRb = undefined;
     }
 
     this._bound = gl;
