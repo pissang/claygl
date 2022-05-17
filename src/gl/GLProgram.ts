@@ -90,7 +90,7 @@ class GLProgram {
     return textureSlot;
   }
 
-  set(_gl: WebGLRenderingContext, type: string, symbol: string, value: any) {
+  set(_gl: WebGLRenderingContext, type: string, symbol: string, value: any, force?: boolean) {
     const locationMap = this._uniformLocations;
     const location = locationMap[symbol];
     const valueCache = this._valueCache;
@@ -101,10 +101,10 @@ class GLProgram {
 
     const prevVal = valueCache[symbol];
     // Only compare the instance because we assume the value is immutable during the rendering pass.
-    if (prevVal === value) {
+    if (prevVal === value && !force) {
       return;
     }
-    valueCache[symbol] = prevVal;
+    valueCache[symbol] = value;
 
     switch (type) {
       case 'm4':
@@ -197,7 +197,8 @@ class GLProgram {
   setSemanticUniform(_gl: WebGLRenderingContext, semantic: string, val: any) {
     const semanticInfo = this.semanticsMap[semantic as UniformSemantic];
     if (semanticInfo) {
-      return this.set(_gl, semanticInfo.type, semanticInfo.name, val);
+      // Force set for semantic uniforms.
+      return this.set(_gl, semanticInfo.type, semanticInfo.name, val, true);
     }
     return false;
   }

@@ -605,7 +605,9 @@ class Renderer extends Notifier {
             const matrixNoTranspose = matrices[semanticInfo.semanticNoTranspose!];
             mat4.transpose(matrix, matrixNoTranspose);
           }
-          program.set(gl, semanticInfo.type, semanticInfo.name, matrix);
+          // Force set the uniform. Because underhood it only compares reference.
+          // And we share reference between renderables.
+          program.set(gl, semanticInfo.type, semanticInfo.name, matrix, true);
         }
       }
     };
