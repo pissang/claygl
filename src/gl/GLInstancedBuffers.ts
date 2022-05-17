@@ -57,7 +57,7 @@ class GLInstancedBuffers {
     const locations: number[] = [];
 
     instancedBuffers.forEach((bufferObj) => {
-      const location = program.getAttributeLocation(gl, bufferObj.name);
+      const location = program.getAttributeLocation(gl, bufferObj);
       if (location < 0) {
         return;
       }
