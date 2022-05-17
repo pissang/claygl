@@ -165,6 +165,8 @@ class Renderer extends Notifier {
 
   private _glRenderer: GLRenderer;
 
+  private _framebuffer?: FrameBuffer;
+
   constructor(opts?: Partial<RendererOpts>) {
     super();
     opts = opts || {};
@@ -360,7 +362,16 @@ class Renderer extends Notifier {
   }
 
   setFrameBuffer(frameBuffer?: FrameBuffer) {
-    this._glRenderer.setFrameBuffer(frameBuffer);
+    this._framebuffer = frameBuffer;
+    if (!frameBuffer) {
+      // Unbind framebuffer immediately.
+      this._glRenderer.bindFrameBuffer(null);
+    }
+    // else do binding in rendering.
+  }
+
+  getWebGLExtension(name: string) {
+    return this._glRenderer.getWebGLExtension(name);
   }
 
   /**
@@ -375,6 +386,11 @@ class Renderer extends Notifier {
     const _gl = this.gl;
 
     const clearColor = this.clearColor;
+    const frameBuffer = this._framebuffer;
+
+    if (frameBuffer) {
+      this._glRenderer.bindFrameBuffer(frameBuffer);
+    }
 
     if (this.clearBit) {
       // Must set depth and color mask true before clear
@@ -491,7 +507,7 @@ class Renderer extends Notifier {
       viewport.height * vDpr
     ];
     const windowDpr = this._devicePixelRatio;
-    const currentFrameBuffer = this._glRenderer.getFrameBuffer();
+    const currentFrameBuffer = this._framebuffer;
     const windowSizeUniform = currentFrameBuffer
       ? [currentFrameBuffer.getTextureWidth(), currentFrameBuffer.getTextureHeight()]
       : [this._width * windowDpr, this._height * windowDpr];

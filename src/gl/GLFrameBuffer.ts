@@ -30,6 +30,7 @@ class GLFrameBuffer {
     const framebuffer = this._fb;
     const webglFb = this._webglFb || (this._webglFb = gl.createFramebuffer()!);
     let webglRenderBuffer = this._webglRb;
+    // PENDING. not bind multiple times? if render twice?
     gl.bindFramebuffer(FRAMEBUFFER, webglFb);
 
     // Attach textures
@@ -64,10 +65,6 @@ class GLFrameBuffer {
       height = texture.height;
       // TODO validate width, height are same.
 
-      if (attachedTextures[attachment] === glTexture) {
-        return;
-      }
-
       if (+attachment === DEPTH_ATTACHMENT || +attachment === DEPTH_STENCIL_ATTACHMENT) {
         depthAttached = true;
         if (webglRenderBuffer) {
@@ -76,6 +73,9 @@ class GLFrameBuffer {
           renderBufferDetached = true;
         }
       }
+      if (attachedTextures[attachment] === glTexture) {
+        return;
+      }
 
       gl.framebufferTexture2D(FRAMEBUFFER, +attachment, target, glTexture.getWebGLTexture(gl), 0);
 
@@ -83,6 +83,7 @@ class GLFrameBuffer {
     });
 
     if (width && height && !depthAttached && framebuffer.depthBuffer) {
+      const renderBufferFirstCreated = !webglRenderBuffer;
       // Create a render buffer if depth buffer is needed and not bound to a texture
       if (!webglRenderBuffer) {
         webglRenderBuffer = this._webglRb = gl.createRenderbuffer()!;
@@ -94,14 +95,15 @@ class GLFrameBuffer {
         this._webglRbH = height;
         gl.bindRenderbuffer(RENDERBUFFER, null);
       }
-
-      gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, webglRenderBuffer);
+      if (renderBufferFirstCreated) {
+        gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, webglRenderBuffer);
+      }
     } else if (webglRenderBuffer) {
       gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, null);
       renderBufferDetached = true;
     }
 
-    // Delete the render buffer.
+    // delete render buffer.
     if (renderBufferDetached) {
       gl.deleteRenderbuffer(webglRenderBuffer!);
       this._webglRb = undefined;

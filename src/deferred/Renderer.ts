@@ -650,7 +650,7 @@ class DeferredRenderer extends Notifier {
       // depthMask must be enabled before clear DEPTH_BUFFER
       gl.clear(gl.DEPTH_BUFFER_BIT);
 
-      renderer._renderPass([volumeMesh], camera, {
+      renderer.renderPass([volumeMesh], camera, {
         getMaterial: getPreZMaterial
       });
 
@@ -658,7 +658,7 @@ class DeferredRenderer extends Notifier {
       gl.colorMask(true, true, true, true);
 
       volumeMesh.material.depthMask = true;
-      renderer._renderPass([volumeMesh], camera);
+      renderer.renderPass([volumeMesh], camera);
     }
 
     gl.depthFunc(gl.LESS);
@@ -667,12 +667,11 @@ class DeferredRenderer extends Notifier {
   dispose(renderer: Renderer) {
     this._gBuffer.dispose(renderer);
 
-    this._lightAccumFrameBuffer.dispose(renderer);
-    this._lightAccumTex.dispose(renderer);
-
-    this._lightConeGeo.dispose(renderer);
-    this._lightCylinderGeo.dispose(renderer);
-    this._lightSphereGeo.dispose(renderer);
+    renderer.disposeFrameBuffer(this._lightAccumFrameBuffer);
+    renderer.disposeTexture(this._lightAccumTex);
+    renderer.disposeGeometry(this._lightConeGeo);
+    renderer.disposeGeometry(this._lightCylinderGeo);
+    renderer.disposeGeometry(this._lightSphereGeo);
 
     this._fullQuadPass.dispose(renderer);
     this._outputPass.dispose(renderer);

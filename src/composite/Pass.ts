@@ -89,7 +89,7 @@ class FullscreenQuadPass<
       this.bind(renderer, frameBuffer);
       // MRT Support in chrome
       // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-      const ext = renderer.getGLExtension('EXT_draw_buffers');
+      const ext = renderer.getWebGLExtension('EXT_draw_buffers');
       if (ext && this.outputs) {
         const bufs = [];
         for (const attachment in this.outputs) {

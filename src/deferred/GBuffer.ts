@@ -411,7 +411,7 @@ class DeferredGBuffer {
           this._defaultRoughnessMap,
           this._defaultDiffuseMap
         ),
-        isMaterialChanged: isMaterialChanged,
+        isMaterialChanged,
         sortCompare: Renderer.opaqueSortCompare
       };
       // FIXME Use MRT if possible

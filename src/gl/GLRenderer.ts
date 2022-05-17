@@ -178,7 +178,8 @@ class GLRenderer {
   private _glInstancedBufferMap = new WeakMap<InstancedMesh, GLInstancedBuffers>();
   private _glFrameBufferMap = new WeakMap<FrameBuffer, GLFrameBuffer>();
 
-  private _framebuffer?: FrameBuffer;
+  /// Framebuffer
+  private _framebuffer?: FrameBuffer | null;
 
   throwError: boolean;
 
@@ -202,7 +203,10 @@ class GLRenderer {
     this.gl.viewport(x * dpr, y * dpr, width * dpr, height * dpr);
   }
 
-  setFrameBuffer(frameBuffer?: FrameBuffer) {
+  /**
+   * Bind framebuffer before render
+   */
+  bindFrameBuffer(frameBuffer?: FrameBuffer | null) {
     const prevFrameBuffer = this._framebuffer;
     const glFrameBufferMap = this._glFrameBufferMap;
     if (prevFrameBuffer) {
@@ -229,10 +233,6 @@ class GLRenderer {
       });
     }
     this._framebuffer = frameBuffer;
-  }
-
-  getFrameBuffer() {
-    return this._framebuffer;
   }
 
   /**
