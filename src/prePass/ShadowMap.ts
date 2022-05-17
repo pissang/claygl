@@ -421,7 +421,6 @@ class ShadowMapPass extends Notifier {
 
     const framebuffer = this._frameBuffer;
     framebuffer.attach(texture);
-    framebuffer.bind(renderer);
 
     for (let i = 0; i < light.shadowCascade; i++) {
       // Get the splitted frustum
@@ -470,7 +469,7 @@ class ShadowMapPass extends Notifier {
       );
 
       const renderList = scene.updateRenderList(lightCamera);
-      renderer.renderPass(renderList.opaque, lightCamera, passConfig);
+      renderer.renderPass(renderList.opaque, lightCamera, framebuffer, passConfig);
 
       const matrix = new Matrix4();
       matrix.copy(lightCamera.viewMatrix).multiplyLeft(lightCamera.projectionMatrix);
@@ -479,8 +478,6 @@ class ShadowMapPass extends Notifier {
 
       lightCamera.projectionMatrix.copy(lightProjMatrix);
     }
-
-    framebuffer.unbind(renderer);
 
     renderer.setViewport(viewport);
   }
@@ -497,7 +494,6 @@ class ShadowMapPass extends Notifier {
     const frameBuffer = this._frameBuffer;
 
     frameBuffer.attach(texture);
-    frameBuffer.bind(renderer);
 
     const defaultShadowMaterial = this._getDepthMaterial(light);
     const passConfig: RenderHooks = {
@@ -516,9 +512,7 @@ class ShadowMapPass extends Notifier {
     };
 
     const renderList = scene.updateRenderList(lightCamera);
-    renderer.renderPass(renderList.opaque, lightCamera, passConfig);
-
-    frameBuffer.unbind(renderer);
+    renderer.renderPass(renderList.opaque, lightCamera, frameBuffer, passConfig);
 
     const matrix = new Matrix4();
     matrix.copy(lightCamera.worldTransform).invert().multiplyLeft(lightCamera.projectionMatrix);
@@ -625,12 +619,9 @@ class ShadowMapPass extends Notifier {
         constants.COLOR_ATTACHMENT0,
         constants.TEXTURE_CUBE_MAP_POSITIVE_X + i
       );
-      frameBuffer.bind(renderer);
 
-      renderer.renderPass(renderListEachSide[target], camera, passConfig);
+      renderer.renderPass(renderListEachSide[target], camera, frameBuffer, passConfig);
     }
-
-    frameBuffer.unbind(renderer);
   }
 
   _getDepthMaterial(light: Light) {

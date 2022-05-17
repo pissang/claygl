@@ -2,9 +2,10 @@ import {
   DEPTH_ATTACHMENT,
   DEPTH_STENCIL_ATTACHMENT,
   FRAMEBUFFER,
-  LINEAR_MIPMAP_LINEAR,
+  FRAMEBUFFER_COMPLETE,
   RENDERBUFFER
 } from '../core/constants';
+import { GLEnum } from '../core/type';
 import { keys } from '../core/util';
 import type FrameBuffer from '../FrameBuffer';
 import Texture from '../Texture';
@@ -19,15 +20,15 @@ class GLFrameBuffer {
   // Bound context
   private _bound?: WebGLRenderingContext | null;
 
-  // Attached textures
-  private _textures: Record<string, GLTexture> = {};
+  // Attached textures, [texture, target, width, height]
+  private _textures: Record<string, [GLTexture, GLEnum, number, number]> = {};
 
   constructor(frambuffer: FrameBuffer) {
     this._fb = frambuffer;
   }
 
   bind(gl: WebGLRenderingContext, helpers: { getGLTexture: (texture: Texture) => GLTexture }) {
-    const framebuffer = this._fb;
+    const frameBuffer = this._fb;
     const webglFb = this._webglFb || (this._webglFb = gl.createFramebuffer()!);
     let webglRenderBuffer = this._webglRb;
     // PENDING. not bind multiple times? if render twice?
@@ -36,20 +37,14 @@ class GLFrameBuffer {
     }
 
     // Attach textures
-    const texturesToAttach = framebuffer.getTextures();
+    const texturesToAttach = frameBuffer.getTextures();
     const attachedTextures = this._textures;
 
     // Detach unused textures
     keys(attachedTextures).forEach((attachment) => {
       if (!texturesToAttach[attachment]) {
         // Detach a texture from framebuffer
-        gl.framebufferTexture2D(
-          FRAMEBUFFER,
-          +attachment,
-          attachedTextures[attachment].getBindTarget(),
-          null,
-          0
-        );
+        gl.framebufferTexture2D(FRAMEBUFFER, +attachment, attachedTextures[attachment][1], null, 0);
         delete attachedTextures[attachment];
       }
     });
@@ -67,7 +62,6 @@ class GLFrameBuffer {
       height = texture.height;
 
       // TODO validate width, height are same.
-
       if (+attachment === DEPTH_ATTACHMENT || +attachment === DEPTH_STENCIL_ATTACHMENT) {
         depthAttached = true;
         if (webglRenderBuffer) {
@@ -76,16 +70,24 @@ class GLFrameBuffer {
           renderBufferDetached = true;
         }
       }
-      if (attachedTextures[attachment] === glTexture) {
+
+      const attached = attachedTextures[attachment];
+      if (
+        attached &&
+        attached[0] === glTexture &&
+        attached[1] === target &&
+        attached[2] === width &&
+        attached[3] === height
+      ) {
         return;
       }
 
       gl.framebufferTexture2D(FRAMEBUFFER, +attachment, target, glTexture.getWebGLTexture(gl), 0);
 
-      attachedTextures[attachment] = glTexture;
+      attachedTextures[attachment] = [glTexture, target, width, height];
     });
 
-    if (width && height && !depthAttached && framebuffer.depthBuffer) {
+    if (width && height && !depthAttached && frameBuffer.depthBuffer) {
       const renderBufferFirstCreated = !webglRenderBuffer;
       // Create a render buffer if depth buffer is needed and not bound to a texture
       if (!webglRenderBuffer) {
@@ -112,6 +114,15 @@ class GLFrameBuffer {
       this._webglRb = undefined;
     }
 
+    // 0x8CD5, 36053, FRAMEBUFFER_COMPLETE
+    // 0x8CD6, 36054, FRAMEBUFFER_INCOMPLETE_ATTACHMENT
+    // 0x8CD7, 36055, FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT
+    // 0x8CD9, 36057, FRAMEBUFFER_INCOMPLETE_DIMENSIONS
+    // 0x8CDD, 36061, FRAMEBUFFER_UNSUPPORTED
+    // if (gl.checkFramebufferStatus(FRAMEBUFFER) !== FRAMEBUFFER_COMPLETE) {
+    //   debugger;
+    // }
+
     this._bound = gl;
   }
 
@@ -130,7 +141,7 @@ class GLFrameBuffer {
     keys(textures).forEach((attachment) =>
       // FIXME some texture format can't generate mipmap
       // TODO check LINEAR_MIPMAP_LINEAR?
-      textures[attachment]!.generateMipmap(gl)
+      textures[attachment]![0].generateMipmap(gl)
     );
   }
 
@@ -138,9 +149,10 @@ class GLFrameBuffer {
     const webglFb = this._webglFb;
     const webglRb = this._webglRb;
     webglFb && gl.deleteFramebuffer(webglFb);
-    webglRb && gl.deleteFramebuffer(WebGLFramebuffer);
+    webglRb && gl.deleteRenderbuffer(webglRb);
 
     // PENDING dispose webgl textures?
+    this._webglFb = this._webglRb = undefined;
     this._textures = {};
   }
 

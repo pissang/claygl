@@ -66,25 +66,8 @@ class FullscreenQuadPass<
     }
   }
 
-  bind(renderer: Renderer, frameBuffer: FrameBuffer) {
-    for (const attachment in this.outputs) {
-      const texture = this.outputs[attachment];
-      if (texture) {
-        frameBuffer.attach(texture, +attachment);
-      }
-    }
-    if (frameBuffer) {
-      frameBuffer.bind(renderer);
-    }
-  }
-
-  unbind(renderer: Renderer, frameBuffer: FrameBuffer) {
-    frameBuffer.unbind(renderer);
-  }
-
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {
     if (frameBuffer) {
-      this.bind(renderer, frameBuffer);
       // MRT Support in chrome
       // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
       const ext = renderer.getWebGLExtension('EXT_draw_buffers');
@@ -113,7 +96,7 @@ class FullscreenQuadPass<
     // FIXME Configure blend.
     // FIXME It will cause screen blink？
 
-    this.renderQuad(renderer, (gl) => {
+    this.renderQuad(renderer, frameBuffer, (gl) => {
       gl.depthMask(true);
       gl[blendWithPrevious ? 'enable' : 'disable'](constants.BLEND);
       this.material && (this.material.transparent = blendWithPrevious!);
@@ -130,16 +113,21 @@ class FullscreenQuadPass<
     });
 
     this.trigger('afterrender', this, renderer);
-
-    if (frameBuffer) {
-      this.unbind(renderer, frameBuffer);
-    }
   }
 
   /**
    * Simply do quad rendering
    */
-  renderQuad(renderer: Renderer, prepare?: RenderHooks['prepare']) {
+  renderQuad(renderer: Renderer, frameBuffer?: FrameBuffer, prepare?: RenderHooks['prepare']) {
+    if (frameBuffer) {
+      for (const attachment in this.outputs) {
+        const texture = this.outputs[attachment];
+        if (texture) {
+          frameBuffer.attach(texture, +attachment);
+        }
+      }
+    }
+
     const material = this.material;
     mesh =
       mesh ||
@@ -147,7 +135,7 @@ class FullscreenQuadPass<
         frustumCulling: false
       });
     mesh.material = material;
-    renderer.renderPass([mesh], camera, {
+    renderer.renderPass([mesh], camera, frameBuffer, {
       prepare
     });
   }

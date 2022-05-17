@@ -394,7 +394,6 @@ class DeferredGBuffer {
       return renderable.material !== prevRenderable.material;
     }
 
-    frameBuffer.bind(renderer);
     // PENDING, scene.boundingBoxLastFrame needs be updated if have shadow
     if (enableTargetTexture1) {
       // Pass 1
@@ -417,7 +416,7 @@ class DeferredGBuffer {
         sortCompare: Renderer.opaqueSortCompare
       };
       // FIXME Use MRT if possible
-      renderer.renderPass(gBufferRenderList, camera, renderHooks, scene);
+      renderer.renderPass(gBufferRenderList, camera, frameBuffer, renderHooks, scene);
     }
     if (enableTargetTexture3) {
       // Pass 2
@@ -435,7 +434,7 @@ class DeferredGBuffer {
         isMaterialChanged: isMaterialChanged,
         sortCompare: Renderer.opaqueSortCompare
       };
-      renderer.renderPass(gBufferRenderList, camera, renderHooks, scene);
+      renderer.renderPass(gBufferRenderList, camera, frameBuffer, renderHooks, scene);
     }
 
     if (enableTargetTexture4) {
@@ -541,10 +540,8 @@ class DeferredGBuffer {
         sortCompare: Renderer.opaqueSortCompare
       };
 
-      renderer.renderPass(gBufferRenderList, camera, renderHooks, scene);
+      renderer.renderPass(gBufferRenderList, camera, frameBuffer, renderHooks, scene);
     }
-
-    frameBuffer.unbind(renderer);
   }
 
   /**

@@ -309,7 +309,6 @@ class DeferredRenderer extends Notifier {
     this.trigger('beforelightaccumulate', renderer, scene, camera, updateShadow);
 
     lightAccumFrameBuffer.attach(lightAccumTex);
-    lightAccumFrameBuffer.bind(renderer);
     const clearColor = renderer.clearColor;
 
     const viewport = lightAccumFrameBuffer.viewport;
@@ -443,7 +442,7 @@ class DeferredRenderer extends Notifier {
         const pass = this._fullQuadPass;
         pass.material = passMaterial;
 
-        pass.renderQuad(renderer, (gl) => {
+        pass.renderQuad(renderer, lightAccumFrameBuffer, (gl) => {
           if (viewport) {
             const dpr = viewport.devicePixelRatio;
             // use scissor to make sure only clear the viewport
@@ -468,8 +467,6 @@ class DeferredRenderer extends Notifier {
     this._renderVolumeMeshList(renderer, scene, camera, volumeMeshList);
 
     this.trigger('lightaccumulate', renderer, scene, camera);
-
-    lightAccumFrameBuffer.unbind(renderer);
 
     this.trigger('afterlightaccumulate', renderer, scene, camera);
   }
@@ -656,7 +653,7 @@ class DeferredRenderer extends Notifier {
       // depthMask must be enabled before clear DEPTH_BUFFER
       gl.clear(gl.DEPTH_BUFFER_BIT);
 
-      renderer.renderPass([volumeMesh], camera, {
+      renderer.renderPass([volumeMesh], camera, this._lightAccumFrameBuffer, {
         getMaterial: getPreZMaterial
       });
 

@@ -111,7 +111,7 @@ export function loadPanorama(
     // PENDING
     texture.flipY = (option as LoadPanoramaOpts).flipY || false;
     panoramaToCubeMap(renderer, texture, cubeMap, option as LoadPanoramaOpts);
-    texture.dispose(renderer);
+    renderer.disposeTexture(texture);
     return cubeMap;
   });
 }

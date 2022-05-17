@@ -67,7 +67,7 @@ class AmbientCubemapLight extends Light {
     this.cubemap = result.environmentMap;
     cubemapPrefilteredMap.set(this.cubemap, true);
 
-    cubemap.dispose(renderer);
+    renderer.disposeTexture(cubemap);
   }
 }
 

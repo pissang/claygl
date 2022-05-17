@@ -139,13 +139,13 @@ class EnvironmentMapPass {
         constants.COLOR_ATTACHMENT0,
         constants.TEXTURE_CUBE_MAP_POSITIVE_X + i
       );
-      this._frameBuffer.bind(renderer);
-      renderer.render(scene, camera, true);
-      this._frameBuffer.unbind(renderer);
+      renderer.render(scene, camera, this._frameBuffer, {
+        notUpdateScene: true
+      });
     }
   }
   dispose(renderer: Renderer) {
-    this._frameBuffer.dispose(renderer);
+    renderer.disposeFrameBuffer(this._frameBuffer);
   }
 }
 export default EnvironmentMapPass;

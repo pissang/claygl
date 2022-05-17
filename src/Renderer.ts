@@ -233,7 +233,6 @@ class Renderer extends Notifier {
       this._width = canvas.width / dpr;
       this._height = canvas.height / dpr;
     }
-
     this.setViewport(0, 0, this._width, this._height);
   }
 
@@ -368,41 +367,41 @@ class Renderer extends Notifier {
     }
   }
 
-  setFrameBuffer(frameBuffer?: FrameBuffer) {
-    this._frameBuffer = frameBuffer;
-    if (!frameBuffer) {
-      // Unbind framebuffer immediately.
-      this._glRenderer.bindFrameBuffer(null);
-    }
-    // else do binding in rendering.
-  }
-
   getWebGLExtension(name: string) {
     return this._glRenderer.getWebGLExtension(name);
   }
 
   /**
    * Render the scene in camera to the screen or binded offline framebuffer
-   * @param  {clay.Scene}       scene
-   * @param  {clay.Camera}      camera
-   * @param  {boolean}     [notUpdateScene] If not call the scene.update methods in the rendering, default true
-   * @param  {boolean}     [preZ]           If use preZ optimization, default false
-   * @return {IRenderInfo}
    */
-  render(scene: Scene, camera: Camera, notUpdateScene?: boolean, preZ?: boolean) {
-    const _gl = this.gl;
+  render(
+    scene: Scene,
+    camera: Camera,
+    frameBuffer?: FrameBuffer,
+    opts?: {
+      /**
+       * If not call the scene.update methods in the rendering
+       */
+      notUpdateScene?: boolean;
+      /**
+       * If use preZ optimization
+       */
+      preZ?: boolean;
+    }
+  ) {
+    const gl = this.gl;
 
     const clearColor = this.clearColor;
-    const frameBuffer = this._frameBuffer;
 
-    if (frameBuffer) {
-      this._glRenderer.bindFrameBuffer(frameBuffer);
-    }
+    this._bindFrameBuffer(frameBuffer);
+
+    opts = opts || {};
+    const { notUpdateScene, preZ } = opts;
 
     if (this.clearBit) {
       // Must set depth and color mask true before clear
-      _gl.colorMask(true, true, true, true);
-      _gl.depthMask(true);
+      gl.colorMask(true, true, true, true);
+      gl.depthMask(true);
       const viewport = this.viewport;
       let needsScissor = false;
       const viewportDpr = viewport.devicePixelRatio;
@@ -416,18 +415,18 @@ class Renderer extends Notifier {
         needsScissor = true;
         // http://stackoverflow.com/questions/11544608/how-to-clear-a-rectangle-area-in-webgl
         // Only clear the viewport
-        _gl.enable(constants.SCISSOR_TEST);
-        _gl.scissor(
+        gl.enable(constants.SCISSOR_TEST);
+        gl.scissor(
           viewport.x * viewportDpr,
           viewport.y * viewportDpr,
           viewport.width * viewportDpr,
           viewport.height * viewportDpr
         );
       }
-      _gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-      _gl.clear(this.clearBit);
+      gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+      gl.clear(this.clearBit);
       if (needsScissor) {
-        _gl.disable(constants.SCISSOR_TEST);
+        gl.disable(constants.SCISSOR_TEST);
       }
     }
 
@@ -454,7 +453,7 @@ class Renderer extends Notifier {
 
     // Render pre z
     preZ && this.renderPreZ(opaqueList, scene, camera);
-    _gl.depthFunc(preZ ? constants.LEQUAL : constants.LESS);
+    gl.depthFunc(preZ ? constants.LEQUAL : constants.LESS);
 
     // Update the depth of transparent list.
     const worldViewMat = mat4Create();
@@ -474,6 +473,7 @@ class Renderer extends Notifier {
     this._renderPass(
       opaqueList,
       camera,
+      frameBuffer,
       {
         getMaterial,
         sortCompare: Renderer.opaqueSortCompare
@@ -484,6 +484,7 @@ class Renderer extends Notifier {
     this._renderPass(
       transparentList,
       camera,
+      frameBuffer,
       {
         getMaterial,
         sortCompare: Renderer.transparentSortCompare
@@ -504,24 +505,32 @@ class Renderer extends Notifier {
   renderPass(
     list: GLRenderableObject<Material>[],
     camera?: Camera,
+    frameBuffer?: FrameBuffer,
     renderHooks?: RenderHooks,
     scene?: Scene
   ) {
-    // Do frmaebuffer bind in the rnderPass method exposed to outside.
-    const frameBuffer = this._frameBuffer;
-    if (frameBuffer) {
-      this._glRenderer.bindFrameBuffer(frameBuffer);
-    }
+    this._bindFrameBuffer(frameBuffer);
+    this._renderPass(list, camera, frameBuffer, renderHooks, scene);
+  }
 
-    renderHooks && renderHooks.prepare && renderHooks.prepare(this.gl);
-
-    this._renderPass(list, camera, renderHooks, scene);
+  private _bindFrameBuffer(frameBuffer?: FrameBuffer) {
+    const glRenderer = this._glRenderer;
+    glRenderer.bindFrameBuffer(frameBuffer);
+    const viewport = frameBuffer ? frameBuffer.getViewport() : this.viewport;
+    glRenderer.setViewport(
+      viewport.x,
+      viewport.y,
+      viewport.width,
+      viewport.height,
+      viewport.devicePixelRatio
+    );
   }
 
   private _renderPass(
     list: GLRenderableObject<Material>[],
     camera?: Camera,
-    renderHooks?: GLRenderHooks<GLRenderableObject<Material>>,
+    frameBuffer?: FrameBuffer,
+    renderHooks?: RenderHooks,
     scene?: Scene
   ) {
     let worldM: mat4.Mat4Array;
@@ -534,9 +543,8 @@ class Renderer extends Notifier {
       viewport.height * vDpr
     ];
     const windowDpr = this._devicePixelRatio;
-    const currentFrameBuffer = this._frameBuffer;
-    const windowSizeUniform = currentFrameBuffer
-      ? [currentFrameBuffer.getTextureWidth(), currentFrameBuffer.getTextureHeight()]
+    const windowSizeUniform = frameBuffer
+      ? [frameBuffer.getWidth(), frameBuffer.getHeight()]
       : [this._width * windowDpr, this._height * windowDpr];
     // DEPRECATED
     const viewportSizeUniform = [viewportUniform[2], viewportUniform[3]];
@@ -654,6 +662,12 @@ class Renderer extends Notifier {
         }
       }
     };
+
+    // Do frmaebuffer bind in the rnderPass method exposed to outside.
+    this._glRenderer.bindFrameBuffer(frameBuffer);
+
+    renderHooks && renderHooks.prepare && renderHooks.prepare(gl);
+
     this._glRenderer.render(list, assign(renderHooksForScene, renderHooks));
   }
 
@@ -681,7 +695,7 @@ class Renderer extends Notifier {
     _gl.depthMask(true);
 
     // Status
-    this._renderPass(list, camera, {
+    this._renderPass(list, camera, undefined, {
       ifRender(renderable) {
         return !renderable.ignorePreZ;
       },

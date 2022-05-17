@@ -136,11 +136,10 @@ export function prefilterEnvironmentMap(
     for (let j = 0; j < targets.length; j++) {
       const pixels = new ArrayCtor(renderTargetTmp.width * renderTargetTmp.height * 4);
       frameBuffer.attach(renderTargetTmp);
-      frameBuffer.bind(renderer);
 
       const camera = envMapPass.getCamera(targets[j]);
       camera.fov = fov;
-      renderer.render(dummyScene, camera);
+      renderer.render(dummyScene, camera, frameBuffer);
       renderer.gl.readPixels(
         0,
         0,
@@ -167,7 +166,6 @@ export function prefilterEnvironmentMap(
       // ctx.putImageData(imageData, 0, 0);
       // container.appendChild(canvas);
 
-      frameBuffer.unbind(renderer);
       prefilteredCubeMap.mipmaps[i].pixels![targets[j]] = pixels;
     }
 
@@ -176,11 +174,11 @@ export function prefilterEnvironmentMap(
     renderTargetTmp.dirty();
   }
 
-  frameBuffer.dispose(renderer);
-  renderTargetTmp.dispose(renderer);
+  renderer.disposeFrameBuffer(frameBuffer);
+  renderer.disposeTexture(renderTargetTmp);
   renderer.disposeScene(dummyScene);
   // Remove gpu resource allucated in renderer
-  normalDistribution.dispose(renderer);
+  renderer.disposeTexture(normalDistribution);
 
   return {
     environmentMap: prefilteredCubeMap,
@@ -224,7 +222,7 @@ export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D)
   // texture.dirty();
   // framebuffer.unbind(renderer);
 
-  framebuffer.dispose(renderer);
+  renderer.disposeFrameBuffer(framebuffer);
 
   return texture;
 }

@@ -209,21 +209,15 @@ class GLRenderer {
 
   /**
    * Bind framebuffer before render
+   *
+   * Set null too unbind
    */
   bindFrameBuffer(frameBuffer?: FrameBuffer | null) {
     const prevFrameBuffer = this._framebuffer;
     const glFrameBufferMap = this._glFrameBufferMap;
     if (prevFrameBuffer) {
-      if (frameBuffer) {
-        // TODO is this check necessary?
-        if (frameBuffer !== prevFrameBuffer) {
-          console.error('Already bound to a framebuffer. Unbind it firstly.');
-        }
-      } else {
-        // Unbind
-        const prevGLFrameBuffer = glFrameBufferMap.get(prevFrameBuffer);
-        prevGLFrameBuffer && prevGLFrameBuffer.unbind(this.gl);
-      }
+      const prevGLFrameBuffer = glFrameBufferMap.get(prevFrameBuffer);
+      prevGLFrameBuffer && prevGLFrameBuffer.unbind(this.gl);
     }
     if (frameBuffer) {
       let glFrameBuffer = glFrameBufferMap.get(frameBuffer);

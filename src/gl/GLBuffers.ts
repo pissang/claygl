@@ -43,8 +43,8 @@ export class GLIndicesBuffer {
   }
 }
 class GLBuffers {
-  private _attributeBuffers: GLAttributeBuffer[] = [];
-  private _indicesBuffer?: GLIndicesBuffer;
+  private _attrbBuffs: GLAttributeBuffer[] = [];
+  private _idxBuff?: GLIndicesBuffer;
   private _geometry: GeometryBase;
 
   private _vao?: any;
@@ -55,7 +55,7 @@ class GLBuffers {
   }
 
   getIndicesBuffer() {
-    return this._indicesBuffer;
+    return this._idxBuff;
   }
 
   update(gl: WebGLRenderingContext) {
@@ -66,8 +66,8 @@ class GLBuffers {
       return;
     }
 
-    const attributeBuffers = this._attributeBuffers;
-    let indicesBuffer = this._indicesBuffer;
+    const attributeBuffers = this._attrbBuffs;
+    let indicesBuffer = this._idxBuff;
     const DRAW = geometry.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
 
     if (attributesDirty) {
@@ -116,7 +116,7 @@ class GLBuffers {
     if (geometry.isUseIndices() && indicesDirty) {
       if (!indicesBuffer) {
         indicesBuffer = new GLIndicesBuffer(gl.createBuffer()!);
-        this._indicesBuffer = indicesBuffer;
+        this._idxBuff = indicesBuffer;
       }
       indicesBuffer.count = geometry.indices!.length;
       gl.bindBuffer(constants.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
@@ -132,8 +132,8 @@ class GLBuffers {
     // const vaoExt = (this._vaoExt = glext.getExtension('OES_vertex_array_object'));
     // let vao = this._vao;
 
-    const attributeBuffers = this._attributeBuffers;
-    const indicesBuffer = this._indicesBuffer;
+    const attributeBuffers = this._attrbBuffs;
+    const indicesBuffer = this._idxBuff;
     const attributeBuffersLen = attributeBuffers.length;
 
     // let needsBindBuffer = true;
@@ -202,13 +202,13 @@ class GLBuffers {
    * Dispose geometry data in GL context.
    */
   dispose(gl: WebGLRenderingContext) {
-    const attributeBuffers = this._attributeBuffers;
-    const indicesBuffer = this._indicesBuffer;
+    const attributeBuffers = this._attrbBuffs;
+    const indicesBuffer = this._idxBuff;
 
     attributeBuffers && attributeBuffers.forEach((buffer) => gl.deleteBuffer(buffer.buffer));
 
     if (indicesBuffer) {
-      gl.deleteBuffer(indicesBuffer);
+      gl.deleteBuffer(indicesBuffer.buffer);
     }
 
     const vao = this._vao;
@@ -216,6 +216,9 @@ class GLBuffers {
     if (vaoExt && vao && vao.vao) {
       vaoExt.deleteVertexArrayOES(vao.vao);
     }
+
+    this._attrbBuffs = [];
+    this._idxBuff = undefined;
   }
 }
 
