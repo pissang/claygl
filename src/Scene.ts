@@ -44,7 +44,7 @@ function getProgramKey(lightNumbers: Record<string, number>) {
 function setUniforms(
   uniforms: Record<string, MaterialUniform>,
   program: GLProgram,
-  renderer: Renderer
+  gl: WebGLRenderingContext
 ) {
   for (const symbol in uniforms) {
     const lu = uniforms[symbol];
@@ -55,12 +55,12 @@ function setUniforms(
       const texSlots = [];
       for (let i = 0; i < lu.value.length; i++) {
         const texture = lu.value[i];
-        const slot = program.takeCurrentTextureSlot(renderer, texture);
+        const slot = program.takeCurrentTextureSlot(gl, texture);
         texSlots.push(slot);
       }
-      program.set(renderer.gl, '1iv', symbol, texSlots);
+      program.set(gl, '1iv', symbol, texSlots);
     } else {
-      program.set(renderer.gl, lu.type, symbol, lu.value);
+      program.set(gl, lu.type, symbol, lu.value);
     }
   }
 }
@@ -520,9 +520,9 @@ class Scene extends ClayNode {
   }
 
   setLightUniforms(program: GLProgram, lightGroup: number, renderer: Renderer) {
-    setUniforms(this._lightUniforms[lightGroup], program, renderer);
+    setUniforms(this._lightUniforms[lightGroup], program, renderer.gl);
     // Set shadows
-    setUniforms(this.shadowUniforms, program, renderer);
+    setUniforms(this.shadowUniforms, program, renderer.gl);
   }
 
   /**

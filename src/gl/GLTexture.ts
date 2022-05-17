@@ -129,14 +129,14 @@ class GLTexture {
     gl.texParameteri(
       textureTarget,
       constants.TEXTURE_WRAP_T,
-      (NPOT && !needsConvertToPOT) || !NPOT ? constants.CLAMP_TO_EDGE : texture.wrapT
+      NPOT && !needsConvertToPOT ? constants.CLAMP_TO_EDGE : texture.wrapT
     );
 
     gl.texParameteri(textureTarget, constants.TEXTURE_MAG_FILTER, texture.magFilter);
     gl.texParameteri(
       textureTarget,
       constants.TEXTURE_MIN_FILTER,
-      needsConvertToPOT ? texture.minFilter : getAvailableMinFilter(texture, NPOT)
+      getAvailableMinFilter(texture, NPOT || needsConvertToPOT)
     );
 
     const anisotropicExt = glExt.getExtension('EXT_texture_filter_anisotropic');
@@ -312,7 +312,7 @@ class GLTexture {
   generateMipmap(gl: WebGLRenderingContext) {
     const texture = this._texture;
     const bindTarget = this.getBindTarget();
-    if (texture.useMipmap && !texture.isPowerOfTwo()) {
+    if (texture.useMipmap && texture.isPowerOfTwo()) {
       gl.bindTexture(bindTarget, this.getWebGLTexture(gl));
       gl.generateMipmap(bindTarget);
       gl.bindTexture(bindTarget, null);

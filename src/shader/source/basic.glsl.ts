@@ -10,17 +10,12 @@ import {
 import { POSITION, TEXCOORD_0, WORLDVIEWPROJECTION } from './shared';
 import {
   ACESToneMappingFunction,
-  decodeHDRFunction,
-  edgeFactorFunction,
-  encodeHDRFunction,
   instancingMixin,
-  linearToSRGBFunction,
   logDepthFragmentMixin,
   logDepthVertexMixin,
   HDREncoderMixin,
   skinningMixin,
   sRGBMixin,
-  sRGBToLinearFunction,
   wireframeMixin
 } from './util.glsl';
 
@@ -120,9 +115,9 @@ void main() {
 
   #if defined(DIFFUSEMAP_ALPHA_ALPHA)
   gl_FragColor.a = texel.a;
-  #else
-  gl_FragColor.rgb *= texel.rgb;
   #endif
+
+  gl_FragColor.rgb *= texel.rgb;
 
 #endif
 
@@ -147,7 +142,6 @@ void main() {
   gl_FragColor = encodeHDR(gl_FragColor);
 
   ${logDepthFragmentMixin.main}
-
 }
   `
 });

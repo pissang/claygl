@@ -1,6 +1,5 @@
 import GeometryBase, { AttributeSize, AttributeType } from '../GeometryBase';
 import { AttributeSemantic } from '../Shader';
-import GLExtension from './GLExtension';
 import GLProgram from './GLProgram';
 import * as constants from '../core/constants';
 
@@ -20,12 +19,6 @@ export class GLAttributeBuffer {
   readonly buffer: WebGLBuffer;
   readonly size: AttributeSize;
   readonly semantic?: AttributeSemantic;
-
-  // To be set in mesh
-  // symbol in the shader
-  // Needs remove flag
-  symbol: string = '';
-  needsRemove = false;
 
   constructor(
     name: string,
@@ -99,8 +92,8 @@ class GLBuffers {
         if (attribute.__dirty) {
           // Only update when they are dirty.
           // TODO: Use BufferSubData?
-          gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-          gl.bufferData(gl.ARRAY_BUFFER, attribute.value as Float32Array, DRAW);
+          gl.bindBuffer(constants.ARRAY_BUFFER, buffer);
+          gl.bufferData(constants.ARRAY_BUFFER, attribute.value as Float32Array, DRAW);
           attribute.__dirty = false;
         }
 
@@ -126,8 +119,8 @@ class GLBuffers {
         this._indicesBuffer = indicesBuffer;
       }
       indicesBuffer.count = geometry.indices!.length;
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geometry.indices!, DRAW);
+      gl.bindBuffer(constants.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
+      gl.bufferData(constants.ELEMENT_ARRAY_BUFFER, geometry.indices!, DRAW);
     }
     geometry.__indicesDirty = false;
   }
@@ -158,14 +151,14 @@ class GLBuffers {
     //   vaoExt.bindVertexArrayOES(vao.vao);
     // }
 
-    const prevMaxLocation = enabledAttributesMap.get(gl) || 0;
+    const enabledAttrCount = enabledAttributesMap.get(gl) || 0;
     let maxLocation = 0;
     // Always bind attribute location
     for (let i = 0; i < attributeBuffersLen; i++) {
       const attributeBufferInfo = attributeBuffers[i];
       const location = program.getAttributeLocation(gl, attributeBufferInfo);
       // Will be -1 if not found
-      if (location == null || location == -1) {
+      if (location == null || location < 0) {
         continue;
       }
 
@@ -175,7 +168,7 @@ class GLBuffers {
 
       gl.bindBuffer(constants.ARRAY_BUFFER, buffer);
       gl.vertexAttribPointer(location, size, glType, false, 0, 0);
-      if (location >= prevMaxLocation) {
+      if (location >= enabledAttrCount) {
         gl.enableVertexAttribArray(location);
       }
       if (location > maxLocation) {
@@ -184,11 +177,11 @@ class GLBuffers {
     }
 
     // Disable unused attribute
-    for (let i = maxLocation; i < prevMaxLocation; i++) {
+    for (let i = maxLocation + 1; i < enabledAttrCount; i++) {
       gl.disableVertexAttribArray(i);
     }
 
-    enabledAttributesMap.set(gl, maxLocation);
+    enabledAttributesMap.set(gl, maxLocation + 1);
 
     // Binding buffers
     // if (needsBindBuffer) {
