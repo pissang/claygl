@@ -3,7 +3,7 @@ import Vector3 from '../math/Vector3';
 import BoundingBox from '../math/BoundingBox';
 import Frustum from '../math/Frustum';
 import Matrix4 from '../math/Matrix4';
-import Renderer from '../Renderer';
+import Renderer, { RenderHooks } from '../Renderer';
 import Shader, { ShaderPrecision } from '../Shader';
 import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
@@ -31,7 +31,6 @@ import {
   shadowMapDistanceFragment,
   shadowMapDistanceVertex
 } from '../shader/source/shadowmap.glsl';
-import { RenderHooks } from '../gl/GLRenderer';
 
 function getDepthMaterialUniform(renderable: Renderable, depthMaterial: Material, symbol: string) {
   const material = renderable.material;
@@ -167,7 +166,7 @@ class ShadowMapPass extends Notifier {
       const texture = this._textures[name];
       renderer.setViewport(x, y, (width * texture.width) / texture.height, height);
       debugPass.material.set('depthMap', texture as Texture2D);
-      debugPass.renderQuad(renderer);
+      debugPass.render(renderer);
       x += (width * texture.width) / texture.height;
     }
     renderer.setViewport(viewport);
@@ -371,6 +370,9 @@ class ShadowMapPass extends Notifier {
   ) {
     const defaultShadowMaterial = this._getDepthMaterial(light);
     const passConfig: RenderHooks = {
+      prepare(gl) {
+        gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
+      },
       getMaterial(renderable) {
         return (renderable as Renderable).shadowDepthMaterial || defaultShadowMaterial;
       },
@@ -417,11 +419,9 @@ class ShadowMapPass extends Notifier {
 
     const viewport = renderer.viewport;
 
-    const _gl = renderer.gl;
     const framebuffer = this._frameBuffer;
     framebuffer.attach(texture);
     framebuffer.bind(renderer);
-    _gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
 
     for (let i = 0; i < light.shadowCascade; i++) {
       // Get the splitted frustum
@@ -494,16 +494,16 @@ class ShadowMapPass extends Notifier {
   ) {
     const texture = this._getTexture(light);
     const lightCamera = this._getSpotLightCamera(light);
-    const _gl = renderer.gl;
     const frameBuffer = this._frameBuffer;
 
     frameBuffer.attach(texture);
     frameBuffer.bind(renderer);
 
-    _gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
-
     const defaultShadowMaterial = this._getDepthMaterial(light);
     const passConfig: RenderHooks = {
+      prepare(gl) {
+        gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
+      },
       getMaterial(renderable) {
         return (renderable as Renderable).shadowDepthMaterial || defaultShadowMaterial;
       },
@@ -534,11 +534,13 @@ class ShadowMapPass extends Notifier {
     pointLightShadowMaps: TextureCube[]
   ) {
     const texture = this._getTexture(light);
-    const _gl = renderer.gl;
     pointLightShadowMaps.push(texture);
 
     const defaultShadowMaterial = this._getDepthMaterial(light);
     const passConfig: RenderHooks = {
+      prepare(gl) {
+        gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
+      },
       getMaterial(renderable) {
         return (renderable as Renderable).shadowDepthMaterial || defaultShadowMaterial;
       },
@@ -624,7 +626,6 @@ class ShadowMapPass extends Notifier {
         constants.TEXTURE_CUBE_MAP_POSITIVE_X + i
       );
       frameBuffer.bind(renderer);
-      _gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
 
       renderer.renderPass(renderListEachSide[target], camera, passConfig);
     }

@@ -7,7 +7,7 @@ import Matrix4 from '../math/Matrix4';
 import * as mat4 from '../glmatrix/mat4';
 import * as constants from '../core/constants';
 
-import Renderer, { RenderableObject, RendererViewport } from '../Renderer';
+import Renderer, { RenderHooks, RendererViewport, RenderableObject } from '../Renderer';
 import Camera from '../Camera';
 import Scene from '../Scene';
 import { assign, optional } from '../core/util';
@@ -18,7 +18,6 @@ import {
   gBufferDebugFragment,
   gBufferVertex
 } from '../shader/source/deferred/gbuffer.glsl';
-import { RenderHooks } from '../gl/GLRenderer';
 
 const renderableGBufferData = new WeakMap<
   RenderableObject,
@@ -401,9 +400,11 @@ class DeferredGBuffer {
       // Pass 1
       frameBuffer.attach(opts.targetTexture1 || this._gBufferTex1);
 
-      clearViewport();
       const gBufferMaterial1 = this._gBufferMaterial1;
       const renderHooks: RenderHooks = {
+        prepare(gl) {
+          clearViewport();
+        },
         getMaterial() {
           return gBufferMaterial1;
         },
@@ -422,10 +423,11 @@ class DeferredGBuffer {
       // Pass 2
       frameBuffer.attach(opts.targetTexture3 || this._gBufferTex3);
 
-      clearViewport();
-
       const gBufferMaterial2 = this._gBufferMaterial2;
       const renderHooks: RenderHooks = {
+        prepare(gl) {
+          clearViewport();
+        },
         getMaterial() {
           return gBufferMaterial2;
         },
@@ -449,6 +451,9 @@ class DeferredGBuffer {
       const cameraViewProj = mat4.create();
       mat4.multiply(cameraViewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
       const renderHooks: RenderHooks = {
+        prepare(gl) {
+          clearViewport();
+        },
         getMaterial() {
           return gBufferMaterial3;
         },

@@ -2,7 +2,7 @@ import { keys } from '../core/util';
 import Material from '../Material';
 import { ShaderDefineValue, ShaderPrecision } from '../Shader';
 import GLProgram from './GLProgram';
-import GLRenderer, { MaterialObject, RenderableObject } from './GLRenderer';
+import GLRenderer, { GLMaterialObject, GLRenderableObject } from './GLRenderer';
 
 // const loopRegex =
 //   /for\s*?\(int\s*?_idx_\s*=\s*([\w-]+);\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
@@ -136,8 +136,8 @@ class ProgramManager {
   }
 
   getProgram(
-    renderable: RenderableObject,
-    material: MaterialObject,
+    renderable: GLRenderableObject,
+    material: GLMaterialObject,
     extraKey: string,
     extraDefineCode: string
   ) {

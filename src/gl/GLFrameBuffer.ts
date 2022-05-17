@@ -31,7 +31,9 @@ class GLFrameBuffer {
     const webglFb = this._webglFb || (this._webglFb = gl.createFramebuffer()!);
     let webglRenderBuffer = this._webglRb;
     // PENDING. not bind multiple times? if render twice?
-    gl.bindFramebuffer(FRAMEBUFFER, webglFb);
+    if (this._bound !== gl) {
+      gl.bindFramebuffer(FRAMEBUFFER, webglFb);
+    }
 
     // Attach textures
     const texturesToAttach = framebuffer.getTextures();
@@ -114,11 +116,13 @@ class GLFrameBuffer {
   }
 
   unbind(gl: WebGLRenderingContext) {
-    this._bound = null;
-    gl.bindFramebuffer(FRAMEBUFFER, null);
-    // Because the data of texture is changed over time,
-    // Here update the mipmaps of texture each time after rendered;
-    this.updateMipmap(gl);
+    if (this._bound) {
+      this._bound = null;
+      gl.bindFramebuffer(FRAMEBUFFER, null);
+      // Because the data of texture is changed over time,
+      // Here update the mipmaps of texture each time after rendered;
+      this.updateMipmap(gl);
+    }
   }
 
   updateMipmap(gl: WebGLRenderingContext) {

@@ -19,13 +19,12 @@ import { Color, GLEnum } from './core/type';
 import { assign, genGUID, optional, setCanvasSize } from './core/util';
 import type Camera from './Camera';
 import type ClayNode from './Node';
-import GLProgram from './gl/GLProgram';
 import type PerspectiveCamera from './camera/Perspective';
 import { preZFragment, preZVertex } from './shader/source/prez.glsl';
 import GLRenderer, {
   ExtendedRenderableObject,
-  RenderableObject,
-  RenderHooks
+  GLRenderableObject,
+  GLRenderHooks
 } from './gl/GLRenderer';
 import Texture from './Texture';
 import InstancedMesh from './InstancedMesh';
@@ -36,6 +35,14 @@ const mat4Create = mat4.create;
 interface ExtendedWebGLRenderingContext extends WebGLRenderingContext {
   targetRenderer: Renderer;
 }
+
+export type RenderableObject = GLRenderableObject<Material>;
+export type RenderHooks = GLRenderHooks<RenderableObject> & {
+  /**
+   * Do preparation like color clear before render and after framebuffer bound.
+   */
+  prepare?(gl: WebGLRenderingContext): void;
+};
 
 export interface RendererViewport {
   x: number;
@@ -487,10 +494,17 @@ class Renderer extends Notifier {
     scene.trigger('afterrender', this, scene, camera, renderList);
   }
 
+  /**
+   * Render a single pass.
+   *
+   * CAUTION:
+   * You must execute gl.clear or other gl commands in the prepare methods.
+   * If you are using framebuffer. executing theme before the renderPass will not affect on the framebuffer.
+   */
   renderPass(
-    list: RenderableObject<Material>[],
+    list: GLRenderableObject<Material>[],
     camera?: Camera,
-    renderHooks?: RenderHooks<RenderableObject<Material>>,
+    renderHooks?: RenderHooks,
     scene?: Scene
   ) {
     // Do frmaebuffer bind in the rnderPass method exposed to outside.
@@ -498,13 +512,16 @@ class Renderer extends Notifier {
     if (frameBuffer) {
       this._glRenderer.bindFrameBuffer(frameBuffer);
     }
+
+    renderHooks && renderHooks.prepare && renderHooks.prepare(this.gl);
+
     this._renderPass(list, camera, renderHooks, scene);
   }
 
   private _renderPass(
-    list: RenderableObject<Material>[],
+    list: GLRenderableObject<Material>[],
     camera?: Camera,
-    renderHooks?: RenderHooks<RenderableObject<Material>>,
+    renderHooks?: GLRenderHooks<GLRenderableObject<Material>>,
     scene?: Scene
   ) {
     let worldM: mat4.Mat4Array;
@@ -541,7 +558,7 @@ class Renderer extends Notifier {
     mat4.invert(matrices.PROJECTIONINVERSE, matrices.PROJECTION);
     mat4.invert(matrices.VIEWPROJECTIONINVERSE, matrices.VIEWPROJECTION);
 
-    const renderHooksForScene: RenderHooks = {
+    const renderHooksForScene: GLRenderHooks = {
       getProgramKey: (renderable) => {
         let key = (scene && scene.getProgramKey(renderable.lightGroup || 0)) || '';
         if (this.logDepthBuffer) {
@@ -648,7 +665,7 @@ class Renderer extends Notifier {
     this._glRenderer.maxJointNumber = val;
   }
 
-  renderPreZ(list: RenderableObject<Material>[], scene: Scene, camera: Camera) {
+  renderPreZ(list: GLRenderableObject<Material>[], scene: Scene, camera: Camera) {
     const _gl = this.gl;
     const preZPassMaterial =
       this._prezMaterial || new Material(new Shader(preZVertex, preZFragment));

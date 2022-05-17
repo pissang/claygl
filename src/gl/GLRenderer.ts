@@ -3,7 +3,7 @@ import { GLEnum } from '../core/type';
 import vendor from '../core/vendor';
 import GeometryBase from '../GeometryBase';
 import InstancedMesh from '../InstancedMesh';
-import Material, { GeneralMaterialUniformObject } from '../Material';
+import { GeneralMaterialUniformObject } from '../Material';
 import type { Matrix4 } from '../math';
 import Mesh from '../Mesh';
 import Skeleton from '../Skeleton';
@@ -23,17 +23,21 @@ import GLFrameBuffer from './GLFrameBuffer';
 
 const errorShader: Record<string, boolean> = {};
 
-function defaultGetMaterial(renderable: RenderableObject) {
+function defaultGetMaterial(renderable: GLRenderableObject) {
   return renderable.material;
 }
-function defaultGetUniform(renderable: RenderableObject, material: MaterialObject, symbol: string) {
+function defaultGetUniform(
+  renderable: GLRenderableObject,
+  material: GLMaterialObject,
+  symbol: string
+) {
   return material.uniforms![symbol].value;
 }
 function defaultIsMaterialChanged(
-  renderable: RenderableObject,
-  prevRenderable: RenderableObject,
-  material: MaterialObject,
-  prevMaterial: MaterialObject
+  renderable: GLRenderableObject,
+  prevRenderable: GLRenderableObject,
+  material: GLMaterialObject,
+  prevMaterial: GLMaterialObject
 ) {
   return material !== prevMaterial;
 }
@@ -46,7 +50,7 @@ function noop() {}
 /**
  * A very basic material that is used in renderPass
  */
-export interface MaterialObject {
+export interface GLMaterialObject {
   __uid__?: number;
 
   shader: Shader;
@@ -72,7 +76,7 @@ export interface MaterialObject {
 /**
  * A very basic renderable that is used in renderPass
  */
-export interface RenderableObject<T extends MaterialObject = MaterialObject> {
+export interface GLRenderableObject<T extends GLMaterialObject = GLMaterialObject> {
   geometry: GeometryBase;
   material: T;
   mode?: GLEnum;
@@ -92,20 +96,20 @@ export interface RenderableObject<T extends MaterialObject = MaterialObject> {
   afterRender?(): void;
 }
 
-export interface ExtendedRenderableObject<T extends MaterialObject = MaterialObject>
-  extends RenderableObject<T> {
+export interface ExtendedRenderableObject<T extends GLMaterialObject = GLMaterialObject>
+  extends GLRenderableObject<T> {
   __program: GLProgram;
   // Depth for transparent list sorting
   __depth: number;
   renderOrder: number;
 }
 
-export interface RenderHooks<T extends RenderableObject = RenderableObject> {
+export interface GLRenderHooks<T extends GLRenderableObject = GLRenderableObject> {
   ifRender?(renderable: T): boolean;
   /**
    * Get material of renderable
    */
-  getMaterial?(renderable: T): MaterialObject;
+  getMaterial?(renderable: T): GLMaterialObject;
 
   /**
    * Get uniform from material
@@ -145,16 +149,16 @@ export interface RenderHooks<T extends RenderableObject = RenderableObject> {
   isMaterialChanged?(
     renderable: T,
     prevRenderable: T,
-    material: MaterialObject,
-    prevMaterial: MaterialObject
+    material: GLMaterialObject,
+    prevMaterial: GLMaterialObject
   ): boolean;
 
   sortCompare?: (a: T & ExtendedRenderableObject, b: T & ExtendedRenderableObject) => number;
 
   beforeRender?: (
     renderable: T,
-    material: MaterialObject,
-    prevMaterial: MaterialObject | undefined
+    material: GLMaterialObject,
+    prevMaterial: GLMaterialObject | undefined
   ) => void;
   afterRender?: (renderable: T) => void;
 }
@@ -239,7 +243,7 @@ class GLRenderer {
    * @param list List of all renderables.
    * @param renderHooks
    */
-  render(list: RenderableObject[], renderHooks?: RenderHooks) {
+  render(list: GLRenderableObject[], renderHooks?: GLRenderHooks) {
     renderHooks = renderHooks || {};
     renderHooks.getMaterial = renderHooks.getMaterial || defaultGetMaterial;
     renderHooks.getMaterialUniform = renderHooks.getMaterialUniform || defaultGetUniform;
@@ -258,9 +262,9 @@ class GLRenderer {
     // Some common builtin uniforms
     const gl = this.gl;
 
-    let prevMaterial: MaterialObject | undefined;
+    let prevMaterial: GLMaterialObject | undefined;
     let prevProgram: GLProgram | undefined;
-    let prevRenderable: RenderableObject | undefined;
+    let prevRenderable: GLRenderableObject | undefined;
 
     // Status
     let depthTest: boolean | undefined, depthMask: boolean | undefined;
@@ -392,7 +396,7 @@ class GLRenderer {
     }
   }
 
-  private _updatePrograms(list: RenderableObject[], renderHooks: RenderHooks) {
+  private _updatePrograms(list: GLRenderableObject[], renderHooks: GLRenderHooks) {
     const getMaterial = renderHooks.getMaterial || defaultGetMaterial;
     for (let i = 0; i < list.length; i++) {
       const renderable = list[i];
@@ -487,7 +491,7 @@ class GLRenderer {
     }
   }
 
-  private _renderObject(renderable: RenderableObject, buffer: GLBuffers, program: GLProgram) {
+  private _renderObject(renderable: GLRenderableObject, buffer: GLBuffers, program: GLProgram) {
     const _gl = this.gl;
     const geometry = renderable.geometry;
     const glext = this._glext;
@@ -563,7 +567,7 @@ class GLRenderer {
     return (
       this._blankTexture ||
       (this._blankTexture = new Texture2D({
-        image: vendor.createBlankCanvas('#fff')
+        image: vendor.createBlankCanvas('#000')
       }))
     );
   }
@@ -595,10 +599,10 @@ class GLRenderer {
   }
 
   private _bindMaterial(
-    renderable: RenderableObject,
-    material: MaterialObject,
+    renderable: GLRenderableObject,
+    material: GLMaterialObject,
     program: GLProgram,
-    getUniformValue: RenderHooks['getMaterialUniform']
+    getUniformValue: GLRenderHooks['getMaterialUniform']
   ) {
     const gl = this.gl;
     // PENDING Same texture in different material take different slot?

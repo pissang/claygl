@@ -313,18 +313,6 @@ class DeferredRenderer extends Notifier {
     const clearColor = renderer.clearColor;
 
     const viewport = lightAccumFrameBuffer.viewport;
-    if (viewport) {
-      const dpr = viewport.devicePixelRatio;
-      // use scissor to make sure only clear the viewport
-      gl.enable(gl.SCISSOR_TEST);
-      gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
-    }
-    gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-    gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.enable(gl.BLEND);
-    if (viewport) {
-      gl.disable(gl.SCISSOR_TEST);
-    }
 
     this.trigger('startlightaccumulate', renderer, scene, camera);
 
@@ -455,7 +443,25 @@ class DeferredRenderer extends Notifier {
         const pass = this._fullQuadPass;
         pass.material = passMaterial;
 
-        pass.renderQuad(renderer);
+        pass.renderQuad(renderer, (gl) => {
+          if (viewport) {
+            const dpr = viewport.devicePixelRatio;
+            // use scissor to make sure only clear the viewport
+            gl.enable(gl.SCISSOR_TEST);
+            gl.scissor(
+              viewport.x * dpr,
+              viewport.y * dpr,
+              viewport.width * dpr,
+              viewport.height * dpr
+            );
+          }
+          gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.enable(gl.BLEND);
+          if (viewport) {
+            gl.disable(gl.SCISSOR_TEST);
+          }
+        });
       }
     }
 

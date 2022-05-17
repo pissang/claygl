@@ -11,6 +11,7 @@ import type Renderer from '../Renderer';
 import type FrameBuffer from '../FrameBuffer';
 import type Texture2D from '../Texture2D';
 import Notifier from '../core/Notifier';
+import { RenderHooks } from '../Renderer';
 
 const planeGeo = new Plane();
 let mesh: Mesh;
@@ -82,8 +83,6 @@ class FullscreenQuadPass<
   }
 
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {
-    const _gl = renderer.gl;
-
     if (frameBuffer) {
       this.bind(renderer, frameBuffer);
       // MRT Support in chrome
@@ -109,24 +108,26 @@ class FullscreenQuadPass<
     // FIXME pixels may be discard
     let clearBit = this.clearDepth ? constants.DEPTH_BUFFER_BIT : 0;
     const blendWithPrevious = this.blendWithPrevious;
-    _gl.depthMask(true);
-    if (this.clearColor) {
-      clearBit = clearBit | constants.COLOR_BUFFER_BIT;
-      _gl.colorMask(true, true, true, true);
-      const cc = this.clearColor;
-      if (isArray(cc)) {
-        _gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
-      }
-    }
-    _gl.clear(clearBit);
 
     // Blend with previous rendered scene in the final output
     // FIXME Configure blend.
     // FIXME It will cause screen blink？
-    _gl[blendWithPrevious ? 'enable' : 'disable'](constants.BLEND);
-    this.material && (this.material.transparent = blendWithPrevious!);
 
-    this.renderQuad(renderer);
+    this.renderQuad(renderer, (gl) => {
+      gl.depthMask(true);
+      gl[blendWithPrevious ? 'enable' : 'disable'](constants.BLEND);
+      this.material && (this.material.transparent = blendWithPrevious!);
+
+      if (this.clearColor) {
+        clearBit = clearBit | constants.COLOR_BUFFER_BIT;
+        gl.colorMask(true, true, true, true);
+        const cc = this.clearColor;
+        if (isArray(cc)) {
+          gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
+        }
+      }
+      gl.clear(clearBit);
+    });
 
     this.trigger('afterrender', this, renderer);
 
@@ -138,7 +139,7 @@ class FullscreenQuadPass<
   /**
    * Simply do quad rendering
    */
-  renderQuad(renderer: Renderer) {
+  renderQuad(renderer: Renderer, prepare?: RenderHooks['prepare']) {
     const material = this.material;
     mesh =
       mesh ||
@@ -146,7 +147,9 @@ class FullscreenQuadPass<
         frustumCulling: false
       });
     mesh.material = material;
-    renderer.renderPass([mesh], camera);
+    renderer.renderPass([mesh], camera, {
+      prepare
+    });
   }
 
   /**

@@ -280,7 +280,6 @@ void main() {
 export const gBufferDebugFragment = new FragmentShader({
   name: 'gBufferDebugFrag',
   uniforms: {
-    gBufferTexture4: uniform('sampler2D'),
     /**
      * DEBUG
      * - 0: normal
@@ -291,7 +290,10 @@ export const gBufferDebugFragment = new FragmentShader({
      * - 5: albedo
      * - 6: velocity
      */
-    debug: uniform('int', 0)
+    debug: uniform('int', 0),
+
+    // gbuffer1, 2, 3 already been in the gBufferReadMixin
+    gBufferTexture4: uniform('sampler2D')
   },
   includes: [gBufferReadMixin],
   main: glsl`
