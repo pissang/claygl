@@ -2,14 +2,14 @@
 import Texture from '../Texture';
 import FrameBuffer from '../FrameBuffer';
 import Texture2D from '../Texture2D';
-import Skybox from '../plugin/Skybox';
+import Skybox from '../Skybox';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
 import Scene from '../Scene';
 import * as vec3 from '../glmatrix/vec3';
 import * as constants from '../core/constants';
 
 // import projectEnvMapShaderCode from './shader/projectEnvMap.glsl';
-import FullscreenQuadPass from '../composite/Pass';
+// import FullscreenQuadPass from '../composite/Pass';
 import type Renderer from '../Renderer';
 import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
 
@@ -156,16 +156,15 @@ export function projectEnvironmentMap(
   let size = 64;
   if (envMap.textureType === 'texture2D') {
     skybox = new Skybox({
-      scene: dummyScene,
       environmentMap: envMap
     });
   } else {
     size = envMap.image && envMap.image.px ? envMap.image.px.width : envMap.width;
     skybox = new Skybox({
-      scene: dummyScene,
       environmentMap: envMap
     });
   }
+  dummyScene.skybox = skybox;
   // Convert to rgbm
   const width = Math.ceil(size / Math.pow(2, opts.lod));
   const height = Math.ceil(size / Math.pow(2, opts.lod));
@@ -186,8 +185,7 @@ export function projectEnvironmentMap(
     const camera = envMapPass.getCamera(cubeTargets[i]);
     camera.fov = 90;
     framebuffer.attach(rgbmTexture);
-    framebuffer.bind(renderer);
-    renderer.render(dummyScene, camera);
+    renderer.render(dummyScene, camera, framebuffer);
     renderer.gl.readPixels(
       0,
       0,
@@ -197,12 +195,11 @@ export function projectEnvironmentMap(
       constants.UNSIGNED_BYTE,
       cubePixels[cubeTargets[i]]
     );
-    framebuffer.unbind(renderer);
   }
 
-  skybox.dispose(renderer);
-  framebuffer.dispose(renderer);
-  rgbmTexture.dispose(renderer);
+  renderer.disposeFrameBuffer(framebuffer);
+  renderer.disposeScene(dummyScene);
+  renderer.disposeTexture(rgbmTexture);
 
   return projectEnvironmentMapCPU(renderer, cubePixels, width, height);
 }

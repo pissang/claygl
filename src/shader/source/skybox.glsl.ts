@@ -7,21 +7,13 @@ import {
   glsl,
   VertexShader
 } from '../../Shader';
-import { POSITION, VIEWINVERSE, WORLD, WORLDVIEWPROJECTION } from './shared';
-import {
-  ACESToneMappingFunction,
-  decodeRGBMFunction,
-  encodeRGBMFunction,
-  HDREncoderMixin,
-  linearToSRGBFunction,
-  sRGBMixin,
-  sRGBToLinearFunction
-} from './util.glsl';
+import { POSITION } from './shared';
+import { ACESToneMappingFunction, HDREncoderMixin, sRGBMixin } from './util.glsl';
 export const skyboxVertex = new VertexShader({
   name: 'skyboxVertex',
   uniforms: {
-    world: WORLD(),
-    worldViewProjection: WORLDVIEWPROJECTION()
+    view: semanticUniform('mat4', 'VIEW'),
+    projection: semanticUniform('mat4', 'PROJECTION')
   },
   attributes: {
     position: POSITION()
@@ -31,8 +23,12 @@ export const skyboxVertex = new VertexShader({
   },
   main: glsl`
 void main() {
-  v_WorldPosition = (world * vec4(position, 1.0)).xyz;
-  gl_Position = worldViewProjection * vec4(position, 1.0);
+  v_WorldPosition = position;
+  mat3 m = mat3(view);
+  m[0] = normalize(m[0]);
+  m[1] = normalize(m[1]);
+  m[2] = normalize(m[2]);
+  gl_Position = projection * mat4(m) * vec4(position, 1.0);
 }`
 });
 
@@ -42,7 +38,6 @@ export const skyboxFragment = new FragmentShader({
     PI: Math.PI
   },
   uniforms: {
-    viewInverse: VIEWINVERSE(),
     equirectangularMap: uniform('sampler2D'),
     cubeMap: uniform('samplerCube'),
     lod: uniform('float', 0)
@@ -53,8 +48,7 @@ ${ACESToneMappingFunction()}
 
 void main()
 {
-  vec3 eyePos = viewInverse[3].xyz;
-  vec3 V = normalize(v_WorldPosition - eyePos);
+  vec3 V = normalize(v_WorldPosition);
 #ifdef EQUIRECTANGULAR
   float phi = acos(V.y);
   // consistent with cubemap.

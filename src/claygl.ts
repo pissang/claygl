@@ -99,7 +99,7 @@ export { default as OrbitControl } from './plugin/OrbitControl';
 export { default as FreeControl } from './plugin/FreeControl';
 export { default as GamepadControl } from './plugin/GamepadControl';
 
-export { default as Skybox } from './plugin/Skybox';
+export { default as Skybox } from './Skybox';
 
 // Utilities
 export * as meshUtil from './util/mesh';

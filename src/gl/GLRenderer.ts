@@ -215,10 +215,7 @@ class GLRenderer {
   bindFrameBuffer(frameBuffer?: FrameBuffer | null) {
     const prevFrameBuffer = this._framebuffer;
     const glFrameBufferMap = this._glFrameBufferMap;
-    if (prevFrameBuffer) {
-      const prevGLFrameBuffer = glFrameBufferMap.get(prevFrameBuffer);
-      prevGLFrameBuffer && prevGLFrameBuffer.unbind(this.gl);
-    }
+    prevFrameBuffer && glFrameBufferMap.get(prevFrameBuffer)!.unbind(this.gl);
     if (frameBuffer) {
       let glFrameBuffer = glFrameBufferMap.get(frameBuffer);
       if (!glFrameBuffer) {

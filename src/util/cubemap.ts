@@ -7,7 +7,6 @@ import FrameBuffer from '../FrameBuffer';
 import FullscreenQuadPass from '../composite/Pass';
 import Material from '../Material';
 import Shader from '../Shader';
-import Skybox from '../plugin/Skybox';
 import Scene from '../Scene';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
 import * as constants from '../core/constants';

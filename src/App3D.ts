@@ -28,7 +28,7 @@ import AmbientCubemapLight from './light/AmbientCubemap';
 import AmbientSHLight from './light/AmbientSH';
 import ShadowMapPass from './prePass/ShadowMap';
 import LRUCache from './core/LRU';
-import Skybox from './plugin/Skybox';
+import Skybox from './Skybox';
 import * as util from './core/util';
 import * as shUtil from './util/sh';
 import * as textureUtil from './util/texture';
@@ -368,7 +368,9 @@ class App3D extends Notifier {
 
   private _doRender(renderer: Renderer, scene: Scene) {
     const camera = scene.getMainCamera();
-    renderer.render(scene, camera, true);
+    renderer.render(scene, camera, undefined, {
+      notUpdateScene: true
+    });
   }
 
   /**
@@ -383,11 +385,8 @@ class App3D extends Notifier {
     const shadowPass = this._shadowPass;
 
     scene.update();
-    const skyboxList = [];
-    const skybox = Skybox.getSceneSkybox(scene);
-    skybox && skyboxList.push(skybox);
 
-    this._updateGraphicOptions(this._graphicOpts, skyboxList, true);
+    scene.skybox && this._updateGraphicOptions(this._graphicOpts, [scene.skybox], true);
     // Render shadow pass
     shadowPass && shadowPass.render(renderer, scene, undefined, true);
 

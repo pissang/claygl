@@ -30,11 +30,11 @@ texture.load({
   nz: 'assets/textures/cube/skybox/nz.jpg'
 });
 
-const skybox = new Skybox({
-  scene: scene
-});
+const skybox = new Skybox();
 skybox.setEnvironmentMap(texture);
+scene.skybox = skybox;
 
+camera.scale.set(10, 10, 10);
 camera.position.set(5, 12, 10);
 camera.lookAt(new Vector3(0, 8, 0));
 

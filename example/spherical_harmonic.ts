@@ -60,10 +60,10 @@ loadGLTF('assets/models/suzanne/suzanne.gltf').then((res) => {
       scene.add(sphere);
       scene.add(monkey);
 
-      new Skybox({
-        scene: scene,
+      const skybox = new Skybox({
         environmentMap: envMap
       });
+      scene.skybox = skybox;
     }
   );
 });

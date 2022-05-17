@@ -67,6 +67,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
       });
       skybox.material.define('fragment', 'RGBM_DECODE');
       skybox.material.set('lod', 3.0);
+      scene.skybox = skybox;
 
       for (var i = 0; i < 10; i++) {
         var material = new StandardMaterial({

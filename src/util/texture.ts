@@ -2,7 +2,7 @@ import Texture2D from '../Texture2D';
 import TextureCube from '../TextureCube';
 import vendor from '../core/vendor';
 import EnvironmentMapPass from '../prePass/EnvironmentMap';
-import Skybox from '../plugin/Skybox';
+import Skybox from '../Skybox';
 import Scene from '../Scene';
 
 import * as dds from './dds';
@@ -128,9 +128,9 @@ export function panoramaToCubeMap(
   }
 ) {
   const environmentMapPass = new EnvironmentMapPass();
-  const skybox = new Skybox({
-    scene: new Scene()
-  });
+  const skybox = new Skybox();
+  const scene = new Scene();
+  scene.skybox = skybox;
   skybox.setEnvironmentMap(panoramaMap);
 
   option = option || {};
@@ -142,7 +142,7 @@ export function panoramaToCubeMap(
   cubeMap.sRGB = panoramaMap.sRGB;
 
   environmentMapPass.texture = cubeMap;
-  environmentMapPass.render(renderer, skybox.getScene()!);
+  environmentMapPass.render(renderer, scene);
   environmentMapPass.texture = undefined;
   environmentMapPass.dispose(renderer);
   return cubeMap;

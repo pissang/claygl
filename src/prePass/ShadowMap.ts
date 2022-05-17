@@ -143,9 +143,7 @@ class ShadowMapPass extends Notifier {
     if (!sceneCamera) {
       sceneCamera = scene.getMainCamera();
     }
-    this.trigger('beforerender', this, renderer, scene, sceneCamera);
     this._renderShadowPass(renderer, scene, sceneCamera, notUpdateScene);
-    this.trigger('afterrender', this, renderer, scene, sceneCamera);
   }
 
   /**

@@ -172,8 +172,6 @@ class Renderer extends Notifier {
 
   private _glRenderer: GLRenderer;
 
-  private _frameBuffer?: FrameBuffer;
-
   constructor(opts?: Partial<RendererOpts>) {
     super();
     opts = opts || {};
@@ -449,8 +447,6 @@ class Renderer extends Notifier {
     const transparentList = renderList.transparent;
     const sceneMaterial = scene.material;
 
-    scene.trigger('beforerender', this, scene, camera, renderList);
-
     // Render pre z
     preZ && this.renderPreZ(opaqueList, scene, camera);
     gl.depthFunc(preZ ? constants.LEQUAL : constants.LESS);
@@ -467,6 +463,13 @@ class Renderer extends Notifier {
 
     function getMaterial(renderable: Renderable) {
       return sceneMaterial || renderable.material;
+    }
+
+    // Render skybox before anyother objects
+    const skybox = scene.skybox;
+    if (skybox) {
+      skybox.update();
+      this._renderPass([skybox], camera, frameBuffer);
     }
 
     // Render opaque list
@@ -491,8 +494,6 @@ class Renderer extends Notifier {
       },
       scene
     );
-
-    scene.trigger('afterrender', this, scene, camera, renderList);
   }
 
   /**
@@ -739,6 +740,7 @@ class Renderer extends Notifier {
    */
   disposeScene(scene: Scene) {
     this.disposeNode(scene, true, true);
+    scene.skybox && this.disposeNode(scene.skybox, true, true);
     scene.dispose();
   }
 

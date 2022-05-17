@@ -25,9 +25,8 @@ const texture = new Texture2D({
 // Sky texture
 // http://www.hdri-hub.com/hdrishop/freesamples/freehdri/item/113-hdr-111-parking-space-free
 texture.load('./assets/textures/Parking_Lot_Bg.jpg');
-const skybox = new Skybox({
-  scene: scene
-});
+const skybox = new Skybox();
+scene.skybox = skybox;
 skybox.setEnvironmentMap(texture);
 
 camera.position.set(0, 1, 2);
