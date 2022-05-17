@@ -351,9 +351,6 @@ class GLRenderer {
           renderable,
           material,
           program,
-          prevRenderable,
-          prevMaterial,
-          prevProgram,
           renderHooks.getMaterialUniform
         );
         prevMaterial = material;
@@ -439,14 +436,14 @@ class GLRenderer {
     return this._glext.getExtension(extName);
   }
 
-  private _getGLTexture(texture: Texture) {
+  private _getGLTexture(texture: Texture, notUpdate?: boolean) {
     const glTextureMap = this._glTextureMap;
     let glTexture = glTextureMap.get(texture);
     if (!glTexture) {
       glTexture = new GLTexture(texture as Texture2D | TextureCube);
       glTextureMap.set(texture, glTexture);
     }
-    if (texture.__dirty) {
+    if (texture.__dirty && !notUpdate) {
       glTexture.update(this.gl, this._glext);
       texture.__dirty = false;
     }
@@ -602,16 +599,10 @@ class GLRenderer {
     renderable: RenderableObject,
     material: MaterialObject,
     program: GLProgram,
-    prevRenderable: RenderableObject | undefined,
-    prevMaterial: MaterialObject | undefined,
-    prevProgram: GLProgram | undefined,
     getUniformValue: RenderHooks['getMaterialUniform']
   ) {
     const gl = this.gl;
     // PENDING Same texture in different material take different slot?
-
-    // May use shader of other material if shader code are same
-    const sameProgram = prevProgram === program;
 
     const uniforms = material.uniforms || {};
     const currentTextureSlot = program.currentTextureSlot();
@@ -644,6 +635,8 @@ class GLRenderer {
         }
       }
     }
+
+    this._getGLTexture(placeholderTexture, true).slot = -1;
 
     // Set uniforms
     for (let u = 0; u < enabledUniforms.length; u++) {
@@ -689,7 +682,6 @@ class GLRenderer {
           const arr = [];
           for (let i = 0; i < uniformValue.length; i++) {
             const glTexture = getGLTexture(uniformValue[i]);
-
             if (glTexture.slot < 0) {
               const slot = program.currentTextureSlot();
               arr.push(slot);
