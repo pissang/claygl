@@ -13,19 +13,6 @@ import Texture from './Texture';
 
 const programKeyCache: Record<string, string> = {};
 
-function getDefineCode(defines: Record<string, ShaderDefineValue>) {
-  const defineKeys = util.keys(defines);
-  const defineStr = [];
-  defineKeys.sort();
-  // Custom Defines
-  for (let i = 0; i < defineKeys.length; i++) {
-    const key = defineKeys[i];
-    const value = defines[key];
-    defineStr.push(value == null ? key : key + ' ' + value.toString());
-  }
-  return defineStr.join('\n');
-}
-
 function getProgramKey(
   vertexDefines: Record<string, ShaderDefineValue>,
   fragmentDefines: Record<string, ShaderDefineValue>,
@@ -103,8 +90,6 @@ interface Material extends Omit<MaterialOpts, 'shader'> {}
 ```js
 const material = new clay.Material(createStandardShader());
 ```
- * @constructor clay.Material
- * @extends clay.core.Base
  */
 class Material<
   // PENDING
@@ -238,7 +223,6 @@ class Material<
 
   /**
    * Clone a new material and keep uniforms, shader will not be cloned
-   * @return {clay.Material}
    */
   clone(): Material<T> {
     const material = new (this as any).constructor({

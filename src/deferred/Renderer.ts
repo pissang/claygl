@@ -464,7 +464,7 @@ class DeferredRenderer extends Notifier {
       }
     }
 
-    this._renderVolumeMeshList(renderer, scene, camera, volumeMeshList);
+    this._renderVolumeMeshList(renderer, scene, camera, lightAccumFrameBuffer, volumeMeshList);
 
     this.trigger('lightaccumulate', renderer, scene, camera);
 
@@ -629,7 +629,13 @@ class DeferredRenderer extends Notifier {
     }
   }
 
-  _renderVolumeMeshList(renderer: Renderer, scene: Scene, camera: Camera, volumeMeshList: Mesh[]) {
+  _renderVolumeMeshList(
+    renderer: Renderer,
+    scene: Scene,
+    camera: Camera,
+    lightAccumFrameBuffer: FrameBuffer,
+    volumeMeshList: Mesh[]
+  ) {
     const gl = renderer.gl;
 
     gl.depthFunc(gl.LEQUAL);
@@ -653,7 +659,7 @@ class DeferredRenderer extends Notifier {
       // depthMask must be enabled before clear DEPTH_BUFFER
       gl.clear(gl.DEPTH_BUFFER_BIT);
 
-      renderer.renderPass([volumeMesh], camera, this._lightAccumFrameBuffer, {
+      renderer.renderPass([volumeMesh], camera, lightAccumFrameBuffer, {
         getMaterial: getPreZMaterial
       });
 
@@ -661,7 +667,7 @@ class DeferredRenderer extends Notifier {
       gl.colorMask(true, true, true, true);
 
       volumeMesh.material.depthMask = true;
-      renderer.renderPass([volumeMesh], camera);
+      renderer.renderPass([volumeMesh], camera, lightAccumFrameBuffer);
     }
 
     gl.depthFunc(gl.LESS);

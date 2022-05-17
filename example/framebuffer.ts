@@ -59,10 +59,7 @@ rttScene.add(rttMesh);
 const orthCamera = new OrthographicCamera();
 
 startTimeline(() => {
-  frameBuffer.bind(renderer);
-  renderer.render(scene, camera);
-  frameBuffer.unbind(renderer);
-
+  renderer.render(scene, camera, frameBuffer);
   renderer.render(rttScene, orthCamera);
 
   mesh.rotation.rotateY(Math.PI / 500);

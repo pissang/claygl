@@ -73,6 +73,7 @@ export function prefilterEnvironmentMap(
   textureOpts.decodeRGBM && prefilterMaterial.define('fragment', 'RGBM_DECODE');
 
   const dummyScene = new Scene();
+  let newCreatedCubemap = false;
 
   if (envMap.textureType === 'texture2D') {
     // Convert panorama to cubemap
@@ -87,6 +88,7 @@ export function prefilterEnvironmentMap(
       encodeRGBM: textureOpts.decodeRGBM
     });
     envMap = envCubemap;
+    newCreatedCubemap = true;
   }
   const mesh = new Mesh(
     new CubeGeometry({
@@ -175,7 +177,11 @@ export function prefilterEnvironmentMap(
 
   renderer.disposeFrameBuffer(frameBuffer);
   renderer.disposeTexture(renderTargetTmp);
-  renderer.disposeScene(dummyScene);
+  renderer.disposeGeometry(mesh.geometry);
+  if (newCreatedCubemap) {
+    // New created temporary cubemap should be disposed
+    renderer.disposeTexture(envMap);
+  }
   // Remove gpu resource allucated in renderer
   renderer.disposeTexture(normalDistribution);
 

@@ -37,7 +37,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
       const ambientCubemapLight = new AmbientCubemapLight({
         cubemap
       });
-      ambientCubemapLight.prefilter(renderer);
+      ambientCubemapLight.prefilter(renderer, 256);
       scene.add(ambientCubemapLight);
 
       const ambientLight = new AmbientLight({
@@ -54,7 +54,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
 
       for (let i = 0; i < 10; i++) {
         const material = new StandardMaterial({
-          // metalness: 1
+          metalness: 1,
           roughness: i / 12
         });
         const mesh = new Mesh(suzanneGeometry, material);

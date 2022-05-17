@@ -39,9 +39,6 @@ function createSkyboxShader() {
 class Skybox extends Mesh<Material<ReturnType<typeof createSkyboxShader>>> {
   culling = false;
 
-  private _targetScene?: Scene;
-  private _dummyCamera = new PerspectiveCamera();
-
   constructor(opts?: Partial<SkyboxOpts>) {
     super(
       new CubeGeometry(),
@@ -57,9 +54,6 @@ class Skybox extends Mesh<Material<ReturnType<typeof createSkyboxShader>>> {
     }
   }
 
-  getScene() {
-    return this._targetScene;
-  }
   /**
    * Set environment map
    * @param {clay.TextureCube} envMap

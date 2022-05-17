@@ -198,7 +198,7 @@ export function projectEnvironmentMap(
   }
 
   renderer.disposeFrameBuffer(framebuffer);
-  renderer.disposeScene(dummyScene);
+  renderer.disposeGeometry(skybox.geometry);
   renderer.disposeTexture(rgbmTexture);
 
   return projectEnvironmentMapCPU(renderer, cubePixels, width, height);

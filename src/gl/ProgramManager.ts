@@ -108,6 +108,19 @@ function defaultGetEnabledTextures(material: Material) {
   );
 }
 
+function getDefineKey(defines: Record<string, ShaderDefineValue>) {
+  const defineKeys = keys(defines);
+  const defineStr = [];
+  defineKeys.sort();
+  // Custom Defines
+  for (let i = 0; i < defineKeys.length; i++) {
+    const key = defineKeys[i];
+    const value = defines[key];
+    defineStr.push(value == null ? key : key + ' ' + value.toString());
+  }
+  return defineStr.join('\n');
+}
+
 export function defaultGetMaterialProgramKey(
   vertexDefines: Record<string, ShaderDefineValue>,
   fragmentDefines: Record<string, ShaderDefineValue>,
@@ -120,11 +133,7 @@ export function defaultGetMaterialProgramKey(
     defineStr.push(symbol);
   }
   return (
-    getDefineCode(vertexDefines) +
-    '\n' +
-    getDefineCode(fragmentDefines) +
-    '\n' +
-    defineStr.join('\n')
+    getDefineKey(vertexDefines) + '\n' + getDefineKey(fragmentDefines) + '\n' + defineStr.join('\n')
   );
 }
 
