@@ -215,7 +215,6 @@ class GLRenderer {
         if (frameBuffer !== prevFrameBuffer) {
           console.error('Already bound to a framebuffer. Unbind it firstly.');
         }
-        return;
       } else {
         // Unbind
         const prevGLFrameBuffer = glFrameBufferMap.get(prevFrameBuffer);

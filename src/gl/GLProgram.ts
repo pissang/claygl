@@ -102,7 +102,8 @@ class GLProgram {
     const prevVal = valueCache[symbol];
     // Only compare the instance because we assume the value is immutable during the rendering pass.
     if (prevVal === value && !force) {
-      return;
+      // Stil return true.
+      return true;
     }
     valueCache[symbol] = value;
 

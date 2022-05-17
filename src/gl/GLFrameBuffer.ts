@@ -37,7 +37,7 @@ class GLFrameBuffer {
     const texturesToAttach = framebuffer.getTextures();
     const attachedTextures = this._textures;
 
-    // Detach unsed textures
+    // Detach unused textures
     keys(attachedTextures).forEach((attachment) => {
       if (!texturesToAttach[attachment]) {
         // Detach a texture from framebuffer
@@ -63,6 +63,7 @@ class GLFrameBuffer {
       const glTexture = helpers.getGLTexture(texture);
       width = texture.width;
       height = texture.height;
+
       // TODO validate width, height are same.
 
       if (+attachment === DEPTH_ATTACHMENT || +attachment === DEPTH_STENCIL_ATTACHMENT) {

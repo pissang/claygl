@@ -18,6 +18,7 @@ import {
   gBufferDebugFragment,
   gBufferVertex
 } from '../shader/source/deferred/gbuffer.glsl';
+import { RenderHooks } from '../gl/GLRenderer';
 
 const renderableGBufferData = new WeakMap<
   RenderableObject,
@@ -402,11 +403,11 @@ class DeferredGBuffer {
 
       clearViewport();
       const gBufferMaterial1 = this._gBufferMaterial1;
-      const renderHooks = {
+      const renderHooks: RenderHooks = {
         getMaterial() {
           return gBufferMaterial1;
         },
-        getUniform: getGetUniformHook1(
+        getMaterialUniform: getGetUniformHook1(
           this._defaultNormalMap,
           this._defaultRoughnessMap,
           this._defaultDiffuseMap
@@ -424,11 +425,11 @@ class DeferredGBuffer {
       clearViewport();
 
       const gBufferMaterial2 = this._gBufferMaterial2;
-      const renderHooks = {
+      const renderHooks: RenderHooks = {
         getMaterial() {
           return gBufferMaterial2;
         },
-        getUniform: getGetUniformHook2(this._defaultDiffuseMap, this._defaultMetalnessMap),
+        getMaterialUniform: getGetUniformHook2(this._defaultDiffuseMap, this._defaultMetalnessMap),
         isMaterialChanged: isMaterialChanged,
         sortCompare: Renderer.opaqueSortCompare
       };
@@ -447,7 +448,7 @@ class DeferredGBuffer {
       const gBufferMaterial3 = this._gBufferMaterial3;
       const cameraViewProj = mat4.create();
       mat4.multiply(cameraViewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
-      const renderHooks = {
+      const renderHooks: RenderHooks = {
         getMaterial() {
           return gBufferMaterial3;
         },
@@ -514,7 +515,7 @@ class DeferredGBuffer {
             }
           }
         },
-        getUniform(renderable: RenderableObject, gBufferMat: Material, symbol: string) {
+        getMaterialUniform(renderable: RenderableObject, gBufferMat: Material, symbol: string) {
           const gbufferData = renderableGBufferData.get(renderable);
           if (symbol === 'prevWorldViewProjection') {
             return gbufferData && gbufferData.prevWorldViewProjection;

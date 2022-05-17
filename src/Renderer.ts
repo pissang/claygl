@@ -165,7 +165,7 @@ class Renderer extends Notifier {
 
   private _glRenderer: GLRenderer;
 
-  private _framebuffer?: FrameBuffer;
+  private _frameBuffer?: FrameBuffer;
 
   constructor(opts?: Partial<RendererOpts>) {
     super();
@@ -362,7 +362,7 @@ class Renderer extends Notifier {
   }
 
   setFrameBuffer(frameBuffer?: FrameBuffer) {
-    this._framebuffer = frameBuffer;
+    this._frameBuffer = frameBuffer;
     if (!frameBuffer) {
       // Unbind framebuffer immediately.
       this._glRenderer.bindFrameBuffer(null);
@@ -386,7 +386,7 @@ class Renderer extends Notifier {
     const _gl = this.gl;
 
     const clearColor = this.clearColor;
-    const frameBuffer = this._framebuffer;
+    const frameBuffer = this._frameBuffer;
 
     if (frameBuffer) {
       this._glRenderer.bindFrameBuffer(frameBuffer);
@@ -446,12 +446,8 @@ class Renderer extends Notifier {
     scene.trigger('beforerender', this, scene, camera, renderList);
 
     // Render pre z
-    if (preZ) {
-      this.renderPreZ(opaqueList, scene, camera);
-      _gl.depthFunc(constants.LEQUAL);
-    } else {
-      _gl.depthFunc(constants.LESS);
-    }
+    preZ && this.renderPreZ(opaqueList, scene, camera);
+    _gl.depthFunc(preZ ? constants.LEQUAL : constants.LESS);
 
     // Update the depth of transparent list.
     const worldViewMat = mat4Create();
@@ -463,26 +459,26 @@ class Renderer extends Notifier {
       renderable.__depth = posViewSpace[2];
     }
 
+    function getMaterial(renderable: Renderable) {
+      return sceneMaterial || renderable.material;
+    }
+
     // Render opaque list
-    this.renderPass(
+    this._renderPass(
       opaqueList,
       camera,
       {
-        getMaterial(renderable) {
-          return sceneMaterial || renderable.material;
-        },
+        getMaterial,
         sortCompare: Renderer.opaqueSortCompare
       },
       scene
     );
 
-    this.renderPass(
+    this._renderPass(
       transparentList,
       camera,
       {
-        getMaterial(renderable) {
-          return sceneMaterial || renderable.material;
-        },
+        getMaterial,
         sortCompare: Renderer.transparentSortCompare
       },
       scene
@@ -494,7 +490,21 @@ class Renderer extends Notifier {
   renderPass(
     list: RenderableObject<Material>[],
     camera?: Camera,
-    passConfig?: RenderHooks<RenderableObject<Material>>,
+    renderHooks?: RenderHooks<RenderableObject<Material>>,
+    scene?: Scene
+  ) {
+    // Do frmaebuffer bind in the rnderPass method exposed to outside.
+    const frameBuffer = this._frameBuffer;
+    if (frameBuffer) {
+      this._glRenderer.bindFrameBuffer(frameBuffer);
+    }
+    this._renderPass(list, camera, renderHooks, scene);
+  }
+
+  private _renderPass(
+    list: RenderableObject<Material>[],
+    camera?: Camera,
+    renderHooks?: RenderHooks<RenderableObject<Material>>,
     scene?: Scene
   ) {
     let worldM: mat4.Mat4Array;
@@ -507,7 +517,7 @@ class Renderer extends Notifier {
       viewport.height * vDpr
     ];
     const windowDpr = this._devicePixelRatio;
-    const currentFrameBuffer = this._framebuffer;
+    const currentFrameBuffer = this._frameBuffer;
     const windowSizeUniform = currentFrameBuffer
       ? [currentFrameBuffer.getTextureWidth(), currentFrameBuffer.getTextureHeight()]
       : [this._width * windowDpr, this._height * windowDpr];
@@ -627,7 +637,7 @@ class Renderer extends Notifier {
         }
       }
     };
-    this._glRenderer.render(list, assign(renderHooksForScene, passConfig));
+    this._glRenderer.render(list, assign(renderHooksForScene, renderHooks));
   }
 
   getMaxJointNumber() {
@@ -654,7 +664,7 @@ class Renderer extends Notifier {
     _gl.depthMask(true);
 
     // Status
-    this.renderPass(list, camera, {
+    this._renderPass(list, camera, {
       ifRender(renderable) {
         return !renderable.ignorePreZ;
       },

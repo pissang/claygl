@@ -72,7 +72,6 @@ class FullscreenQuadPass<
         frameBuffer.attach(texture, +attachment);
       }
     }
-
     if (frameBuffer) {
       frameBuffer.bind(renderer);
     }
