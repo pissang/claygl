@@ -151,7 +151,7 @@ class Material<
     this.depthMask = util.optional(opts.depthMask, true);
     this.blend = opts.blend;
     this.transparent = opts.transparent || false;
-    this.precision = opts.precision || 'mediump';
+    this.precision = opts.precision || 'highp';
 
     util.assign(this.vertexDefines, opts.vertexDefines);
     util.assign(this.fragmentDefines, opts.fragmentDefines);

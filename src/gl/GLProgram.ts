@@ -237,7 +237,7 @@ class GLProgram {
     gl.attachShader(program, fragmentShader);
     // Force the position bind to location 0;
     // Must bindAttribLocation before link program.
-    const POSITION = shader.semanticsMap.POSITION;
+    const POSITION = semanticsMap.POSITION;
     if (POSITION) {
       gl.bindAttribLocation(program, 0, POSITION.name);
     } else {
@@ -248,8 +248,6 @@ class GLProgram {
 
     gl.deleteShader(vertexShader);
     gl.deleteShader(fragmentShader);
-
-    this._program = program;
 
     // Save code.
     this.vertexCode = vertexShaderCode;
@@ -269,6 +267,7 @@ class GLProgram {
 
       return 'Could not link program\n' + gl.getProgramInfoLog(program);
     }
+    this._program = program;
 
     // Cache uniform locations
     const numUniforms = gl.getProgramParameter(program, constants.ACTIVE_UNIFORMS);

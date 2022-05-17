@@ -8,7 +8,7 @@ import {
   VertexShader
 } from '../../Shader';
 import { POSITION, WORLD, WORLDVIEWPROJECTION } from './shared';
-import { floatEncoderMixin, instancingMixin, skinningMixin } from './util.glsl';
+import { floatEncoderMixin, instancingMixin, skinningMixin, wireframeMixin } from './util.glsl';
 export const wireframeVertex = new VertexShader({
   name: 'wireframeVertex',
   uniforms: {
@@ -48,7 +48,7 @@ export const wireframeFragment = new FragmentShader({
     alpha: uniform('float', 1),
     lineWidth: uniform('float', 0)
   },
-  includes: [floatEncoderMixin],
+  includes: [floatEncoderMixin, wireframeMixin],
   main: glsl`
 void main() {
   gl_FragColor.rgb = color;

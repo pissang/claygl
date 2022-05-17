@@ -216,7 +216,7 @@ class ProgramManager {
     const fragmentCode =
       getExtensionCode(extensions) +
       '\n' +
-      getPrecisionCode(material.precision || 'mediump') +
+      getPrecisionCode(material.precision || 'highp') +
       '\n' +
       fragmentDefineStr +
       '\n' +

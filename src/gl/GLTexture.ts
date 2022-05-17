@@ -159,7 +159,7 @@ class GLTexture {
       level: number,
       width: number,
       height: number,
-      convertToPOT?: boolean
+      convertToPOT: boolean
     ) => {
       if (isTexture2D) {
         this._updateTextureData2D(
@@ -193,7 +193,7 @@ class GLTexture {
         height = Math.max(height / 2, 1);
       }
     } else {
-      updateTextureData(gl, texture, 0, width, height);
+      updateTextureData(gl, texture, 0, width, height, needsConvertToPOT);
       if (useMipmap && (!NPOT || needsConvertToPOT)) {
         gl.generateMipmap(textureTarget);
       }
@@ -210,7 +210,7 @@ class GLTexture {
     height: number,
     glFormat: GLEnum,
     glType: GLEnum,
-    convertToPOT?: boolean
+    convertToPOT: boolean
   ) {
     if (data.image) {
       let imgData = data.image;

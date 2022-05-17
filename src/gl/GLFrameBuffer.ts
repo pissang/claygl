@@ -27,10 +27,6 @@ class GLFrameBuffer {
   }
 
   bind(gl: WebGLRenderingContext, helpers: { getGLTexture: (texture: Texture) => GLTexture }) {
-    if (this._bound === gl) {
-      // Already bound
-      return;
-    }
     const framebuffer = this._fb;
     const webglFb = this._webglFb || (this._webglFb = gl.createFramebuffer()!);
     let webglRenderBuffer = this._webglRb;
@@ -67,8 +63,6 @@ class GLFrameBuffer {
       height = texture.height;
       // TODO validate width, height are same.
 
-      const webglTexture = glTexture.getWebGLTexture(gl);
-
       if (attachedTextures[attachment] === glTexture) {
         return;
       }
@@ -82,7 +76,7 @@ class GLFrameBuffer {
         }
       }
 
-      gl.framebufferTexture2D(FRAMEBUFFER, +attachment, target, webglTexture, 0);
+      gl.framebufferTexture2D(FRAMEBUFFER, +attachment, target, glTexture.getWebGLTexture(gl), 0);
 
       attachedTextures[attachment] = glTexture;
     });
@@ -108,6 +102,7 @@ class GLFrameBuffer {
 
   unbind(gl: WebGLRenderingContext) {
     this._bound = null;
+    gl.bindFramebuffer(FRAMEBUFFER, null);
     // Because the data of texture is changed over time,
     // Here update the mipmaps of texture each time after rendered;
     this.updateMipmap(gl);
