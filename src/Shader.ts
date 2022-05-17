@@ -581,7 +581,7 @@ export class Shader<
 
     const textures: Shader['textures'] = {};
 
-    const uniformsTpls: Shader['uniformTpls'] = {};
+    const materialUniformTpls: Shader['uniformTpls'] = {};
     const semanticsMap: Shader['semanticsMap'] = {};
     const attributes: Shader['attributes'] = {};
     const matrixSemantics: MatrixSemantic[] = [];
@@ -620,16 +620,18 @@ export class Shader<
           if (isTranpose || isInverse || BASIC_MATRIX_SEMANTICS.includes(uniformSemantic as any)) {
             matrixSemantics.push(uniformSemantic as MatrixSemantic);
           }
-        }
-        // don't support string color to be default value.
-        // Avoid including color as core module.
-        // (materialUniformObj as any).value =
-        //   (uniformType === 'rgb' || uniformType === 'rgba') && isString(uniformValue)
-        //     ? parseToFloat(uniformValue)
-        //     : uniformValue;
-        (materialUniformObj as any).value = uniformValue;
+        } else {
+          // don't support string color to be default value.
+          // Avoid including color as core module.
+          // (materialUniformObj as any).value =
+          //   (uniformType === 'rgb' || uniformType === 'rgba') && isString(uniformValue)
+          //     ? parseToFloat(uniformValue)
+          //     : uniformValue;
+          (materialUniformObj as any).value = uniformValue;
 
-        (uniformsTpls as any)[uniformName] = materialUniformObj;
+          // semantic uniform can't be set in material.
+          (materialUniformTpls as any)[uniformName] = materialUniformObj;
+        }
       });
     }
     // Process uniforms
@@ -653,7 +655,7 @@ export class Shader<
     });
 
     this.textures = textures;
-    this.uniformTpls = uniformsTpls;
+    this.uniformTpls = materialUniformTpls;
     this.semanticsMap = semanticsMap;
     this.matrixSemantics = matrixSemantics;
     this.attributes = attributes;
