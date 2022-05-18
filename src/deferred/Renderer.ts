@@ -321,6 +321,29 @@ class DeferredRenderer extends Notifier {
     const volumeMeshList = [];
     const gBuffer = this._gBuffer;
 
+    // Render nothing and only do the clear.
+    renderer.renderPass([], camera, lightAccumFrameBuffer, {
+      prepare() {
+        if (viewport) {
+          const dpr = viewport.devicePixelRatio;
+          // use scissor to make sure only clear the viewport
+          gl.enable(gl.SCISSOR_TEST);
+          gl.scissor(
+            viewport.x * dpr,
+            viewport.y * dpr,
+            viewport.width * dpr,
+            viewport.height * dpr
+          );
+        }
+        gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.enable(gl.BLEND);
+        if (viewport) {
+          gl.disable(gl.SCISSOR_TEST);
+        }
+      }
+    });
+
     for (let i = 0; i < scene.lights.length; i++) {
       const light = scene.lights[i];
       if (light.invisible) {
@@ -442,25 +465,7 @@ class DeferredRenderer extends Notifier {
         const pass = this._fullQuadPass;
         pass.material = passMaterial;
 
-        pass.renderQuad(renderer, lightAccumFrameBuffer, (gl) => {
-          if (viewport) {
-            const dpr = viewport.devicePixelRatio;
-            // use scissor to make sure only clear the viewport
-            gl.enable(gl.SCISSOR_TEST);
-            gl.scissor(
-              viewport.x * dpr,
-              viewport.y * dpr,
-              viewport.width * dpr,
-              viewport.height * dpr
-            );
-          }
-          gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-          gl.clear(gl.COLOR_BUFFER_BIT);
-          gl.enable(gl.BLEND);
-          if (viewport) {
-            gl.disable(gl.SCISSOR_TEST);
-          }
-        });
+        pass.renderQuad(renderer, lightAccumFrameBuffer);
       }
     }
 
@@ -653,21 +658,24 @@ class DeferredRenderer extends Notifier {
         continue;
       }
 
-      // Use prez to avoid one pixel rendered twice
-      gl.colorMask(false, false, false, false);
-      gl.depthMask(true);
-      // depthMask must be enabled before clear DEPTH_BUFFER
-      gl.clear(gl.DEPTH_BUFFER_BIT);
-
       renderer.renderPass([volumeMesh], camera, lightAccumFrameBuffer, {
-        getMaterial: getPreZMaterial
+        getMaterial: getPreZMaterial,
+        prepare() {
+          // Use prez to avoid one pixel rendered twice
+          gl.colorMask(false, false, false, false);
+          gl.depthMask(true);
+          // depthMask must be enabled before clear DEPTH_BUFFER
+          gl.clear(gl.DEPTH_BUFFER_BIT);
+        }
       });
 
-      // Render light
-      gl.colorMask(true, true, true, true);
-
       volumeMesh.material.depthMask = true;
-      renderer.renderPass([volumeMesh], camera, lightAccumFrameBuffer);
+      renderer.renderPass([volumeMesh], camera, lightAccumFrameBuffer, {
+        prepare() {
+          // Render light
+          gl.colorMask(true, true, true, true);
+        }
+      });
     }
 
     gl.depthFunc(gl.LESS);

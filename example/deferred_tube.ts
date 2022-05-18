@@ -18,7 +18,7 @@ import {
   Shader
 } from 'claygl';
 import { outputTextureFragment } from 'claygl/shaders';
-import * as Stats from 'stats.js';
+import Stats from 'stats.js';
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,

@@ -126,10 +126,14 @@ class GLFrameBuffer {
     this._bound = gl;
   }
 
-  unbind(gl: WebGLRenderingContext) {
+  unbind(gl: WebGLRenderingContext, willBooleanNewFrameBuffer: boolean) {
     if (this._bound) {
       this._bound = null;
-      gl.bindFramebuffer(FRAMEBUFFER, null);
+      if (!willBooleanNewFrameBuffer) {
+        // Just skip a binding operation if it will bind another framebuffer.
+        // Not sure how much performance will it gain.
+        gl.bindFramebuffer(FRAMEBUFFER, null);
+      }
       // Because the data of texture is changed over time,
       // Here update the mipmaps of texture each time after rendered;
       this.updateMipmap(gl);
