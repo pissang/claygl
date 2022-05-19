@@ -118,8 +118,8 @@ class Material<
   // shadowTransparentMap : null
 
   // PENDING enable the uniform that only used in shader.
-  private _enabledUniforms: string[] = [];
-  private _textureUniforms: string[] = [];
+  private _enabledUniforms: (keyof T['uniformTpls'])[] = [];
+  private _textureUniforms: (keyof T['uniformTpls'])[] = [];
 
   private _programKey?: string;
 
@@ -130,7 +130,9 @@ class Material<
     const uniforms = (this.uniforms = shader.createUniforms());
 
     // Make sure uniforms are set in same order to avoid texture slot wrong
-    const enabledUniforms = (this._enabledUniforms = util.keys(uniforms).sort());
+    const enabledUniforms = (this._enabledUniforms = util
+      .keys(uniforms)
+      .sort() as (keyof T['uniformTpls'])[]);
     this._textureUniforms = enabledUniforms.filter((uniformName) => {
       const type = uniforms[uniformName].type;
       return type === 't' || type === 'tv';

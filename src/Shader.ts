@@ -330,10 +330,10 @@ type MergeChunk<
 
 class StageShader<
   TDefines extends Dict<ShaderDefineValue> = Dict<ShaderDefineValue>,
-  TUniforms extends Dict<ShaderUniformLoose> = Dict<ShaderUniformLoose>,
-  TAttributes extends Dict<ShaderAttributeLoose> = Dict<ShaderAttributeLoose>,
-  TVaryings extends Dict<ShaderVaringLoose> = Dict<ShaderVaringLoose>,
-  TMixins extends ShaderMixinLoose[] = ShaderMixinLoose[]
+  TUniforms extends Dict<ShaderUniformLoose> = {},
+  TAttributes extends Dict<ShaderAttributeLoose> = {},
+  TVaryings extends Dict<ShaderVaringLoose> = {},
+  TMixins extends ShaderMixinLoose[] = never
 > {
   readonly defines!: TDefines & MergeChunk<TMixins, 'defines'>;
   readonly uniforms!: TUniforms & MergeChunk<TMixins, 'uniforms'>;
@@ -382,10 +382,11 @@ class StageShader<
 
 export class VertexShader<
   TDefines extends Dict<ShaderDefineValue> = Dict<ShaderDefineValue>,
-  TUniforms extends Dict<ShaderUniformLoose> = Dict<ShaderUniformLoose>,
-  TAttributes extends Dict<ShaderAttributeLoose> = Dict<ShaderAttributeLoose>,
-  TVaryings extends Dict<ShaderVaringLoose> = Dict<ShaderVaringLoose>,
-  TMixins extends ShaderMixinLoose[] = ShaderMixinLoose[]
+  // Default to be empty object.
+  TUniforms extends Dict<ShaderUniformLoose> = {},
+  TAttributes extends Dict<ShaderAttributeLoose> = {},
+  TVaryings extends Dict<ShaderVaringLoose> = {},
+  TMixins extends ShaderMixinLoose[] = never
 > extends StageShader<TDefines, TUniforms, TAttributes, TVaryings, TMixins> {
   constructor(options: {
     name?: string;
@@ -405,8 +406,8 @@ export class VertexShader<
 
 export class FragmentShader<
   TDefines extends Dict<ShaderDefineValue> = Dict<ShaderDefineValue>,
-  TUniforms extends Dict<ShaderUniformLoose> = Dict<ShaderUniformLoose>,
-  TMixins extends ShaderMixinLoose[] = ShaderMixinLoose[]
+  TUniforms extends Dict<ShaderUniformLoose> = {},
+  TMixins extends ShaderMixinLoose[] = never
   // TVaryings extends Dict<ShaderVaringLoose> = Dict<ShaderVaringLoose>
 > extends StageShader<TDefines, TUniforms, never, never, TMixins> {
   constructor(options: {
@@ -497,8 +498,14 @@ function getShaderID(vertex: string, fragment: string) {
   return id;
 }
 export class Shader<
-  V extends VertexShader = VertexShader,
-  F extends FragmentShader = FragmentShader
+  // Having more loose type so it won't struggle on the key type in th materials.
+  V extends VertexShader = VertexShader<
+    Dict<ShaderDefineValue>,
+    Dict<ShaderUniformLoose>,
+    Dict<ShaderAttributeLoose>,
+    Dict<ShaderVaringLoose>
+  >,
+  F extends FragmentShader = FragmentShader<Dict<ShaderDefineValue>, Dict<ShaderUniformLoose>>
 > {
   // Default defines
   readonly vertexDefines: Dict<ShaderDefineValue>;
@@ -565,7 +572,7 @@ export class Shader<
     const uniformTpls = this.uniformTpls;
 
     keys(uniformTpls).forEach((uniformName) => {
-      const tpl = uniformTpls[uniformName];
+      const tpl = (uniformTpls as any)[uniformName];
       uniforms[uniformName] = {
         type: tpl.type,
         value: cloneUniformVal(tpl.type, tpl.value) // Default value?
