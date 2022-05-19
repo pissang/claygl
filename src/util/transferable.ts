@@ -8,6 +8,7 @@ import GeometryBase, {
 } from '../GeometryBase';
 import BoundingBox from '../math/BoundingBox';
 import Vector3 from '../math/Vector3';
+import { AttributeSemantic } from '../Shader';
 
 const META = {
   version: 1.0,
@@ -29,7 +30,7 @@ interface DataObject {
       name: string;
       type: AttributeType;
       size: AttributeSize;
-      semantic?: string;
+      semantic?: AttributeSemantic;
       value: AttributeValue;
     }
   >;

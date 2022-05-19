@@ -77,9 +77,12 @@ export type GeneralMaterialUniformObject =
 type UniformValueRecord<T extends Shader['uniformTpls']> = {
   [key in keyof T]?: T[key]['value'];
 };
-type PickTextureUniforms<T extends Shader['uniformTpls']> = {
-  [key in keyof T]: T[key]['type'] extends 'sampler2D' | 'samplerCube' ? T[key] : never;
-};
+type PickTextureUniforms<T extends Shader['uniformTpls']> = Pick<
+  T,
+  {
+    [key in keyof T]: T[key]['type'] extends 't' | 'tv' ? key : never;
+  }[keyof T]
+>;
 
 interface Material extends Omit<MaterialOpts, 'shader'> {}
 /**
@@ -119,7 +122,7 @@ class Material<
 
   // PENDING enable the uniform that only used in shader.
   private _enabledUniforms: (keyof T['uniformTpls'])[] = [];
-  private _textureUniforms: (keyof T['uniformTpls'])[] = [];
+  private _textureUniforms: (keyof PickTextureUniforms<T['uniformTpls']>)[] = [];
 
   private _programKey?: string;
 
@@ -134,9 +137,9 @@ class Material<
       .keys(uniforms)
       .sort() as (keyof T['uniformTpls'])[]);
     this._textureUniforms = enabledUniforms.filter((uniformName) => {
-      const type = uniforms[uniformName].type;
+      const type = uniforms[uniformName].type as MaterialUniformType;
       return type === 't' || type === 'tv';
-    });
+    }) as (keyof PickTextureUniforms<T['uniformTpls']>)[];
 
     this.vertexDefines = util.clone(shader.vertexDefines);
     this.fragmentDefines = util.clone(shader.fragmentDefines);
@@ -207,8 +210,7 @@ class Material<
     return this._enabledUniforms;
   }
 
-  // TODO more precise type
-  getTextureUniforms(): (keyof PickTextureUniforms<T['uniformTpls']>)[] {
+  getTextureUniforms() {
     return this._textureUniforms;
   }
 
@@ -369,9 +371,10 @@ class Material<
    */
   enableTexturesAll() {
     const textureStatus = this._textureStatus;
-    for (const symbol in textureStatus) {
-      textureStatus[symbol].enabled = true;
-    }
+
+    util.keys(textureStatus).forEach((key) => {
+      (textureStatus as any)[key].enabled = true;
+    });
 
     this._programKey = '';
   }
@@ -401,9 +404,9 @@ class Material<
    */
   disableTexturesAll() {
     const textureStatus = this._textureStatus;
-    for (const symbol in textureStatus) {
-      textureStatus[symbol].enabled = false;
-    }
+    util.keys(textureStatus).forEach((key) => {
+      (textureStatus as any)[key].enabled = false;
+    });
 
     this._programKey = '';
   }
@@ -422,14 +425,12 @@ class Material<
    * @return {string[]}
    */
   getEnabledTextures() {
-    const enabledTextures = [];
     const textureStatus = this._textureStatus;
-    for (const symbol in textureStatus) {
-      if (textureStatus[symbol].enabled) {
-        enabledTextures.push(symbol);
-      }
-    }
-    return enabledTextures;
+    return util
+      .keys(textureStatus)
+      .filter((key) => (textureStatus as any)[key].enabled) as (keyof PickTextureUniforms<
+      T['uniformTpls']
+    >)[];
   }
 
   /**

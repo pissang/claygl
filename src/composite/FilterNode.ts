@@ -1,11 +1,11 @@
 // TODO Shader library
-import CompositeNode from './CompositeNode';
+import CompositeNode, { CompositeNodeInput } from './CompositeNode';
 import FullscreenQuadPass from './Pass';
 import Renderer from '../Renderer';
 import FrameBuffer from '../FrameBuffer';
 import Texture from '../Texture';
 import { keys } from '../core/util';
-import { FragmentShader } from '../Shader';
+import { FragmentShaderLoose, PickFragmentTextureUniforms } from '../Shader';
 
 /**
  * Filter node
@@ -41,11 +41,14 @@ import { FragmentShader } from '../Shader';
  */
 
 class CompositeFilterNode<
-  T extends FragmentShader<any, any, any> = FragmentShader<any, any, any>
-> extends CompositeNode {
+  T extends FragmentShaderLoose = FragmentShaderLoose,
+  S = PickFragmentTextureUniforms<T['uniforms']>
+> extends CompositeNode<keyof S> {
   pass: FullscreenQuadPass<T>;
 
-  // Example: { name: 2 }
+  // inputs?: Record<keyof S, CompositeNode | CompositeNodeInput>;
+
+  // Example: { name: 2 }d
 
   constructor(shader: T) {
     super();
@@ -62,12 +65,14 @@ class CompositeFilterNode<
     frameBuffer?: FrameBuffer
   ): void {
     const pass = this.pass;
+    const material = pass.material;
 
+    // Disable textures all and enable when necessary
     pass.material?.disableTexturesAll();
     keys(inputTextures).forEach((inputName) => {
       // Enabled the pin texture in shader
-      this.pass.material!.enableTexture(inputName);
-      pass.material.set(inputName, inputTextures[inputName]);
+      material.enableTexture(inputName as any);
+      material.set(inputName, inputTextures[inputName]);
     });
 
     // Output
@@ -76,20 +81,6 @@ class CompositeFilterNode<
 
   get material() {
     return this.pass.material;
-  }
-  /**
-   * Proxy of pass.material.define('fragment', xxx);
-   */
-  define(symbol: string, val: any) {
-    this.pass.material!.define('fragment', symbol, val);
-  }
-
-  /**
-   * Proxy of pass.material.undefine('fragment', xxx)
-   * @param  {string} symbol
-   */
-  undefine(symbol: string) {
-    this.pass.material!.undefine('fragment', symbol);
   }
 
   validateInput(inputName: string) {

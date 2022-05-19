@@ -4,46 +4,49 @@ import type Renderer from '../Renderer';
 import type Texture from '../Texture';
 import CompositeNode from './CompositeNode';
 
-class GroupCompositeNode extends CompositeNode {
+class GroupCompositeNode<InputKey extends string, OutputKeys extends string> extends CompositeNode<
+  InputKey,
+  OutputKeys
+> {
   private _nodes: CompositeNode[] = [];
 
   /**
    * Input links to internal node inputs
    * Key is group input name.
    */
-  private _inputLinks: Record<
-    string,
+  private _inputLinks = {} as Record<
+    InputKey,
     {
       node: CompositeNode;
       input: string;
     }
-  > = {};
+  >;
 
   /**
    * Input links to internal node output
    * Key is group output name.
    */
-  private _outputLinks: Record<
-    string,
+  private _outputLinks = {} as Record<
+    OutputKeys,
     {
       node: CompositeNode;
       output: string;
     }
-  > = {};
+  >;
 
   /**
    * Add a child node
    */
-  addNode(
-    node: CompositeNode,
+  addNode<T extends CompositeNode>(
+    node: T,
     /**
      * Links map to group input. Key is node input name. Value is group input name.
      */
-    linksToInput?: Record<string, string>,
+    linksToInput?: Record<keyof T['inputs'], InputKey>,
     /**
      * Links map to group output. Key is node output name. Value is group output name.
      */
-    linksToOutput?: Record<string, string>
+    linksToOutput?: Record<keyof T['outputs'], OutputKeys>
   ) {
     const nodes = this._nodes;
     if (nodes.indexOf(node) < 0) {
@@ -51,7 +54,7 @@ class GroupCompositeNode extends CompositeNode {
 
       if (linksToInput) {
         keys(linksToInput).forEach((nodeInputName) => {
-          this._inputLinks[linksToInput[nodeInputName]] = {
+          this._inputLinks[linksToInput[nodeInputName as keyof T['inputs']]] = {
             node,
             input: nodeInputName
           };
@@ -60,7 +63,7 @@ class GroupCompositeNode extends CompositeNode {
 
       if (linksToOutput) {
         keys(linksToOutput).forEach((nodeOutputName) => {
-          this._outputLinks[linksToOutput[nodeOutputName]] = {
+          this._outputLinks[linksToOutput[nodeOutputName as keyof T['outputs']]] = {
             node,
             output: nodeOutputName
           };
@@ -81,13 +84,13 @@ class GroupCompositeNode extends CompositeNode {
       nodes.splice(idx, 1);
 
       keys(inputLinks).forEach((groupInputName) => {
-        if (inputLinks[groupInputName].node === node) {
-          delete inputLinks[groupInputName];
+        if (inputLinks[groupInputName as InputKey].node === node) {
+          delete inputLinks[groupInputName as InputKey];
         }
       });
       keys(outputLinks).forEach((groupOutputName) => {
-        if (outputLinks[groupOutputName].node === node) {
-          delete outputLinks[groupOutputName];
+        if (outputLinks[groupOutputName as OutputKeys].node === node) {
+          delete outputLinks[groupOutputName as OutputKeys];
         }
       });
     }
@@ -109,10 +112,10 @@ class GroupCompositeNode extends CompositeNode {
     // Update inputs
   }
 
-  getInputInnerLink(groupInputName: string) {
+  getInputInnerLink(groupInputName: InputKey) {
     return this._inputLinks[groupInputName];
   }
-  getOutputInnerLink(groupInputName: string) {
+  getOutputInnerLink(groupInputName: OutputKeys) {
     return this._outputLinks[groupInputName];
   }
 

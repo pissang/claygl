@@ -10,10 +10,7 @@ import type Renderable from './Renderable';
 import type Material from './Material';
 import Mesh from './Mesh';
 import { MaterialUniform, MaterialUniformType } from './Shader';
-import Renderer from './Renderer';
-import GLProgram from './gl/GLProgram';
-import Skybox from './plugin/Skybox';
-import Texture from './Texture';
+import Skybox from './Skybox';
 
 const IDENTITY = mat4.create();
 const WORLDVIEW = mat4.create();

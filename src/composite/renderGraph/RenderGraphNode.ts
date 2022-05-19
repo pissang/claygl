@@ -23,20 +23,20 @@ class RenderGraphNode {
   /**
    * Input links, will be updated by the graph
    * @example:
-   *     inputName: {
-   *         node: someNode,
-   *         pin: 'xxxx'
-   *     }
+   *   inputName: {
+   *     node: someNode,
+   *     pin: 'xxxx'
+   *    }
    */
   protected _inputs: Record<string, RenderGraphNodeLink> = {};
 
   /**
    * Output links, will be updated by the graph
    * @example:
-   *     outputName: [{
-   *         node: someNode,
-   *         pin: 'xxxx'
-   *     }]
+   *   outputName: [{
+   *     node: someNode,
+   *     pin: 'xxxx'
+   *   }]
    */
   protected _outputs: Record<string, RenderGraphNodeLink[]> = {};
 
@@ -86,6 +86,7 @@ class RenderGraphNode {
   renderAndOutputTexture(renderer: Renderer, outputPin: string): Texture2D | undefined {
     const outputInfo = this._compositeNode.outputs![outputPin];
     const prevOutputTextures = this._prevOutputTextures;
+    const outputTextures = this._outputTextures;
     if (!outputInfo) {
       return;
     }
@@ -96,7 +97,7 @@ class RenderGraphNode {
       if (outputInfo.outputLastFrame) {
         return prevOutputTextures[outputPin];
       } else {
-        return this._outputTextures[outputPin];
+        return outputTextures[outputPin];
       }
     } else if (
       // TODO
@@ -114,7 +115,7 @@ class RenderGraphNode {
 
     this.render(renderer);
 
-    return this._outputTextures[outputPin];
+    return outputTextures[outputPin];
   }
 
   hasOutput() {
@@ -143,8 +144,6 @@ class RenderGraphNode {
 
     // MRT Support in chrome
     // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-    const ext = renderer.getWebGLExtension('EXT_draw_buffers');
-    const bufs: GLEnum[] = [];
     const outputTextures: Record<string, Texture> | undefined = hasOutput ? {} : undefined;
 
     // Clear before rebind.
@@ -162,16 +161,9 @@ class RenderGraphNode {
       this._outputTextures[outputName] = texture;
       outputTextures![outputName] = texture;
 
-      if (ext && attachment >= COLOR_ATTACHMENT0 && attachment <= COLOR_ATTACHMENT0 + 8) {
-        bufs.push(attachment);
-      }
       // FIXME attachment changes in different nodes
       sharedFrameBuffer!.attach(texture, +attachment);
     });
-
-    if (ext && bufs.length) {
-      ext.drawBuffersEXT(bufs);
-    }
 
     this._compositeNode.render(
       renderer,
@@ -199,18 +191,22 @@ class RenderGraphNode {
   releaseReference(outputName: string) {
     const prevOutputTextures = this._prevOutputTextures;
     const outputTextures = this._outputTextures;
-    this._outputReferences[outputName]--;
-    if (this._outputReferences[outputName] === 0) {
+    const renderGraph = this._renderGraph;
+    const outputReferences = this._outputReferences;
+
+    outputReferences[outputName]--;
+
+    if (outputReferences[outputName] === 0) {
       const outputInfo = this._compositeNode.outputs![outputName];
       if (outputInfo.keepLastFrame) {
         if (prevOutputTextures[outputName]) {
-          this._renderGraph!.releaseTexture(prevOutputTextures[outputName]);
+          renderGraph!.releaseTexture(prevOutputTextures[outputName]);
         }
         prevOutputTextures[outputName] = outputTextures[outputName];
       } else {
         // Output of this node have alreay been used by all other nodes
         // Put the texture back to the pool.
-        this._renderGraph!.releaseTexture(outputTextures[outputName]);
+        renderGraph!.releaseTexture(outputTextures[outputName]);
       }
     }
   }
@@ -257,18 +253,18 @@ class RenderGraphNode {
   }
 
   afterFrame() {
-    const compositor = this._renderGraph!;
+    const renderGraph = this._renderGraph!;
     // Put back all the textures to pool
     for (const name in this._outputs) {
       if (this._outputReferences[name] > 0) {
         const outputInfo = this._compositeNode.outputs![name];
         if (outputInfo.keepLastFrame) {
           if (this._prevOutputTextures[name]) {
-            compositor.releaseTexture(this._prevOutputTextures[name]);
+            renderGraph.releaseTexture(this._prevOutputTextures[name]);
           }
           this._prevOutputTextures[name] = this._outputTextures[name];
         } else {
-          compositor.releaseTexture(this._outputTextures[name]);
+          renderGraph.releaseTexture(this._outputTextures[name]);
         }
       }
     }

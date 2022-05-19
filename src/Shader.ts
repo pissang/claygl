@@ -41,8 +41,8 @@ const attributeSizeMap = {
   float: 1
 } as const;
 
-type NativeToClayUniformMap = typeof uniformTypeMap;
-type NativeUniformType = keyof NativeToClayUniformMap;
+type NativeToMaterialUniformTypeMap = typeof uniformTypeMap;
+type NativeUniformType = keyof NativeToMaterialUniformTypeMap;
 type NativeUniformValueMap = {
   bool: number;
   int: number;
@@ -71,21 +71,28 @@ type NativeToClayAttributeMap = {
   vec4: 'float';
 };
 
+type NativeToMaterialUniformArrayTypeMap = {
+  bool: '1iv';
+  int: '1iv';
+  sampler2D: 'tv';
+  samplerCube: 'tv';
+  float: '1fv';
+  vec2: '2fv';
+  vec3: '3fv';
+  vec4: '4fv';
+  ivec2: '2iv';
+  ivec3: '3iv';
+  ivec4: '4iv';
+  mat2: 'm2v';
+  mat3: 'm3v';
+  mat4: 'm4v';
+  rgb: '3fv';
+  rgba: '4fv';
+};
+
 export type MaterialUniformType =
-  | NativeToClayUniformMap[NativeUniformType]
-  | '1i'
-  | '1iv'
-  | 'tv'
-  | '1fv'
-  | '2fv'
-  | '3fv'
-  | '4fv'
-  | '2iv'
-  | '3iv'
-  | '4iv'
-  | 'm2v'
-  | 'm3v'
-  | 'm4v';
+  | NativeToMaterialUniformTypeMap[NativeUniformType]
+  | NativeToMaterialUniformArrayTypeMap[keyof NativeToMaterialUniformArrayTypeMap];
 
 export type AttributeSemantic =
   | 'POSITION'
@@ -471,7 +478,9 @@ type ConvertShaderUniformToMaterialUniform<T extends Dict<ShaderUniformLoose>> =
   [key in keyof T]: {
     value: T[key]['value'];
     // TODO Needs more precise type
-    type: MaterialUniformType;
+    type: T[key]['array'] extends true
+      ? NativeToMaterialUniformArrayTypeMap[T[key]['type']]
+      : NativeToMaterialUniformTypeMap[T[key]['type']];
     semantic?: T[key]['semantic'];
   };
 };
@@ -497,6 +506,24 @@ function getShaderID(vertex: string, fragment: string) {
 
   return id;
 }
+
+export type VertexShaderLoose = VertexShader<
+  Dict<ShaderDefineValue>,
+  Dict<ShaderUniformLoose>,
+  Dict<ShaderAttributeLoose>,
+  Dict<ShaderVaringLoose>
+>;
+export type FragmentShaderLoose = FragmentShader<Dict<ShaderDefineValue>, Dict<ShaderUniformLoose>>;
+
+export type PickFragmentTextureUniforms<
+  T extends FragmentShader<Dict<ShaderDefineValue>, Dict<ShaderUniformLoose>>['uniforms']
+> = Pick<
+  T,
+  {
+    [key in keyof T]: T[key]['type'] extends 'sampler2D' | 'samplerCube' ? key : never;
+  }[keyof T]
+>;
+
 export class Shader<
   // Having more loose type so it won't struggle on the key type in th materials.
   V extends VertexShader = VertexShader<
@@ -647,7 +674,7 @@ export class Shader<
 
     // Parse attributes in vertex
     keys(vert.attributes).forEach((attrName) => {
-      const attr = vert.attributes[attrName] as ShaderAttributeLoose;
+      const attr = (vert.attributes as any)[attrName] as ShaderAttributeLoose;
       const semantic = attr.semantic;
       if (semantic) {
         semanticsMap[semantic] = {
