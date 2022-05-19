@@ -80,7 +80,7 @@ export interface GLRenderableObject<T extends GLMaterialObject = GLMaterialObjec
   geometry: GeometryBase;
   material: T;
   mode?: GLEnum;
-  lightGroup: number;
+  lightGroup?: number;
   worldTransform?: Matrix4;
 
   cullFace?: GLEnum;
@@ -225,7 +225,8 @@ class GLRenderer {
         glFrameBufferMap.set(frameBuffer, glFrameBuffer);
       }
       glFrameBuffer.bind(gl, {
-        getGLTexture: (texture) => this._getGLTexture(texture)
+        getGLTexture: (texture) => this._getGLTexture(texture),
+        getGLExtension: (name) => this._glext.getExtension(name)
       });
     }
     this._framebuffer = frameBuffer;

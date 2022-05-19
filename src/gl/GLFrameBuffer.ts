@@ -1,4 +1,5 @@
 import {
+  COLOR_ATTACHMENT0,
   DEPTH_ATTACHMENT,
   DEPTH_STENCIL_ATTACHMENT,
   FRAMEBUFFER,
@@ -27,7 +28,13 @@ class GLFrameBuffer {
     this._fb = frambuffer;
   }
 
-  bind(gl: WebGLRenderingContext, helpers: { getGLTexture: (texture: Texture) => GLTexture }) {
+  bind(
+    gl: WebGLRenderingContext,
+    helpers: {
+      getGLTexture: (texture: Texture) => GLTexture;
+      getGLExtension: (name: string) => any;
+    }
+  ) {
     const frameBuffer = this._fb;
     const webglFb = this._webglFb || (this._webglFb = gl.createFramebuffer()!);
     let webglRenderBuffer = this._webglRb;
@@ -55,20 +62,28 @@ class GLFrameBuffer {
     let width: number | undefined;
     let height: number | undefined;
 
-    keys(texturesToAttach).forEach((attachment) => {
+    const bufs: GLEnum[] = [];
+    // MRT Support in chrome
+    // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
+    const ext = helpers.getGLExtension('EXT_draw_buffers');
+    keys(texturesToAttach).forEach((attachmentStr) => {
+      const attachment = +attachmentStr;
       const { texture, target } = texturesToAttach[attachment]!;
       const glTexture = helpers.getGLTexture(texture);
       width = texture.width;
       height = texture.height;
 
       // TODO validate width, height are same.
-      if (+attachment === DEPTH_ATTACHMENT || +attachment === DEPTH_STENCIL_ATTACHMENT) {
+      if (attachment === DEPTH_ATTACHMENT || attachment === DEPTH_STENCIL_ATTACHMENT) {
         depthAttached = true;
         if (webglRenderBuffer) {
           // Detach from renderbuffer before attach to depth texture
           gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, null);
           renderBufferDetached = true;
         }
+      }
+      if (ext && attachment >= COLOR_ATTACHMENT0 && attachment <= COLOR_ATTACHMENT0 + 8) {
+        bufs.push(attachment);
       }
 
       const attached = attachedTextures[attachment];
@@ -82,7 +97,7 @@ class GLFrameBuffer {
         return;
       }
 
-      gl.framebufferTexture2D(FRAMEBUFFER, +attachment, target, glTexture.getWebGLTexture(gl), 0);
+      gl.framebufferTexture2D(FRAMEBUFFER, attachment, target, glTexture.getWebGLTexture(gl), 0);
 
       attachedTextures[attachment] = [glTexture, target, width, height];
     });
@@ -112,6 +127,10 @@ class GLFrameBuffer {
     if (renderBufferDetached) {
       gl.deleteRenderbuffer(webglRenderBuffer!);
       this._webglRb = undefined;
+    }
+
+    if (ext) {
+      ext.drawBuffersEXT(bufs);
     }
 
     // 0x8CD5, 36053, FRAMEBUFFER_COMPLETE

@@ -69,7 +69,7 @@ abstract class CompositeNode extends Notifier {
      */
     outputTextures?: Record<string, Texture>,
     /**
-     * If render to another framebuffer when it's the output node.
+     * Target framebuffer.
      */
     frameBuffer?: FrameBuffer
   ): void;

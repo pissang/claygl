@@ -129,7 +129,8 @@ class RenderGraphNode {
     const inputNames = keys(inputLinks);
     const outputLinks = this._outputs || {};
     const outputNames = keys(outputLinks);
-    const sharedFrameBuffer = renderGraph.getFrameBuffer();
+    const hasOutput = outputNames.length > 0;
+    const sharedFrameBuffer = hasOutput ? renderGraph.getFrameBuffer() : undefined;
 
     const inputTextures: Record<string, Texture> = {};
     inputNames.forEach((inputName) => {
@@ -144,46 +145,40 @@ class RenderGraphNode {
     // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
     const ext = renderer.getWebGLExtension('EXT_draw_buffers');
     const bufs: GLEnum[] = [];
-    let outputTextures: Record<string, Texture> | undefined;
-    if (!outputNames.length) {
-      // Final output
-      sharedFrameBuffer.unbind(renderer);
-    } else {
-      outputTextures = {};
+    const outputTextures: Record<string, Texture> | undefined = hasOutput ? {} : undefined;
 
-      outputNames.forEach((outputName) => {
-        const parameters = this.updateParameter(outputName, renderer);
-        if (isNaN(parameters.width as number)) {
-          this.updateParameter(outputName, renderer);
-        }
-        // TODO Avoid reading from composite node too much
-        const outputInfo = this._compositeNode.outputs![outputName];
-        const texture = renderGraph.allocateTexture(parameters);
-        const attachment = outputInfo.attachment || COLOR_ATTACHMENT0;
-        this._outputTextures[outputName] = texture;
-        outputTextures![outputName] = texture;
+    // Clear before rebind.
+    sharedFrameBuffer && sharedFrameBuffer.clearTextures();
 
-        if (ext && attachment >= COLOR_ATTACHMENT0 && attachment <= COLOR_ATTACHMENT0 + 8) {
-          bufs.push(attachment);
-        }
-        // FIXME attachment changes in different nodes
-        sharedFrameBuffer.attach(texture, +attachment);
-      });
+    outputNames.forEach((outputName) => {
+      const parameters = this.updateParameter(outputName, renderer);
+      if (isNaN(parameters.width as number)) {
+        this.updateParameter(outputName, renderer);
+      }
+      // TODO Avoid reading from composite node too much
+      const outputInfo = this._compositeNode.outputs![outputName];
+      const texture = renderGraph.allocateTexture(parameters);
+      const attachment = outputInfo.attachment || COLOR_ATTACHMENT0;
+      this._outputTextures[outputName] = texture;
+      outputTextures![outputName] = texture;
 
-      sharedFrameBuffer.bind(renderer);
-    }
+      if (ext && attachment >= COLOR_ATTACHMENT0 && attachment <= COLOR_ATTACHMENT0 + 8) {
+        bufs.push(attachment);
+      }
+      // FIXME attachment changes in different nodes
+      sharedFrameBuffer!.attach(texture, +attachment);
+    });
+
     if (ext && bufs.length) {
       ext.drawBuffersEXT(bufs);
     }
 
-    this._compositeNode.render(renderer, inputTextures, outputTextures, finalFrameBuffer);
-
-    // Because the data of texture is changed over time,
-    // Here update the mipmaps of texture each time after rendered;
-    if (outputNames.length) {
-      sharedFrameBuffer.updateMipmap(renderer);
-      sharedFrameBuffer.unbind(renderer);
-    }
+    this._compositeNode.render(
+      renderer,
+      inputTextures,
+      outputTextures,
+      sharedFrameBuffer || finalFrameBuffer
+    );
 
     inputNames.forEach((inputName) => {
       const link = inputLinks[inputName];

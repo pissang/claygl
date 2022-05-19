@@ -27,24 +27,12 @@ export class CompositeSceneNode extends CompositeNode {
     renderer: Renderer,
     inputTextures: Record<string, Texture>,
     outputTextures?: Record<string, Texture>,
-    finalFrameBuffer?: FrameBuffer
+    frameBuffer?: FrameBuffer
   ): void {
-    this.trigger('beforerender');
-
-    let renderInfo;
-
-    if (!outputTextures) {
-      renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
-    } else {
-      // Always clear
-      // PENDING
-      renderer.saveClear();
-      renderer.clearBit = constants.DEPTH_BUFFER_BIT | constants.COLOR_BUFFER_BIT;
-      renderInfo = renderer.render(this.scene, this.camera, !this.autoUpdateScene, this.preZ);
-      renderer.restoreClear();
-    }
-
-    this.trigger('afterrender', renderInfo);
+    renderer.render(this.scene, this.camera, frameBuffer, {
+      preZ: this.preZ,
+      notUpdateScene: this.autoUpdateScene
+    });
   }
 }
 

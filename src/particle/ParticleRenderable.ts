@@ -263,7 +263,7 @@ class ParticleRenderable extends Renderable {
       const p = this._particles[i];
       p.emitter!.kill(p);
     }
-    this.geometry.dispose(renderer);
+    renderer.disposeGeometry(this.geometry);
     // TODO Dispose texture ?
   }
 

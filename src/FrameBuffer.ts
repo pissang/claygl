@@ -64,6 +64,11 @@ class FrameBuffer {
     );
   }
 
+  clearTextures() {
+    this._textures = {};
+    this._width = this._height = 0;
+  }
+
   /**
    * Attach a texture(RTT) to the framebuffer
    * @param  {clay.Texture} texture

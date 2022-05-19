@@ -44,9 +44,7 @@ class TexturePool {
   }
 
   clear(renderer: Renderer) {
-    for (let i = 0; i < this._allocatedTextures.length; i++) {
-      this._allocatedTextures[i].dispose(renderer);
-    }
+    this._allocatedTextures.forEach(renderer.dispose.bind(renderer));
     this._pool = {};
     this._allocatedTextures = [];
   }

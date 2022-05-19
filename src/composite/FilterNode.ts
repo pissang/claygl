@@ -59,10 +59,8 @@ class CompositeFilterNode<
     renderer: Renderer,
     inputTextures: Record<string, Texture>,
     outputTextures?: Record<string, Texture>,
-    finalFrameBuffer?: FrameBuffer
+    frameBuffer?: FrameBuffer
   ): void {
-    this.trigger('beforerender', renderer);
-
     const pass = this.pass;
 
     pass.material?.disableTexturesAll();
@@ -73,30 +71,12 @@ class CompositeFilterNode<
     });
 
     // Output
-    if (!outputTextures) {
-      pass.outputs = undefined;
-      pass.render(renderer, finalFrameBuffer);
-    } else {
-      pass.outputs = {};
-
-      pass.render(renderer);
-    }
-
-    this.trigger('afterrender', renderer);
+    pass.render(renderer, frameBuffer);
   }
 
   get material() {
     return this.pass.material;
   }
-  // /**
-  //  * Set shader code
-  //  * @param {string} shaderStr
-  //  */
-  // setShader(shaderStr) {
-  //     const material = this.pass.material;
-  //     material.shader.setFragment(shaderStr);
-  //     material.attachShader(material.shader, true);
-  // },
   /**
    * Proxy of pass.material.define('fragment', xxx);
    */
