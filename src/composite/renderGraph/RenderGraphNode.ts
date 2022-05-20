@@ -1,11 +1,12 @@
 import { COLOR_ATTACHMENT0 } from '../../core/constants';
 import { GLEnum } from '../../core/type';
-import { isFunction, keys } from '../../core/util';
+import { assign, isFunction, keys } from '../../core/util';
 import type FrameBuffer from '../../FrameBuffer';
 import type Renderer from '../../Renderer';
 import type Texture from '../../Texture';
 import Texture2D, { Texture2DOpts } from '../../Texture2D';
 import CompositeNode, { CompositeNodeOutput } from '../CompositeNode';
+import { TexturePoolParameters } from '../TexturePool';
 import type RenderGraph from './RenderGraph';
 
 const parametersCopyMap = new WeakMap<CompositeNodeOutput, Partial<Texture2DOpts>>();
@@ -51,36 +52,50 @@ class RenderGraphNode {
   private _compositeNode: CompositeNode;
   private _renderGraph: RenderGraph;
 
+  // Cached texture params.
+  private _textureParams: Record<string, TexturePoolParameters> = {};
+
   constructor(compositeNode: CompositeNode, renderGraph: RenderGraph) {
     this._compositeNode = compositeNode;
     this._renderGraph = renderGraph;
   }
 
-  updateParameter(outputName: string, renderer: Renderer) {
-    const outputInfo = this._compositeNode.outputs![outputName];
-    const parameters = outputInfo.parameters || {};
-    let parametersCopy = parametersCopyMap.get(outputInfo);
-    if (!parametersCopy) {
-      parametersCopy = {};
-      parametersCopyMap.set(outputInfo, parametersCopy);
+  getTextureParams(
+    outputName: string,
+    renderer: Renderer
+    // derivedParams: TexturePoolParameters
+  ) {
+    const cachedTextureParams = this._textureParams;
+    if (!cachedTextureParams[outputName]) {
+      const derivedParams = this._deriveTextureParams(renderer);
+      const outputInfo = this._compositeNode.outputs![outputName];
+      const width = isFunction(outputInfo.width) ? outputInfo.width(renderer) : outputInfo.width;
+      const height = isFunction(outputInfo.height)
+        ? outputInfo.height(renderer)
+        : outputInfo.height;
+      const params = assign({} as TexturePoolParameters, derivedParams, outputInfo.params);
+      width != null && (params.width = width);
+      height != null && (params.height = height);
+      cachedTextureParams[outputName] = params;
     }
-    keys(parameters).forEach((key) => {
-      if (key !== 'width' && key !== 'height') {
-        (parametersCopy as any)[key] = (parameters as any)[key];
+    return cachedTextureParams[outputName];
+  }
+  /**
+   * Find the most large input texture to inherit.
+   */
+  private _deriveTextureParams(renderer: Renderer) {
+    let mostProbablyParams: TexturePoolParameters;
+    let largestSize = 0;
+    keys(this._inputs).forEach((inputName) => {
+      const { node, pin } = this._inputs[inputName];
+      const params = node.getTextureParams(pin, renderer);
+      const size = params.width * params.height;
+      if (size > largestSize) {
+        largestSize = size;
+        mostProbablyParams = params;
       }
+      return mostProbablyParams;
     });
-    const width = isFunction(parameters.width) ? parameters.width(renderer) : parameters.width;
-    const height = isFunction(parameters.height) ? parameters.height(renderer) : parameters.height;
-    // const outputTextures = this._outputTextures;
-    // if (parametersCopy.width !== width || parametersCopy.height !== height) {
-    //   if (outputTextures[outputName]) {
-    //     outputTextures[outputName].dispose(renderer);
-    //   }
-    // }
-    parametersCopy.width = width;
-    parametersCopy.height = height;
-
-    return parametersCopy;
   }
 
   renderAndOutputTexture(renderer: Renderer, outputPin: string): Texture2D | undefined {
@@ -106,7 +121,7 @@ class RenderGraphNode {
       if (!prevOutputTextures[outputPin]) {
         // Create a blank texture at first pass
         prevOutputTextures[outputPin] = this._renderGraph.allocateTexture(
-          this.updateParameter(outputPin, renderer)
+          this.getTextureParams(outputPin, renderer)
           // parametersCopyMap.get(outputInfo) || {}
         );
       }
@@ -150,9 +165,9 @@ class RenderGraphNode {
     sharedFrameBuffer && sharedFrameBuffer.clearTextures();
 
     outputNames.forEach((outputName) => {
-      const parameters = this.updateParameter(outputName, renderer);
+      const parameters = this.getTextureParams(outputName, renderer);
       if (isNaN(parameters.width as number)) {
-        this.updateParameter(outputName, renderer);
+        this.getTextureParams(outputName, renderer);
       }
       // TODO Avoid reading from composite node too much
       const outputInfo = this._compositeNode.outputs![outputName];
@@ -230,6 +245,7 @@ class RenderGraphNode {
   beforeUpdate() {
     this._inputs = {};
     this._outputs = {};
+    this._textureParams = {};
   }
 
   countReference(outputName?: string) {
@@ -244,15 +260,14 @@ class RenderGraphNode {
     }
   }
 
-  beforeFrame() {
+  beforeRender() {
     this._rendered = false;
-
     for (const name in this._outputs) {
       this._outputReferences[name] = 0;
     }
   }
 
-  afterFrame() {
+  afterRender() {
     const renderGraph = this._renderGraph!;
     // Put back all the textures to pool
     for (const name in this._outputs) {

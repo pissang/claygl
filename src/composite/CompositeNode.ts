@@ -4,7 +4,7 @@ import type Renderer from '../Renderer';
 import type FrameBuffer from '../FrameBuffer';
 import { GLEnum } from '../core/type';
 import type Texture from '../Texture';
-import { PoolParameters } from './TexturePool';
+import { TexturePoolParameters } from './TexturePool';
 
 export interface CompositeNodeInput {
   /**
@@ -18,15 +18,12 @@ export interface CompositeNodeInput {
 }
 export interface CompositeNodeOutput {
   /**
-   *
+   * Attachment.
    */
-  parameters?:
-    | Partial<PoolParameters>
-    | {
-        width?: (renderer: Renderer) => number;
-        height?: (renderer: Renderer) => number;
-      };
   attachment?: GLEnum;
+  width?: number | ((renderer: Renderer) => number);
+  height?: number | ((renderer: Renderer) => number);
+  params?: Partial<Omit<TexturePoolParameters, 'width' | 'height'>>;
   keepLastFrame?: boolean;
   outputLastFrame?: boolean;
 }

@@ -31,7 +31,7 @@ export class CompositeSceneNode extends CompositeNode {
   ): void {
     renderer.render(this.scene, this.camera, frameBuffer, {
       preZ: this.preZ,
-      notUpdateScene: this.autoUpdateScene
+      notUpdateScene: !this.autoUpdateScene
     });
   }
 }

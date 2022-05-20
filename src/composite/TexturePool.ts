@@ -5,7 +5,7 @@ import * as constants from '../core/constants';
 import * as util from '../core/util';
 import Renderer from '../Renderer';
 
-export type PoolParameters = Pick<
+export type TexturePoolParameters = Pick<
   Texture2DOpts,
   | 'width'
   | 'height'
@@ -23,7 +23,7 @@ class TexturePool {
   private _pool: Record<string, Texture2D[]> = {};
   private _allocatedTextures: Texture2D[] = [];
 
-  get(parameters: Partial<PoolParameters>): Texture2D {
+  get(parameters: Partial<TexturePoolParameters>): Texture2D {
     const key = generateKey(parameters);
     const list = (this._pool[key] = this._pool[key] || []);
     if (!list.length) {
@@ -49,7 +49,7 @@ class TexturePool {
     this._allocatedTextures = [];
   }
 }
-const defaultParams: Partial<PoolParameters> = {
+const defaultParams: Partial<TexturePoolParameters> = {
   width: 512,
   height: 512,
   type: constants.UNSIGNED_BYTE,
@@ -64,7 +64,7 @@ const defaultParams: Partial<PoolParameters> = {
 
 const defaultParamPropList = util.keys(defaultParams);
 
-function generateKey(parameters: Partial<PoolParameters>) {
+function generateKey(parameters: Partial<TexturePoolParameters>) {
   util.defaults(parameters, defaultParams);
   fallBack(parameters);
 

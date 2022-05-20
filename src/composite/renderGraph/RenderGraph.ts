@@ -39,13 +39,13 @@ class RenderGraph {
     const outputs = nodes.filter((node) => !node.hasOutput());
 
     // Update the reference number of each output texture
-    nodes.forEach((node) => node.beforeFrame());
+    nodes.forEach((node) => node.beforeRender());
 
     outputs.forEach((output) => output.countReference());
     outputs.forEach((output) => output.render(renderer, frameBuffer));
 
     // Clear up
-    nodes.forEach((node) => node.afterFrame());
+    nodes.forEach((node) => node.afterRender());
   }
 
   allocateTexture(parameters: Partial<Texture2DOpts>) {

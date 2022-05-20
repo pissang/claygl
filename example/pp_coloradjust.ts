@@ -15,6 +15,7 @@ import {
   DirectionalLight,
   startTimeline
 } from 'claygl';
+import { colorAdjustCompositeFragment } from '../src/shader/source/compositor/coloradjust.glsl';
 
 const compositor = new Compositor();
 
@@ -51,25 +52,20 @@ scene.add(light);
 const sceneCompositeNode = new SceneCompositeNode(scene, camera);
 sceneCompositeNode.outputs = {
   color: {
-    parameters: {
-      width: 1024,
-      height: 1024
-    }
+    width: 1024,
+    height: 1024
   }
 };
 compositor.addNode(sceneCompositeNode);
 
-const colorAdjustNode = new FilterCompositeNode(Shader.source('clay.composite.coloradjust'));
+const colorAdjustNode = new FilterCompositeNode(colorAdjustCompositeFragment);
 colorAdjustNode.inputs = {
-  texture: {
-    node: sceneCompositeNode,
-    output: 'color'
-  }
+  texture: sceneCompositeNode
 };
-colorAdjustNode.setParameter('gamma', 1.2);
+colorAdjustNode.material.set('gamma', 1.2);
 compositor.addNode(colorAdjustNode);
 
 startTimeline(() => {
-  compositor.render(renderer);
   mesh.rotation.rotateY(Math.PI / 500);
+  compositor.render(renderer);
 });
