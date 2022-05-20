@@ -216,14 +216,17 @@ class GLRenderer {
     const prevFrameBuffer = this._framebuffer;
     const glFrameBufferMap = this._glFrameBufferMap;
     const gl = this.gl;
-    // Unbind if there is no new framebuffer. Else only update mipmap
-    prevFrameBuffer && glFrameBufferMap.get(prevFrameBuffer)!.unbind(gl, !!frameBuffer);
+    let glFrameBuffer;
     if (frameBuffer) {
-      let glFrameBuffer = glFrameBufferMap.get(frameBuffer);
+      glFrameBuffer = glFrameBufferMap.get(frameBuffer);
       if (!glFrameBuffer) {
         glFrameBuffer = new GLFrameBuffer(frameBuffer);
         glFrameBufferMap.set(frameBuffer, glFrameBuffer);
       }
+    }
+    // Unbind if there is no new framebuffer. Else only update mipmap
+    prevFrameBuffer && glFrameBufferMap.get(prevFrameBuffer)!.unbind(gl, glFrameBuffer);
+    if (glFrameBuffer) {
       glFrameBuffer.bind(gl, {
         getGLTexture: (texture) => this._getGLTexture(texture),
         getGLExtension: (name) => this._glext.getExtension(name)

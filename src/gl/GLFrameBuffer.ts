@@ -145,10 +145,13 @@ class GLFrameBuffer {
     this._bound = gl;
   }
 
-  unbind(gl: WebGLRenderingContext, willBooleanNewFrameBuffer: boolean) {
+  unbind(gl: WebGLRenderingContext, nextFameBuffer?: GLFrameBuffer) {
     if (this._bound) {
-      this._bound = null;
-      if (!willBooleanNewFrameBuffer) {
+      // the _bound will keep since we know we will rebind again.
+      if (nextFameBuffer !== this) {
+        this._bound = null;
+      }
+      if (!nextFameBuffer) {
         // Just skip a binding operation if it will bind another framebuffer.
         // Not sure how much performance will it gain.
         gl.bindFramebuffer(FRAMEBUFFER, null);
