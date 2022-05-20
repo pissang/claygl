@@ -1,6 +1,6 @@
 import { COLOR_ATTACHMENT0 } from '../../core/constants';
 import { GLEnum } from '../../core/type';
-import { assign, isFunction, keys } from '../../core/util';
+import { assign, isFunction, keys, optional } from '../../core/util';
 import type FrameBuffer from '../../FrameBuffer';
 import type Renderer from '../../Renderer';
 import type Texture from '../../Texture';
@@ -8,8 +8,6 @@ import Texture2D, { Texture2DOpts } from '../../Texture2D';
 import CompositeNode, { CompositeNodeOutput } from '../CompositeNode';
 import { TexturePoolParameters } from '../TexturePool';
 import type RenderGraph from './RenderGraph';
-
-const parametersCopyMap = new WeakMap<CompositeNodeOutput, Partial<Texture2DOpts>>();
 
 interface RenderGraphNodeLink {
   node: RenderGraphNode;
@@ -74,8 +72,9 @@ class RenderGraphNode {
         ? outputInfo.height(renderer)
         : outputInfo.height;
       const params = assign({} as TexturePoolParameters, derivedParams, outputInfo.params);
-      width != null && (params.width = width);
-      height != null && (params.height = height);
+      const scale = optional(outputInfo.scale, 1);
+      width != null && (params.width = width * scale);
+      height != null && (params.height = height * scale);
       cachedTextureParams[outputName] = params;
     }
     return cachedTextureParams[outputName];
@@ -84,7 +83,7 @@ class RenderGraphNode {
    * Find the most large input texture to inherit.
    */
   private _deriveTextureParams(renderer: Renderer) {
-    let mostProbablyParams: TexturePoolParameters;
+    let mostProbablyParams: TexturePoolParameters | undefined;
     let largestSize = 0;
     keys(this._inputs).forEach((inputName) => {
       const { node, pin } = this._inputs[inputName];
@@ -94,8 +93,8 @@ class RenderGraphNode {
         largestSize = size;
         mostProbablyParams = params;
       }
-      return mostProbablyParams;
     });
+    return mostProbablyParams;
   }
 
   renderAndOutputTexture(renderer: Renderer, outputPin: string): Texture2D | undefined {
@@ -137,6 +136,11 @@ class RenderGraphNode {
     return keys(this._outputs).length > 0;
   }
 
+  isEndNode() {
+    const compositeNode = this._compositeNode;
+    return compositeNode.renderToScreen || !this.hasOutput();
+  }
+
   render(renderer: Renderer, finalFrameBuffer?: FrameBuffer) {
     this._rendering = true;
 
@@ -145,7 +149,7 @@ class RenderGraphNode {
     const inputNames = keys(inputLinks);
     const outputLinks = this._outputs || {};
     const outputNames = keys(outputLinks);
-    const hasOutput = outputNames.length > 0;
+    const hasOutput = !this.isEndNode();
     const sharedFrameBuffer = hasOutput ? renderGraph.getFrameBuffer() : undefined;
 
     const inputTextures: Record<string, Texture> = {};

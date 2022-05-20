@@ -21,8 +21,20 @@ export interface CompositeNodeOutput {
    * Attachment.
    */
   attachment?: GLEnum;
+  /**
+   * Width of output texture. Will inherit from the largest input texture if not given.
+   */
   width?: number | ((renderer: Renderer) => number);
+  /**
+   * Height of output texture. Will inherit from the largest input texture if not given.
+   */
   height?: number | ((renderer: Renderer) => number);
+  /**
+   * If width and height are not given and inherited from the input texture.
+   * Scale can define the downscaling / upscaling factor.
+   * default to be 1
+   */
+  scale?: number;
   params?: Partial<Omit<TexturePoolParameters, 'width' | 'height'>>;
   keepLastFrame?: boolean;
   outputLastFrame?: boolean;
@@ -42,6 +54,11 @@ abstract class CompositeNode<InputKey extends string = string, OutputKey extends
    * Output of node. Usually only one output. Key is the output name.
    */
   outputs?: Record<OutputKey, CompositeNodeOutput>;
+
+  /**
+   * If render to screen as an end node. Will ignore outpus.
+   */
+  renderToScreen?: boolean;
 
   /**
    * Do preparation logic.

@@ -1,10 +1,8 @@
 import CompositeNode from './CompositeNode';
-import * as constants from '../core/constants';
 import FrameBuffer from '../FrameBuffer';
 import type Scene from '../Scene';
 import type Camera from '../Camera';
 import type Renderer from '../Renderer';
-import { GLEnum } from '../core/type';
 import Texture from '../Texture';
 
 export class CompositeSceneNode extends CompositeNode {

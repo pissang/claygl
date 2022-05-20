@@ -23,9 +23,6 @@ class RenderGraph {
     }
   }
 
-  /**
-   * @param node
-   */
   removeNode(node: RenderGraphNode) {
     const nodes = this._nodes;
     const idx = nodes.indexOf(node);
@@ -34,9 +31,13 @@ class RenderGraph {
     }
   }
 
+  beforeUpdate() {
+    this._nodes.forEach((node) => node.beforeUpdate());
+  }
+
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {
     const nodes = this._nodes;
-    const outputs = nodes.filter((node) => !node.hasOutput());
+    const outputs = nodes.filter((node) => node.isEndNode());
 
     // Update the reference number of each output texture
     nodes.forEach((node) => node.beforeRender());

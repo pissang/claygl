@@ -109,7 +109,14 @@ class GroupCompositeNode<InputKey extends string, OutputKeys extends string> ext
 
   prepare(renderer: Renderer): void {
     this._nodes.forEach((node) => node.prepare(renderer));
-    // Update inputs
+
+    const outputLinks = this._outputLinks;
+    // Update renderToScreen in output nodes.
+    keys(outputLinks).forEach(
+      (groupOutputName) =>
+        (outputLinks[groupOutputName as OutputKeys].node.renderToScreen = this.renderToScreen)
+    );
+    // TODO what if group node set outputs to empty?
   }
 
   getInputInnerLink(groupInputName: InputKey) {

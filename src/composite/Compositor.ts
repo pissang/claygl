@@ -71,8 +71,9 @@ class Compositor {
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {
     this._nodes.forEach((node) => {
       node.prepare && node.prepare(renderer);
-      renderGraphNodeMap.get(node)!.beforeUpdate();
     });
+
+    this._renderGraph.beforeUpdate();
 
     this._buildRenderGraphLinks(renderer);
 
@@ -158,7 +159,7 @@ class Compositor {
       }
     }
 
-    function buildLinksOfGroupNode(groupNode: GroupCompositeNode) {
+    function buildLinksOfGroupNode(groupNode: GroupCompositeNode<string, string>) {
       groupNode.eachNode(buildLinksOfNode);
       eachNodeInput(groupNode, (groupInputInfo, groupInputName) => {
         const fromPin = findLink(groupInputInfo);
