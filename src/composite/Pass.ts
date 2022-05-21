@@ -38,7 +38,7 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
     opts = opts || {};
     this.clearColor = opts.clearColor || false;
     this.blendWithPrevious = opts.blendWithPrevious || false;
-    this.clearDepth = optional(opts.clearColor, true);
+    this.clearDepth = optional(opts.clearDepth, true);
   }
 
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {

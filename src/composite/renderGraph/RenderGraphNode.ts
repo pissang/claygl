@@ -159,8 +159,8 @@ class RenderGraphNode {
     const inputLinks = this._inputs || {};
     const inputNames = keys(inputLinks);
     const outputLinks = this._outputs || {};
-    const outputNames = keys(outputLinks);
     const hasOutput = !this.isEndNode();
+    const outputNames = hasOutput ? keys(outputLinks) : [];
     const sharedFrameBuffer = hasOutput ? renderGraph.getFrameBuffer() : undefined;
 
     const inputTextures: Record<string, Texture> = {};

@@ -63,6 +63,26 @@ type NativeUniformValueMap = {
   rgba: vec4.Vec4Array | string;
 };
 
+type NativeUniformArrayValueMap = {
+  bool: ArrayLike<number>;
+  int: ArrayLike<number>;
+  sampler2D: Texture2D[];
+  samplerCube: TextureCube[];
+  float: ArrayLike<number>;
+  vec2: ArrayLike<number>;
+  vec3: ArrayLike<number>;
+  vec4: ArrayLike<number>;
+  ivec2: ArrayLike<number>;
+  ivec3: ArrayLike<number>;
+  ivec4: ArrayLike<number>;
+  mat2: ArrayLike<number>;
+  mat3: ArrayLike<number>;
+  mat4: ArrayLike<number>;
+  // TODO
+  rgb: ArrayLike<number>;
+  rgba: ArrayLike<number>;
+};
+
 type NativeAttributeType = 'float' | 'vec2' | 'vec3' | 'vec4';
 type NativeToClayAttributeMap = {
   float: 'float';
@@ -228,7 +248,7 @@ export function createSemanticUniform<
 export function createArrayUniform<T extends NativeUniformType>(
   type: T,
   len: string | number, // Can be a define SKIN_COUNT or literal number
-  value?: NativeUniformValueMap[T][]
+  value?: NativeUniformArrayValueMap[T]
 ) {
   return {
     type,

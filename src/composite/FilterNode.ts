@@ -58,12 +58,21 @@ class CompositeFilterNode<
 
   prepare(renderer: Renderer): void {}
 
+  beforeRender?: (
+    renderer: Renderer,
+    inputTextures: Record<keyof S, Texture>,
+    outputTextures?: Record<O, Texture>
+  ) => void;
+  afterRender?: () => void;
+
   render(
     renderer: Renderer,
-    inputTextures: Record<string, Texture>,
-    outputTextures?: Record<string, Texture>,
+    inputTextures: Record<keyof S, Texture>,
+    outputTextures?: Record<O, Texture>,
     frameBuffer?: FrameBuffer
   ): void {
+    this.beforeRender && this.beforeRender(renderer, inputTextures, outputTextures);
+
     const pass = this.pass;
     const material = pass.material;
 
@@ -72,11 +81,13 @@ class CompositeFilterNode<
     keys(inputTextures).forEach((inputName) => {
       // Enabled the pin texture in shader
       material.enableTexture(inputName as any);
-      material.set(inputName, inputTextures[inputName]);
+      material.set(inputName, inputTextures[inputName as keyof S]);
     });
 
     // Output
     pass.render(renderer, frameBuffer);
+
+    this.afterRender && this.afterRender();
   }
 
   get material() {

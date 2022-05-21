@@ -2,7 +2,6 @@ import {
   Renderer,
   Scene,
   PerspectiveCamera,
-  SceneCompositeNode,
   Compositor,
   Texture2D,
   Mesh,

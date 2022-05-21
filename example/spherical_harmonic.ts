@@ -46,7 +46,7 @@ loadGLTF('assets/models/suzanne/suzanne.gltf').then((res) => {
       const light = new AmbientSHLight({
         coefficients: coeff
       });
-      console.log(coeff);
+      console.log(Array.from(coeff));
       scene.add(light);
 
       const material = new Material(createStandardShader());
