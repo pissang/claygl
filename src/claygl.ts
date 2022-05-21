@@ -15,6 +15,7 @@ export { default as Skeleton } from './Skeleton';
 export { default as Joint } from './Joint';
 export { default as FrameBuffer } from './FrameBuffer';
 export { default as Scene } from './Scene';
+export { default as Camera } from './Camera';
 
 export { default as GLRenderer } from './gl/GLRenderer';
 
@@ -22,6 +23,7 @@ export { default as StandardMaterial } from './StandardMaterial';
 
 export { Timeline };
 
+export { default as Texture } from './Texture';
 export { default as Texture2D } from './Texture2D';
 export { default as TextureCube } from './TextureCube';
 

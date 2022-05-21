@@ -16,7 +16,8 @@ export interface CompositeNodeInput {
    */
   output?: string;
 }
-export interface CompositeNodeOutput {
+export interface CompositeNodeOutput
+  extends Partial<Omit<TexturePoolParameters, 'width' | 'height'>> {
   /**
    * Attachment.
    */
@@ -35,7 +36,11 @@ export interface CompositeNodeOutput {
    * default to be 1
    */
   scale?: number;
-  params?: Partial<Omit<TexturePoolParameters, 'width' | 'height'>>;
+  /**
+   * If this output is disabled.
+   */
+  disabled?: boolean;
+
   keepLastFrame?: boolean;
   outputLastFrame?: boolean;
 }

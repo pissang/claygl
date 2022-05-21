@@ -1,6 +1,5 @@
 import { FilterCompositeNode, GroupCompositeNode } from 'claygl';
 import { gaussianBlurCompositeFragment } from 'claygl/shaders';
-import { assign } from '../../src/core/util';
 
 interface GaussianBlurCompositeNodeOpts {
   downscale?: number;
@@ -14,7 +13,7 @@ class GaussianBlurCompositeNode extends GroupCompositeNode<'texture', 'color'> {
   constructor(opts?: GaussianBlurCompositeNodeOpts) {
     super();
 
-    opts = assign(
+    opts = Object.assign(
       {},
       {
         downscale: 1,

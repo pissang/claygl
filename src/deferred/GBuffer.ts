@@ -166,29 +166,21 @@ class DeferredGBuffer {
   // - G: normal.y
   // - B: normal.z
   // - A: glossiness
-  private _gBufferTex1 = new Texture2D(
-    assign(
-      {
-        // PENDING
-        type: constants.HALF_FLOAT_OES
-      },
-      commonTextureOpts
-    )
-  );
+  private _gBufferTex1 = new Texture2D({
+    // PENDING
+    type: constants.HALF_FLOAT_OES,
+    ...commonTextureOpts
+  });
 
   // - R: depth
-  private _gBufferTex2 = new Texture2D(
-    assign(
-      {
-        // format: constants.DEPTH_COMPONENT,
-        // type: constants.UNSIGNED_INT
+  private _gBufferTex2 = new Texture2D({
+    // format: constants.DEPTH_COMPONENT,
+    // type: constants.UNSIGNED_INT
 
-        format: constants.DEPTH_STENCIL,
-        type: constants.UNSIGNED_INT_24_8_WEBGL
-      },
-      commonTextureOpts
-    )
-  );
+    format: constants.DEPTH_STENCIL,
+    type: constants.UNSIGNED_INT_24_8_WEBGL,
+    ...commonTextureOpts
+  });
 
   // - R: albedo.r
   // - G: albedo.g
@@ -196,15 +188,11 @@ class DeferredGBuffer {
   // - A: metalness
   private _gBufferTex3 = new Texture2D(commonTextureOpts);
 
-  private _gBufferTex4 = new Texture2D(
-    assign(
-      {
-        // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
-        type: constants.HALF_FLOAT_OES
-      },
-      commonTextureOpts
-    )
-  );
+  private _gBufferTex4 = new Texture2D({
+    // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
+    type: constants.HALF_FLOAT_OES,
+    ...commonTextureOpts
+  });
 
   private _defaultNormalMap = new Texture2D({
     image: createFillCanvas('#000')

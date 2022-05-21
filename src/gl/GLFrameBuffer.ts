@@ -61,7 +61,6 @@ class GLFrameBuffer {
 
     let width: number | undefined;
     let height: number | undefined;
-
     const bufs: GLEnum[] = [];
     // MRT Support in chrome
     // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html

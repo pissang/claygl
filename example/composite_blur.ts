@@ -13,7 +13,7 @@ import {
   DirectionalLight,
   startTimeline
 } from 'claygl';
-import GaussianBlurCompositeNode from './common/GaussianBlurCompositeNode';
+import GaussianBlurCompositeNode from './common/HDComposite/GaussianBlurNode';
 
 const compositor = new Compositor();
 

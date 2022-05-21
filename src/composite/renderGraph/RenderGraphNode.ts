@@ -63,22 +63,28 @@ class RenderGraphNode {
     renderer: Renderer
     // derivedParams: TexturePoolParameters
   ) {
-    const cachedTextureParams = this._textureParams;
-    if (!cachedTextureParams[outputName]) {
+    const textureParams = this._textureParams;
+    if (!textureParams[outputName]) {
       const derivedParams = this._deriveTextureParams(renderer);
       const outputInfo = this._compositeNode.outputs![outputName];
       const width = isFunction(outputInfo.width) ? outputInfo.width(renderer) : outputInfo.width;
       const height = isFunction(outputInfo.height)
         ? outputInfo.height(renderer)
         : outputInfo.height;
-      const params = assign({} as TexturePoolParameters, derivedParams, outputInfo.params);
+      // TODO Omit other params??
+      const params = assign({} as TexturePoolParameters, derivedParams, outputInfo);
       const scale = optional(outputInfo.scale, 1);
       width != null && (params.width = width * scale);
       height != null && (params.height = height * scale);
-      cachedTextureParams[outputName] = params;
+      // Use width/height from renderer by default
+      params.width = params.width || renderer.getWidth();
+      params.height = params.height || renderer.getHeight();
+
+      textureParams[outputName] = params;
     }
-    return cachedTextureParams[outputName];
+    return textureParams[outputName];
   }
+
   /**
    * Find the most large input texture to inherit.
    */
@@ -126,6 +132,11 @@ class RenderGraphNode {
       }
       return this._prevOutputTextures[outputPin];
     }
+
+    // Update for all outputs. this.outputs only inlcude that is linked.
+    keys(this._compositeNode.outputs).forEach((outputName) => {
+      this.getTextureParams(outputName, renderer);
+    });
 
     this.render(renderer);
 
@@ -230,7 +241,7 @@ class RenderGraphNode {
     }
   }
 
-  updateLinkFrom(inputPinName: string, fromNode: RenderGraphNode, fromPinName: string) {
+  addLinkFrom(inputPinName: string, fromNode: RenderGraphNode, fromPinName: string) {
     // The relationship from output pin to input pin is one-on-multiple
     this._inputs[inputPinName] = {
       node: fromNode,
@@ -248,7 +259,11 @@ class RenderGraphNode {
 
   beforeUpdate() {
     this._inputs = {};
-    this._outputs = {};
+    // All parameters of outputs need to be updated
+    this._outputs = keys(this._compositeNode.outputs).reduce((obj, key) => {
+      obj[key] = [];
+      return obj;
+    }, {} as RenderGraphNode['_outputs']);
     this._textureParams = {};
   }
 

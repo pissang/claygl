@@ -96,9 +96,11 @@ class Compositor {
       let inputPin = input.output;
       if (!inputPin && outputs) {
         // Use first pin defaultly
-        inputPin = keys(outputs)[0];
+        inputPin = keys(outputs).find(
+          (outputName) => outputs[outputName] && !outputs[outputName].disabled
+        );
       }
-      if (!inputPin) {
+      if (!inputPin || (outputs && outputs[inputPin] && outputs[inputPin].disabled)) {
         return;
       }
 
@@ -154,7 +156,7 @@ class Compositor {
           }
           renderGraphNodeMap
             .get(node)!
-            .updateLinkFrom(inputName, renderGraphNodeMap.get(fromPin.node)!, fromPin.pin);
+            .addLinkFrom(inputName, renderGraphNodeMap.get(fromPin.node)!, fromPin.pin);
         });
       }
     }
@@ -171,7 +173,7 @@ class Compositor {
         if (inputInnerLink) {
           renderGraphNodeMap
             .get(inputInnerLink.node)!
-            .updateLinkFrom(groupInputName, renderGraphNodeMap.get(fromPin.node)!, fromPin.pin);
+            .addLinkFrom(groupInputName, renderGraphNodeMap.get(fromPin.node)!, fromPin.pin);
           // TODO Error info when can't find inner link
         }
       });

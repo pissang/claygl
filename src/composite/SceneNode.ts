@@ -5,7 +5,10 @@ import type Camera from '../Camera';
 import type Renderer from '../Renderer';
 import Texture from '../Texture';
 
-export class CompositeSceneNode extends CompositeNode {
+export class CompositeSceneNode<OutputKey extends string = string> extends CompositeNode<
+  never,
+  OutputKey
+> {
   name = 'scene';
   scene: Scene;
   camera: Camera;

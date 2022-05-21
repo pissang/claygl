@@ -312,7 +312,7 @@ class GLTexture {
   generateMipmap(gl: WebGLRenderingContext) {
     const texture = this._texture;
     const bindTarget = this._getBindTarget();
-    if (texture.useMipmap && texture.isPowerOfTwo()) {
+    if (texture.useMipmap && texture.isPowerOfTwo() && texture.format === constants.RGBA) {
       gl.bindTexture(bindTarget, this.getWebGLTexture(gl));
       gl.generateMipmap(bindTarget);
       gl.bindTexture(bindTarget, null);
