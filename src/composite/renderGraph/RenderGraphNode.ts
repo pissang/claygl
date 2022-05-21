@@ -265,12 +265,15 @@ class RenderGraphNode {
   }
 
   beforeUpdate() {
+    const rawOutputs = this._compositeNode.outputs!;
     this._inputs = {};
     // All parameters of outputs need to be updated
-    this._outputs = keys(this._compositeNode.outputs).reduce((obj, key) => {
-      obj[key] = [];
-      return obj;
-    }, {} as RenderGraphNode['_outputs']);
+    this._outputs = keys(rawOutputs)
+      .filter((key) => rawOutputs![key] && !rawOutputs![key].disabled)
+      .reduce((obj, key) => {
+        obj[key] = [];
+        return obj;
+      }, {} as RenderGraphNode['_outputs']);
     this._textureParams = {};
   }
 
