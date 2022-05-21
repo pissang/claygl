@@ -19,16 +19,21 @@ export type TexturePoolParameters = Pick<
   | 'anisotropic'
 >;
 
+const MAX_ALLOCATE_TEXTURE = 1e3;
+
 class TexturePool {
   private _pool: Record<string, Texture2D[]> = {};
-  private _allocatedTextures: Texture2D[] = [];
+  private _allocated: Texture2D[] = [];
 
   get(parameters: Partial<TexturePoolParameters>): Texture2D {
+    if (this._allocated.length > MAX_ALLOCATE_TEXTURE) {
+      throw 'Allocated moo much textures.';
+    }
     const key = generateKey(parameters);
     const list = (this._pool[key] = this._pool[key] || []);
     if (!list.length) {
       const texture = new Texture2D(parameters);
-      this._allocatedTextures.push(texture);
+      this._allocated.push(texture);
       return texture;
     }
     return list.pop() as Texture2D;
@@ -44,9 +49,9 @@ class TexturePool {
   }
 
   clear(renderer: Renderer) {
-    this._allocatedTextures.forEach(renderer.dispose.bind(renderer));
+    this._allocated.forEach(renderer.dispose.bind(renderer));
     this._pool = {};
-    this._allocatedTextures = [];
+    this._allocated = [];
   }
 }
 const defaultParams: Partial<TexturePoolParameters> = {

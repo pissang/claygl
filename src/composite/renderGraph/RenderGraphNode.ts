@@ -207,6 +207,13 @@ class RenderGraphNode {
       link.node.releaseReference(link.pin);
     });
 
+    // Release textures that are not taken
+    outputNames.forEach((outputName) => {
+      if (!this._outputReferences[outputName]) {
+        renderGraph!.releaseTexture(outputTextures![outputName] as Texture2D);
+      }
+    });
+
     this._rendering = false;
     this._rendered = true;
   }
