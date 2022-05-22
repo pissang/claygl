@@ -39,6 +39,8 @@ function createSkyboxShader() {
 class Skybox extends Mesh<Material<ReturnType<typeof createSkyboxShader>>> {
   culling = false;
 
+  private _envMap?: Texture2D | TextureCube;
+
   constructor(opts?: Partial<SkyboxOpts>) {
     super(
       new CubeGeometry(),
@@ -69,13 +71,18 @@ class Skybox extends Mesh<Material<ReturnType<typeof createSkyboxShader>>> {
       material.undefine('EQUIRECTANGULAR');
       material.uniforms.cubeMap.value = envMap;
     }
+    this._envMap = envMap;
   }
   /**
    * Get environment map
    * @return {clay.TextureCube}
    */
   getEnvironmentMap() {
-    return this.material.get('environmentMap');
+    return this._envMap;
+  }
+
+  setLOD(lod: number) {
+    this.material.set('lod', lod);
   }
 
   update() {
