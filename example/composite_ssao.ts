@@ -11,8 +11,6 @@ import {
   FilterCompositeNode,
   SceneCompositeNode,
   AmbientSHLight,
-  Texture2D,
-  constants,
   textureUtil,
   AmbientCubemapLight,
   Skybox
@@ -122,11 +120,7 @@ tonemappingNode.inputs = {
   texture: blendNode
 };
 
-compositor.addNode(gbufferNode);
-compositor.addNode(ssaoNode);
-compositor.addNode(blendNode);
-compositor.addNode(sceneNode);
-compositor.addNode(tonemappingNode);
+compositor.addNode(gbufferNode, ssaoNode, blendNode, sceneNode, tonemappingNode);
 
 ssaoNode.setKernelSize(64);
 

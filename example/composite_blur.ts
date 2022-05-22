@@ -54,13 +54,12 @@ sceneCompositeNode.outputs = {
     height: renderer.getHeight()
   }
 };
-compositor.addNode(sceneCompositeNode);
 
 const blurNode = new GaussianBlurCompositeNode();
 blurNode.inputs = {
   texture: sceneCompositeNode
 };
-compositor.addNode(blurNode);
+compositor.addNode(sceneCompositeNode, blurNode);
 
 startTimeline(() => {
   mesh.rotation.rotateY(Math.PI / 500);

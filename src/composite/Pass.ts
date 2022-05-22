@@ -9,13 +9,14 @@ import { isArray, optional } from '../core/util';
 import Renderer, { RenderHooks } from '../Renderer';
 import type FrameBuffer from '../FrameBuffer';
 import Notifier from '../core/Notifier';
+import { Color } from '../core/type';
 
 const planeGeo = new Plane();
 let mesh: Mesh;
 const camera = new OrthoCamera();
 
 interface FullscreenQuadPassOpts {
-  clearColor?: boolean;
+  clearColor?: Color;
   clearDepth?: boolean;
   blendWithPrevious?: boolean;
 }
@@ -23,7 +24,7 @@ interface FullscreenQuadPassOpts {
 class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Notifier {
   material: Material<Shader<typeof fullscreenQuadPassVertex, T>>;
 
-  clearColor?: boolean;
+  clearColor?: Color;
   clearDepth?: boolean;
   blendWithPrevious?: boolean;
 

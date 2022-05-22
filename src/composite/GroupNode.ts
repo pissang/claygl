@@ -37,7 +37,7 @@ type InputLinksMap<Key extends string> = Record<
   {
     node: CompositeNode;
     input: string;
-  }
+  }[]
 >;
 type OutputLinksMap<Key extends string> = Record<
   Key,
@@ -68,11 +68,13 @@ class GroupCompositeNode<InputKey extends string, OutputKey extends string> exte
   /**
    * Add a child node
    */
-  addNode<T extends CompositeNode>(node: T) {
+  addNode(...newNodes: CompositeNode[]) {
     const nodes = this._nodes;
-    if (nodes.indexOf(node) < 0) {
-      nodes.push(node);
-    }
+    newNodes.forEach((newNode) => {
+      if (nodes.indexOf(newNode) < 0) {
+        nodes.push(newNode);
+      }
+    });
   }
 
   /**
@@ -107,10 +109,12 @@ class GroupCompositeNode<InputKey extends string, OutputKey extends string> exte
       keys(node.inputs).forEach((inputName) => {
         const groupInput = node.inputs![inputName];
         if (groupInput instanceof GroupInput) {
-          inputLinks[groupInput.output as InputKey] = {
+          inputLinks[groupInput.output as InputKey] =
+            inputLinks[groupInput.output as InputKey] || [];
+          inputLinks[groupInput.output as InputKey].push({
             node: node,
             input: inputName
-          };
+          });
         }
       });
       keys(node.outputs).forEach((outputName) => {

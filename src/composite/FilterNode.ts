@@ -41,8 +41,8 @@ import { FragmentShaderLoose, PickFragmentTextureUniforms } from '../Shader';
  */
 
 class CompositeFilterNode<
-  O extends string = string,
   T extends FragmentShaderLoose = FragmentShaderLoose,
+  O extends string = string,
   S = PickFragmentTextureUniforms<T['uniforms']>
 > extends CompositeNode<keyof S, O> {
   pass: FullscreenQuadPass<T>;

@@ -271,7 +271,7 @@ class RenderGraphNode {
     this._outputs = keys(rawOutputs)
       .filter((key) => {
         const rawOutput = this._getOutputInfo(key);
-        return rawOutput[key] && !rawOutput[key].disabled;
+        return rawOutput && !rawOutput.disabled;
       })
       .reduce((obj, key) => {
         obj[key] = [];

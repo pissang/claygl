@@ -13,6 +13,8 @@ import {
 type GBufferOutput = 'texture1' | 'texture2' | 'texture3' | 'texture4';
 
 class GBufferNode extends CompositeNode<never, GBufferOutput> {
+  name = 'GBuffer';
+
   private _scene: Scene;
   private _camera: Camera;
   private _gbuffer = new DeferredGBuffer();

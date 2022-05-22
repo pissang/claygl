@@ -58,10 +58,10 @@ interface SSAOCompositeNodeOpts {
 }
 
 class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'color'> {
-  private _estimateNode = new FilterCompositeNode<'color', typeof SSAOEstimateFragment>(
+  private _estimateNode = new FilterCompositeNode<typeof SSAOEstimateFragment, 'color'>(
     SSAOEstimateFragment
   );
-  private _blurNode = new FilterCompositeNode<'color', typeof SSAOBlurFragment>(SSAOBlurFragment);
+  private _blurNode = new FilterCompositeNode<typeof SSAOBlurFragment, 'color'>(SSAOBlurFragment);
 
   private _camera: PerspectiveCamera;
 
@@ -86,8 +86,7 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
       color: this.getGroupOutput('color')
     };
 
-    this.addNode(this._estimateNode);
-    this.addNode(this._blurNode);
+    this.addNode(this._estimateNode, this._blurNode);
 
     opts = Object.assign(
       {},

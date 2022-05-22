@@ -7,10 +7,10 @@ interface GaussianBlurCompositeNodeOpts {
 }
 
 class GaussianBlurCompositeNode extends GroupCompositeNode<'texture', 'color'> {
-  private _blurH = new FilterCompositeNode<'color', typeof gaussianBlurCompositeFragment>(
+  private _blurH = new FilterCompositeNode<typeof gaussianBlurCompositeFragment, 'color'>(
     gaussianBlurCompositeFragment
   );
-  private _blurV = new FilterCompositeNode<'color', typeof gaussianBlurCompositeFragment>(
+  private _blurV = new FilterCompositeNode<typeof gaussianBlurCompositeFragment, 'color'>(
     gaussianBlurCompositeFragment
   );
 

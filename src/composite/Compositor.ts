@@ -28,17 +28,20 @@ class Compositor {
   /**
    * Add a new node
    */
-  addNode(node: CompositeNode) {
+  addNode(...newNodes: CompositeNode[]) {
     const nodes = this._nodes;
-    const renderGraph = this._renderGraph;
-    if (nodes.indexOf(node) < 0) {
-      nodes.push(node);
-      if (node instanceof GroupCompositeNode) {
-        node.eachNode((node) => createRenderGraphNode(renderGraph, node));
-      } else {
-        createRenderGraphNode(renderGraph, node);
+
+    newNodes.forEach((newNode) => {
+      const renderGraph = this._renderGraph;
+      if (nodes.indexOf(newNode) < 0) {
+        nodes.push(newNode);
+        if (newNode instanceof GroupCompositeNode) {
+          newNode.eachNode((newNode) => createRenderGraphNode(renderGraph, newNode));
+        } else {
+          createRenderGraphNode(renderGraph, newNode);
+        }
       }
-    }
+    });
   }
 
   /**
@@ -170,12 +173,18 @@ class Compositor {
           logMissingLink(groupInputInfo);
           return;
         }
-        const inputInnerLink = groupNode.getInputInnerLink(groupInputName);
-        if (inputInnerLink) {
-          renderGraphNodeMap
-            .get(inputInnerLink.node)!
-            .addLinkFrom(groupInputName, renderGraphNodeMap.get(fromPin.node)!, fromPin.pin);
-          // TODO Error info when can't find inner link
+        const inputInnerLinks = groupNode.getInputInnerLink(groupInputName);
+        if (inputInnerLinks) {
+          inputInnerLinks.forEach((inputInnerLink) => {
+            renderGraphNodeMap
+              .get(inputInnerLink.node)!
+              .addLinkFrom(
+                inputInnerLink.input,
+                renderGraphNodeMap.get(fromPin.node)!,
+                fromPin.pin
+              );
+            // TODO Error info when can't find inner link
+          });
         }
       });
     }
