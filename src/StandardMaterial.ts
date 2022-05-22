@@ -170,7 +170,7 @@ const defaultStandardMaterialOpts = {
  * });
  * mat.roughness = 1;
  */
-class StandardMaterial extends Material {
+class StandardMaterial extends Material<typeof standardShader> {
   constructor(opts?: Partial<StandardMaterialOpts>) {
     if (!standardShader) {
       standardShader = createStandardShader();

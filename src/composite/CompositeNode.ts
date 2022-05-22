@@ -54,7 +54,9 @@ abstract class CompositeNode<InputKey extends string = string, OutputKey extends
   /**
    * Input of node. Key is the uniform name
    */
-  inputs?: Record<InputKey, CompositeNode | CompositeNodeInput>;
+  // PENDING some filter node may only require some of texture enabled. So we use partial here.
+  // But how should we define some input is required?
+  inputs?: Partial<Record<InputKey, CompositeNode | CompositeNodeInput>>;
   /**
    * Output of node. Usually only one output. Key is the output name.
    */
