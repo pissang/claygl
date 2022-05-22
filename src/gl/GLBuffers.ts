@@ -3,7 +3,7 @@ import { AttributeSemantic } from '../Shader';
 import GLProgram from './GLProgram';
 import * as constants from '../core/constants';
 
-const enabledAttributesMap = new WeakMap<WebGLRenderingContext, number>();
+const enabledAttributesMap = new WeakMap<WebGLRenderingContext, number[]>();
 
 export const attributeBufferTypeMap = {
   float: constants.FLOAT,
@@ -151,7 +151,8 @@ class GLBuffers {
     //   vaoExt.bindVertexArrayOES(vao.vao);
     // }
 
-    const enabledAttrCount = enabledAttributesMap.get(gl) || 0;
+    const lastEnabledAttributes = enabledAttributesMap.get(gl) || [];
+    const currentEnabledAttributes: number[] = [];
     let maxLocation = 0;
     // Always bind attribute location
     for (let i = 0; i < attributeBuffersLen; i++) {
@@ -168,7 +169,8 @@ class GLBuffers {
 
       gl.bindBuffer(constants.ARRAY_BUFFER, buffer);
       gl.vertexAttribPointer(location, size, glType, false, 0, 0);
-      if (location >= enabledAttrCount) {
+      currentEnabledAttributes[location] = 1;
+      if (!lastEnabledAttributes[location]) {
         gl.enableVertexAttribArray(location);
       }
       if (location > maxLocation) {
@@ -177,11 +179,13 @@ class GLBuffers {
     }
 
     // Disable unused attribute
-    for (let i = maxLocation + 1; i < enabledAttrCount; i++) {
-      gl.disableVertexAttribArray(i);
+    for (let loc = 0; loc < lastEnabledAttributes.length; loc++) {
+      if (lastEnabledAttributes[loc] && !currentEnabledAttributes[loc]) {
+        gl.disableVertexAttribArray(loc);
+      }
     }
 
-    enabledAttributesMap.set(gl, maxLocation + 1);
+    enabledAttributesMap.set(gl, currentEnabledAttributes);
 
     // Binding buffers
     // if (needsBindBuffer) {

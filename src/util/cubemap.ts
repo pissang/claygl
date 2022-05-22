@@ -210,9 +210,9 @@ export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D)
     magFilter: constants.NEAREST,
     useMipmap: false
   });
+  framebuffer.attach(texture);
   quadPass.material.set('normalDistribution', normalDistribution);
   quadPass.material.set('viewportSize', [512, 256]);
-  quadPass.attachOutput(texture);
   quadPass.render(renderer, framebuffer);
 
   // FIXME Only chrome and firefox can readPixels with float type.

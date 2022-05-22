@@ -3,6 +3,7 @@ import { floatEncoderMixin } from 'claygl/shaders';
 const { uniform, arrayUniform } = Shader;
 
 export const SSAOEstimateFragment = new FragmentShader({
+  name: 'SSAOEstimateFrag',
   uniforms: {
     gBufferTex: uniform('sampler2D'),
     depthTex: uniform('sampler2D'),
@@ -51,9 +52,9 @@ void main()
   vec4 tex = texture2D(gBufferTex, v_Texcoord);
 
   // Is empty
-  if (dot(tex.rgb, vec3(1.0)) == 0.0) {
-    discard;
-  }
+  // if (dot(tex.rgb, vec3(1.0)) == 0.0) {
+  //   discard;
+  // }
 
   vec3 N = tex.rgb * 2.0 - 1.0;
 
@@ -87,6 +88,7 @@ void main()
 }`
 });
 export const SSAOBlurFragment = new FragmentShader({
+  name: 'SSAOBlurFrag',
   uniforms: {
     texture: uniform('sampler2D'),
     textureSize: uniform('vec2')
@@ -114,6 +116,6 @@ void main () {
     }
   }
 
-  gl_FragColor = vec4(color.rgb / weightAll, 1.0);
+  gl_FragColor = color / weightAll;
 }`
 });
