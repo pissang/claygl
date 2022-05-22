@@ -1,11 +1,11 @@
 import { COLOR_ATTACHMENT0 } from '../../core/constants';
-import { GLEnum } from '../../core/type';
 import { assign, isFunction, keys, optional } from '../../core/util';
 import type FrameBuffer from '../../FrameBuffer';
 import type Renderer from '../../Renderer';
 import type Texture from '../../Texture';
-import Texture2D, { Texture2DOpts } from '../../Texture2D';
-import CompositeNode, { CompositeNodeOutput } from '../CompositeNode';
+import Texture2D from '../../Texture2D';
+import CompositeNode from '../CompositeNode';
+import { GroupOutput } from '../GroupNode';
 import { TexturePoolParameters } from '../TexturePool';
 import type RenderGraph from './RenderGraph';
 
@@ -269,7 +269,10 @@ class RenderGraphNode {
     this._inputs = {};
     // All parameters of outputs need to be updated
     this._outputs = keys(rawOutputs)
-      .filter((key) => rawOutputs![key] && !rawOutputs![key].disabled)
+      .filter((key) => {
+        const rawOutput = this._getOutputInfo(key);
+        return rawOutput[key] && !rawOutput[key].disabled;
+      })
       .reduce((obj, key) => {
         obj[key] = [];
         return obj;
@@ -312,6 +315,15 @@ class RenderGraphNode {
         }
       }
     }
+  }
+
+  // TODO Should avoid accessing the composite node too much
+  private _getOutputInfo(outputName: string) {
+    const output = this._compositeNode.outputs![outputName];
+    if ((output as GroupOutput).groupOutput) {
+      return (output as GroupOutput).groupOutput;
+    }
+    return output;
   }
 }
 

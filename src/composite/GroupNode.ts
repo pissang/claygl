@@ -2,11 +2,54 @@ import { keys } from '../core/util';
 import type FrameBuffer from '../FrameBuffer';
 import type Renderer from '../Renderer';
 import type Texture from '../Texture';
-import CompositeNode from './CompositeNode';
+import CompositeNode, { CompositeNodeInput, CompositeNodeOutput } from './CompositeNode';
 
-class GroupCompositeNode<InputKey extends string, OutputKeys extends string> extends CompositeNode<
+export class GroupInput implements CompositeNodeInput {
+  output: string;
+  /**
+   * Group node is self. Must have here to compatitable with CompositeNode#inputs
+   */
+  node: GroupCompositeNode<string, string>;
+  constructor(node: GroupCompositeNode<string, string>, output: string) {
+    this.output = output;
+    this.node = node;
+  }
+}
+
+// It will only be used as a handle to verify it's connected to the group output.
+// The parameters will be not used.
+export interface GroupOutput extends CompositeNodeOutput {}
+export class GroupOutput {
+  name: string;
+  /**
+   * The alactul output info of group
+   * Will be updated in the prepare
+   */
+  // TODO should be optimized
+  groupOutput?: CompositeNodeOutput;
+  constructor(name: string) {
+    this.name = name;
+  }
+}
+
+type InputLinksMap<Key extends string> = Record<
+  Key,
+  {
+    node: CompositeNode;
+    input: string;
+  }
+>;
+type OutputLinksMap<Key extends string> = Record<
+  Key,
+  {
+    node: CompositeNode;
+    output: string;
+  }
+>;
+
+class GroupCompositeNode<InputKey extends string, OutputKey extends string> extends CompositeNode<
   InputKey,
-  OutputKeys
+  OutputKey
 > {
   private _nodes: CompositeNode[] = [];
 
@@ -14,61 +57,21 @@ class GroupCompositeNode<InputKey extends string, OutputKeys extends string> ext
    * Input links to internal node inputs
    * Key is group input name.
    */
-  private _inputLinks = {} as Record<
-    InputKey,
-    {
-      node: CompositeNode;
-      input: string;
-    }
-  >;
+  private _inputLinks = {} as InputLinksMap<InputKey>;
 
   /**
    * Input links to internal node output
    * Key is group output name.
    */
-  private _outputLinks = {} as Record<
-    OutputKeys,
-    {
-      node: CompositeNode;
-      output: string;
-    }
-  >;
+  private _outputLinks = {} as OutputLinksMap<OutputKey>;
 
   /**
    * Add a child node
    */
-  addNode<T extends CompositeNode>(
-    node: T,
-    /**
-     * Links map to group input. Key is node input name. Value is group input name.
-     */
-    linksToInput?: Record<keyof T['inputs'], InputKey>,
-    /**
-     * Links map to group output. Key is node output name. Value is group output name.
-     */
-    linksToOutput?: Record<keyof T['outputs'], OutputKeys>
-  ) {
+  addNode<T extends CompositeNode>(node: T) {
     const nodes = this._nodes;
     if (nodes.indexOf(node) < 0) {
       nodes.push(node);
-
-      if (linksToInput) {
-        keys(linksToInput).forEach((nodeInputName) => {
-          this._inputLinks[linksToInput[nodeInputName as keyof T['inputs']]] = {
-            node,
-            input: nodeInputName
-          };
-        });
-      }
-
-      if (linksToOutput) {
-        keys(linksToOutput).forEach((nodeOutputName) => {
-          this._outputLinks[linksToOutput[nodeOutputName as keyof T['outputs']]] = {
-            node,
-            output: nodeOutputName
-          };
-        });
-      }
     }
   }
 
@@ -78,21 +81,8 @@ class GroupCompositeNode<InputKey extends string, OutputKeys extends string> ext
   removeNode(node: CompositeNode) {
     const nodes = this._nodes;
     const idx = nodes.indexOf(node);
-    const inputLinks = this._inputLinks;
-    const outputLinks = this._outputLinks;
     if (idx >= 0) {
       nodes.splice(idx, 1);
-
-      keys(inputLinks).forEach((groupInputName) => {
-        if (inputLinks[groupInputName as InputKey].node === node) {
-          delete inputLinks[groupInputName as InputKey];
-        }
-      });
-      keys(outputLinks).forEach((groupOutputName) => {
-        if (outputLinks[groupOutputName as OutputKeys].node === node) {
-          delete outputLinks[groupOutputName as OutputKeys];
-        }
-      });
     }
   }
 
@@ -107,22 +97,56 @@ class GroupCompositeNode<InputKey extends string, OutputKeys extends string> ext
     return this._nodes.find((node) => node.name === name);
   }
 
+  // TODO it's easy to forget call super.prepare when it's overridden
   prepare(renderer: Renderer): void {
-    this._nodes.forEach((node) => node.prepare(renderer));
+    const inputLinks = (this._inputLinks = {} as InputLinksMap<InputKey>);
+    const outputLinks = (this._outputLinks = {} as OutputLinksMap<OutputKey>);
+    this._nodes.forEach((node) => {
+      node.prepare(renderer);
 
-    const outputLinks = this._outputLinks;
-    // Update renderToScreen in output nodes.
-    keys(outputLinks).forEach(
-      (groupOutputName) =>
-        (outputLinks[groupOutputName as OutputKeys].node.renderToScreen = this.renderToScreen)
-    );
+      keys(node.inputs).forEach((inputName) => {
+        const groupInput = node.inputs![inputName];
+        if (groupInput instanceof GroupInput) {
+          inputLinks[groupInput.output as InputKey] = {
+            node: node,
+            input: inputName
+          };
+        }
+      });
+      keys(node.outputs).forEach((outputName) => {
+        const groupOutput = node.outputs![outputName];
+        if (groupOutput instanceof GroupOutput) {
+          outputLinks[groupOutput.name as OutputKey] = {
+            node: node,
+            output: outputName
+          };
+          groupOutput.groupOutput = this.outputs && this.outputs[groupOutput.name as OutputKey];
+          // Update renderToScreen in output nodes.
+          node.renderToScreen = this.renderToScreen;
+        }
+      });
+    });
+
     // TODO what if group node set outputs to empty?
+  }
+
+  /**
+   * Get a handle of group input. Group will know how to link to the inside nodes to outside.
+   */
+  getGroupInput(inputName: InputKey): GroupInput {
+    return new GroupInput(this, inputName);
+  }
+  /**
+   * Get a handle of group output. Group will know how to link to the inside nodes to outside.
+   */
+  getGroupOutput(outputName: OutputKey): GroupOutput {
+    return new GroupOutput(outputName);
   }
 
   getInputInnerLink(groupInputName: InputKey) {
     return this._inputLinks[groupInputName];
   }
-  getOutputInnerLink(groupInputName: OutputKeys) {
+  getOutputInnerLink(groupInputName: OutputKey) {
     return this._outputLinks[groupInputName];
   }
 

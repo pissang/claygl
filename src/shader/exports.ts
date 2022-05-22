@@ -16,7 +16,11 @@ export {
 
 // Composite shaders.
 export { blendCompositeFragment } from './source/compositor/blend.glsl';
-export { gaussianBlurCompositeFragment } from './source/compositor/blur.glsl';
+export {
+  gaussianBlurCompositeFragment,
+  gaussianKernel9,
+  gaussianKernel13
+} from './source/compositor/blur.glsl';
 export { brightCompositeFragment } from './source/compositor/bright.glsl';
 export { colorAdjustCompositeFragment } from './source/compositor/coloradjust.glsl';
 export { composeCompositeFragment } from './source/compositor/compose.glsl';

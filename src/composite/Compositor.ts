@@ -2,7 +2,7 @@ import { keys } from '../core/util';
 import FrameBuffer from '../FrameBuffer';
 import Renderer from '../Renderer';
 import CompositeNode, { CompositeNodeInput } from './CompositeNode';
-import GroupCompositeNode from './GroupNode';
+import GroupCompositeNode, { GroupInput } from './GroupNode';
 import RenderGraph from './renderGraph/RenderGraph';
 import RenderGraphNode from './renderGraph/RenderGraphNode';
 
@@ -127,7 +127,8 @@ class Compositor {
     ) {
       keys(node.inputs || {}).forEach((inputName) => {
         let inputInfo = node.inputs![inputName];
-        if (!inputInfo) {
+        // Just ignore groGroupInput
+        if (!inputInfo || inputInfo instanceof GroupInput) {
           return;
         }
         if (!node.validateInput(inputName)) {
