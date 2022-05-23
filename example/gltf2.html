@@ -17,9 +17,7 @@
         var timeline = new clay.Timeline();
         timeline.start();
 
-        var shadowMapPass = new clay.prePass.ShadowMap({
-          softShadow: clay.prePass.ShadowMap.VSM
-        });
+        var shadowMapPass = new clay.prePass.ShadowMap();
 
         var cubemap = new clay.TextureCube({
           type: clay.Texture.HALF_FLOAT,

@@ -2,6 +2,7 @@ import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader'
 import { HDREncoderMixin } from '../util.glsl';
 
 export const blendCompositeFragment = new FragmentShader({
+  name: 'blendFrag',
   defines: {
     /**
      * 0 ADD
@@ -9,7 +10,6 @@ export const blendCompositeFragment = new FragmentShader({
      */
     BLEND_METHOD: 0
   },
-  name: 'blendFrag',
   uniforms: {
     texture1: uniform('sampler2D'),
     weight1: uniform('float', 1.0),

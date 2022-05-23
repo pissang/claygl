@@ -79,9 +79,15 @@ class CompositeFilterNode<
     // Disable textures all and enable when necessary
     pass.material?.disableTexturesAll();
     keys(inputTextures).forEach((inputName) => {
+      const texture = inputTextures[inputName as keyof S];
       // Enabled the pin texture in shader
       material.enableTexture(inputName as any);
-      material.set(inputName, inputTextures[inputName as keyof S]);
+      material.set(inputName, texture);
+
+      const textureSizeName = inputName + 'Size';
+      // Try setting size automatically
+      material.uniforms[textureSizeName] &&
+        (material.uniforms[textureSizeName].value = [texture.width, texture.height]);
     });
 
     // Output

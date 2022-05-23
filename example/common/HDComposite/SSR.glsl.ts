@@ -294,7 +294,8 @@ export const SSRBlurFragment = new FragmentShader({
   uniforms: {
     colorTex: uniform('sampler2D'),
     gBufferTexture1: uniform('sampler2D'),
-    textureSize: uniform('vec2'),
+    // colorTexSize will be updated by the compositor automatically.
+    colorTexSize: uniform('vec2'),
     blurSize: uniform('float', 1),
     /**
      * 0.0 is horizontal, 1.0 is vertical
@@ -311,7 +312,7 @@ void main() {
   vec4 centerNormalTexel = texture2D(gBufferTexture1, v_Texcoord);
   float g = centerNormalTexel.a;
   // Add 0.1000 bias to filling holes from missed rays.
-  vec2 off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.1000) / textureSize;
+  vec2 off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.1000) / colorTexSize;
   off *= vec2(1.0 - blurDir, blurDir);
 
   vec2 coord = v_Texcoord;

@@ -120,11 +120,6 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
       projectionInv: camera.invProjectionMatrix.array,
       viewInverseTranspose: viewInverseTranspose.array
     });
-
-    // TODO Can only access texture size in beforeRender
-    this._blurNode.beforeRender = (renderer, inputTextures) => {
-      blurMaterial.set('textureSize', [inputTextures.texture.width, inputTextures.texture.height]);
-    };
   }
 
   setEstimateRadius(radius: number) {

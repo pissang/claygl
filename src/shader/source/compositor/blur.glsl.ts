@@ -40,7 +40,9 @@ export const gaussianBlurCompositeFragment = new FragmentShader({
     texture: uniform('sampler2D'),
 
     blurSize: uniform('float', 2.0),
-    textureSize: uniform('vec2', [512.0, 512.0]),
+
+    // texture size  will be updated by the compositor automatically.
+    textureSize: uniform('vec2'),
     /**
      * 0.0 is horizontal, 1.0 is vertical
      */

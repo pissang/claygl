@@ -115,15 +115,6 @@ class SSRCompositeNode extends GroupCompositeNode<
     ssrNode.material.set('projectionInv', camera.invProjectionMatrix.array);
     ssrNode.material.set('viewInverseTranspose', viewInverseTranspose.array);
     ssrNode.material.set('nearZ', camera.near);
-
-    [blurHNode, blurVNode].forEach((node) => {
-      node.beforeRender = (renderer, inputTextures) => {
-        blurHNode.material.set('textureSize', [
-          inputTextures.colorTex.width,
-          inputTextures.colorTex.height
-        ]);
-      };
-    });
   }
 }
 

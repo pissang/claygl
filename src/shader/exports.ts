@@ -16,6 +16,7 @@ export {
 
 // Composite shaders.
 export { blendCompositeFragment } from './source/compositor/blend.glsl';
+export { splitViewCompositeFragment } from './source/compositor/splitview.glsl';
 export {
   gaussianBlurCompositeFragment,
   gaussianKernel9,

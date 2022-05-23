@@ -144,7 +144,8 @@ class RenderGraphNode {
   }
 
   hasOutput() {
-    return keys(this._outputs).length > 0;
+    const outputs = this._outputs;
+    return keys(outputs).find((key) => outputs[key] && outputs[key].length > 0) != null;
   }
 
   isEndNode() {

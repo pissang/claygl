@@ -49,10 +49,7 @@ scene.add(light);
 
 const sceneCompositeNode = new SceneCompositeNode(scene, camera);
 sceneCompositeNode.outputs = {
-  color: {
-    width: renderer.getWidth(),
-    height: renderer.getHeight()
-  }
+  color: {}
 };
 
 const blurNode = new GaussianBlurCompositeNode();
