@@ -80,7 +80,7 @@ export interface GLRenderableObject<T extends GLMaterialObject = GLMaterialObjec
   geometry: GeometryBase;
   material: T;
   mode?: GLEnum;
-  lightGroup?: number;
+  lightGroup: number;
   worldTransform?: Matrix4;
 
   cullFace?: GLEnum;
@@ -612,7 +612,8 @@ class GLRenderer {
     const textureUniforms = material.getTextureUniforms
       ? material.getTextureUniforms()
       : enabledUniforms.filter(
-          (uniformName) => uniforms[uniformName].type === 't' || uniforms[uniformName].type === 'tv'
+          (uniformName) =>
+            uniforms[uniformName].type === 't' || (uniforms[uniformName].type as any) === 'tv'
         );
     const placeholderTexture = this._getBlankTexture();
 
@@ -627,7 +628,8 @@ class GLRenderer {
       if (uniformType === 't' && uniformValue && (uniformValue as Texture).isRenderable()) {
         // Reset slot
         getGLTexture(uniformValue).slot = -1;
-      } else if (uniformType === 'tv') {
+      } else if ((uniformType as any) === 'tv') {
+        // TODO
         for (let i = 0; i < uniformValue.length; i++) {
           if (uniformValue[i] && (uniformValue as Texture).isRenderable()) {
             getGLTexture(uniformValue[i]).slot = -1;
@@ -674,7 +676,7 @@ class GLRenderer {
           continue;
         }
         // Texture Array
-        if (uniformType === 'tv') {
+        if ((uniformType as any) === 'tv') {
           if (!program.hasUniform(symbol)) {
             continue;
           }

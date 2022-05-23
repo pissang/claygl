@@ -40,7 +40,7 @@ import { FragmentShaderLoose, PickFragmentTextureUniforms } from '../Shader';
  *
  */
 
-class CompositeFilterNode<
+class FilterCompositeNode<
   T extends FragmentShaderLoose = FragmentShaderLoose,
   O extends string = string,
   S = PickFragmentTextureUniforms<T['uniforms']>
@@ -104,4 +104,4 @@ class CompositeFilterNode<
     return !!this.pass.material!.uniforms[inputName];
   }
 }
-export default CompositeFilterNode;
+export default FilterCompositeNode;

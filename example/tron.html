@@ -3,8 +3,6 @@
     <title>Tron Effect</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script type="text/javascript" src="lib/require.js"></script>
-    <script type="text/javascript" src="lib/dat.gui.js"></script>
   </head>
   <body>
     <style>
@@ -16,112 +14,6 @@
       }
     </style>
     <canvas id="main"></canvas>
-    <script type="text/javascript">
-      require(['../dist/claygl', 'text!./shader/tron.glsl', 'js/createCompositor'], function (
-        clay,
-        tronShader,
-        createCompositor
-      ) {
-        var Shader = clay.Shader;
-        Shader.import(tronShader);
-
-        var renderer = new clay.Renderer({
-          canvas: document.getElementById('main')
-          // devicePixelRatio: 1
-        });
-        renderer.resize(window.innerWidth, window.innerHeight);
-        var scene = new clay.Scene();
-        var camera = new clay.camera.Perspective({
-          aspect: renderer.getViewportAspect(),
-          far: 500
-        });
-
-        var cube = new clay.geometry.Cube({
-          widthSegments: 1,
-          heightSegments: 1,
-          depthSegments: 1
-        });
-
-        var tronMaterial = new clay.Material({
-          shader: new clay.Shader({
-            vertex: Shader.source('tron.vertex'),
-            fragment: Shader.source('tron.fragment')
-          })
-        });
-        tronMaterial.define('fragment', 'RGBM_ENCODE');
-
-        camera.position.set(0, 0, 7);
-
-        var cubeMeshTronOutline = new clay.Mesh({
-          geometry: cube,
-          material: tronMaterial,
-          culling: false,
-          beforeRender: function (renderer) {
-            renderer.gl.clear(renderer.gl.DEPTH_BUFFER_BIT);
-          }
-        });
-        var cubeMesh = new clay.Mesh({
-          geometry: cube,
-          material: new clay.Material({
-            shader: clay.shader.library.get('clay.standard')
-          })
-        });
-        cubeMesh.material.define('fragment', 'RGBM_ENCODE');
-        cubeMeshTronOutline.scale.set(1.5, 1.5, 1.5);
-        cubeMesh.scale.set(1.5, 1.5, 1.5);
-
-        scene.add(cubeMesh);
-        scene.add(cubeMeshTronOutline);
-
-        var light = new clay.light.Directional({
-          intensity: 0.5
-        });
-        light.position.set(4, 5, 2);
-        light.lookAt(scene.position);
-        scene.add(light);
-
-        var timeline = new clay.Timeline();
-        timeline.start();
-
-        var control = new clay.plugin.OrbitControl({
-          domElement: renderer.canvas,
-          target: camera
-        });
-
-        var compositor = createCompositor({
-          scene: scene,
-          camera: camera,
-          // enableBloom: false,
-          enableLensflare: false
-        });
-
-        timeline.on('frame', function (dTime) {
-          compositor.render(renderer);
-          // renderer.render(scene, camera);
-          control.update(dTime);
-        });
-
-        var gui = new dat.GUI();
-        var config = {
-          sharpness: 10.0,
-          substraction: 0.2,
-          strength: 50.0,
-          bloomIntensity: 0.25
-        };
-        function updateTronMat() {
-          tronMaterial.set('sharpness', config.sharpness);
-          tronMaterial.set('substraction', config.substraction);
-          tronMaterial.set('strength', config.strength);
-        }
-        function updateGlowMat() {
-          var finalCompositeNode = compositor.getNodeByName('composite');
-          finalCompositeNode.setParameter('bloomIntensity', config.bloomIntensity);
-        }
-        gui.add(config, 'sharpness', 0, 100).onChange(updateTronMat);
-        gui.add(config, 'substraction', 0, 1).onChange(updateTronMat);
-        gui.add(config, 'strength', 0, 200).onChange(updateTronMat);
-        gui.add(config, 'bloomIntensity', 0, 1).onChange(updateGlowMat);
-      });
-    </script>
+    <script type="module" src="./tron.ts"></script>
   </body>
 </html>

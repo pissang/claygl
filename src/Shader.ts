@@ -378,19 +378,16 @@ class StageShader<
     includes?: TMixins;
     main: string;
   }) {
-    options = assign(
-      {
-        defines: options.name
-          ? assign(
-              {
-                SHADER_NAME: options.name
-              },
-              options.defines
-            )
-          : options.defines
-      },
-      options
-    );
+    options = assign({}, options, {
+      defines: options.name
+        ? assign(
+            {
+              SHADER_NAME: options.name
+            },
+            options.defines
+          )
+        : options.defines
+    });
     const includes = options.includes || ([] as any as TMixins);
     (['defines', 'uniforms', 'attributes', 'varyings'] as const).forEach((prop) => {
       // @ts-ignore we are sure the readonly property is inited in the constructor here.

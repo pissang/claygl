@@ -613,7 +613,7 @@ class Renderer extends Notifier {
         program.setSemanticUniform(gl, 'VIEWPORT_SIZE', viewportSizeUniform);
       },
       getCommonUniforms: (renderable) => {
-        return scene && scene.getLightUniforms(renderable.lightGroup);
+        return scene && scene.getLightUniforms(renderable.lightGroup!);
       },
       renderableChanged: (renderable, material, program) => {
         const isSceneNode = renderable.worldTransform != null;

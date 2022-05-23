@@ -36,3 +36,9 @@ export { vignetteCompositeFragment } from './source/compositor/vignette.glsl';
 
 export { fullscreenQuadPassVertex } from './source/compositor/vertex.glsl';
 export { outputFragment as outputTextureFragment } from './source/compositor/output.glsl';
+
+// Materials
+export { basicVertex, basicFragment } from './source/basic.glsl';
+export { lambertVertex, lambertFragment } from './source/lambert.glsl';
+export { standardVertex, standardFragment } from './source/standard.glsl';
+export { wireframeVertex, wireframeFragment } from './source/wireframe.glsl';

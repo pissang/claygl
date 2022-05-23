@@ -74,11 +74,16 @@ class RenderGraphNode {
       // TODO Omit other params??
       const params = assign({} as TexturePoolParameters, derivedParams, outputInfo);
       const scale = optional(outputInfo.scale, 1);
-      width != null && (params.width = width * scale);
-      height != null && (params.height = height * scale);
+      width != null && (params.width = width);
+      height != null && (params.height = height);
       // Use width/height from renderer by default
       params.width = params.width || renderer.getWidth();
       params.height = params.height || renderer.getHeight();
+
+      if (scale != null) {
+        params.width *= scale;
+        params.height *= scale;
+      }
 
       textureParams[outputName] = params;
     }

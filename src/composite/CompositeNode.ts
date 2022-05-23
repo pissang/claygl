@@ -31,7 +31,7 @@ export interface CompositeNodeOutput
    */
   height?: number | ((renderer: Renderer) => number);
   /**
-   * If width and height are not given and inherited from the input texture.
+   * If width and height are not given and inherited from the input texture. If width and height are give. scale will also been applied.
    * Scale can define the downscaling / upscaling factor.
    * default to be 1
    */
