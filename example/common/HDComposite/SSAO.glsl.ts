@@ -52,9 +52,9 @@ void main()
   vec4 tex = texture2D(gBufferTex, v_Texcoord);
 
   // Is empty
-  // if (dot(tex.rgb, vec3(1.0)) == 0.0) {
-  //   discard;
-  // }
+  if (dot(tex.rgb, vec3(1.0)) == 0.0) {
+    discard;
+  }
 
   vec3 N = tex.rgb * 2.0 - 1.0;
 

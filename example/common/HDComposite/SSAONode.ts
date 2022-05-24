@@ -74,6 +74,7 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
     this._estimateNode.outputs = {
       color: {}
     };
+    this._estimateNode.pass.clearColor = [0, 0, 0, 0];
     this._blurNode.inputs = {
       texture: this._estimateNode
     };
