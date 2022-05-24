@@ -73,6 +73,7 @@ class GBufferNode extends CompositeNode<never, GBufferOutput> {
     gbuffer.enableTargetTexture2 = this.enableTexture2;
     gbuffer.enableTargetTexture3 = this.enableTexture3;
     gbuffer.enableTargetTexture4 = this.enableTexture4;
+
     gbuffer.update(renderer, this._scene, this._camera, {
       targetTexture1: outputTextures.texture1 as Texture2D,
       targetTexture2: outputTextures.texture2 as Texture2D,

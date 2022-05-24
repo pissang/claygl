@@ -73,6 +73,9 @@ class Compositor {
    */
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {
     this._nodes.forEach((node) => {
+      if (node instanceof GroupCompositeNode) {
+        node.updateInnerLinks();
+      }
       node.prepare && node.prepare(renderer);
     });
 
@@ -89,7 +92,10 @@ class Compositor {
   private _buildRenderGraphLinks(renderer: Renderer) {
     function logMissingLink(input: CompositeNodeInput) {
       console.warn(
-        'Pin of ' + input.node + (input.output ? '.' + input.output : '') + ' not exist'
+        'Pin of ' +
+          (input.node.name || 'Anoymous') +
+          (input.output ? '.' + input.output : '') +
+          ' not exist'
       );
     }
     function findLink(input: CompositeNodeInput) {
@@ -130,7 +136,7 @@ class Compositor {
     ) {
       keys(node.inputs || {}).forEach((inputName) => {
         let inputInfo = node.inputs![inputName];
-        // Just ignore groGroupInput
+        // Just ignore GroupInput because it's already linked in the group nodes
         if (!inputInfo || inputInfo instanceof GroupInput) {
           return;
         }
@@ -185,6 +191,8 @@ class Compositor {
               );
             // TODO Error info when can't find inner link
           });
+        } else {
+          console.error(`Can't find inner node linkes to ${groupInputName}`);
         }
       });
     }

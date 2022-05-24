@@ -102,8 +102,6 @@ class SSRCompositeNode extends GroupCompositeNode<
   }
 
   prepare(renderer: Renderer): void {
-    super.prepare(renderer);
-
     const viewInverseTranspose = new Matrix4();
     const camera = this._camera;
     const ssrNode = this._ssrNode;

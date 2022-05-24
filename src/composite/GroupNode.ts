@@ -99,13 +99,10 @@ class GroupCompositeNode<InputKey extends string, OutputKey extends string> exte
     return this._nodes.find((node) => node.name === name);
   }
 
-  // TODO it's easy to forget call super.prepare when it's overridden
-  prepare(renderer: Renderer): void {
+  updateInnerLinks(): void {
     const inputLinks = (this._inputLinks = {} as InputLinksMap<InputKey>);
     const outputLinks = (this._outputLinks = {} as OutputLinksMap<OutputKey>);
     this._nodes.forEach((node) => {
-      node.prepare(renderer);
-
       keys(node.inputs).forEach((inputName) => {
         const groupInput = node.inputs![inputName];
         if (groupInput instanceof GroupInput) {

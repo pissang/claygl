@@ -29,8 +29,6 @@ function generateNoiseData(size: number) {
 function generateNoiseTexture(size: number) {
   return new Texture2D({
     pixels: generateNoiseData(size),
-    wrapS: constants.REPEAT,
-    wrapT: constants.REPEAT,
     width: size,
     height: size
   });
@@ -107,8 +105,6 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
   }
 
   prepare(renderer: Renderer): void {
-    super.prepare(renderer);
-
     const estimateMaterial = this._estimateNode.material;
     const blurMaterial = this._blurNode.material;
     const camera = this._camera;

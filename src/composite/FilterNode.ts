@@ -50,10 +50,11 @@ class FilterCompositeNode<
   // inputs?: Record<keyof S, CompositeNode | CompositeNodeInput>;
   // Example: { name: 2 }d
 
-  constructor(shader: T) {
+  constructor(shader: T, name?: string) {
     super();
     const pass = new FullscreenQuadPass(shader);
     this.pass = pass;
+    this.name = name || '';
   }
 
   prepare(renderer: Renderer): void {}

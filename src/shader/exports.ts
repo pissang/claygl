@@ -11,7 +11,8 @@ export {
   HDREncoderMixin,
   skinningMixin,
   wireframeMixin,
-  sRGBMixin
+  sRGBMixin,
+  randomFunction
 } from './source/util.glsl';
 
 // Composite shaders.
