@@ -1,4 +1,4 @@
-import { FilterCompositeNode, GroupCompositeNode } from 'claygl';
+import { FilterCompositeNode, GroupCompositeNode, Renderer } from 'claygl';
 import { gaussianBlurCompositeFragment } from 'claygl/shaders';
 
 interface GaussianBlurCompositeNodeOpts {
@@ -48,9 +48,15 @@ class GaussianBlurCompositeNode extends GroupCompositeNode<'texture', 'color'> {
 
     blurV.material.set('blurDir', 1);
 
+    this.outputs = {
+      color: {}
+    };
+
     this.addNode(blurH);
     this.addNode(blurV);
   }
+
+  prepare(renderer: Renderer): void {}
 }
 
 export default GaussianBlurCompositeNode;

@@ -1,35 +1,12 @@
-const EXTENSION_LIST = [
-  'OES_texture_float',
-  'OES_texture_half_float',
-  'OES_texture_float_linear',
-  'OES_texture_half_float_linear',
-  'OES_standard_derivatives',
-  'OES_vertex_array_object',
-  'OES_element_index_uint',
-  'WEBGL_compressed_texture_s3tc',
-  'WEBGL_compressed_texture_etc',
-  'WEBGL_compressed_texture_etc1',
-  'WEBGL_compressed_texture_pvrtc',
-  'WEBGL_compressed_texture_atc',
-  'WEBGL_compressed_texture_astc',
-  'WEBGL_depth_texture',
-  'EXT_texture_filter_anisotropic',
-  'EXT_shader_texture_lod',
-  'WEBGL_draw_buffers',
-  'EXT_frag_depth',
-  'EXT_sRGB',
-  'ANGLE_instanced_arrays'
-] as const;
-
 class GLExtension {
   private _extensions: Record<string, any> = {};
   gl: WebGLRenderingContext;
 
-  constructor(gl: WebGLRenderingContext) {
+  constructor(gl: WebGLRenderingContext, extensions: readonly string[]) {
     this.gl = gl;
     // Get webgl extension
-    for (let i = 0; i < EXTENSION_LIST.length; i++) {
-      const extName = EXTENSION_LIST[i];
+    for (let i = 0; i < extensions.length; i++) {
+      const extName = extensions[i];
       this._createExtension(extName);
     }
   }

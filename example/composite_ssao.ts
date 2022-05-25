@@ -102,23 +102,15 @@ ssaoNode.inputs = {
     output: 'texture2'
   }
 };
-ssaoNode.outputs = {
-  color: {}
-};
-sceneNode.outputs = {
-  color: {}
-};
 blendNode.inputs = {
   // Render scene node firstly
   texture1: sceneNode,
   texture2: ssaoNode
 };
-blendNode.outputs = {
-  color: {}
-};
 tonemappingNode.inputs = {
   texture: blendNode
 };
+tonemappingNode.renderToScreen = true;
 
 compositor.addNode(gbufferNode, ssaoNode, blendNode, sceneNode, tonemappingNode);
 

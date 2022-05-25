@@ -82,6 +82,10 @@ class SSRCompositeNode extends GroupCompositeNode<
       color: this.getGroupOutput('color')
     };
 
+    this.outputs = {
+      color: {}
+    };
+
     this.addNode(ssrNode, blurHNode, blurVNode);
 
     this.setParams(opts || {});

@@ -6,7 +6,7 @@ class TextureNode extends CompositeNode {
   texture: Texture2D;
 
   // Texture node must have output without parameters
-  outputs = {
+  readonly outputs = {
     color: {}
   };
 

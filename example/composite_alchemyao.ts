@@ -16,7 +16,7 @@ import {
   FilterCompositeNode
 } from 'claygl';
 import { blendCompositeFragment, composeCompositeFragment } from 'claygl/shaders';
-import AlchemyAOCompositeNode from './common/HDComposite/AlchemyAOCompositeNode';
+import AlchemyAOCompositeNode from './common/HDComposite/AlchemyAONode';
 import GBufferNode from './common/HDComposite/GBufferNode';
 import { projectEnvironmentMap } from '../src/util/sh';
 import dat from 'dat.gui';
@@ -112,9 +112,6 @@ alchemyAONode.inputs = {
     output: 'texture2'
   }
 };
-alchemyAONode.outputs = {
-  color: {}
-};
 sceneNode.outputs = {
   color: {}
 };
@@ -123,12 +120,11 @@ blendNode.inputs = {
   texture1: sceneNode,
   texture2: alchemyAONode
 };
-blendNode.outputs = {
-  color: {}
-};
 tonemappingNode.inputs = {
   texture: blendNode
 };
+tonemappingNode.renderToScreen = true;
+
 blendNode.material.define('BLEND_METHOD', 1);
 blendNode.material.set('weight1', 1);
 blendNode.material.set('weight2', 1);

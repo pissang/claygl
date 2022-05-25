@@ -1,6 +1,6 @@
 // Bloom from https://cdn2.unrealengine.com/Resources/files/The_Technology_Behind_the_Elemental_Demo_16x9-1248544805.pdf
 
-import { constants, FilterCompositeNode, GroupCompositeNode } from 'claygl';
+import { constants, FilterCompositeNode, GroupCompositeNode, Renderer } from 'claygl';
 import {
   gaussianBlurCompositeFragment,
   brightCompositeFragment,
@@ -92,8 +92,14 @@ class BloomNode extends GroupCompositeNode<'texture', 'color'> {
         this._blendNodes.push(blendNode);
         this.addNode(blendNode);
       }
+
+      this.outputs = {
+        color: {}
+      };
     }
   }
+
+  prepare(renderer: Renderer): void {}
 
   setBrightThreshold(threshold: number) {
     this._brightNode.material.set('threshold', threshold);

@@ -163,6 +163,32 @@ export interface GLRenderHooks<T extends GLRenderableObject = GLRenderableObject
   afterRender?: (renderable: T) => void;
 }
 
+const OES_texture = 'OES_texture';
+const WEBGL_compressed_texture = 'WEBGL_compressed_texture';
+
+const GL1_EXTENSION_LIST = [
+  `${OES_texture}_float`,
+  `${OES_texture}_half_float`,
+  `${OES_texture}_float_linear`,
+  `${OES_texture}_half_float_linear`,
+  'OES_standard_derivatives',
+  'OES_vertex_array_object',
+  'OES_element_index_uint',
+  `${WEBGL_compressed_texture}_s3tc`,
+  `${WEBGL_compressed_texture}_etc`,
+  `${WEBGL_compressed_texture}_etc1`,
+  `${WEBGL_compressed_texture}_pvrtc`,
+  `${WEBGL_compressed_texture}_atc`,
+  `${WEBGL_compressed_texture}_astc`,
+  'WEBGL_depth_texture',
+  'EXT_texture_filter_anisotropic',
+  'EXT_shader_texture_lod',
+  'WEBGL_draw_buffers',
+  'EXT_frag_depth',
+  'EXT_sRGB',
+  'ANGLE_instanced_arrays'
+] as const;
+
 /**
  * Basic webgl renderer without scene management.
  */
@@ -199,7 +225,7 @@ class GLRenderer {
     this.gl = gl;
     // Init managers
     this._programMgr = new ProgramManager(this);
-    this._glext = new GLExtension(gl);
+    this._glext = new GLExtension(gl, GL1_EXTENSION_LIST);
     this.throwError = optional(opts.throwError, true);
   }
 

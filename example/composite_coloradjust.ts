@@ -50,12 +50,6 @@ light.lookAt(new Vector3());
 scene.add(light);
 
 const sceneCompositeNode = new SceneCompositeNode(scene, camera);
-sceneCompositeNode.outputs = {
-  color: {
-    width: 1024,
-    height: 1024
-  }
-};
 compositor.addNode(sceneCompositeNode);
 
 const colorAdjustNode = new FilterCompositeNode(colorAdjustCompositeFragment);

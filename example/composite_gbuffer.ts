@@ -78,6 +78,7 @@ gui.add(config, 'debugType', availableDebugTypes);
 const gbufferNode = new GBufferCompositeNode(scene, camera);
 gbufferNode.enableTexture4 = true;
 const outputNode = new FilterCompositeNode(outputTextureFragment);
+outputNode.renderToScreen = true;
 
 compositor.addNode(gbufferNode);
 compositor.addNode(outputNode);

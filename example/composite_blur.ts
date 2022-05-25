@@ -48,14 +48,12 @@ light.lookAt(new Vector3());
 scene.add(light);
 
 const sceneCompositeNode = new SceneCompositeNode(scene, camera);
-sceneCompositeNode.outputs = {
-  color: {}
-};
 
 const blurNode = new GaussianBlurCompositeNode();
 blurNode.inputs = {
   texture: sceneCompositeNode
 };
+blurNode.renderToScreen = true;
 compositor.addNode(sceneCompositeNode, blurNode);
 
 startTimeline(() => {

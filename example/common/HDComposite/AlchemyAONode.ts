@@ -108,6 +108,10 @@ class AlchemyAOCompositeNode extends GroupCompositeNode<
     };
     this._blurVNode.material.set('blurDir', 1);
 
+    this.outputs = {
+      color: {}
+    };
+
     this.addNode(this._estimateNode, this._blurHNode, this._blurVNode);
 
     const defaultOpts: Required<AlchemyAOCompositeNodeOpts> = {

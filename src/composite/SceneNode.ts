@@ -1,11 +1,11 @@
-import CompositeNode from './CompositeNode';
+import CompositeNode, { CompositeNodeOutput } from './CompositeNode';
 import FrameBuffer from '../FrameBuffer';
 import type Scene from '../Scene';
 import type Camera from '../Camera';
 import type Renderer from '../Renderer';
 import Texture from '../Texture';
 
-export class CompositeSceneNode<OutputKey extends string = string> extends CompositeNode<
+export class CompositeSceneNode<OutputKey extends string = 'color'> extends CompositeNode<
   never,
   OutputKey
 > {
@@ -16,10 +16,16 @@ export class CompositeSceneNode<OutputKey extends string = string> extends Compo
   autoUpdateScene = true;
   preZ = false;
 
-  constructor(scene: Scene, camera: Camera) {
+  constructor(scene: Scene, camera: Camera, outputs?: Record<OutputKey, CompositeNodeOutput>) {
     super();
     this.scene = scene;
     this.camera = camera;
+
+    this.outputs =
+      outputs ||
+      ({
+        color: {}
+      } as Record<OutputKey, CompositeNodeOutput>);
   }
 
   prepare() {}

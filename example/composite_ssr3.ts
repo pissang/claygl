@@ -115,9 +115,6 @@ const sceneNode = new SceneCompositeNode(scene, camera);
 const gBufferNode = new GBufferNode(scene, camera);
 const ssrNode = new SSRCompositeNode(camera);
 const blendNode = new FilterCompositeNode(blendCompositeFragment);
-sceneNode.outputs = {
-  color: {}
-};
 ssrNode.inputs = {
   gBufferTexture1: {
     node: gBufferNode,
@@ -129,13 +126,12 @@ ssrNode.inputs = {
   },
   colorTexture: sceneNode
 };
-ssrNode.outputs = {
-  color: {}
-};
 blendNode.inputs = {
   texture1: sceneNode,
   texture2: ssrNode
 };
+
+blendNode.renderToScreen = true;
 
 compositor.addNode(sceneNode, gBufferNode, ssrNode, blendNode);
 

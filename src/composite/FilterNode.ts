@@ -1,5 +1,5 @@
 // TODO Shader library
-import CompositeNode, { CompositeNodeInput } from './CompositeNode';
+import CompositeNode, { CompositeNodeInput, CompositeNodeOutput } from './CompositeNode';
 import FullscreenQuadPass from './Pass';
 import Renderer from '../Renderer';
 import FrameBuffer from '../FrameBuffer';
@@ -42,7 +42,7 @@ import { FragmentShaderLoose, PickFragmentTextureUniforms } from '../Shader';
 
 class FilterCompositeNode<
   T extends FragmentShaderLoose = FragmentShaderLoose,
-  O extends string = string,
+  O extends string = 'color',
   S = PickFragmentTextureUniforms<T['uniforms']>
 > extends CompositeNode<keyof S, O> {
   pass: FullscreenQuadPass<T>;
@@ -50,11 +50,17 @@ class FilterCompositeNode<
   // inputs?: Record<keyof S, CompositeNode | CompositeNodeInput>;
   // Example: { name: 2 }d
 
-  constructor(shader: T, name?: string) {
+  constructor(shader: T, name?: string, outputs?: Record<O, CompositeNodeOutput>) {
     super();
     const pass = new FullscreenQuadPass(shader);
     this.pass = pass;
     this.name = name || '';
+
+    this.outputs =
+      outputs ||
+      ({
+        color: {}
+      } as Record<O, CompositeNodeOutput>);
   }
 
   prepare(renderer: Renderer): void {}

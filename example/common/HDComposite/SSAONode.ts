@@ -85,6 +85,10 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
       color: this.getGroupOutput('color')
     };
 
+    this.outputs = {
+      color: {}
+    };
+
     this.addNode(this._estimateNode, this._blurNode);
 
     opts = Object.assign(

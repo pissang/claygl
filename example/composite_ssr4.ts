@@ -85,9 +85,6 @@ loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
   const gBufferNode = new GBufferNode(scene, camera);
   const ssrNode = new SSRCompositeNode(camera);
   const blendNode = new FilterCompositeNode(blendCompositeFragment);
-  sceneNode.outputs = {
-    color: {}
-  };
   ssrNode.inputs = {
     gBufferTexture1: {
       node: gBufferNode,
@@ -99,13 +96,11 @@ loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
     },
     colorTexture: sceneNode
   };
-  ssrNode.outputs = {
-    color: {}
-  };
   blendNode.inputs = {
     texture1: sceneNode,
     texture2: ssrNode
   };
+  blendNode.renderToScreen = true;
   compositor.addNode(sceneNode, gBufferNode, ssrNode, blendNode);
 
   startTimeline((deltaTime) => {
