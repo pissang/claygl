@@ -19,13 +19,18 @@ export type TexturePoolParameters = Pick<
   | 'anisotropic'
 >;
 
+const textureAllocatedMap = new WeakMap<Texture2D, boolean>();
+
 const MAX_ALLOCATE_TEXTURE = 1e3;
 
 class TexturePool {
   private _pool: Record<string, Texture2D[]> = {};
   private _allocated: Texture2D[] = [];
 
-  get(parameters: Partial<TexturePoolParameters>): Texture2D {
+  /**d
+   * Allocate a new texture from pool.
+   */
+  allocate(parameters: Partial<TexturePoolParameters>): Texture2D {
     if (this._allocated.length > MAX_ALLOCATE_TEXTURE) {
       throw 'Allocated moo much textures.';
     }
@@ -34,16 +39,25 @@ class TexturePool {
     if (!list.length) {
       const texture = new Texture2D(parameters);
       this._allocated.push(texture);
+      textureAllocatedMap.set(texture, true);
       return texture;
     }
-    return list.pop() as Texture2D;
+    const texture = list.pop() as Texture2D;
+    textureAllocatedMap.set(texture, true);
+    return texture;
   }
 
-  put(texture: Texture2D) {
+  release(texture: Texture2D) {
+    // Already been released.
+    if (!textureAllocatedMap.get(texture)) {
+      return;
+    }
+
     const key = generateKey(texture);
     if (!util.hasOwn(this._pool, key)) {
       this._pool[key] = [];
     }
+    textureAllocatedMap.set(texture, false);
     const list = this._pool[key];
     list.push(texture);
   }

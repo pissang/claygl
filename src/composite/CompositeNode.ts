@@ -15,6 +15,11 @@ export interface CompositeNodeInput {
    * Name of output. Will use the first if not given.
    */
   output?: string;
+
+  /**
+   * If using the previous frame result of output.
+   */
+  prevFrame?: boolean;
 }
 export interface CompositeNodeOutput
   extends Partial<Omit<TexturePoolParameters, 'width' | 'height'>> {
@@ -40,9 +45,6 @@ export interface CompositeNodeOutput
    * If this output is disabled.
    */
   disabled?: boolean;
-
-  keepLastFrame?: boolean;
-  outputLastFrame?: boolean;
 }
 
 /**

@@ -166,7 +166,12 @@ class Compositor {
           }
           renderGraphNodeMap
             .get(node)!
-            .addLinkFrom(inputName, renderGraphNodeMap.get(fromPin.node)!, fromPin.pin);
+            .addLinkFrom(
+              inputName,
+              renderGraphNodeMap.get(fromPin.node)!,
+              fromPin.pin,
+              inputInfo.prevFrame
+            );
         });
       }
     }
@@ -187,7 +192,8 @@ class Compositor {
               .addLinkFrom(
                 inputInnerLink.input,
                 renderGraphNodeMap.get(fromPin.node)!,
-                fromPin.pin
+                fromPin.pin,
+                groupInputInfo.prevFrame
               );
             // TODO Error info when can't find inner link
           });

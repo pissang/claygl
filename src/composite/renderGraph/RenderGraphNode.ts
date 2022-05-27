@@ -12,6 +12,7 @@ import type RenderGraph from './RenderGraph';
 interface RenderGraphNodeLink {
   node: RenderGraphNode;
   pin: string;
+  prevFrame?: boolean;
 }
 
 class RenderGraphNode {
@@ -44,8 +45,9 @@ class RenderGraphNode {
   private _prevOutputTextures: Record<string, Texture2D> = {};
   private _outputTextures: Record<string, Texture2D> = {};
 
-  // Example: { name: 2 }
-  private _outputReferences: Record<string, number> = {};
+  private _needsKeepPrevFrame: Record<string, boolean> = {};
+  private _outputRefCount: Record<string, number> = {};
+  private _prevOutputRefCount: Record<string, number> = {};
 
   private _compositeNode: CompositeNode;
   private _renderGraph: RenderGraph;
@@ -108,7 +110,11 @@ class RenderGraphNode {
     return mostProbablyParams;
   }
 
-  renderAndOutputTexture(renderer: Renderer, outputPin: string): Texture2D | undefined {
+  getOutputTexture(
+    renderer: Renderer,
+    outputPin: string,
+    usePrevFrame?: boolean
+  ): Texture2D | undefined {
     const outputInfo = this._compositeNode.outputs![outputPin];
     const prevOutputTextures = this._prevOutputTextures;
     const outputTextures = this._outputTextures;
@@ -116,34 +122,22 @@ class RenderGraphNode {
       return;
     }
 
-    // Already been rendered in this frame
-    if (this._rendered) {
-      // Force return texture in last frame
-      if (outputInfo.outputLastFrame) {
-        return prevOutputTextures[outputPin];
-      } else {
-        return outputTextures[outputPin];
-      }
-    } else if (
-      // TODO
-      this._rendering // Solve Circular Reference
-    ) {
-      if (!prevOutputTextures[outputPin]) {
-        // Create a blank texture at first pass
-        prevOutputTextures[outputPin] = this._renderGraph.allocateTexture(
-          this.getTextureParams(outputPin, renderer)
-          // parametersCopyMap.get(outputInfo) || {}
-        );
-      }
-      return this._prevOutputTextures[outputPin];
+    if (usePrevFrame) {
+      return prevOutputTextures[outputPin];
     }
 
-    // Update for all outputs. this.outputs only inlcude that is linked.
-    keys(this._compositeNode.outputs).forEach((outputName) => {
-      this.getTextureParams(outputName, renderer);
-    });
+    if (this._rendering) {
+      throw new Error('Circular reference exists.');
+    }
 
-    this.render(renderer);
+    if (!this._rendered) {
+      // Update for all outputs. this.outputs only inlcude that is linked.
+      keys(this._compositeNode.outputs).forEach((outputName) => {
+        this.getTextureParams(outputName, renderer);
+      });
+
+      this.render(renderer, undefined);
+    }
 
     return outputTextures[outputPin];
   }
@@ -168,11 +162,12 @@ class RenderGraphNode {
     const hasOutput = !this.isEndNode();
     const outputNames = hasOutput ? keys(outputLinks) : [];
     const sharedFrameBuffer = hasOutput ? renderGraph.getFrameBuffer() : undefined;
+    const texturePool = renderGraph.getTexturePool();
 
     const inputTextures: Record<string, Texture> = {};
     inputNames.forEach((inputName) => {
       const link = inputLinks[inputName];
-      const texture = link.node.renderAndOutputTexture(renderer, link.pin);
+      const texture = link.node.getOutputTexture(renderer, link.pin, link.prevFrame);
       if (texture) {
         inputTextures[inputName] = texture;
       }
@@ -192,7 +187,7 @@ class RenderGraphNode {
       }
       // TODO Avoid reading from composite node too much
       const outputInfo = this._compositeNode.outputs![outputName];
-      const texture = renderGraph.allocateTexture(parameters);
+      const texture = texturePool.allocate(parameters);
       const attachment = outputInfo.attachment || COLOR_ATTACHMENT0;
       this._outputTextures[outputName] = texture;
       outputTextures![outputName] = texture;
@@ -210,13 +205,14 @@ class RenderGraphNode {
 
     inputNames.forEach((inputName) => {
       const link = inputLinks[inputName];
-      link.node.releaseReference(link.pin);
+      link.node.outputLinkReleased(link, inputTextures[inputName]);
     });
 
-    // Release textures that are not taken
+    // Release textures that are not linked
     outputNames.forEach((outputName) => {
-      if (!this._outputReferences[outputName]) {
-        renderGraph!.releaseTexture(outputTextures![outputName] as Texture2D);
+      const texture = outputTextures![outputName] as Texture2D;
+      if (!outputLinks[outputName].length) {
+        texturePool.release(texture);
       }
     });
 
@@ -224,55 +220,42 @@ class RenderGraphNode {
     this._rendered = true;
   }
 
-  getOutputTexture(name: string) {
-    return this._outputTextures[name];
-  }
-
-  /**
-   * Remove reference from subsequent node after it's rendered.
-   */
-  releaseReference(outputName: string) {
-    const prevOutputTextures = this._prevOutputTextures;
-    const outputTextures = this._outputTextures;
-    const renderGraph = this._renderGraph;
-    const outputReferences = this._outputReferences;
-
-    outputReferences[outputName]--;
-
-    if (outputReferences[outputName] === 0) {
-      const outputInfo = this._compositeNode.outputs![outputName];
-      if (outputInfo.keepLastFrame) {
-        if (prevOutputTextures[outputName]) {
-          renderGraph!.releaseTexture(prevOutputTextures[outputName]);
-        }
-        prevOutputTextures[outputName] = outputTextures[outputName];
-      } else {
-        // Output of this node have alreay been used by all other nodes
-        // Put the texture back to the pool.
-        renderGraph!.releaseTexture(outputTextures[outputName]);
-      }
-    }
-  }
-
-  addLinkFrom(inputPinName: string, fromNode: RenderGraphNode, fromPinName: string) {
+  addLinkFrom(
+    inputPinName: string,
+    fromNode: RenderGraphNode,
+    outputPinName: string,
+    usePrevFrame: boolean | undefined
+  ) {
     // The relationship from output pin to input pin is one-on-multiple
     this._inputs[inputPinName] = {
       node: fromNode,
-      pin: fromPinName
+      pin: outputPinName,
+      prevFrame: usePrevFrame
     };
     const outputLinks = fromNode._outputs;
-    if (!outputLinks[fromPinName]) {
-      outputLinks[fromPinName] = [];
+    if (!outputLinks[outputPinName]) {
+      outputLinks[outputPinName] = [];
     }
-    outputLinks[fromPinName].push({
+    outputLinks[outputPinName].push({
       node: this,
-      pin: inputPinName
+      pin: inputPinName,
+      prevFrame: usePrevFrame
     });
+
+    const refCount = usePrevFrame ? this._prevOutputRefCount : this._outputRefCount;
+    refCount[outputPinName] = refCount[outputPinName] || 0;
+    refCount[outputPinName]++;
+    if (usePrevFrame) {
+      this._needsKeepPrevFrame[outputPinName] = true;
+    }
   }
 
   beforeUpdate() {
     const rawOutputs = this._compositeNode.outputs!;
     this._inputs = {};
+    this._needsKeepPrevFrame = {};
+    this._outputRefCount = {};
+    this._prevOutputRefCount = {};
     // All parameters of outputs need to be updated
     this._outputs = keys(rawOutputs)
       .filter((key) => {
@@ -283,42 +266,36 @@ class RenderGraphNode {
         obj[key] = [];
         return obj;
       }, {} as RenderGraphNode['_outputs']);
-    this._textureParams = {};
-  }
 
-  countReference(outputName?: string) {
-    if (!this._rendering) {
-      for (const inputName in this._inputs) {
-        const link = this._inputs[inputName];
-        link.node.countReference(link.pin);
-      }
-    }
-    if (outputName) {
-      this._outputReferences[outputName]++;
-    }
+    this._textureParams = {};
   }
 
   beforeRender() {
     this._rendered = false;
-    for (const name in this._outputs) {
-      this._outputReferences[name] = 0;
-    }
+    this._outputTextures = {};
   }
 
   afterRender() {
-    const renderGraph = this._renderGraph!;
+    const texturePool = this._renderGraph!.getTexturePool();
     // Put back all the textures to pool
-    for (const name in this._outputs) {
-      if (this._outputReferences[name] > 0) {
-        const outputInfo = this._compositeNode.outputs![name];
-        if (outputInfo.keepLastFrame) {
-          if (this._prevOutputTextures[name]) {
-            renderGraph.releaseTexture(this._prevOutputTextures[name]);
-          }
-          this._prevOutputTextures[name] = this._outputTextures[name];
-        } else {
-          renderGraph.releaseTexture(this._outputTextures[name]);
-        }
+    keys(this._outputs).forEach((outputName) => {
+      const outputTexture = this._outputTextures[outputName];
+      if (this._needsKeepPrevFrame[outputName]) {
+        this._prevOutputTextures[outputName] = outputTexture;
+      } else {
+        texturePool.release(outputTexture);
+      }
+    });
+  }
+
+  outputLinkReleased(link: RenderGraphNodeLink, texture: Texture) {
+    const outputName = link.pin;
+    const texturePool = this._renderGraph.getTexturePool();
+    const refCount = link.prevFrame ? this._prevOutputRefCount : this._outputRefCount;
+    refCount[outputName]--;
+    if (refCount[outputName] <= 0) {
+      if (link.prevFrame || !this._needsKeepPrevFrame[outputName]) {
+        texturePool.release(texture as Texture2D);
       }
     }
   }

@@ -42,19 +42,14 @@ class RenderGraph {
     // Update the reference number of each output texture
     nodes.forEach((node) => node.beforeRender());
 
-    outputs.forEach((output) => output.countReference());
     outputs.forEach((output) => output.render(renderer, frameBuffer));
 
     // Clear up
     nodes.forEach((node) => node.afterRender());
   }
 
-  allocateTexture(parameters: Partial<Texture2DOpts>) {
-    return this._texturePool.get(parameters);
-  }
-
-  releaseTexture(texture: Texture2D) {
-    this._texturePool.put(texture);
+  getTexturePool() {
+    return this._texturePool;
   }
 
   getFrameBuffer() {
