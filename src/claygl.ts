@@ -115,7 +115,6 @@ export { default as Compositor } from './composite/Compositor';
 export { default as CompositeNode } from './composite/CompositeNode';
 export { default as FilterCompositeNode } from './composite/FilterNode';
 export { default as SceneCompositeNode } from './composite/SceneNode';
-export { default as TextureCompositeNode } from './composite/TextureNode';
 export { default as GroupCompositeNode } from './composite/GroupNode';
 
 // Deferred renderer

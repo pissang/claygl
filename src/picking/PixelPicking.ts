@@ -77,12 +77,10 @@ class PixelPicking {
     }
 
     frameBuffer.attach(this._texture);
-    frameBuffer.bind(renderer);
     this._idOffset = this.lookupOffset;
     this._setMaterial(scene);
-    renderer.render(scene, camera);
+    renderer.render(scene, camera, frameBuffer);
     this._restoreMaterial();
-    frameBuffer.unbind(renderer);
   }
 
   _setMaterial(root: ClayNode) {
@@ -126,13 +124,13 @@ class PixelPicking {
     x = Math.ceil(ratio * x);
     y = Math.ceil(ratio * (this.height - y));
 
-    this._frameBuffer.bind(renderer);
+    renderer.bindFrameBuffer(this._frameBuffer);
     const pixel = new Uint8Array(4);
-    const _gl = renderer.gl;
+    const gl = renderer.gl;
     // TODO out of bounds ?
     // preserveDrawingBuffer ?
-    _gl.readPixels(x, y, 1, 1, _gl.RGBA, _gl.UNSIGNED_BYTE, pixel);
-    this._frameBuffer.unbind(renderer);
+    gl.readPixels(x, y, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+    renderer.bindFrameBuffer(this._frameBuffer);
     // Skip interpolated pixel because of anti alias
     if (pixel[3] === 255) {
       const id = unpackID(pixel[0], pixel[1], pixel[2]);
@@ -150,7 +148,7 @@ class PixelPicking {
   }
 
   dispose(renderer: Renderer) {
-    this._frameBuffer.dispose(renderer);
+    renderer.disposeFrameBuffer(this._frameBuffer);
   }
 }
 

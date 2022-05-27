@@ -3,7 +3,7 @@ import type AmbientCubemap from '../light/AmbientCubemap';
 import type Material from '../Material';
 import type Renderer from '../Renderer';
 import type Scene from '../Scene';
-import type Texture from '../Texture';
+import Texture from '../Texture';
 
 type Resource = Geometry | Texture;
 const usedMap = new WeakMap<Resource, number>();
@@ -16,8 +16,13 @@ function markUnused(resourceList: Resource[]) {
 
 function checkAndDispose(renderer: Renderer, resourceList: Resource[]) {
   for (let i = 0; i < resourceList.length; i++) {
-    if (!usedMap.get(resourceList[i])) {
-      resourceList[i].dispose(renderer);
+    const resource = resourceList[i];
+    if (!usedMap.get(resource)) {
+      if (resource instanceof Texture) {
+        renderer.disposeTexture(resource);
+      } else {
+        renderer.disposeGeometry(resource);
+      }
     }
   }
 }

@@ -24,7 +24,7 @@ interface FullscreenQuadPassOpts {
 class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Notifier {
   material: Material<Shader<typeof fullscreenQuadPassVertex, T>>;
 
-  clearColor?: Color;
+  clearColor?: Color | boolean;
   clearDepth?: boolean;
   blendWithPrevious?: boolean;
 

@@ -514,7 +514,15 @@ class Renderer extends Notifier {
     this._renderPass(list, camera, frameBuffer, renderHooks, scene);
   }
 
-  private _bindFrameBuffer(frameBuffer?: FrameBuffer) {
+  /**
+   * Bind frame buffer manually.
+   * Use #bindFrameBuffer(null) to unbind
+   */
+  bindFrameBuffer(frameBuffer?: FrameBuffer | null) {
+    this._bindFrameBuffer(frameBuffer);
+  }
+
+  private _bindFrameBuffer(frameBuffer?: FrameBuffer | null) {
     const glRenderer = this._glRenderer;
     glRenderer.bindFrameBuffer(frameBuffer);
     const viewport = frameBuffer ? frameBuffer.getViewport() : this.viewport;

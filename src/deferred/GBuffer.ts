@@ -580,7 +580,6 @@ class DeferredGBuffer {
 
     const debugPass = this._debugPass;
     const debugPassMat = debugPass.material;
-    debugPassMat.set('viewportSize', [renderer.getWidth(), renderer.getHeight()]);
     debugPassMat.set('gBufferTexture1', this._gBufferTex1);
     debugPassMat.set('gBufferTexture2', this._gBufferTex2);
     debugPassMat.set('gBufferTexture3', this._gBufferTex3);

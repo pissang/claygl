@@ -705,12 +705,12 @@ function KHRCommonMaterialToStandard(
       diffuseProp = diffuseProp.slice(0, 3);
       isStandardMaterial
         ? ((material as StandardMaterial).color = diffuseProp)
-        : material.set('color', diffuseProp);
+        : (material as StandardMaterial).set('color', diffuseProp);
     } else {
       // Texture
       isStandardMaterial
         ? ((material as StandardMaterial).diffuseMap = diffuseProp)
-        : material.set('diffuseMap', diffuseProp);
+        : (material as StandardMaterial).set('diffuseMap', diffuseProp);
     }
   }
   let emissionProp = uniforms.emission;
@@ -720,12 +720,12 @@ function KHRCommonMaterialToStandard(
       emissionProp = emissionProp.slice(0, 3);
       isStandardMaterial
         ? ((material as StandardMaterial).emission = emissionProp)
-        : material.set('emission', emissionProp);
+        : (material as StandardMaterial).set('emission', emissionProp);
     } else {
       // Texture
       isStandardMaterial
         ? ((material as StandardMaterial).emissiveMap = emissionProp)
-        : material.set('emissiveMap', emissionProp);
+        : (material as StandardMaterial).set('emissiveMap', emissionProp);
     }
   }
   if (materialInfo.normalTexture != null) {
@@ -734,23 +734,23 @@ function KHRCommonMaterialToStandard(
     if (isStandardMaterial) {
       (material as StandardMaterial).normalMap = lib.textures[normalTextureIndex];
     } else {
-      material.set('normalMap', lib.textures[normalTextureIndex]);
+      (material as StandardMaterial).set('normalMap', lib.textures[normalTextureIndex]);
     }
   }
   if (uniforms.shininess != null) {
     const glossiness = Math.log(uniforms.shininess) / Math.log(8192);
     // Uniform glossiness
-    material.set('glossiness', glossiness);
-    material.set('roughness', 1 - glossiness);
+    (material as StandardMaterial).set('glossiness', glossiness);
+    (material as StandardMaterial).set('roughness', 1 - glossiness);
   } else {
-    material.set('glossiness', 0.3);
-    material.set('roughness', 0.3);
+    (material as StandardMaterial).set('glossiness', 0.3);
+    (material as StandardMaterial).set('roughness', 0.3);
   }
   if (uniforms.specular != null) {
-    material.set('specularColor', uniforms.specular.slice(0, 3));
+    (material as StandardMaterial).set('specularColor', uniforms.specular.slice(0, 3));
   }
   if (uniforms.transparency != null) {
-    material.set('alpha', uniforms.transparency);
+    (material as StandardMaterial).set('alpha', uniforms.transparency);
   }
 
   return material;

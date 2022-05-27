@@ -131,6 +131,8 @@ class GroupCompositeNode<InputKey extends string, OutputKey extends string> exte
     // TODO what if group node set outputs to empty?
   }
 
+  prepare(renderer: Renderer): void {}
+
   /**
    * Get a handle of group input. Group will know how to link to the inside nodes to outside.
    */
