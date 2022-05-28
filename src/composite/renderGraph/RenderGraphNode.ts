@@ -55,6 +55,9 @@ class RenderGraphNode {
   // Cached texture params.
   private _textureParams: Record<string, TexturePoolParameters> = {};
 
+  // A flag to avoid infinite loop when having a self-pointing node.
+  private _inLoop = false;
+
   constructor(compositeNode: CompositeNode, renderGraph: RenderGraph) {
     this._compositeNode = compositeNode;
     this._renderGraph = renderGraph;
@@ -96,6 +99,10 @@ class RenderGraphNode {
    * Find the most large input texture to inherit.
    */
   private _deriveTextureParams(renderer: Renderer) {
+    if (this._inLoop) {
+      return;
+    }
+    this._inLoop = true;
     let mostProbablyParams: TexturePoolParameters | undefined;
     let largestSize = 0;
     keys(this._inputs).forEach((inputName) => {
@@ -107,6 +114,7 @@ class RenderGraphNode {
         mostProbablyParams = params;
       }
     });
+    this._inLoop = false;
     return mostProbablyParams;
   }
 

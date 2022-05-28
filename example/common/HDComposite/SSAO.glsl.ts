@@ -53,7 +53,8 @@ void main()
 
   // Is empty
   if (dot(tex.rgb, vec3(1.0)) == 0.0) {
-    discard;
+    gl_FragColor = vec4(vec3(1.0), 0.0);
+    return;
   }
 
   vec3 N = tex.rgb * 2.0 - 1.0;

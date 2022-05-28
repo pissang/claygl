@@ -10,7 +10,7 @@ import * as constants from '../core/constants';
 import Renderer, { RenderHooks, RendererViewport, RenderableObject } from '../Renderer';
 import Camera from '../Camera';
 import Scene from '../Scene';
-import { assign, optional } from '../core/util';
+import { optional } from '../core/util';
 import {
   gBuffer1Fragment,
   gBuffer2Fragment,

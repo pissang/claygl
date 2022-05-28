@@ -26,16 +26,14 @@ export const blendCompositeFragment = new FragmentShader({
   },
   includes: [HDREncoderMixin],
   main: glsl`
-
 vec4 blend(vec4 col1, vec4 col2, float w) {
 #if BLEND_METHOD == 1
-  return col1 * col2 * w;
+  return vec4(col1.rgb * col2.rgb * w, max(col1.a, col2.a));
 #else
   return col1 + col2 * w;
 #endif
 }
-void main()
-{
+void main() {
 #if BLEND_METHOD == 1
   vec4 tex = vec4(1.0);
 #else

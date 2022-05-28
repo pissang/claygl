@@ -19,10 +19,13 @@ import { blendCompositeFragment, composeCompositeFragment } from 'claygl/shaders
 import { projectEnvironmentMap } from '../src/util/sh';
 import GBufferCompositeNode from './common/HDComposite/GBufferNode';
 import SSAOCompositeNode from './common/HDComposite/SSAONode';
+import TAACameraJitter from './common/HDComposite/TAACameraJitter';
+import TAACompositeNode from './common/HDComposite/TAANode';
 
 const compositor = new Compositor();
 const renderer = new Renderer({
-  canvas: document.getElementById('main') as HTMLCanvasElement
+  canvas: document.getElementById('main') as HTMLCanvasElement,
+  devicePixelRatio: 1
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 
@@ -43,15 +46,13 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
     roughness: 0.5
   });
 
-  for (let i = 0; i < 10; i++) {
-    for (let k = 0; k < 10; k++) {
+  for (let i = 0; i < 2; i++) {
+    for (let k = 0; k < 2; k++) {
       const mesh = new Mesh(suzanneGeometry, material);
       mesh.position.set(Math.random() * 6 - 3, Math.random() * 6 - 3, Math.random() * 6 - 3);
       scene.add(mesh);
     }
   }
-
-  material.diffuseMap = textureUtil.loadTextureSync('assets/textures/diffuse2.png');
 
   textureUtil
     .loadTexture('assets/textures/hdr/pisa.hdr', {
@@ -75,7 +76,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
       const skybox = new Skybox({
         environmentMap: ambientCubemapLight.cubemap
       });
-      // skybox.material.define('fragment', 'RGBM_DECODE');
+      skybox.material.define('fragment', 'RGBM_DECODE');
       skybox.material.set('lod', 3.0);
       scene.skybox = skybox;
     });
@@ -84,14 +85,22 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
 const control = new OrbitControl({
   target: camera,
   domElement: renderer.canvas,
+  // autoRotate: true,
   timeline: startTimeline()
 });
+control.on('update', () => {
+  taaCameraJitter.resetFrame();
+});
+
+const taaCameraJitter = new TAACameraJitter(renderer, camera);
 
 const gbufferNode = new GBufferCompositeNode(scene, camera);
+gbufferNode.enableTexture4 = true;
 const ssaoNode = new SSAOCompositeNode(camera);
 const sceneNode = new SceneCompositeNode(scene, camera);
 const blendNode = new FilterCompositeNode(blendCompositeFragment);
 const tonemappingNode = new FilterCompositeNode(composeCompositeFragment);
+const taaNode = new TAACompositeNode(camera);
 ssaoNode.inputs = {
   gBufferTex: {
     node: gbufferNode,
@@ -110,15 +119,26 @@ blendNode.inputs = {
 tonemappingNode.inputs = {
   texture: blendNode
 };
-tonemappingNode.renderToScreen = true;
+taaNode.inputs = {
+  colorTexture: tonemappingNode,
+  gBufferTexture2: {
+    node: gbufferNode,
+    output: 'texture2'
+  },
+  gBufferTexture3: {
+    node: gbufferNode,
+    output: 'texture4'
+  }
+};
+taaNode.renderToScreen = true;
+taaNode.setStill(true);
 
-compositor.addNode(gbufferNode, ssaoNode, blendNode, sceneNode, tonemappingNode);
+compositor.addNode(gbufferNode, ssaoNode, blendNode, sceneNode, tonemappingNode, taaNode);
 
-ssaoNode.setKernelSize(64);
+ssaoNode.setKernelSize(16);
 
 startTimeline(() => {
   ssaoNode.setEstimateRadius(0.2);
-  tonemappingNode.renderToScreen = true;
   blendNode.material.define('BLEND_METHOD', 1);
   blendNode.material.set('weight1', 1);
   blendNode.material.set('weight2', 1);
