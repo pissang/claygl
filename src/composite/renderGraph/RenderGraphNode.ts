@@ -157,7 +157,8 @@ class RenderGraphNode {
 
   isEndNode() {
     const compositeNode = this._compositeNode;
-    return compositeNode.renderToScreen || !this.hasOutput();
+    return compositeNode.renderToScreen;
+    // return compositeNode.renderToScreen || !this.hasOutput();
   }
 
   render(renderer: Renderer, finalFrameBuffer?: FrameBuffer) {
