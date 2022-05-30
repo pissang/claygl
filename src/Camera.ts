@@ -31,14 +31,25 @@ class Camera extends ClayNode {
    */
   frustum = new Frustum();
 
+  /**
+   * Jitter offset. In pixels.
+   */
+  offset = new Vector2();
+
   update() {
     super.update.call(this);
     Matrix4.invert(this.viewMatrix, this.worldTransform);
 
     this.updateProjectionMatrix();
-    Matrix4.invert(this.invProjectionMatrix, this.projectionMatrix);
+    const projectionMatrix = this.projectionMatrix;
+    const translationMat = new Matrix4();
+    const offset = this.offset;
+    translationMat.array[12] = offset.x;
+    translationMat.array[13] = offset.y;
+    Matrix4.mul(projectionMatrix, translationMat, projectionMatrix);
+    Matrix4.invert(this.invProjectionMatrix, projectionMatrix);
 
-    this.frustum.setFromProjection(this.projectionMatrix);
+    this.frustum.setFromProjection(projectionMatrix);
   }
 
   /**

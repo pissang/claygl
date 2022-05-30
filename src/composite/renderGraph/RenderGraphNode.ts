@@ -190,9 +190,6 @@ class RenderGraphNode {
 
     outputNames.forEach((outputName) => {
       const parameters = this.getTextureParams(outputName, renderer);
-      if (isNaN(parameters.width as number)) {
-        this.getTextureParams(outputName, renderer);
-      }
       // TODO Avoid reading from composite node too much
       const outputInfo = this._compositeNode.outputs![outputName];
       const texture = texturePool.allocate(parameters);
@@ -204,12 +201,16 @@ class RenderGraphNode {
       sharedFrameBuffer!.attach(texture, +attachment);
     });
 
-    this._compositeNode.render(
+    const compositeNode = this._compositeNode;
+    compositeNode.beforeRender &&
+      compositeNode.beforeRender(renderer, inputTextures, outputTextures);
+    compositeNode.render(
       renderer,
       inputTextures,
       outputTextures,
       sharedFrameBuffer || finalFrameBuffer
     );
+    compositeNode.afterRender && compositeNode.afterRender();
 
     inputNames.forEach((inputName) => {
       const link = inputLinks[inputName];

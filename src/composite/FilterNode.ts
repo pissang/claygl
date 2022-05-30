@@ -65,21 +65,12 @@ class FilterCompositeNode<
 
   prepare(renderer: Renderer): void {}
 
-  beforeRender?: (
-    renderer: Renderer,
-    inputTextures: Record<keyof S, Texture>,
-    outputTextures?: Record<O, Texture>
-  ) => void;
-  afterRender?: () => void;
-
   render(
     renderer: Renderer,
     inputTextures: Record<keyof S, Texture>,
     outputTextures?: Record<O, Texture>,
     frameBuffer?: FrameBuffer
   ): void {
-    this.beforeRender && this.beforeRender(renderer, inputTextures, outputTextures);
-
     const pass = this.pass;
     const material = pass.material;
 
@@ -99,8 +90,6 @@ class FilterCompositeNode<
 
     // Output
     pass.render(renderer, frameBuffer);
-
-    this.afterRender && this.afterRender();
   }
 
   get material() {
