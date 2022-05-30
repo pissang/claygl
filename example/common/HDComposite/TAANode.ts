@@ -33,13 +33,22 @@ class TAACompositeNode extends GroupCompositeNode<
       color: this.getGroupOutput('color')
     };
 
+    this._outputNode.material.blend = function (gl) {
+      gl.blendEquationSeparate(gl.FUNC_ADD, gl.FUNC_ADD);
+      gl.blendFuncSeparate(gl.ONE, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    };
+
+    this.outputs = {
+      color: {}
+    };
+
     this._camera = camera;
 
     this.addNode(this._taaNode, this._outputNode);
   }
 
   prepare(renderer: Renderer): void {
-    this._taaNode.material.set('projection', this._camera.projectionMatrix.array);
+    // this._taaNode.material.set('projection', this._camera.projectionMatrix.array);
   }
 
   setStill(isStill: boolean) {

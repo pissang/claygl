@@ -2,6 +2,7 @@ import { createUniform, FragmentShader, glsl } from '../../../Shader';
 import { HDREncoderMixin } from '../util.glsl';
 
 export const outputFragment = new FragmentShader({
+  name: 'outputFrag',
   defines: {
     OUTPUT_ALPHA: null
   },

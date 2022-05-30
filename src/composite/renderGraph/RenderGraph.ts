@@ -39,6 +39,10 @@ class RenderGraph {
     const nodes = this._nodes;
     const outputs = nodes.filter((node) => node.isEndNode());
 
+    if (!outputs.length) {
+      console.error('No output. Set renderToScreen on the output node.');
+    }
+
     // Update the reference number of each output texture
     nodes.forEach((node) => node.beforeRender());
 

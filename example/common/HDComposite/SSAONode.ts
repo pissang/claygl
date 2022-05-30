@@ -9,6 +9,7 @@ import {
   Matrix4
 } from 'claygl';
 import { SSAOBlurFragment, SSAOEstimateFragment } from './SSAO.glsl';
+import TAACameraJitter from './TAACameraJitter';
 
 function generateNoiseData(size: number) {
   var data = new Uint8Array(size * size * 4);
@@ -53,6 +54,7 @@ interface SSAOCompositeNodeOpts {
   kernelSize?: number;
   radius?: number;
   power?: number;
+  TAAJitter?: TAACameraJitter;
 }
 
 class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'color'> {
@@ -62,6 +64,11 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
   private _blurNode = new FilterCompositeNode<typeof SSAOBlurFragment, 'color'>(SSAOBlurFragment);
 
   private _camera: PerspectiveCamera;
+
+  private _kernels: Float32Array[] = [];
+
+  private _frame = 0;
+  private _TAAJitter?: TAACameraJitter;
 
   constructor(camera: PerspectiveCamera, opts?: SSAOCompositeNodeOpts) {
     super();
@@ -96,6 +103,7 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
       } as SSAOCompositeNodeOpts,
       opts
     );
+    this._TAAJitter = opts.TAAJitter;
 
     this.setKernelSize(opts.kernelSize!);
     this.setNoiseSize(4);
@@ -106,7 +114,6 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
 
   prepare(renderer: Renderer): void {
     const estimateMaterial = this._estimateNode.material;
-    const blurMaterial = this._blurNode.material;
     const camera = this._camera;
 
     const viewInverseTranspose = new Matrix4();
@@ -116,6 +123,11 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
       projectionInv: camera.invProjectionMatrix.array,
       viewInverseTranspose: viewInverseTranspose.array
     });
+
+    if (this._TAAJitter) {
+      const kernel = this._kernels[this._TAAJitter.getFrame() % this._kernels.length];
+      estimateMaterial.set('kernel', kernel);
+    }
   }
 
   setEstimateRadius(radius: number) {
@@ -129,7 +141,15 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
   setKernelSize(size: number) {
     const estimateMaterial = this._estimateNode.material;
     estimateMaterial.define('fragment', 'KERNEL_SIZE', size);
-    estimateMaterial.set('kernel', generateKernel(size));
+    if (this._TAAJitter) {
+      this._kernels = [];
+      for (let i = 0; i < this._TAAJitter.getSequenceFrames(); i++) {
+        const kernel = generateKernel(size);
+        this._kernels.push(kernel);
+      }
+    } else {
+      estimateMaterial.set('kernel', generateKernel(size));
+    }
   }
 
   setBlurSize(size: number) {
