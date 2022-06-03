@@ -56,8 +56,8 @@ class TAACompositeNode extends GroupCompositeNode<
     this._taaNode.material.set('frame', frame);
   }
 
-  setStill(isStill: boolean) {
-    this._taaNode.material.set('still', +isStill || 0);
+  setDynamic(isDynamic: boolean) {
+    this._taaNode.material.set('still', +!isDynamic);
   }
 }
 

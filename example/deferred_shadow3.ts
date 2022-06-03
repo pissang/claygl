@@ -102,7 +102,7 @@ startTimeline((deltaTime) => {
   // renderer.render(scene, camera);
   deferredRenderer.render(renderer, scene, camera);
 
-  // shadowMapPass.renderDebug(renderer);
+  shadowMapPass.renderDebug(renderer);
 
   stats.update();
 });

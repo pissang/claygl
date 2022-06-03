@@ -457,17 +457,20 @@ class ShadowMapPass extends Notifier {
 
       const shadowSize = light.shadowResolution || 512;
 
-      // Reversed, left to right => far to near
-      renderer.setViewport(
-        (light.shadowCascade - i - 1) * shadowSize,
-        0,
-        shadowSize,
-        shadowSize,
-        1
-      );
-
       const renderList = scene.updateRenderList(lightCamera);
-      renderer.renderPass(renderList.opaque, lightCamera, framebuffer, passConfig);
+      renderer.renderPass(
+        renderList.opaque,
+        lightCamera,
+        framebuffer,
+        assign({}, passConfig, {
+          prepare(gl) {
+            // Reversed, left to right => far to near
+            gl.viewport((light.shadowCascade - i - 1) * shadowSize, 0, shadowSize, shadowSize);
+            // Only clear on the first pass.
+            i === 0 && gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
+          }
+        } as RenderHooks)
+      );
 
       const matrix = new Matrix4();
       matrix.copy(lightCamera.viewMatrix).multiplyLeft(lightCamera.projectionMatrix);

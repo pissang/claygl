@@ -147,7 +147,7 @@ tonemappingNode.inputs = {
 };
 tonemappingNode.renderToScreen = true;
 
-taaNode.setStill(true);
+taaNode.setDynamic(false);
 
 compositor.addNode(gbufferNode, ssaoNode, blendNode, sceneNode, tonemappingNode, taaNode);
 
