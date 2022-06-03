@@ -90,6 +90,9 @@ class RenderGraphNode {
         params.height *= scale;
       }
 
+      params.width = Math.round(params.width);
+      params.height = Math.round(params.height);
+
       textureParams[outputName] = params;
     }
     return textureParams[outputName];

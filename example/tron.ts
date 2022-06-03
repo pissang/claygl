@@ -66,19 +66,15 @@ const sceneNode = new SceneCompositeNode(scene, camera);
 const bloomNode = new BloomNode();
 const tonemappingNode = new FilterCompositeNode(composeCompositeFragment);
 
-sceneNode.outputs = { color: {} };
 bloomNode.inputs = {
   texture: sceneNode
-};
-bloomNode.outputs = {
-  color: {}
 };
 tonemappingNode.inputs = {
   texture: sceneNode,
   bloom: bloomNode
 };
 bloomNode.setBrightThreshold(0.6);
-
+tonemappingNode.renderToScreen = true;
 compositor.addNode(sceneNode, bloomNode, tonemappingNode);
 
 startTimeline((dTime) => {
