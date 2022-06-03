@@ -33,7 +33,7 @@ class TAACameraJitter {
     this._frame = 0;
   }
 
-  updateFrame() {
+  step() {
     this._frame++;
   }
 

@@ -17,7 +17,8 @@ const TAAFragment = new FragmentShader({
     stillBlending: uniform('float', 0.95),
     motionBlending: uniform('float', 0.85),
     sharpness: uniform('float', 0.25),
-    motionAmplification: uniform('float', 6000)
+    motionAmplification: uniform('float', 6000),
+    frame: uniform('float')
   },
   main: glsl`
 float Luminance(vec4 color) {
@@ -71,8 +72,10 @@ vec4 Untonemap(vec4 color) {
 
 void main()
 {
-  vec2 closest = GetClosestFragment(v_Texcoord);
-  vec4 motionTexel = texture2D(velocityTex, closest);
+  if (frame == 0.0) {
+    gl_FragColor = texture2D(currTex, v_Texcoord);
+    return;
+  }
 
   if (still) {
     gl_FragColor = Untonemap(
@@ -84,6 +87,10 @@ void main()
     );
     return;
   }
+
+  vec2 closest = GetClosestFragment(v_Texcoord);
+  vec4 motionTexel = texture2D(velocityTex, closest);
+
 
   if (motionTexel.a < 0.1) {
     gl_FragColor = texture2D(currTex, v_Texcoord);

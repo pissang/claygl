@@ -13,7 +13,9 @@ import {
   AmbientSHLight,
   textureUtil,
   AmbientCubemapLight,
-  Skybox
+  Skybox,
+  Node as ClayNode,
+  color
 } from 'claygl';
 import { blendCompositeFragment, composeCompositeFragment } from 'claygl/shaders';
 import { projectEnvironmentMap } from '../src/util/sh';
@@ -35,24 +37,31 @@ const camera = new PerspectiveCamera({
 camera.position.set(0, 0, 6);
 
 const scene = new Scene();
+const rootNode = new ClayNode();
+scene.add(rootNode);
 
-loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
+loadGLTF('assets/models/suzanne/suzanne_high.gltf', {
+  // rootNode
+}).then((res) => {
   const suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
   suzanneGeometry.generateTangents();
 
-  const material = new StandardMaterial({
-    uvRepeat: [3, 3],
-    metalness: 0,
-    roughness: 0.5
-  });
-
-  for (let i = 0; i < 2; i++) {
-    for (let k = 0; k < 2; k++) {
-      const mesh = new Mesh(suzanneGeometry, material);
+  for (let i = 0; i < 10; i++) {
+    for (let k = 0; k < 10; k++) {
+      const mesh = new Mesh(
+        suzanneGeometry,
+        new StandardMaterial({
+          uvRepeat: [3, 3],
+          metalness: 0,
+          roughness: 0
+        })
+      );
       mesh.position.set(Math.random() * 6 - 3, Math.random() * 6 - 3, Math.random() * 6 - 3);
+      // mesh.scale.set(2, 2, 2);
       scene.add(mesh);
     }
   }
+  // material.diffuseMap = textureUtil.loadTextureSync('assets/textures/diffuse2.png');
 
   textureUtil
     .loadTexture('assets/textures/hdr/pisa.hdr', {
@@ -70,7 +79,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
       const ambientCubemapLight = new AmbientCubemapLight({
         cubemap
       });
-      ambientCubemapLight.prefilter(renderer, 64);
+      ambientCubemapLight.prefilter(renderer, 256);
       scene.add(ambientCubemapLight);
 
       const skybox = new Skybox({
@@ -85,22 +94,27 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
 const control = new OrbitControl({
   target: camera,
   domElement: renderer.canvas,
+  zoomSensitivity: 0.2,
   // autoRotate: true,
   timeline: startTimeline()
 });
 control.on('update', () => {
   taaCameraJitter.resetFrame();
 });
+// control.autoRotate = true;
+// control.autoRotateSpeed = 100;
 
-const taaCameraJitter = new TAACameraJitter(renderer, camera);
+const taaCameraJitter = new TAACameraJitter();
 
 const gbufferNode = new GBufferCompositeNode(scene, camera);
 gbufferNode.enableTexture4 = true;
-const ssaoNode = new SSAOCompositeNode(camera);
+const ssaoNode = new SSAOCompositeNode(camera, {
+  TAAJitter: taaCameraJitter
+});
 const sceneNode = new SceneCompositeNode(scene, camera);
 const blendNode = new FilterCompositeNode(blendCompositeFragment);
 const tonemappingNode = new FilterCompositeNode(composeCompositeFragment);
-const taaNode = new TAACompositeNode(camera);
+const taaNode = new TAACompositeNode(camera, taaCameraJitter);
 ssaoNode.inputs = {
   gBufferTex: {
     node: gbufferNode,
@@ -112,15 +126,13 @@ ssaoNode.inputs = {
   }
 };
 blendNode.inputs = {
-  // Render scene node firstly
   texture1: sceneNode,
   texture2: ssaoNode
 };
-tonemappingNode.inputs = {
-  texture: blendNode
-};
+blendNode.material.set('weight1', 1);
+blendNode.material.set('weight2', 1);
 taaNode.inputs = {
-  colorTexture: tonemappingNode,
+  colorTexture: blendNode,
   gBufferTexture2: {
     node: gbufferNode,
     output: 'texture2'
@@ -130,17 +142,30 @@ taaNode.inputs = {
     output: 'texture4'
   }
 };
-taaNode.renderToScreen = true;
+tonemappingNode.inputs = {
+  texture: taaNode
+};
+tonemappingNode.renderToScreen = true;
+
 taaNode.setStill(true);
 
 compositor.addNode(gbufferNode, ssaoNode, blendNode, sceneNode, tonemappingNode, taaNode);
 
-ssaoNode.setKernelSize(16);
+ssaoNode.setKernelSize(32);
 
 startTimeline(() => {
   ssaoNode.setEstimateRadius(0.2);
   blendNode.material.define('BLEND_METHOD', 1);
-  blendNode.material.set('weight1', 1);
-  blendNode.material.set('weight2', 1);
+  camera.offset.setArray(taaCameraJitter.getJitterOffset(renderer));
+
   compositor.render(renderer);
+  taaCameraJitter.step();
 });
+
+const button = document.createElement('button');
+button.innerHTML = 'Step';
+button.onclick = () => {
+  taaCameraJitter.step();
+};
+button.style.cssText = 'position:absolute;top:0;left:0;';
+document.body.appendChild(button);

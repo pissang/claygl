@@ -203,6 +203,7 @@ class RenderGraphNode {
     });
 
     const compositeNode = this._compositeNode;
+    // TODO. Getting viewport in the beforeRender hook will be wrong because frame buffer is not bound yet.
     compositeNode.beforeRender &&
       compositeNode.beforeRender(renderer, inputTextures, outputTextures);
     compositeNode.render(

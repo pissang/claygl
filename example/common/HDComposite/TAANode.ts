@@ -1,6 +1,7 @@
 import { GroupCompositeNode, FilterCompositeNode, Renderer, Camera } from 'claygl';
 import { outputTextureFragment } from 'claygl/shaders';
 import TAAFragment from './TAA.glsl';
+import TAACameraJitter from './TAACameraJitter';
 
 class TAACompositeNode extends GroupCompositeNode<
   'gBufferTexture2' | 'gBufferTexture3' | 'colorTexture',
@@ -11,8 +12,9 @@ class TAACompositeNode extends GroupCompositeNode<
   private _taaNode = new FilterCompositeNode(TAAFragment, 'TAABlend');
   private _outputNode = new FilterCompositeNode(outputTextureFragment, 'TAAOutput');
   private _camera: Camera;
+  private _TAAJitter: TAACameraJitter;
 
-  constructor(camera: Camera) {
+  constructor(camera: Camera, taaJitter: TAACameraJitter) {
     super();
 
     this._taaNode.inputs = {
@@ -45,10 +47,13 @@ class TAACompositeNode extends GroupCompositeNode<
     this._camera = camera;
 
     this.addNode(this._taaNode, this._outputNode);
+
+    this._TAAJitter = taaJitter;
   }
 
   prepare(renderer: Renderer): void {
-    // this._taaNode.material.set('projection', this._camera.projectionMatrix.array);
+    const frame = this._TAAJitter.getFrame();
+    this._taaNode.material.set('frame', frame);
   }
 
   setStill(isStill: boolean) {

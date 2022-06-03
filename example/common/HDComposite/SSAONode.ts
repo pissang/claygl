@@ -12,11 +12,11 @@ import { SSAOBlurFragment, SSAOEstimateFragment } from './SSAO.glsl';
 import TAACameraJitter from './TAACameraJitter';
 
 function generateNoiseData(size: number) {
-  var data = new Uint8Array(size * size * 4);
-  var n = 0;
-  var v3 = new Vector3();
-  for (var i = 0; i < size; i++) {
-    for (var j = 0; j < size; j++) {
+  const data = new Uint8Array(size * size * 4);
+  const v3 = new Vector3();
+  let n = 0;
+  for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
       v3.set(Math.random() * 2 - 1, Math.random() * 2 - 1, 0).normalize();
       data[n++] = (v3.x * 0.5 + 0.5) * 255;
       data[n++] = (v3.y * 0.5 + 0.5) * 255;
@@ -36,9 +36,9 @@ function generateNoiseTexture(size: number) {
 }
 
 function generateKernel(size: number) {
-  var kernel = new Float32Array(size * 3);
-  var v3 = new Vector3();
-  for (var i = 0; i < size; i++) {
+  const kernel = new Float32Array(size * 3);
+  const v3 = new Vector3();
+  for (let i = 0; i < size; i++) {
     v3.set(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random())
       .normalize()
       .scale(Math.random());
@@ -66,8 +66,6 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
   private _camera: PerspectiveCamera;
 
   private _kernels: Float32Array[] = [];
-
-  private _frame = 0;
   private _TAAJitter?: TAACameraJitter;
 
   constructor(camera: PerspectiveCamera, opts?: SSAOCompositeNodeOpts) {
@@ -158,7 +156,7 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
 
   setNoiseSize(size: number) {
     const estimateMaterial = this._estimateNode.material;
-    var texture = estimateMaterial.get('noiseTex');
+    let texture = estimateMaterial.get('noiseTex');
     if (!texture) {
       texture = generateNoiseTexture(size);
       estimateMaterial.set('noiseTex', generateNoiseTexture(size));
