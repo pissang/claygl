@@ -66,7 +66,7 @@ interface ClayNode extends ClayNodeOpts {
   dispose(renderer: Renderer): void;
 }
 class ClayNode extends Notifier {
-  readonly __uid__: number = genGUID();
+  readonly uid: number = genGUID();
 
   readonly type: string = '';
 

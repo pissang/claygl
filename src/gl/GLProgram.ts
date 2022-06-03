@@ -28,7 +28,7 @@ function checkShaderErrorMsg(
 const tmpFloat32Array16 = new Float32Array(16);
 
 class GLProgram {
-  readonly __uid__ = genGUID();
+  readonly uid = genGUID();
 
   semanticsMap: Shader['semanticsMap'] = {};
   attributes: Shader['attributes'] = {};

@@ -456,7 +456,7 @@ class DeferredGBuffer {
             const joints = renderable.joints;
             if (joints.length > renderer.getMaxJointNumber()) {
               const skinMatricesTexture = skeleton.getSubSkinMatricesTexture(
-                renderable.__uid__,
+                renderable.uid,
                 joints
               );
               let prevSkinMatricesTexture = gbufferData.prevSkinMatricesTexture;
@@ -482,7 +482,7 @@ class DeferredGBuffer {
               prevSkinMatricesTexture.width = skinMatricesTexture.width;
               prevSkinMatricesTexture.height = skinMatricesTexture.height;
             } else {
-              const skinMatricesArray = skeleton.getSubSkinMatrices(renderable.__uid__, joints);
+              const skinMatricesArray = skeleton.getSubSkinMatrices(renderable.uid, joints);
               if (
                 !gbufferData.prevSkinMatricesArray ||
                 gbufferData.prevSkinMatricesArray.length !== skinMatricesArray.length

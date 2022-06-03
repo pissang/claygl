@@ -626,7 +626,7 @@ class ShadowMapPass extends Notifier {
   }
 
   _getDepthMaterial(light: Light) {
-    let shadowMaterial = this._lightMaterials[light.__uid__];
+    let shadowMaterial = this._lightMaterials[light.uid];
     const isPointLight = light.type === 'POINT_LIGHT';
     if (!shadowMaterial) {
       shadowMaterial = new Material(
@@ -639,7 +639,7 @@ class ShadowMapPass extends Notifier {
         }
       );
 
-      this._lightMaterials[light.__uid__] = shadowMaterial;
+      this._lightMaterials[light.uid] = shadowMaterial;
     }
     if ((light as DirectionalLight).shadowSlopeScale != null) {
       shadowMaterial.set('slopeScale', (light as DirectionalLight).shadowSlopeScale);
@@ -659,7 +659,7 @@ class ShadowMapPass extends Notifier {
   _getTexture(light: PointLight, cascade?: number): TextureCube;
   _getTexture(light: DirectionalLight | SpotLight, cascade?: number): Texture2D;
   _getTexture(light: DirectionalLight | PointLight | SpotLight, cascade?: number) {
-    const key = light.__uid__;
+    const key = light.uid;
     let texture = this._textures[key];
     const resolution = light.shadowResolution || 512;
     cascade = cascade || 1;

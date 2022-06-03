@@ -51,7 +51,7 @@ function noop() {}
  * A very basic material that is used in renderPass
  */
 export interface GLMaterialObject {
-  __uid__?: number;
+  uid?: number;
 
   shader: Shader;
   uniforms?: Shader['uniformTpls'];
@@ -195,7 +195,7 @@ const GL1_EXTENSION_LIST = [
 class GLRenderer {
   readonly gl: WebGLRenderingContext;
 
-  readonly __uid__ = genGUID();
+  readonly uid = genGUID();
 
   private _programMgr: ProgramManager;
 
@@ -314,7 +314,7 @@ class GLRenderer {
         continue;
       }
 
-      const currentDrawID = geometry.__uid__ + '-' + program.__uid__;
+      const currentDrawID = geometry.uid + '-' + program.uid;
       const drawIDChanged = currentDrawID !== drawID;
       drawID = currentDrawID;
 
@@ -479,10 +479,10 @@ class GLRenderer {
   private _validateProgram(program: GLProgram) {
     if (program.__error) {
       const errorMsg = program.__error;
-      if (errorShader[program.__uid__]) {
+      if (errorShader[program.uid]) {
         return;
       }
-      errorShader[program.__uid__] = true;
+      errorShader[program.uid] = true;
 
       if (this.throwError) {
         throw new Error(errorMsg);
@@ -500,15 +500,12 @@ class GLRenderer {
       // TODO Update before culling.
       skeleton.update();
       if (object.joints.length > this.maxJointNumber) {
-        const skinMatricesTexture = skeleton.getSubSkinMatricesTexture(
-          object.__uid__,
-          object.joints
-        );
+        const skinMatricesTexture = skeleton.getSubSkinMatricesTexture(object.uid, object.joints);
         program.useTextureSlot(gl, this._getGLTexture(skinMatricesTexture), slot);
         program.set(gl, '1i', 'skinMatricesTexture', slot);
         program.set(gl, '1f', 'skinMatricesTextureSize', skinMatricesTexture.width);
       } else {
-        const skinMatricesArray = skeleton.getSubSkinMatrices(object.__uid__, object.joints);
+        const skinMatricesArray = skeleton.getSubSkinMatrices(object.uid, object.joints);
         program.set(gl, 'm4v', 'skinMatrix', skinMatricesArray);
       }
     }

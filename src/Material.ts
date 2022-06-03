@@ -100,7 +100,7 @@ class Material<
   // like: renderPass([{ material }])
   T extends Shader = Shader<VertexShader<any, any, any, any>, FragmentShader<any, any, any>>
 > {
-  readonly __uid__: number = util.genGUID();
+  readonly uid: number = util.genGUID();
 
   name: string;
 

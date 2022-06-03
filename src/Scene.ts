@@ -213,7 +213,7 @@ class Scene extends ClayNode {
     const newNode = node.clone();
     const clonedNodesMap: Record<string, ClayNode> = {};
     function buildNodesMap(sNode: ClayNode, tNode: ClayNode) {
-      clonedNodesMap[sNode.__uid__] = tNode;
+      clonedNodesMap[sNode.uid] = tNode;
 
       const sChildren = sNode.childrenRef();
       const tChildren = tNode.childrenRef();
@@ -246,7 +246,7 @@ class Scene extends ClayNode {
    * @return {clay.Scene.RenderList}
    */
   updateRenderList(camera: Camera, updateSceneBoundingBox?: boolean) {
-    const id = camera.__uid__ + '';
+    const id = camera.uid + '';
     let renderList = this._renderLists.get(id);
     if (!renderList) {
       renderList = new RenderList();
@@ -279,7 +279,7 @@ class Scene extends ClayNode {
    * @return {clay.Scene.RenderList}
    */
   getRenderList(camera: Camera) {
-    return this._renderLists.get(camera.__uid__ + '');
+    return this._renderLists.get(camera.uid + '');
   }
 
   _doUpdateRenderList(

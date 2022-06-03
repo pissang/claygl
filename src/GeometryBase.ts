@@ -210,7 +210,7 @@ export interface GeometryBaseOpts {
 
 interface GeometryBase extends GeometryBaseOpts {}
 class GeometryBase {
-  readonly __uid__ = genGUID();
+  readonly uid = genGUID();
 
   // TODO put in GeometryBase?
   boundingBox?: BoundingBox;

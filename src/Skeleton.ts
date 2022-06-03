@@ -378,7 +378,7 @@ class Skeleton {
       newJoint.index = joint.index;
 
       if (clonedNodesMap && joint.node) {
-        const newNode = clonedNodesMap[joint.node.__uid__];
+        const newNode = clonedNodesMap[joint.node.uid];
 
         if (!newNode) {
           // PENDING

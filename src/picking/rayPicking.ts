@@ -143,10 +143,7 @@ function intersectRenderable(
     return;
   }
   if (isSkinnedMesh) {
-    skinMatricesArray = renderable.skeleton.getSubSkinMatrices(
-      renderable.__uid__,
-      renderable.joints
-    );
+    skinMatricesArray = renderable.skeleton.getSubSkinMatrices(renderable.uid, renderable.joints);
     for (let i = 0; i < renderable.joints.length; i++) {
       skinMatrices[i] = skinMatrices[i] || [];
       for (let k = 0; k < 16; k++) {

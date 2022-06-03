@@ -127,7 +127,7 @@ interface Renderer
  * @extends clay.core.Base
  */
 class Renderer extends Notifier {
-  __uid__ = genGUID();
+  uid = genGUID();
 
   canvas: HTMLCanvasElement;
   /**
@@ -775,7 +775,7 @@ class Renderer extends Notifier {
       if ((node as InstancedMesh).instancedAttributes) {
         this.disposeInstancedMesh(node as InstancedMesh);
       }
-      if (disposeTexture && material && !disposedMap[material.__uid__]) {
+      if (disposeTexture && material && !disposedMap[material.uid]) {
         const textureUniforms = material.getTextureUniforms();
         for (let u = 0; u < textureUniforms.length; u++) {
           const uniformName = textureUniforms[u];
@@ -794,7 +794,7 @@ class Renderer extends Notifier {
             }
           }
         }
-        disposedMap[material.__uid__] = true;
+        disposedMap[material.uid] = true;
       }
       // Particle system and AmbientCubemap light need to dispose
       node.dispose && node.dispose(this);
@@ -857,12 +857,12 @@ class Renderer extends Notifier {
     if (x.renderOrder === y.renderOrder) {
       if (x.__program === y.__program) {
         if (x.material === y.material) {
-          return x.geometry.__uid__ - y.geometry.__uid__;
+          return x.geometry.uid - y.geometry.uid;
         }
-        return x.material.__uid__! - y.material.__uid__!;
+        return x.material.uid! - y.material.uid!;
       }
       if (x.__program && y.__program) {
-        return x.__program.__uid__ - y.__program.__uid__;
+        return x.__program.uid - y.__program.uid;
       }
       return 0;
     }
@@ -883,12 +883,12 @@ class Renderer extends Notifier {
       if (x.__depth === y.__depth) {
         if (x.__program === y.__program) {
           if (x.material === y.material) {
-            return x.geometry.__uid__ - y.geometry.__uid__;
+            return x.geometry.uid - y.geometry.uid;
           }
-          return x.material.__uid__! - y.material.__uid__!;
+          return x.material.uid! - y.material.uid!;
         }
         if (x.__program && y.__program) {
-          return x.__program.__uid__ - y.__program.__uid__;
+          return x.__program.uid - y.__program.uid;
         }
         return 0;
       }
