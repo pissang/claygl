@@ -12,7 +12,7 @@ import {
 
 type GBufferOutput = 'texture1' | 'texture2' | 'texture3' | 'texture4';
 
-class GBufferNode extends CompositeNode<never, GBufferOutput> {
+class GBufferCompositeNode extends CompositeNode<never, GBufferOutput> {
   name = 'GBuffer';
 
   private _scene: Scene;
@@ -51,6 +51,7 @@ class GBufferNode extends CompositeNode<never, GBufferOutput> {
         ...commonTextureOpts
       },
       texture3: {
+        type: constants.HALF_FLOAT_OES,
         disabled: !this.enableTexture3,
         ...commonTextureOpts
       },
@@ -83,4 +84,4 @@ class GBufferNode extends CompositeNode<never, GBufferOutput> {
   }
 }
 
-export default GBufferNode;
+export default GBufferCompositeNode;

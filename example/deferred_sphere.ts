@@ -94,12 +94,12 @@ for (let i = 0; i < 10; i++) {
   }
 }
 
-loadGLTF('assets/models/suzanne/suzanne.gltf').then((res) => {
+loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   const suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
   const material = new StandardMaterial({
     // specularColor: [0.95, 0.64, 0.54],
-    metalness: 0.2,
-    roughness: 0.5
+    metalness: 0,
+    roughness: 0.2
   });
 
   for (let i = 0; i < 5; i++) {
