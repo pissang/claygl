@@ -428,8 +428,6 @@ class DeferredGBuffer {
     if (enableTargetTexture4) {
       frameBuffer.attach(opts.targetTexture4 || this._gBufferTex4);
 
-      clearViewport();
-
       // Remove jittering in temporal aa.
       // PENDING. Better solution?
       camera.update();
