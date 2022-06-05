@@ -211,6 +211,14 @@ class GLRenderer {
   /// Framebuffer
   private _framebuffer?: FrameBuffer | null;
 
+  private _viewport?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    devicePixelRatio: number;
+  };
+
   throwError: boolean;
 
   maxJointNumber = 20;
@@ -230,7 +238,18 @@ class GLRenderer {
   }
 
   setViewport(x: number, y: number, width: number, height: number, dpr: number) {
+    this._viewport = {
+      x,
+      y,
+      width,
+      height,
+      devicePixelRatio: dpr
+    };
     this.gl.viewport(x * dpr, y * dpr, width * dpr, height * dpr);
+  }
+
+  getViewport() {
+    return this._viewport || { x: 0, y: 0, width: 0, height: 0, devicePixelRatio: 1 };
   }
 
   /**

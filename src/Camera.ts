@@ -52,6 +52,8 @@ class Camera extends ClayNode {
     this.frustum.setFromProjection(projectionMatrix);
   }
 
+  updateOffset?: (width: number, height: number, dpr: number) => void;
+
   /**
    * Set camera view matrix
    */

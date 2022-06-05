@@ -1,4 +1,4 @@
-import { GroupCompositeNode, FilterCompositeNode, Renderer, Camera } from 'claygl';
+import { GroupCompositeNode, FilterCompositeNode, Renderer, Camera, Texture } from 'claygl';
 import { outputTextureFragment } from 'claygl/shaders';
 import TAAFragment from './TAA.glsl';
 import TAACameraJitter from './TAACameraJitter';
@@ -24,8 +24,8 @@ class TAACompositeNode extends GroupCompositeNode<
         output: 'color'
       },
       currTex: this.getGroupInput('colorTexture'),
-      velocityTex: this.getGroupInput('gBufferTexture3'),
-      depthTex: this.getGroupInput('gBufferTexture2')
+      depthTex: this.getGroupInput('gBufferTexture2'),
+      velocityTex: this.getGroupInput('gBufferTexture3')
     };
 
     this._outputNode.inputs = {
@@ -49,6 +49,13 @@ class TAACompositeNode extends GroupCompositeNode<
     this.addNode(this._taaNode, this._outputNode);
 
     this._TAAJitter = taaJitter;
+
+    this._taaNode.beforeRender = (renderer, inputTextures) => {
+      if (!(inputTextures.depthTex && inputTextures.velocityTex)) {
+        // Force to set still
+        this._taaNode.material.set('still', 1);
+      }
+    };
   }
 
   prepare(renderer: Renderer): void {

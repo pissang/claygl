@@ -1,25 +1,24 @@
-import { Renderer } from 'claygl';
+import { Renderer, Camera } from 'claygl';
 
 import halton from '../halton';
 
 class TAACameraJitter {
   private _haltonSequence: number[][] = [];
   private _frame = 0;
+  private _camera: Camera;
 
-  constructor() {
+  constructor(camera: Camera) {
+    this._camera = camera;
     for (let i = 0; i < 30; i++) {
       this._haltonSequence.push([halton(i, 2), halton(i, 3)]);
     }
-  }
-
-  getJitterOffset(renderer: Renderer): [number, number] {
-    const offset = this._haltonSequence[this._frame % this._haltonSequence.length];
-    const viewport = renderer.viewport;
-    const dpr = viewport.devicePixelRatio || renderer.getDevicePixelRatio();
-    const width = viewport.width * dpr;
-    const height = viewport.height * dpr;
-
-    return [(offset[0] * 2.0 - 1.0) / width, (offset[1] * 2.0 - 1.0) / height];
+    camera.updateOffset = (width, height, dpr) => {
+      const offset = this._haltonSequence[this._frame % this._haltonSequence.length];
+      camera.offset.setArray([
+        (offset[0] * 2.0 - 1.0) / width / (dpr || 1),
+        (offset[1] * 2.0 - 1.0) / height / (dpr || 1)
+      ]);
+    };
   }
 
   getSequenceFrames() {

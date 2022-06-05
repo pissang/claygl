@@ -400,13 +400,14 @@ class Renderer extends Notifier {
     opts = opts || {};
     const { notUpdateScene, preZ } = opts;
 
+    const viewport = this._glRenderer.getViewport();
+    const viewportDpr = viewport.devicePixelRatio;
+
     if (this.clearBit) {
       // Must set depth and color mask true before clear
       gl.colorMask(true, true, true, true);
       gl.depthMask(true);
-      const viewport = this.viewport;
       let needsScissor = false;
-      const viewportDpr = viewport.devicePixelRatio;
       if (
         viewport.width !== this._width ||
         viewport.height !== this._height ||
@@ -445,6 +446,7 @@ class Renderer extends Notifier {
       return;
     }
     camera.update();
+    camera.updateOffset && camera.updateOffset(viewport.width, viewport.height, viewportDpr);
     const renderList = scene.updateRenderList(camera, true);
 
     const opaqueList = renderList.opaque;
@@ -547,7 +549,7 @@ class Renderer extends Notifier {
     scene?: Scene
   ) {
     let worldM: mat4.Mat4Array;
-    const viewport = this.viewport;
+    const viewport = this._glRenderer.getViewport();
     const vDpr = viewport.devicePixelRatio;
     const viewportUniform = [
       viewport.x * vDpr,

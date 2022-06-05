@@ -104,7 +104,7 @@ control.on('update', () => {
 // control.autoRotate = true;
 // control.autoRotateSpeed = 100;
 
-const taaCameraJitter = new TAACameraJitter();
+const taaCameraJitter = new TAACameraJitter(camera);
 
 const gbufferNode = new GBufferCompositeNode(scene, camera);
 gbufferNode.enableTexture4 = true;
@@ -146,7 +146,6 @@ tonemappingNode.inputs = {
   texture: taaNode
 };
 tonemappingNode.renderToScreen = true;
-
 taaNode.setDynamic(false);
 
 compositor.addNode(gbufferNode, ssaoNode, blendNode, sceneNode, tonemappingNode, taaNode);
@@ -159,7 +158,6 @@ startTimeline(() => {
 
   compositor.render(renderer);
   taaCameraJitter.step();
-  camera.offset.setArray(taaCameraJitter.getJitterOffset(renderer));
 });
 
 const button = document.createElement('button');

@@ -17,10 +17,11 @@ import { unlitVertex, composeCompositeFragment } from 'claygl/shaders';
 import { tronFragment } from './shader/tron.glsl';
 import * as dat from 'dat.gui';
 import BloomNode from './common/HDComposite/BloomNode';
+import TAACameraJitter from './common/HDComposite/TAACameraJitter';
+import TAACompositeNode from './common/HDComposite/TAANode';
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement
-  // devicePixelRatio: 1
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 const scene = new Scene();
@@ -48,38 +49,40 @@ const cubeMeshTronOutline = new Mesh(cube, tronMaterial, {
 // scene.add(cubeMesh);
 scene.add(cubeMeshTronOutline);
 
-const light = new DirectionalLight({
-  intensity: 0.5
-});
-light.position.set(4, 5, 2);
-light.lookAt(scene.position);
-scene.add(light);
-
 const control = new OrbitControl({
   domElement: renderer.canvas,
   target: camera
 });
+control.on('update', () => {
+  taaCameraJitter.resetFrame();
+});
 
+const taaCameraJitter = new TAACameraJitter(camera);
 const compositor = new Compositor();
 const sceneNode = new SceneCompositeNode(scene, camera);
 const bloomNode = new BloomNode();
 const tonemappingNode = new FilterCompositeNode(composeCompositeFragment);
+const taaNode = new TAACompositeNode(camera, taaCameraJitter);
 
 bloomNode.inputs = {
-  texture: sceneNode
-};
-tonemappingNode.inputs = {
-  texture: sceneNode,
-  bloom: bloomNode
+  texture: taaNode
 };
 bloomNode.setBrightThreshold(0.6);
+taaNode.inputs = {
+  colorTexture: sceneNode
+};
+taaNode.setDynamic(false);
+tonemappingNode.inputs = {
+  texture: taaNode,
+  bloom: bloomNode
+};
 tonemappingNode.renderToScreen = true;
-compositor.addNode(sceneNode, bloomNode, tonemappingNode);
+compositor.addNode(sceneNode, bloomNode, tonemappingNode, taaNode);
 
 startTimeline((dTime) => {
-  // renderer.render(scene, camera);
   control.update(dTime);
   compositor.render(renderer);
+  taaCameraJitter.step();
 });
 
 const gui = new dat.GUI();

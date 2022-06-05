@@ -117,7 +117,7 @@ const control = new OrbitControl({
   zoomSensitivity: 0.4
 });
 
-const taaCameraJitter = new TAACameraJitter();
+const taaCameraJitter = new TAACameraJitter(camera);
 const gbufferNode = new GBufferCompositeNode(scene, camera);
 gbufferNode.enableTexture4 = true;
 const lightingNode = new LightingCompositeNode(scene, camera);
@@ -152,7 +152,6 @@ startTimeline(() => {
   material.roughness = config.roughness;
   compositor.render(renderer);
   taaCameraJitter.step();
-  camera.offset.setArray(taaCameraJitter.getJitterOffset(renderer));
   stats.update();
 });
 
