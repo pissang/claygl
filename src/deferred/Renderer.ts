@@ -17,7 +17,6 @@ import type ShadowMapPass from '../prePass/ShadowMap';
 import type Geometry from '../Geometry';
 import type Scene from '../Scene';
 import type Camera from '../Camera';
-import Notifier from '../core/Notifier';
 import Renderer, { RendererViewport } from '../Renderer';
 import type PointLight from '../light/Point';
 import SphereLight from '../light/Sphere';
@@ -42,6 +41,7 @@ import { deferredSpotLightFragment } from '../shader/source/deferred/spot.glsl';
 import { deferredPointLightFragment } from '../shader/source/deferred/point.glsl';
 import { deferredSphereLightFragment } from '../shader/source/deferred/sphere.glsl';
 import { deferredTubeLightFragment } from '../shader/source/deferred/tube.glsl';
+import { depthWriteFragment } from '../shader/source/deferred/depthwrite.glsl';
 
 const worldView = new Matrix4();
 const preZMaterial = new Material(new Shader(preZVertex, preZFragment));
@@ -58,7 +58,7 @@ interface LightShadowInfo {
 /**
  * Deferred renderer
  */
-class DeferredRenderer extends Notifier {
+class DeferredRenderer {
   /**
    * Provide ShadowMapPass for shadow rendering.
    * @type {clay.prePass.ShadowMap}
@@ -85,6 +85,8 @@ class DeferredRenderer extends Notifier {
   private _fullQuadPass = new FullscreenQuadPass(outputFragment, {
     blendWithPrevious: true
   });
+
+  private _depthWriteMat = new Material(new Shader(fullscreenQuadPassVertex, depthWriteFragment));
 
   private _directionalLightMat: Material;
 
@@ -114,7 +116,6 @@ class DeferredRenderer extends Notifier {
   private _lightShadowInfosMap = new WeakMap<Light, LightShadowInfo>();
 
   constructor() {
-    super();
     const directionalLightShader = new Shader(
       fullscreenQuadPassVertex,
       deferredDirectionalLightFragment
@@ -179,23 +180,36 @@ class DeferredRenderer extends Notifier {
    * @param {clay.Renderer} renderer
    * @param {clay.Scene} scene
    * @param {clay.Camera} camera
-   * @param {Object} [opts]
-   * @param {boolean} [opts.renderToTarget = false] If not ouput and render to the target texture
-   * @param {boolean} [opts.notUpdateShadow = true] If not update the shadow.
-   * @param {boolean} [opts.notUpdateScene = true] If not update the scene.
    */
   render(
     renderer: Renderer,
     scene: Scene,
     camera: Camera,
     opts?: {
+      /**
+       * If not ouput and render to the target texture
+       */
       notUpdateScene?: boolean;
-      renderToTarget?: boolean;
+      /**
+       * If not update the scene.
+       */
       notUpdateShadow?: boolean;
+
+      /**
+       * If using input gbuffer texture
+       */
+      gBufferTexture1?: Texture2D;
+      gBufferTexture2?: Texture2D;
+      gBufferTexture3?: Texture2D;
+
+      ssaoTexture?: Texture2D;
+      /**
+       * If render to target texture.
+       */
+      targetTexture?: Texture2D;
     }
   ) {
     opts = opts || {};
-    opts.renderToTarget = opts.renderToTarget || false;
     opts.notUpdateShadow = opts.notUpdateShadow || false;
     opts.notUpdateScene = opts.notUpdateScene || false;
 
@@ -206,40 +220,55 @@ class DeferredRenderer extends Notifier {
     // Render list will be updated in gbuffer.
     camera.update();
 
-    // PENDING For stereo rendering
+    const lightAccumTex = opts.targetTexture || this._lightAccumTex;
     const dpr = renderer.getDevicePixelRatio();
+    const isInputGBuffer = opts.gBufferTexture1 && opts.gBufferTexture2 && opts.gBufferTexture3;
+
     if (
       this.autoResize &&
-      (renderer.getWidth() * dpr !== this._lightAccumTex.width ||
-        renderer.getHeight() * dpr !== this._lightAccumTex.height)
+      (renderer.getWidth() * dpr !== lightAccumTex.width ||
+        renderer.getHeight() * dpr !== lightAccumTex.height)
     ) {
       this.resize(renderer.getWidth() * dpr, renderer.getHeight() * dpr);
     }
 
-    this._gBuffer.update(renderer, scene, camera);
+    if (!isInputGBuffer) {
+      this._gBuffer.update(renderer, scene, camera);
+    }
 
+    this._lightAccumFrameBuffer.attach(opts.targetTexture || this._lightAccumTex);
     // Accumulate light buffer
-    this._accumulateLightBuffer(renderer, scene, camera, !opts.notUpdateShadow);
+    this._accumulateLightBuffer(
+      renderer,
+      scene,
+      camera,
+      !opts.notUpdateShadow,
+      isInputGBuffer
+        ? {
+            gBufferTexture1: opts.gBufferTexture1!,
+            gBufferTexture2: opts.gBufferTexture2!,
+            gBufferTexture3: opts.gBufferTexture3!
+          }
+        : undefined
+    );
 
-    if (!opts.renderToTarget) {
-      this._outputPass.material.set('texture', this._lightAccumTex);
+    this._renderOthers(
+      renderer,
+      scene,
+      camera,
+      isInputGBuffer ? opts.gBufferTexture2! : this._gBuffer.getTargetTexture2(),
+      this._lightAccumFrameBuffer
+    );
+
+    if (!opts.targetTexture) {
+      this._outputPass.material.set('texture', lightAccumTex);
       this._outputPass.render(renderer);
       // this._gBuffer.renderDebug(renderer, camera, 'normal');
     }
   }
 
-  /**
-   * @return {clay.Texture2D}
-   */
   getTargetTexture() {
     return this._lightAccumTex;
-  }
-
-  /**
-   * @return {clay.FrameBuffer}
-   */
-  getTargetFrameBuffer() {
-    return this._lightAccumFrameBuffer;
   }
 
   /**
@@ -279,16 +308,53 @@ class DeferredRenderer extends Notifier {
    * @param {number} height
    */
   resize(width: number, height: number) {
-    this._lightAccumTex.width = width;
-    this._lightAccumTex.height = height;
-
+    this._lightAccumTex.resize(width, height);
     // PENDING viewport ?
     this._gBuffer.resize(width, height);
   }
+  // Render transparent object, skybox
+  _renderOthers(
+    renderer: Renderer,
+    scene: Scene,
+    camera: Camera,
+    gBufferTexture2: Texture2D,
+    frameBuffer: FrameBuffer
+  ) {
+    // Render depth
+    const pass = this._fullQuadPass;
+    this._depthWriteMat.set('gBufferTexture2', gBufferTexture2);
+    pass.material = this._depthWriteMat as Material;
+    pass.renderQuad(
+      renderer,
+      frameBuffer,
+      (gl) => {
+        gl.depthMask(true);
+        gl.clear(gl.DEPTH_BUFFER_BIT);
+        gl.colorMask(false, false, false, false);
+      },
+      (gl) => {
+        gl.colorMask(true, true, true, true);
+      }
+    );
 
-  _accumulateLightBuffer(renderer: Renderer, scene: Scene, camera: Camera, updateShadow?: boolean) {
+    if (scene.skybox) {
+      scene.skybox.update();
+      renderer.renderPass([scene.skybox], camera, frameBuffer);
+    }
+  }
+
+  _accumulateLightBuffer(
+    renderer: Renderer,
+    scene: Scene,
+    camera: Camera,
+    updateShadow?: boolean,
+    gBufferTextures?: {
+      gBufferTexture1: Texture2D;
+      gBufferTexture2: Texture2D;
+      gBufferTexture3: Texture2D;
+    }
+  ) {
     const gl = renderer.gl;
-    const lightAccumTex = this._lightAccumTex;
     const lightAccumFrameBuffer = this._lightAccumFrameBuffer;
 
     const eyePosition = camera.getWorldPosition().array;
@@ -306,22 +372,29 @@ class DeferredRenderer extends Notifier {
       this._prepareLightShadow(renderer, scene, camera as PerspectiveCamera | OrthographicCamera);
     }
 
-    this.trigger('beforelightaccumulate', renderer, scene, camera, updateShadow);
-
-    lightAccumFrameBuffer.attach(lightAccumTex);
     const clearColor = renderer.clearColor;
 
     const viewport = lightAccumFrameBuffer.viewport;
-
-    this.trigger('startlightaccumulate', renderer, scene, camera);
 
     const viewProjectionInv = new Matrix4();
     Matrix4.multiply(viewProjectionInv, camera.worldTransform, camera.invProjectionMatrix);
 
     const volumeMeshList = [];
     const gBuffer = this._gBuffer;
+    let gBufferTexture1: Texture2D;
+    let gBufferTexture2: Texture2D;
+    let gBufferTexture3: Texture2D;
+    if (gBufferTextures) {
+      gBufferTexture1 = gBufferTextures.gBufferTexture1;
+      gBufferTexture2 = gBufferTextures.gBufferTexture2;
+      gBufferTexture3 = gBufferTextures.gBufferTexture3;
+    } else {
+      gBufferTexture1 = gBuffer.getTargetTexture1();
+      gBufferTexture2 = gBuffer.getTargetTexture2();
+      gBufferTexture3 = gBuffer.getTargetTexture3();
+    }
 
-    // Render nothing and only do the clear.
+    // Render nothing and do the clear.
     renderer.renderPass([], camera, lightAccumFrameBuffer, {
       prepare() {
         if (viewport) {
@@ -398,9 +471,9 @@ class DeferredRenderer extends Notifier {
 
         material.set('eyePosition', eyePosition);
         material.set('viewProjectionInv', viewProjectionInv.array);
-        material.set('gBufferTexture1', gBuffer.getTargetTexture1());
-        material.set('gBufferTexture2', gBuffer.getTargetTexture2());
-        material.set('gBufferTexture3', gBuffer.getTargetTexture3());
+        material.set('gBufferTexture1', gBufferTexture1);
+        material.set('gBufferTexture2', gBufferTexture2);
+        material.set('gBufferTexture3', gBufferTexture3);
 
         volumeMeshList.push(volumeMesh);
       } else {
@@ -448,9 +521,9 @@ class DeferredRenderer extends Notifier {
 
         passMaterial.set('eyePosition', eyePosition);
         passMaterial.set('viewProjectionInv', viewProjectionInv.array);
-        passMaterial.set('gBufferTexture1', gBuffer.getTargetTexture1());
-        passMaterial.set('gBufferTexture2', gBuffer.getTargetTexture2());
-        passMaterial.set('gBufferTexture3', gBuffer.getTargetTexture3());
+        passMaterial.set('gBufferTexture1', gBufferTexture1);
+        passMaterial.set('gBufferTexture2', gBufferTexture2);
+        passMaterial.set('gBufferTexture3', gBufferTexture3);
 
         // TODO
         if (shadowMapPass && light.castShadow) {
@@ -470,10 +543,6 @@ class DeferredRenderer extends Notifier {
     }
 
     this._renderVolumeMeshList(renderer, scene, camera, lightAccumFrameBuffer, volumeMeshList);
-
-    this.trigger('lightaccumulate', renderer, scene, camera);
-
-    this.trigger('afterlightaccumulate', renderer, scene, camera);
   }
 
   _prepareLightShadow(
