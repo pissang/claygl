@@ -42,6 +42,10 @@ export type RenderHooks = GLRenderHooks<RenderableObject> & {
    * Do preparation like color clear before render and after framebuffer bound.
    */
   prepare?(gl: WebGLRenderingContext): void;
+  /**
+   * Do cleanup like restore gl state after pass rendered, before framebuffer unbound.
+   */
+  cleanup?(gl: WebGLRenderingContext): void;
 };
 
 export interface RendererViewport {
@@ -676,8 +680,8 @@ class Renderer extends Notifier {
     this._glRenderer.bindFrameBuffer(frameBuffer);
 
     renderHooks && renderHooks.prepare && renderHooks.prepare(gl);
-
     this._glRenderer.render(list, assign(renderHooksForScene, renderHooks));
+    renderHooks && renderHooks.cleanup && renderHooks.cleanup(gl);
   }
 
   getMaxJointNumber() {

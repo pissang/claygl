@@ -297,8 +297,7 @@ export const gBufferDebugFragment = new FragmentShader({
   },
   includes: [gBufferReadMixin],
   main: glsl`
-void main ()
-{
+void main() {
   ${gBufferReadMixin.main}
 
   if (debug == 0) {

@@ -76,7 +76,12 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
   /**
    * Simply do quad rendering
    */
-  renderQuad(renderer: Renderer, frameBuffer?: FrameBuffer, prepare?: RenderHooks['prepare']) {
+  renderQuad(
+    renderer: Renderer,
+    frameBuffer?: FrameBuffer,
+    prepare?: RenderHooks['prepare'],
+    cleanup?: RenderHooks['cleanup']
+  ) {
     const material = this.material;
     mesh =
       mesh ||
@@ -85,7 +90,8 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
       });
     mesh.material = material;
     renderer.renderPass([mesh], camera, frameBuffer, {
-      prepare
+      prepare,
+      cleanup
     });
   }
 

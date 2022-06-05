@@ -13,11 +13,15 @@ import {
   Node as ClayNode,
   SphereGeometry,
   PointLight,
-  AmbientLight
+  FilterCompositeNode,
+  Skybox
 } from 'claygl';
-import GBufferCompositeNode from './common/HDComposite/GBufferNode';
-import * as dat from 'dat.gui';
 import LightingCompositeNode from './common/HDComposite/LightingNode';
+import { composeCompositeFragment } from 'claygl/shaders';
+import GBufferCompositeNode from './common/HDComposite/GBufferNode';
+import TAACameraJitter from './common/HDComposite/TAACameraJitter';
+import TAACompositeNode from './common/HDComposite/TAANode';
+import * as dat from 'dat.gui';
 import Stats from 'stats.js';
 
 const compositor = new Compositor();
@@ -39,6 +43,17 @@ const material = new StandardMaterial({
   roughness: 0,
   linear: true
 });
+
+const texture = new Texture2D({
+  flipY: false
+});
+// Sky texture
+// http://www.hdri-hub.com/hdrishop/freesamples/freehdri/item/113-hdr-111-parking-space-free
+texture.load('./assets/textures/Parking_Lot_Bg.jpg');
+const skybox = new Skybox();
+skybox.material.define('SRGB_DECODE');
+scene.skybox = skybox;
+skybox.setEnvironmentMap(texture);
 
 loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   const suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
@@ -68,7 +83,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
 
 const lights: ClayNode[] = [];
 const sphereGeo = new SphereGeometry();
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 50; i++) {
   const rootNode = new ClayNode();
   const pointLight = new PointLight({
     color: [Math.random(), Math.random(), Math.random()],
@@ -98,16 +113,34 @@ for (let i = 0; i < 100; i++) {
 const control = new OrbitControl({
   target: camera,
   domElement: renderer.canvas,
-  timeline: startTimeline()
+  timeline: startTimeline(),
+  zoomSensitivity: 0.4
 });
 
+const taaCameraJitter = new TAACameraJitter();
 const gbufferNode = new GBufferCompositeNode(scene, camera);
 gbufferNode.enableTexture4 = true;
 const lightingNode = new LightingCompositeNode(scene, camera);
+const tonemappingNode = new FilterCompositeNode(composeCompositeFragment);
+const taaNode = new TAACompositeNode(camera, taaCameraJitter);
 lightingNode.fromGBufferNode(gbufferNode);
-lightingNode.renderToScreen = true;
+taaNode.inputs = {
+  colorTexture: lightingNode,
+  gBufferTexture2: {
+    node: gbufferNode,
+    output: 'texture2'
+  },
+  gBufferTexture3: {
+    node: gbufferNode,
+    output: 'texture4'
+  }
+};
+tonemappingNode.inputs = {
+  texture: taaNode
+};
+tonemappingNode.renderToScreen = true;
 
-compositor.addNode(gbufferNode, lightingNode);
+compositor.addNode(gbufferNode, lightingNode, taaNode, tonemappingNode);
 
 startTimeline(() => {
   // PENDING
@@ -115,7 +148,12 @@ startTimeline(() => {
   lights.forEach(function (light) {
     light.rotation.rotateY(0.01);
   });
+  material.metalness = config.metalness;
+  material.roughness = config.roughness;
   compositor.render(renderer);
+  taaCameraJitter.step();
+  camera.offset.setArray(taaCameraJitter.getJitterOffset(renderer));
+  stats.update();
 });
 
 const stats = new Stats();
@@ -129,6 +167,5 @@ const config = {
   metalness: 0
 };
 const gui = new dat.GUI();
-
 gui.add(config, 'roughness', 0, 1);
 gui.add(config, 'metalness', 0, 1);

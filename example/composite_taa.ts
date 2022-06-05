@@ -156,10 +156,10 @@ ssaoNode.setKernelSize(32);
 startTimeline(() => {
   ssaoNode.setEstimateRadius(0.2);
   blendNode.material.define('BLEND_METHOD', 1);
-  camera.offset.setArray(taaCameraJitter.getJitterOffset(renderer));
 
   compositor.render(renderer);
   taaCameraJitter.step();
+  camera.offset.setArray(taaCameraJitter.getJitterOffset(renderer));
 });
 
 const button = document.createElement('button');
