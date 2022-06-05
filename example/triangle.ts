@@ -1,5 +1,5 @@
 import {
-  createBasicShader,
+  createUnlitShader,
   Material,
   Mesh,
   OrthographicCamera,
@@ -32,7 +32,7 @@ const geometry = new Geometry({
 // Add triangle vertices to position attribute.
 geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 
-const mesh = new Mesh(geometry, new Material(createBasicShader()));
+const mesh = new Mesh(geometry, new Material(createUnlitShader()));
 mesh.material.set('color', [0, 0, 1]);
 scene.add(mesh);
 

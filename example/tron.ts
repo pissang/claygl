@@ -6,7 +6,6 @@ import {
   CubeGeometry,
   Material,
   Mesh,
-  createStandardShader,
   DirectionalLight,
   OrbitControl,
   startTimeline,
@@ -14,7 +13,7 @@ import {
   SceneCompositeNode,
   FilterCompositeNode
 } from 'claygl';
-import { basicVertex, composeCompositeFragment } from 'claygl/shaders';
+import { unlitVertex, composeCompositeFragment } from 'claygl/shaders';
 import { tronFragment } from './shader/tron.glsl';
 import * as dat from 'dat.gui';
 import BloomNode from './common/HDComposite/BloomNode';
@@ -36,7 +35,7 @@ const cube = new CubeGeometry({
   depthSegments: 1
 });
 
-const tronMaterial = new Material(new Shader(basicVertex, tronFragment));
+const tronMaterial = new Material(new Shader(unlitVertex, tronFragment));
 
 camera.position.set(0, 0, 7);
 

@@ -5,7 +5,7 @@ import {
   glsl,
   FragmentShader
 } from '../../Shader';
-import { sharedBasicFragmentUniforms, sharedBasicVertexAttributes } from './basic.glsl';
+import { sharedBasicFragmentUniforms, sharedBasicVertexAttributes } from './unlit.glsl';
 import { lightHeaderMixin } from './header/light.glsl';
 import { shadowMapMixin } from './shadowmap.glsl';
 import { NORMAL, WORLD, WORLDINVERSETRANSPOSE, WORLDVIEWPROJECTION } from './shared';
@@ -97,7 +97,7 @@ void main() {
 });
 
 export const lambertFragment = new FragmentShader({
-  name: 'basicFrag',
+  name: 'lambertFrag',
   defines: {
     DIFFUSEMAP_ALPHA_ALPHA: null
   },

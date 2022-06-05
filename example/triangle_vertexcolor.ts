@@ -1,5 +1,5 @@
 import {
-  createBasicShader,
+  createUnlitShader,
   Material,
   Mesh,
   OrthographicCamera,
@@ -31,7 +31,7 @@ const geometry = new Geometry();
 geometry.attributes.position.fromArray(TRIANGLE_POSITIONS);
 geometry.attributes.color.fromArray(VERTEX_COLORS);
 
-const mesh = new Mesh(geometry, new Material(createBasicShader()));
+const mesh = new Mesh(geometry, new Material(createUnlitShader()));
 mesh.material.define('both', 'VERTEX_COLOR');
 mesh.material.set('color', [1, 1, 1]);
 scene.add(mesh);

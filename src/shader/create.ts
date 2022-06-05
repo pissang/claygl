@@ -1,11 +1,11 @@
 import Shader from '../Shader';
-import { basicFragment, basicVertex } from './source/basic.glsl';
+import { unlitFragment, unlitVertex } from './source/unlit.glsl';
 import { lambertFragment, lambertVertex } from './source/lambert.glsl';
 import { standardFragment, standardVertex } from './source/standard.glsl';
 import { wireframeFragment, wireframeVertex } from './source/wireframe.glsl';
 
-export function createBasicShader() {
-  return new Shader(basicVertex, basicFragment);
+export function createUnlitShader() {
+  return new Shader(unlitVertex, unlitFragment);
 }
 
 export function createStandardShader() {

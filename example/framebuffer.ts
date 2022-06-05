@@ -12,7 +12,7 @@ import {
   PointLight,
   Scene,
   createStandardShader,
-  createBasicShader,
+  createUnlitShader,
   startTimeline
 } from 'claygl';
 
@@ -50,7 +50,7 @@ const rtt = new Texture2D({
   height: 1024
 });
 frameBuffer.attach(rtt);
-const rttShader = createBasicShader();
+const rttShader = createUnlitShader();
 const rttMesh = new Mesh(new PlaneGeometry(), new Material(rttShader));
 rttMesh.material.set('diffuseMap', rtt);
 const rttScene = new Scene();

@@ -2,7 +2,7 @@ import {
   Renderer,
   Scene,
   PerspectiveCamera,
-  createBasicShader,
+  createUnlitShader,
   Material,
   Texture2D,
   Node as ClayNode,
@@ -24,7 +24,7 @@ const camera = new PerspectiveCamera({
   far: 500
 });
 
-const material = new Material(createBasicShader());
+const material = new Material(createUnlitShader());
 const image = new Image();
 image.src = 'assets/textures/ground_tile.jpg';
 const texture = new Texture2D({

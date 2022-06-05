@@ -1,5 +1,5 @@
 import {
-  createBasicShader,
+  createUnlitShader,
   Renderer,
   startTimeline,
   Vector3,
@@ -38,7 +38,7 @@ camera.lookAt(new Vector3(0, 0, 0));
 const cnt = 100;
 const distance = 20;
 const size = 10 / 2;
-const shader = createBasicShader();
+const shader = createUnlitShader();
 for (let i = 0; i < cnt; ++i) {
   for (let j = 0; j < cnt; ++j) {
     const material = new Material(shader);

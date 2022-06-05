@@ -26,8 +26,8 @@ export const sharedBasicVertexAttributes = {
   a_Color: attribute('vec4', 'COLOR')
 };
 
-export const basicVertex = new VertexShader({
-  name: 'basicVertex',
+export const unlitVertex = new VertexShader({
+  name: 'unlitVertex',
   attributes: {
     ...sharedBasicVertexAttributes
   },
@@ -81,8 +81,8 @@ export const sharedBasicFragmentUniforms = {
   lineColor: uniform('rgba', [0, 0, 0, 0.6])
 };
 
-export const basicFragment = new FragmentShader({
-  name: 'basicFrag',
+export const unlitFragment = new FragmentShader({
+  name: 'unlitFrag',
   defines: {
     DIFFUSEMAP_ALPHA_ALPHA: null
   },

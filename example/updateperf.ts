@@ -1,9 +1,9 @@
-import { Scene, Node as ClayNode, Mesh, CubeGeometry, Material, createBasicShader } from 'claygl';
+import { Scene, Node as ClayNode, Mesh, CubeGeometry, Material, createUnlitShader } from 'claygl';
 
 const scene = new Scene();
 
 const cube = new CubeGeometry();
-const material = new Material(createBasicShader());
+const material = new Material(createUnlitShader());
 const root = new ClayNode();
 scene.add(root);
 for (let i = 0; i < 10; i++) {

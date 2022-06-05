@@ -79,7 +79,7 @@ export * as easing from './animation/easing';
 
 // Bultin shader
 export {
-  createBasicShader,
+  createUnlitShader,
   createLambertShader,
   createStandardShader,
   createWireframeShader

@@ -8,7 +8,7 @@ import {
   Texture2D,
   constants,
   createStandardShader,
-  createBasicShader,
+  createUnlitShader,
   TextureCube,
   SphereGeometry,
   PlaneGeometry,
@@ -29,7 +29,7 @@ const camera = new PerspectiveCamera({
   far: 500
 });
 
-const material = new Material(createBasicShader());
+const material = new Material(createUnlitShader());
 const texture = new Texture2D({
   wrapS: constants.REPEAT,
   wrapT: constants.REPEAT,

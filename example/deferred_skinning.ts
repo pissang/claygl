@@ -6,7 +6,7 @@ import {
   Scene,
   Material,
   Geometry,
-  createBasicShader,
+  createUnlitShader,
   Mesh,
   loadGLTF,
   PerspectiveCamera,
@@ -25,7 +25,7 @@ function createSkeletonDebugScene(skeleton: Skeleton) {
   const sphereGeo = new SphereGeometry({
     radius: 0.1
   });
-  const sphereMat = new Material(createBasicShader());
+  const sphereMat = new Material(createUnlitShader());
   sphereMat.set('color', [0.3, 0.3, 0.3]);
 
   const updates: (() => void)[] = [];

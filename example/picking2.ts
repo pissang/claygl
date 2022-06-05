@@ -5,7 +5,7 @@ import {
   Material,
   SphereGeometry,
   createStandardShader,
-  createBasicShader,
+  createUnlitShader,
   Mesh,
   DirectionalLight,
   AmbientLight,
@@ -54,7 +54,7 @@ startTimeline((dTime) => {
   renderer.render(scene, camera);
 });
 
-const sphere = new Mesh(new SphereGeometry(), new Material(createBasicShader()));
+const sphere = new Mesh(new SphereGeometry(), new Material(createUnlitShader()));
 sphere.scale.set(0.02, 0.02, 0.02);
 sphere.material.set('color', [1, 0, 0]);
 scene.add(sphere);
