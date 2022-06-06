@@ -285,6 +285,10 @@ class App3D extends Notifier {
     return this._renderer.getHeight();
   }
 
+  getShadowMapPass() {
+    return this._shadowPass;
+  }
+
   /**
    * Init app3D. Only available when lazyInit is set true.
    *
@@ -390,7 +394,7 @@ class App3D extends Notifier {
 
     scene.skybox && this._updateGraphicOptions(this._graphicOpts, [scene.skybox], true);
     // Render shadow pass
-    shadowPass && shadowPass.render(renderer, scene, undefined, true);
+    shadowPass && shadowPass.render(renderer, scene, scene.getMainCamera(), true);
 
     this._doRender(renderer, scene);
 

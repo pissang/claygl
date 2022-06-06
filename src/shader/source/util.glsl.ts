@@ -29,6 +29,20 @@ highp float ${FUNCTION_NAME_PLACEHOLDER}(vec2 uv) {
   'rand'
 );
 
+/**
+ * Random in GLSL
+ */
+export const rotateVec2Function = createShaderFunction(
+  glsl`
+vec2 rotateVec2(vec2 v, float a) {
+  float s = sin(a);
+  float c = cos(a);
+  mat2 m = mat2(c, -s, s, c);
+  return m * v;
+}`,
+  'rotateVec2'
+);
+
 const lightAttenuationUniforms = {
   attenuationFactor: uniform('float', 5.0)
 };

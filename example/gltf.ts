@@ -73,7 +73,7 @@ loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
 
   timeline.on('frame', function (deltaTime: number) {
     control.update(deltaTime);
-    shadowMapPass.render(renderer, scene);
+    shadowMapPass.render(renderer, scene, camera);
     renderer.render(scene, camera);
     // shadowMapPass.renderDebug(renderer);
   });

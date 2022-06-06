@@ -16,7 +16,7 @@ import dat from 'dat.gui';
 import halton from './common/halton';
 
 const pcfKernel: number[] = [];
-for (let i = 0; i < 128; i++) {
+for (let i = 0; i < 16; i++) {
   pcfKernel.push(halton(i, 2) * 2.0 - 1.0);
   pcfKernel.push(halton(i, 3) * 2.0 - 1.0);
 }
@@ -62,7 +62,7 @@ loadGLTF('assets/models/basic_scene/scene.gltf', {
 
   scene.add(
     new AmbientLight({
-      intensity: 0.1
+      intensity: 0.4
     })
   );
 
@@ -74,9 +74,9 @@ loadGLTF('assets/models/basic_scene/scene.gltf', {
   });
 
   const shadowMapConfig = {
-    PCSSLightSize: 0
+    PCSSLightSize: 50
   };
 
   const gui = new dat.GUI();
-  gui.add(shadowMapConfig, 'PCSSLightSize', 0, 1, 0.01);
+  gui.add(shadowMapConfig, 'PCSSLightSize', 0, 100);
 });

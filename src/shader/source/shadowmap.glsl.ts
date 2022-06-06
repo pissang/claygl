@@ -13,6 +13,8 @@ import {
   decodeFloatFunction,
   floatEncoderMixin,
   instancingMixin,
+  randomFunction,
+  rotateVec2Function,
   skinningMixin
 } from './util.glsl';
 
@@ -158,17 +160,14 @@ float tapShadowMap(sampler2D map, vec2 uv, float z) {
 }
 
 #ifdef PCF_KERNEL_SIZE
-#define NEAR_PLANE 0.1
-#define LIGHT_FRUSTUM_WIDTH 3.75
-// TODO
-#ifdef PCSS_LIGHT_SIZE
-#define LIGHT_SIZE_UV (PCSS_LIGHT_SIZE / LIGHT_FRUSTUM_WIDTH)
-#endif
+${randomFunction()}
+${rotateVec2Function()}
+
 float pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {
   float shadowContrib = tapShadowMap(map, uv, z);
   vec2 offset = vec2(1.0 / textureSize) * scale;
   for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{
-      shadowContrib += tapShadowMap(map, uv + offset * pcfKernel[_idx_], z);
+    shadowContrib += tapShadowMap(map, uv + rotateVec2(offset * pcfKernel[_idx_], rand(uv)), z);
   }}
   return shadowContrib / float(PCF_KERNEL_SIZE + 1);
 }
@@ -178,16 +177,17 @@ float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
 }
 
 // https://developer.download.nvidia.cn/whitepapers/2008/PCSS_Integration.pdf
-#ifdef LIGHT_SIZE_UV
+  #ifdef PCSS_LIGHT_SIZE
+  #define NEAR_PLANE 0.1
 float findBlocker(sampler2D shadowMap, vec2 uv, float z, float textureSize) {
   // This uses similar triangles to compute what
   // area of the shadow map we should search
-  float searchRadius = LIGHT_SIZE_UV * (z - NEAR_PLANE) / z;
+  float searchRadius = PCSS_LIGHT_SIZE / textureSize;
   float blockerDepthSum = 0.0;
   int numBlockers = 0;
 
   for (int i = 0; i < PCF_KERNEL_SIZE; i++) {
-    float shadowMapDepth = decodeFloat(texture2D(shadowMap, uv + pcfKernel[i] * searchRadius));
+    float shadowMapDepth = decodeFloat(texture2D(shadowMap, uv + rotateVec2(pcfKernel[i] * searchRadius, rand(uv))));
     if (shadowMapDepth < z) {
       blockerDepthSum += shadowMapDepth;
       numBlockers++;
@@ -205,11 +205,11 @@ float pcss(sampler2D shadowMap, vec2 uv, float z, float textureSize, vec2 scale)
   if (avgBlockerDepth == -1.0) return 1.0;
 
   float penumbraRatio = (z - avgBlockerDepth) / avgBlockerDepth;
-  float filterRadiusUV = penumbraRatio * LIGHT_SIZE_UV * NEAR_PLANE / z;
+  float filterRadiusUV = penumbraRatio * PCSS_LIGHT_SIZE / textureSize;
 
   return pcf(shadowMap, uv, z, textureSize, vec2(filterRadiusUV * textureSize) * scale);
 }
-#endif
+  #endif
 #endif
 
 float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset) {
@@ -222,7 +222,7 @@ float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float te
       // To texture uv
       vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
 #ifdef PCF_KERNEL_SIZE
-  #ifdef LIGHT_SIZE_UV
+  #ifdef PCSS_LIGHT_SIZE
       return pcss(map, uv * scale + offset, z, textureSize, scale);
   #else
       return pcf(map, uv * scale + offset, z, textureSize, scale);
