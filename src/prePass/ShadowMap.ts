@@ -71,14 +71,7 @@ const cropMatrix = new Matrix4();
 const lightViewProjMatrix = new Matrix4();
 const lightProjMatrix = new Matrix4();
 
-interface ShadowMapPassOpts {
-  /**
-   * If apply PCF soft shadow
-   * @type {number}
-   */
-  softShadow: boolean;
-  shadowBlur: number;
-}
+interface ShadowMapPassOpts {}
 
 /**
  * Pass rendering shadow map.
@@ -94,17 +87,22 @@ interface ShadowMapPassOpts {
  *     });
  */
 class ShadowMapPass extends Notifier {
-  softShadow: boolean = true;
-
-  /**
-   * Soft shadow blur size
-   * @type {number}
-   */
-  shadowBlur = 1.0;
-
   lightFrustumBias: number | 'auto' = 'auto';
 
+  /**
+   * Light size for pcss shadow.
+   */
+  PCSSLightSize: number = 0;
+
   kernelPCF = new Float32Array([1, 0, 1, 1, -1, 1, 0, 1, -1, 0, -1, -1, 1, -1, 0, -1]);
+  // Using a poission kenel
+  // kernelPCF = new Float32Array([
+  //   -0.94201624, -0.39906216, 0.94558609, -0.76890725, -0.094184101, -0.9293887, 0.34495938,
+  //   0.2938776, -0.91588581, 0.45771432, -0.81544232, -0.87912464, -0.38277543, 0.27676845,
+  //   0.97484398, 0.75648379, 0.44323325, -0.97511554, 0.53742981, -0.4737342, -0.26496911,
+  //   -0.41893023, 0.79197514, 0.19090188, -0.2418884, 0.99706507, -0.81409955, 0.9143759, 0.19984126,
+  //   0.78641367, 0.14383161, -0.141007
+  // ]);
 
   precision: ShaderPrecision = 'highp';
 
@@ -131,15 +129,14 @@ class ShadowMapPass extends Notifier {
 
   private _debugPass?: FullscreenQuadPass<typeof shadowMapDepthDebugFragment>;
 
-  constructor(opts?: Partial<ShadowMapPassOpts>) {
+  constructor() {
     super();
-    assign(this, opts);
   }
 
   /**
    * Render scene to shadow textures
    */
-  render(renderer: Renderer, scene: Scene, sceneCamera?: Camera, notUpdateScene?: boolean) {
+  render(renderer: Renderer, scene: Scene, sceneCamera: Camera, notUpdateScene?: boolean) {
     if (!sceneCamera) {
       sceneCamera = scene.getMainCamera();
     }
@@ -172,20 +169,22 @@ class ShadowMapPass extends Notifier {
   }
 
   _updateReceivers(renderer: Renderer, mesh: Renderable) {
+    const material = mesh.material;
     if (mesh.receiveShadow) {
       this._receivers.push(mesh);
-      mesh.material.set('shadowEnabled', 1);
-
-      mesh.material.set('pcfKernel', this.kernelPCF);
+      material.set('shadowEnabled', 1);
+      material.set('pcfKernel', this.kernelPCF);
     } else {
-      mesh.material.set('shadowEnabled', 0);
+      material.set('shadowEnabled', 0);
     }
 
     const kernelPCF = this.kernelPCF;
-    if (kernelPCF && kernelPCF.length) {
-      mesh.material.define('fragment', 'PCF_KERNEL_SIZE', kernelPCF.length / 2);
+    material.define('fragment', 'PCF_KERNEL_SIZE', kernelPCF.length / 2);
+
+    if (this.PCSSLightSize) {
+      material.define('fragment', 'PCSS_LIGHT_SIZE', this.PCSSLightSize.toFixed(2));
     } else {
-      mesh.material.undefine('fragment', 'PCF_KERNEL_SIZE');
+      material.undefine('fragment', 'PCSS_LIGHT_SIZE');
     }
   }
 

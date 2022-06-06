@@ -28,7 +28,7 @@ export const shadowMapDepthVertex = new VertexShader({
     texcoord: TEXCOORD_0()
   },
   varyings: {
-    v_ViewPosition: varying('vec4'),
+    v_PosZW: varying('vec2'),
     v_Texcoord: varying('vec2')
   },
   includes: [skinningMixin, instancingMixin],
@@ -46,8 +46,8 @@ void main(){
   P = instanceMat * P;
 #endif
 
-  v_ViewPosition = worldViewProjection * P;
-  gl_Position = v_ViewPosition;
+  gl_Position = worldViewProjection * P;
+  v_PosZW = gl_Position.zw;
 
   v_Texcoord = texcoord * uvRepeat + uvOffset;
 }`
@@ -65,9 +65,8 @@ export const shadowMapDepthFragment = new FragmentShader({
   main: glsl`
 
 void main(){
-  // Whats the difference between gl_FragCoord.z and this v_ViewPosition
-  // gl_FragCoord consider the polygon offset ?
-  float depth = v_ViewPosition.z / v_ViewPosition.w;
+  // Higher precision than gl_FragCoord
+  float depth = v_PosZW.x / v_PosZW.y;
   // float depth = gl_FragCoord.z / gl_FragCoord.w;
 
   if (alphaCutoff > 0.0) {
@@ -145,9 +144,9 @@ export const shadowMapDistanceFragment = new FragmentShader({
   includes: [floatEncoderMixin],
   main: glsl`
 void main(){
-    float dist = distance(lightPosition, v_WorldPosition);
-    dist = dist / range;
-    gl_FragColor = encodeFloat(dist);
+  float dist = distance(lightPosition, v_WorldPosition);
+  dist = dist / range;
+  gl_FragColor = encodeFloat(dist);
 }`
 });
 
@@ -155,49 +154,82 @@ void main(){
 export const shadowMapFunction = createShaderFunction(glsl`
 float tapShadowMap(sampler2D map, vec2 uv, float z) {
   vec4 tex = texture2D(map, uv);
-  return step(z, decodeFloat(tex) * 2.0 - 1.0);
+  return step(z, decodeFloat(tex));
 }
 
+#ifdef PCF_KERNEL_SIZE
+#define NEAR_PLANE 0.1
+#define LIGHT_FRUSTUM_WIDTH 3.75
+// TODO
+#ifdef PCSS_LIGHT_SIZE
+#define LIGHT_SIZE_UV (PCSS_LIGHT_SIZE / LIGHT_FRUSTUM_WIDTH)
+#endif
 float pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {
-
   float shadowContrib = tapShadowMap(map, uv, z);
   vec2 offset = vec2(1.0 / textureSize) * scale;
-#ifdef PCF_KERNEL_SIZE
   for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{
       shadowContrib += tapShadowMap(map, uv + offset * pcfKernel[_idx_], z);
   }}
-
   return shadowContrib / float(PCF_KERNEL_SIZE + 1);
-#else
-  // TODO Removed in deferred pipeline
-  shadowContrib += tapShadowMap(map, uv+vec2(offset.x, 0.0), z);
-  shadowContrib += tapShadowMap(map, uv+vec2(offset.x, offset.y), z);
-  shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, offset.y), z);
-  shadowContrib += tapShadowMap(map, uv+vec2(0.0, offset.y), z);
-  shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, 0.0), z);
-  shadowContrib += tapShadowMap(map, uv+vec2(-offset.x, -offset.y), z);
-  shadowContrib += tapShadowMap(map, uv+vec2(offset.x, -offset.y), z);
-  shadowContrib += tapShadowMap(map, uv+vec2(0.0, -offset.y), z);
-
-  return shadowContrib / 9.0;
-#endif
 }
 
 float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
   return pcf(map, uv, z, textureSize, vec2(1.0));
 }
 
+// https://developer.download.nvidia.cn/whitepapers/2008/PCSS_Integration.pdf
+#ifdef LIGHT_SIZE_UV
+float findBlocker(sampler2D shadowMap, vec2 uv, float z, float textureSize) {
+  // This uses similar triangles to compute what
+  // area of the shadow map we should search
+  float searchRadius = LIGHT_SIZE_UV * (z - NEAR_PLANE) / z;
+  float blockerDepthSum = 0.0;
+  int numBlockers = 0;
+
+  for (int i = 0; i < PCF_KERNEL_SIZE; i++) {
+    float shadowMapDepth = decodeFloat(texture2D(shadowMap, uv + pcfKernel[i] * searchRadius));
+    if (shadowMapDepth < z) {
+      blockerDepthSum += shadowMapDepth;
+      numBlockers++;
+    }
+  }
+
+  if (numBlockers == 0) return -1.0;
+
+  return blockerDepthSum / float(numBlockers);
+}
+
+float pcss(sampler2D shadowMap, vec2 uv, float z, float textureSize, vec2 scale) {
+  float avgBlockerDepth = findBlocker(shadowMap, uv, z, textureSize);
+
+  if (avgBlockerDepth == -1.0) return 1.0;
+
+  float penumbraRatio = (z - avgBlockerDepth) / avgBlockerDepth;
+  float filterRadiusUV = penumbraRatio * LIGHT_SIZE_UV * NEAR_PLANE / z;
+
+  return pcf(shadowMap, uv, z, textureSize, vec2(filterRadiusUV * textureSize) * scale);
+}
+#endif
+#endif
+
 float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float textureSize, vec2 scale, vec2 offset) {
   vec4 posInLightSpace = lightVPM * vec4(position, 1.0);
   posInLightSpace.xyz /= posInLightSpace.w;
-  float z = posInLightSpace.z;
+  float z = posInLightSpace.z * 0.5 + 0.5;
   // In frustum
   if(all(greaterThan(posInLightSpace.xyz, vec3(-0.99, -0.99, -1.0))) &&
       all(lessThan(posInLightSpace.xyz, vec3(0.99, 0.99, 1.0)))){
       // To texture uv
       vec2 uv = (posInLightSpace.xy+1.0) / 2.0;
-
+#ifdef PCF_KERNEL_SIZE
+  #ifdef LIGHT_SIZE_UV
+      return pcss(map, uv * scale + offset, z, textureSize, scale);
+  #else
       return pcf(map, uv * scale + offset, z, textureSize, scale);
+  #endif
+#else
+      return tapShadowMap(map, uv * scale + offset, z);
+#endif
   }
   return 1.0;
 }

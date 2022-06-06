@@ -167,6 +167,15 @@ class RenderGraphNode {
   render(renderer: Renderer, finalFrameBuffer?: FrameBuffer) {
     this._rendering = true;
 
+    try {
+      this._doRender(renderer, finalFrameBuffer);
+    } finally {
+      this._rendering = false;
+      this._rendered = true;
+    }
+  }
+
+  private _doRender(renderer: Renderer, finalFrameBuffer?: FrameBuffer) {
     const renderGraph = this._renderGraph;
     const inputLinks = this._inputs || {};
     const inputNames = keys(inputLinks);
@@ -229,9 +238,6 @@ class RenderGraphNode {
         texturePool.release(texture);
       }
     });
-
-    this._rendering = false;
-    this._rendered = true;
   }
 
   addLinkFrom(
