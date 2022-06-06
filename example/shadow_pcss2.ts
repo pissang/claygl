@@ -2,8 +2,8 @@ import { App3D, OrbitControl } from 'claygl';
 import dat from 'dat.gui';
 // import halton from './common/halton';
 
-const NUM_SAMPLES = 32;
-const NUM_RINGS = 5;
+const NUM_SAMPLES = 16;
+const NUM_RINGS = 11;
 
 const pcfKernel: number[] = [];
 // github.com/mrdoob/three.js/blob/master/examples/webgl_shadowmap_pcss.html#L54
@@ -38,6 +38,17 @@ app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf').then((res) => {
   res.materials.forEach((mat) => {
     mat.set('roughness', 0.2);
   });
+});
+app.loadModel('./assets/models/suzanne/suzanne_high.gltf').then((res) => {
+  const monkey = res.rootNode!;
+  monkey.scale.set(50, 50, 50);
+  monkey.position.set(200, 50, 0);
+  res.materials.forEach((mat) => {
+    mat.set('roughness', 0.2);
+  });
+
+  const monkey2 = app.cloneNode(monkey);
+  monkey2.position.set(-200, 50, 0);
 });
 // Create light
 const light = app.createDirectionalLight([-100, -100, -100]);

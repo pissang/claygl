@@ -1205,7 +1205,7 @@ class App3D extends Notifier {
    * @param parentNode Parent node that new cloned node will be mounted.
    *          Default to have same parent with source node.
    */
-  cloneNode(node: ClayNode, parentNode?: ClayNode) {
+  cloneNode<T extends ClayNode>(node: T, parentNode?: ClayNode): T {
     parentNode = parentNode || node.getParent();
 
     const newNode = this._scene.cloneNode(node);

@@ -229,9 +229,7 @@ class Material<
    * Clone a new material and keep uniforms, shader will not be cloned
    */
   clone(): Material<T> {
-    const material = new (this as any).constructor({
-      shader: this.shader
-    });
+    const material = new (this as any).constructor(this.shader) as Material<T>;
     for (const symbol in this.uniforms) {
       material.uniforms[symbol].value = this.uniforms[symbol].value;
     }
@@ -242,7 +240,7 @@ class Material<
 
     material.vertexDefines = util.clone(this.vertexDefines);
     material.fragmentDefines = util.clone(this.fragmentDefines);
-    material.enableTexture(this.getEnabledTextures());
+    material.enableTexture(this.getEnabledTextures() as any);
     material.precision = this.precision;
 
     return material;
@@ -349,7 +347,11 @@ class Material<
    * For example, if texture symbol is diffuseMap, it will add a line `#define DIFFUSEMAP_ENABLED` in the shader code
    * @param  {string} symbol
    */
-  enableTexture(symbol: keyof PickTextureUniforms<T['uniformTpls']>) {
+  enableTexture(
+    symbol:
+      | keyof PickTextureUniforms<T['uniformTpls']>
+      | keyof PickTextureUniforms<T['uniformTpls']>[]
+  ) {
     if (util.isArray(symbol)) {
       for (let i = 0; i < symbol.length; i++) {
         this.enableTexture(symbol[i]);
@@ -357,7 +359,7 @@ class Material<
       return;
     }
 
-    const status = this._textureStatus[symbol];
+    const status = this._textureStatus[symbol as keyof PickTextureUniforms<T['uniformTpls']>];
     if (status) {
       const isEnabled = status.enabled;
       if (!isEnabled) {

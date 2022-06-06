@@ -180,7 +180,6 @@ float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
 // https://developer.download.nvidia.cn/whitepapers/2008/PCSS_Integration.pdf
 // https://gkjohnson.github.io/threejs-sandbox/pcss/index.html
   #ifdef PCSS_LIGHT_SIZE
-  #define NEAR_PLANE 0.1
 float findBlocker(sampler2D shadowMap, vec2 uv, float z, float textureSize) {
   // This uses similar triangles to compute what
   // area of the shadow map we should search
@@ -190,7 +189,7 @@ float findBlocker(sampler2D shadowMap, vec2 uv, float z, float textureSize) {
   float rot = rand(uv) * 6.28;
 
   for (int i = 0; i < PCF_KERNEL_SIZE; i++) {
-    float shadowMapDepth = decodeFloat(texture2D(shadowMap, uv + rotateVec2(pcfKernel[i], rot) * searchRadius));
+    float shadowMapDepth = decodeFloat(texture2D(shadowMap, uv + rotateVec2(pcfKernel[i] * searchRadius, rot)));
     if (shadowMapDepth < z) {
       blockerDepthSum += shadowMapDepth;
       numBlockers++;

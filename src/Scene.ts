@@ -209,7 +209,7 @@ class Scene extends ClayNode {
    * Unlike using `Node#clone`. It will clone skeleton and remap the joints. Material will also be cloned.
    *
    */
-  cloneNode(node: ClayNode) {
+  cloneNode<T extends ClayNode>(node: T): T {
     const newNode = node.clone();
     const clonedNodesMap: Record<string, ClayNode> = {};
     function buildNodesMap(sNode: ClayNode, tNode: ClayNode) {
