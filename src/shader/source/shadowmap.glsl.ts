@@ -164,12 +164,13 @@ ${randomFunction()}
 ${rotateVec2Function()}
 
 float pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {
-  float shadowContrib = tapShadowMap(map, uv, z);
+  float shadowContrib = 0.0;
   vec2 offset = vec2(1.0 / textureSize) * scale;
-  for (int _idx_ = 0; _idx_ < PCF_KERNEL_SIZE; _idx_++) {{
-    shadowContrib += tapShadowMap(map, uv + rotateVec2(offset * pcfKernel[_idx_], rand(uv)), z);
-  }}
-  return shadowContrib / float(PCF_KERNEL_SIZE + 1);
+  float rot = rand(uv) * 6.28;
+  for (int i = 0; i < PCF_KERNEL_SIZE; i++) {
+    shadowContrib += tapShadowMap(map, uv + rotateVec2(offset * pcfKernel[i], rot), z);
+  }
+  return shadowContrib / float(PCF_KERNEL_SIZE);
 }
 
 float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
@@ -177,6 +178,7 @@ float pcf(sampler2D map, vec2 uv, float z, float textureSize) {
 }
 
 // https://developer.download.nvidia.cn/whitepapers/2008/PCSS_Integration.pdf
+// https://gkjohnson.github.io/threejs-sandbox/pcss/index.html
   #ifdef PCSS_LIGHT_SIZE
   #define NEAR_PLANE 0.1
 float findBlocker(sampler2D shadowMap, vec2 uv, float z, float textureSize) {
@@ -185,9 +187,10 @@ float findBlocker(sampler2D shadowMap, vec2 uv, float z, float textureSize) {
   float searchRadius = PCSS_LIGHT_SIZE / textureSize;
   float blockerDepthSum = 0.0;
   int numBlockers = 0;
+  float rot = rand(uv) * 6.28;
 
   for (int i = 0; i < PCF_KERNEL_SIZE; i++) {
-    float shadowMapDepth = decodeFloat(texture2D(shadowMap, uv + rotateVec2(pcfKernel[i] * searchRadius, rand(uv))));
+    float shadowMapDepth = decodeFloat(texture2D(shadowMap, uv + rotateVec2(pcfKernel[i], rot) * searchRadius));
     if (shadowMapDepth < z) {
       blockerDepthSum += shadowMapDepth;
       numBlockers++;
@@ -205,9 +208,9 @@ float pcss(sampler2D shadowMap, vec2 uv, float z, float textureSize, vec2 scale)
   if (avgBlockerDepth == -1.0) return 1.0;
 
   float penumbraRatio = (z - avgBlockerDepth) / avgBlockerDepth;
-  float filterRadiusUV = penumbraRatio * PCSS_LIGHT_SIZE / textureSize;
+  float filterRadiusUV = penumbraRatio * PCSS_LIGHT_SIZE;
 
-  return pcf(shadowMap, uv, z, textureSize, vec2(filterRadiusUV * textureSize) * scale);
+  return pcf(shadowMap, uv, z, textureSize, vec2(filterRadiusUV) * scale);
 }
   #endif
 #endif

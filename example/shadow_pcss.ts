@@ -10,13 +10,14 @@ import {
   DirectionalLight,
   Node as ClayNode,
   Timeline,
-  Scene
+  Scene,
+  startTimeline
 } from 'claygl';
 import dat from 'dat.gui';
 import halton from './common/halton';
 
 const pcfKernel: number[] = [];
-for (let i = 0; i < 16; i++) {
+for (let i = 0; i < 32; i++) {
   pcfKernel.push(halton(i, 2) * 2.0 - 1.0);
   pcfKernel.push(halton(i, 3) * 2.0 - 1.0);
 }
@@ -35,8 +36,6 @@ loadGLTF('assets/models/basic_scene/scene.gltf', {
   renderer.resize(window.innerWidth, window.innerHeight);
   const shadowMapPass = new ShadowMapPass();
   shadowMapPass.kernelPCF = new Float32Array(pcfKernel);
-  const timeline = new Timeline();
-  timeline.start();
 
   const camera = new PerspectiveCamera({
     aspect: renderer.getViewportAspect(),
@@ -66,9 +65,18 @@ loadGLTF('assets/models/basic_scene/scene.gltf', {
     })
   );
 
-  timeline.on('frame', function (deltaTime: number) {
+  let elpasedTime = 0;
+  startTimeline((deltaTime: number) => {
     control.update(deltaTime);
     shadowMapPass.PCSSLightSize = shadowMapConfig.PCSSLightSize;
+    light.position.set(
+      -7 * Math.cos(elpasedTime / 1000),
+      3 * (Math.sin(elpasedTime / 1000) + 2),
+      7 * Math.sin(elpasedTime / 1000)
+    );
+    light.lookAt(scene.position);
+    elpasedTime += deltaTime;
+
     shadowMapPass.render(renderer, scene, camera);
     renderer.render(scene, camera);
   });

@@ -8,6 +8,7 @@ import {
   Renderer,
   ShadowMapPass,
   SpotLight,
+  startTimeline,
   TextureCube,
   Timeline
 } from 'claygl';
@@ -25,8 +26,6 @@ loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
   const environmentMapPass = new EnvironmentMapPass({
     texture: environmentMap
   });
-  const timeline = new Timeline();
-  timeline.start();
 
   const scene = res.scene!;
   scene.rotation.rotateX(-Math.PI / 2);
@@ -71,7 +70,7 @@ loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
 
   suzanneMaterial.set('environmentMap', environmentMap);
 
-  timeline.on('frame', function (deltaTime: number) {
+  startTimeline((deltaTime: number) => {
     control.update(deltaTime);
     shadowMapPass.render(renderer, scene, camera);
     renderer.render(scene, camera);
