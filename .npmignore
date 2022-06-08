@@ -1,7 +1,8 @@
 /example
 /test
 /build
-/jsdoc-tmpl
 /doc
 /asset
 /src
+/.vscode
+/.github

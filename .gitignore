@@ -8,5 +8,4 @@ example/dist
 /coverage
 /doc
 /lib
-todo
-claygl.todo
+/dist
