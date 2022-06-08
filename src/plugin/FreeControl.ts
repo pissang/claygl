@@ -8,7 +8,6 @@ import { assign } from '../core/util';
 const addEvent = vendor.addEventListener;
 const removeEvent = vendor.removeEventListener;
 
-const doc = document;
 interface FreeControlOpts {
   /**
    * Scene node to control, mostly it is a camera
@@ -110,12 +109,12 @@ class FreeControl extends Notifier {
     //Why ? ?
     addEvent(el, 'click', this._requestPointerLock);
 
-    addEvent(doc, 'pointerlockchange', this._lockChange);
-    addEvent(doc, 'mozpointerlockchange', this._lockChange);
-    addEvent(doc, 'webkitpointerlockchange', this._lockChange);
+    addEvent(document, 'pointerlockchange', this._lockChange);
+    addEvent(document, 'mozpointerlockchange', this._lockChange);
+    addEvent(document, 'webkitpointerlockchange', this._lockChange);
 
-    addEvent(doc, 'keydown', this._keyDown);
-    addEvent(doc, 'keyup', this._keyUp);
+    addEvent(document, 'keydown', this._keyDown);
+    addEvent(document, 'keyup', this._keyUp);
 
     if (this.timeline) {
       this.timeline.on('frame', this._detectMovementChange, this);
@@ -128,20 +127,20 @@ class FreeControl extends Notifier {
   dispose() {
     const el = this.domElement;
 
-    doc.exitPointerLock = doc.exitPointerLock || (doc as any).mozExitPointerLock;
+    document.exitPointerLock = document.exitPointerLock || (document as any).mozExitPointerLock;
 
-    if (doc.exitPointerLock) {
-      doc.exitPointerLock();
+    if (document.exitPointerLock) {
+      document.exitPointerLock();
     }
 
     removeEvent(el, 'click', this._requestPointerLock);
 
-    removeEvent(doc, 'pointerlockchange', this._lockChange);
-    removeEvent(doc, 'mozpointerlockchange', this._lockChange);
-    removeEvent(doc, 'webkitpointerlockchange', this._lockChange);
+    removeEvent(document, 'pointerlockchange', this._lockChange);
+    removeEvent(document, 'mozpointerlockchange', this._lockChange);
+    removeEvent(document, 'webkitpointerlockchange', this._lockChange);
 
-    removeEvent(doc, 'keydown', this._keyDown);
-    removeEvent(doc, 'keyup', this._keyUp);
+    removeEvent(document, 'keydown', this._keyDown);
+    removeEvent(document, 'keyup', this._keyUp);
 
     if (this.timeline) {
       this.timeline.off('frame', this._detectMovementChange);
@@ -199,12 +198,12 @@ class FreeControl extends Notifier {
 
   _lockChange() {
     if (
-      doc.pointerLockElement === this.domElement ||
-      (doc as any).mozPointerLockElement === this.domElement
+      document.pointerLockElement === this.domElement ||
+      (document as any).mozPointerLockElement === this.domElement
     ) {
-      addEvent(doc, 'mousemove', this._mouseMove, false);
+      addEvent(document, 'mousemove', this._mouseMove, false);
     } else {
-      removeEvent(doc, 'mousemove', this._mouseMove);
+      removeEvent(document, 'mousemove', this._mouseMove);
     }
   }
 
