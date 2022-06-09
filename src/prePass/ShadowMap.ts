@@ -666,6 +666,8 @@ class ShadowMapPass extends Notifier {
       texture.height = resolution;
       texture.minFilter = constants.NEAREST;
       texture.magFilter = constants.NEAREST;
+      texture.wrapS = constants.CLAMP_TO_EDGE;
+      texture.wrapT = constants.CLAMP_TO_EDGE;
       texture.useMipmap = false;
       this._textures[key] = texture;
     }
@@ -742,25 +744,27 @@ class ShadowMapPass extends Notifier {
 
     lightViewBBox.copy(sceneViewBoundingBox).applyTransform(lightViewMatrix);
 
-    const min = lightViewBBox.min.array;
-    const max = lightViewBBox.max.array;
+    const min = lightViewBBox.min;
+    const max = lightViewBBox.max;
 
     // Move camera to adjust the near to 0
     camera.position
-      .set((min[0] + max[0]) / 2, (min[1] + max[1]) / 2, max[2])
+      .set((min.x + max.x) / 2, (min.y + max.y) / 2, max.z)
       .transformMat4(camera.worldTransform);
     camera.near = 0;
-    camera.far = -min[2] + max[2];
+    camera.far = -min.z + max.z;
     // Make sure receivers not in the frustum will stil receive the shadow.
     if (isNaN(+this.lightFrustumBias)) {
       camera.far *= 4;
     } else {
       camera.far += +this.lightFrustumBias;
     }
-    camera.left = min[0];
-    camera.right = max[0];
-    camera.top = max[1];
-    camera.bottom = min[1];
+    // PENDING
+    const PCSSLightSize = this.PCSSLightSize || 0;
+    camera.left = min.x - PCSSLightSize;
+    camera.right = max.x + PCSSLightSize;
+    camera.top = max.y + PCSSLightSize;
+    camera.bottom = min.y - PCSSLightSize;
     camera.update();
 
     return camera;
