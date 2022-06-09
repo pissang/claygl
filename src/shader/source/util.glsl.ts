@@ -43,10 +43,6 @@ vec2 rotateVec2(vec2 v, float a) {
   'rotateVec2'
 );
 
-const lightAttenuationUniforms = {
-  attenuationFactor: uniform('float', 5.0)
-};
-
 /**
  * Calculate light attenuation
  */
@@ -68,7 +64,9 @@ float ${FUNCTION_NAME_PLACEHOLDER}(float dist, float range) {
 );
 
 export const lightAttenuationMixin = createShaderMixin({
-  uniforms: lightAttenuationUniforms,
+  uniforms: {
+    attenuationFactor: uniform('float', 5.0)
+  },
   functions: [lightAttenuationFunction]
 });
 

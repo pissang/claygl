@@ -747,12 +747,18 @@ class ShadowMapPass extends Notifier {
     const min = lightViewBBox.min;
     const max = lightViewBBox.max;
 
+    const PCSSLightSize = this.PCSSLightSize || 0;
+
+    // Add a distance to make sure the blur size of different object are similar.
+    // Or the object near to camera will be too blurry.
+    const nearDistance = PCSSLightSize > 0 ? max.z - min.z : 0;
+
     // Move camera to adjust the near to 0
     camera.position
-      .set((min.x + max.x) / 2, (min.y + max.y) / 2, max.z)
+      .set((min.x + max.x) / 2, (min.y + max.y) / 2, max.z + nearDistance)
       .transformMat4(camera.worldTransform);
     camera.near = 0;
-    camera.far = -min.z + max.z;
+    camera.far = max.z - min.z + nearDistance;
     // Make sure receivers not in the frustum will stil receive the shadow.
     if (isNaN(+this.lightFrustumBias)) {
       camera.far *= 4;
@@ -760,7 +766,6 @@ class ShadowMapPass extends Notifier {
       camera.far += +this.lightFrustumBias;
     }
     // PENDING
-    const PCSSLightSize = this.PCSSLightSize || 0;
     camera.left = min.x - PCSSLightSize;
     camera.right = max.x + PCSSLightSize;
     camera.top = max.y + PCSSLightSize;
