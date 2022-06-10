@@ -96,14 +96,12 @@ class ClayNode extends Notifier {
    */
   protected _scene?: Scene;
 
-  private _inIterating = false;
-
   constructor(opts?: Partial<ClayNodeOpts>) {
     super();
 
     opts = opts || {};
 
-    this.name = (this.type || 'NODE') + '_' + nameId++;
+    this.name = opts.name || (this.type || 'NODE') + '_' + nameId++;
 
     this.position = opts.position || new Vector3();
     this.rotation = opts.rotation || new Quaternion();

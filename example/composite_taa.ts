@@ -129,6 +129,7 @@ blendNode.inputs = {
   texture1: sceneNode,
   texture2: ssaoNode
 };
+blendNode.material.define('BLEND_METHOD', 1);
 blendNode.material.set('weight1', 1);
 blendNode.material.set('weight2', 1);
 taaNode.inputs = {
@@ -154,7 +155,6 @@ ssaoNode.setKernelSize(32);
 
 startTimeline(() => {
   ssaoNode.setEstimateRadius(0.2);
-  blendNode.material.define('BLEND_METHOD', 1);
 
   compositor.render(renderer);
   taaCameraJitter.step();
