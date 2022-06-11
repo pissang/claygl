@@ -274,7 +274,7 @@ export function parse(colorStr: string, rgbaArr?: number[]) {
     ep = str.indexOf(')');
   if (op !== -1 && ep + 1 === str.length) {
     const fname = str.slice(0, op);
-    const params = str.slice(op + 1, ep - (op + 1)).split(',');
+    const params = str.slice(op + 1, ep).split(',');
     let alpha = 1; // To allow case fallthrough.
     switch (fname) {
       case 'rgba':
