@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES5",
+    "lib": ["dom", "dom.iterable", "esnext"],
 
     "strict": true,
     "removeComments": false,
