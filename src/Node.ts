@@ -456,6 +456,7 @@ class ClayNode extends Notifier {
    * @private
    */
   _updateWorldTransformTopDown() {
+    this.updateLocalTransform();
     const localTransform = this.localTransform.array;
     const worldTransform = this.worldTransform.array;
     if (this._parent) {
