@@ -84,11 +84,6 @@ export class GeometryAttribute<TSize extends AttributeSize = AttributeSize> {
   semantic?: AttributeSemantic;
 
   /**
-   * If attributes needs update buffer
-   */
-  __dirty?: boolean = true;
-
-  /**
    * Value of the attribute.
    */
   value?: AttributeValue;
@@ -255,6 +250,7 @@ class GeometryBase {
 
   private _attributeList: string[];
   private _enabledAttributes?: string[];
+  private _attributesUploaded: Record<string, boolean> = {};
 
   __indicesDirty: boolean = true;
 
@@ -288,10 +284,7 @@ class GeometryBase {
    * Usually called after you change the data in attributes.
    */
   dirty() {
-    const enabledAttributes = this.getEnabledAttributes();
-    for (let i = 0; i < enabledAttributes.length; i++) {
-      this.dirtyAttribute(enabledAttributes[i]);
-    }
+    this._attributesUploaded = {};
     this.dirtyIndices();
     this._enabledAttributes = undefined;
   }
@@ -306,8 +299,7 @@ class GeometryBase {
    * @param {string} [attrName]
    */
   dirtyAttribute(attrName: string) {
-    const attr = this.attributes[attrName];
-    attr && (attr.__dirty = true);
+    this._attributesUploaded[attrName] = false;
   }
   /**
    * Is any of attributes dirty.
@@ -318,12 +310,23 @@ class GeometryBase {
     }
     const enabledAttributes = this.getEnabledAttributes();
     for (let i = 0; i < enabledAttributes.length; i++) {
-      if (this.attributes[enabledAttributes[i]].__dirty) {
+      if (this.isAttributeDirty(enabledAttributes[i])) {
         return true;
       }
     }
     return false;
   }
+
+  isAttributeDirty(attrName: string) {
+    return !this._attributesUploaded[attrName];
+  }
+
+  // Mark this attribute has been uploaded to GPU.
+  // Used internal
+  __markAttributeUploaded(attrName: string) {
+    this._attributesUploaded[attrName] = true;
+  }
+
   /**
    * Get indices of triangle at given index.
    * @param {number} idx

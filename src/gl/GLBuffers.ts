@@ -79,26 +79,26 @@ class GLBuffers {
       let k;
       // FIXME If some attributes removed
       for (k = 0; k < attributeList.length; k++) {
-        const name = attributeList[k];
-        const attribute = geometry.attributes[name];
+        const attrName = attributeList[k];
+        const attribute = geometry.attributes[attrName];
 
-        const existsBufferInfo = attributeBufferMap[name];
+        const existsBufferInfo = attributeBufferMap[attrName];
         let buffer: WebGLBuffer;
         if (existsBufferInfo) {
           buffer = existsBufferInfo.buffer;
         } else {
           buffer = gl.createBuffer()!;
         }
-        if (attribute.__dirty) {
+        if (geometry.isAttributeDirty(attrName)) {
           // Only update when they are dirty.
           // TODO: Use BufferSubData?
           gl.bindBuffer(constants.ARRAY_BUFFER, buffer);
           gl.bufferData(constants.ARRAY_BUFFER, attribute.value as Float32Array, DRAW);
-          attribute.__dirty = false;
+          geometry.__markAttributeUploaded(attrName);
         }
 
         attributeBuffers[k] = new GLAttributeBuffer(
-          name,
+          attrName,
           attribute.type,
           buffer,
           attribute.size,
@@ -208,19 +208,15 @@ class GLBuffers {
   dispose(gl: WebGLRenderingContext) {
     const attributeBuffers = this._attrbBuffs;
     const indicesBuffer = this._idxBuff;
-
     attributeBuffers && attributeBuffers.forEach((buffer) => gl.deleteBuffer(buffer.buffer));
-
     if (indicesBuffer) {
       gl.deleteBuffer(indicesBuffer.buffer);
     }
-
     const vao = this._vao;
     const vaoExt = this._vaoExt;
     if (vaoExt && vao && vao.vao) {
       vaoExt.deleteVertexArrayOES(vao.vao);
     }
-
     this._attrbBuffs = [];
     this._idxBuff = undefined;
   }

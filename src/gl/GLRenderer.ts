@@ -421,6 +421,9 @@ class GLRenderer {
         const glBuffersMap = this._glBuffersMap;
         let buffers = glBuffersMap.get(geometry);
         if (!buffers) {
+          // Force mark geometry to be dirty
+          // In case this geometry is used by multiple gl context.
+          geometry.dirty();
           buffers = new GLBuffers(geometry);
           glBuffersMap.set(geometry, buffers);
         }
@@ -555,6 +558,9 @@ class GLRenderer {
       const instancedBufferMap = this._glInstancedBufferMap;
       let buffer = instancedBufferMap.get(renderable as InstancedMesh);
       if (!buffer) {
+        // Force mark renderable to be dirty if its a new created buffer.
+        // In case the object is used by multiple gl context.
+        renderable.__dirty = true;
         buffer = new GLInstancedBuffers(renderable as InstancedMesh);
         instancedBufferMap.set(renderable as InstancedMesh, buffer);
       }
