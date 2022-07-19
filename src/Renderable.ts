@@ -148,7 +148,7 @@ class Renderable<T extends Material = Material> extends ClayNode {
    */
   afterRender() {}
 
-  getBoundingBox(filter: GetBoundingBoxFilter, out?: BoundingBox): BoundingBox {
+  getBoundingBox(filter?: GetBoundingBoxFilter, out?: BoundingBox): BoundingBox {
     out = super.getBoundingBox.call(this, filter, out);
     if (this.geometry && this.geometry.boundingBox) {
       out.union(this.geometry.boundingBox);
