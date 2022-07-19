@@ -17,6 +17,7 @@ let nameId = 0;
 const tmpMat4Arr = mat4.create();
 const tmpBBox = new BoundingBox();
 const tmpMat4 = new Matrix4();
+const tmpMat4_2 = new Matrix4();
 const tmpVec3 = new Vector3();
 const RTMatrix = new Matrix4();
 
@@ -509,7 +510,7 @@ class ClayNode extends Notifier {
   getBoundingBox(filter?: GetBoundingBoxFilter, out?: BoundingBox): BoundingBox {
     out = out || new BoundingBox();
     const meshFilter = filter || defaultBoundingBoxNodeFilter;
-    const invWorldTransform = tmpMat4;
+    const invWorldTransform = tmpMat4_2;
 
     if (this._parent) {
       Matrix4.invert(invWorldTransform, this._parent.worldTransform);
