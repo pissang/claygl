@@ -6,3 +6,9 @@
 /src
 /.vscode
 /.github
+/coverage
+.*
+/circle.yml
+/tools
+/rollup.config.js
+/tsconfig.json

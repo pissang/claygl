@@ -1,6 +1,6 @@
 {
-  "name": "claygl",
-  "version": "2.0.0",
+  "name": "claygl-next",
+  "version": "2.0.0-alpha.2",
   "description": "A 3D graphic library",
   "keywords": [
     "graphic",
@@ -16,8 +16,8 @@
   "jsdelivr": "dist/claygl.min.js",
   "sideEffects": false,
   "scripts": {
-    "build": "npx rollup -c && npx terser dist/claygl.js -c -m > dist/claygl.min.js",
-    "build:lib": "npx tsc",
+    "build": "rm -r dist  && npx rollup -c && npx terser dist/claygl.js -c -m > dist/claygl.min.js",
+    "build:lib": "rm -r lib  && npx tsc",
     "prepublishOnly": "npm run build && npm run build:lib",
     "prepare:nightly": "node build/prepareNightly.js",
     "prepare:nightly-next": "node build/prepareNightly.js --next",
