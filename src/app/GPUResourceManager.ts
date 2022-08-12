@@ -1,6 +1,7 @@
 import type Geometry from '../Geometry';
 import type AmbientCubemap from '../light/AmbientCubemap';
 import type Material from '../Material';
+import Renderable from '../Renderable';
 import type Renderer from '../Renderer';
 import type Scene from '../Scene';
 import Texture from '../Texture';
@@ -42,11 +43,10 @@ function collectResources(
 ) {
   let prevMaterial: Material;
   let prevGeometry: Geometry;
-  scene.traverse(function (renderable) {
-    if (renderable.isRenderable()) {
-      const geometry = renderable.geometry;
-      const material = renderable.material;
-
+  scene.traverse((node) => {
+    const geometry = (node as Renderable).geometry;
+    const material = (node as Renderable).material;
+    if (geometry && material) {
       // TODO optimize!!
       if (material !== prevMaterial) {
         const textureUniforms = material.getTextureUniforms();
