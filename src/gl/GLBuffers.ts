@@ -153,7 +153,6 @@ class GLBuffers {
 
     const lastEnabledAttributes = enabledAttributesMap.get(gl) || [];
     const currentEnabledAttributes: number[] = [];
-    let maxLocation = 0;
     // Always bind attribute location
     for (let i = 0; i < attributeBuffersLen; i++) {
       const attributeBufferInfo = attributeBuffers[i];
@@ -172,9 +171,6 @@ class GLBuffers {
       currentEnabledAttributes[location] = 1;
       if (!lastEnabledAttributes[location]) {
         gl.enableVertexAttribArray(location);
-      }
-      if (location > maxLocation) {
-        maxLocation = location;
       }
     }
 

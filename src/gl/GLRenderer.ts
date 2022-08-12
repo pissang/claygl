@@ -270,7 +270,8 @@ class GLRenderer {
       }
     }
     // Unbind if there is no new framebuffer. Else only update mipmap
-    prevFrameBuffer && glFrameBufferMap.get(prevFrameBuffer)!.unbind(gl, glFrameBuffer);
+    const prevGLFrameBuffer = prevFrameBuffer && glFrameBufferMap.get(prevFrameBuffer);
+    prevGLFrameBuffer && prevGLFrameBuffer.unbind(gl, glFrameBuffer);
     if (glFrameBuffer) {
       glFrameBuffer.bind(gl, {
         getGLTexture: (texture) => this._getGLTexture(texture),
@@ -761,8 +762,7 @@ class GLRenderer {
    * @param geometry
    */
   disposeGeometry(geometry: GeometryBase) {
-    const glBuffers = this._glBuffersMap.get(geometry);
-    glBuffers && glBuffers.dispose(this.gl);
+    this._disposeResource(this._glBuffersMap, geometry);
   }
 
   /**
@@ -770,8 +770,7 @@ class GLRenderer {
    * @param texture
    */
   disposeTexture(texture: Texture) {
-    const glTexture = this._glTextureMap.get(texture);
-    glTexture && glTexture.dispose(this.gl);
+    this._disposeResource(this._glTextureMap, texture);
   }
 
   /**
@@ -779,17 +778,26 @@ class GLRenderer {
    * @param frameBuffer
    */
   disposeFrameBuffer(frameBuffer: FrameBuffer) {
-    const glFramebuffer = this._glFrameBufferMap.get(frameBuffer);
-    glFramebuffer && glFramebuffer.dispose(this.gl);
+    // TODO unbind if framebuffer is in usage?
+    this._disposeResource(this._glFrameBufferMap, frameBuffer);
   }
 
   /**
    * Dispose instanced mesh
    */
   disposeInstancedMesh(mesh: InstancedMesh) {
-    const buffers = this._glInstancedBufferMap.get(mesh as InstancedMesh);
-    if (buffers) {
-      buffers.dispose(this.gl);
+    this._disposeResource(this._glInstancedBufferMap, mesh);
+  }
+
+  private _disposeResource<T extends GeometryBase | Texture | FrameBuffer | InstancedMesh>(
+    // TODO provide disposable
+    storage: WeakMap<T, { dispose: (gl: WebGLRenderingContext) => void }>,
+    resource: T
+  ) {
+    const obj = storage.get(resource);
+    if (obj) {
+      obj.dispose(this.gl);
+      storage.delete(resource);
     }
   }
 }
