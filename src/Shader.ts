@@ -726,6 +726,7 @@ export class Shader<
   static arrayUniform = createArrayUniform;
   static attribute = createAttribute;
   static varying = createVarying;
+  static semanticUniform = createSemanticUniform;
 
   static Vertex = VertexShader;
   static Fragment = FragmentShader;

@@ -2,7 +2,11 @@ import typescript from '@rollup/plugin-typescript';
 
 export default {
   input: 'src/claygl.ts',
-  plugins: [typescript()],
+  plugins: [
+    typescript({
+      target: 'ES5'
+    })
+  ],
   output: [
     {
       format: 'umd',

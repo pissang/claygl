@@ -12,7 +12,9 @@ export {
   skinningMixin,
   wireframeMixin,
   sRGBMixin,
-  randomFunction
+  randomFunction,
+  ACESToneMappingFunction,
+  parallaxCorrectFunction
 } from './source/util.glsl';
 
 // Composite shaders.

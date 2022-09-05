@@ -10,6 +10,7 @@
     "name": "Yi Shen",
     "url": "https://github.com/pissang"
   },
+  "type": "module",
   "module": "index.js",
   "types": "index.d.ts",
   "main": "dist/claygl.js",
