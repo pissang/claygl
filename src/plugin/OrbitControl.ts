@@ -705,12 +705,12 @@ class OrbitControl extends Notifier {
       const needsCheckShiftKey =
         rotateMouseButton.includes('shift') || panMouseButton.includes('shift');
 
-      function checkShift(buttonName: MouseButtonsWithSpecialKey) {
+      const checkShift = (buttonName: MouseButtonsWithSpecialKey) => {
         if (!needsCheckShiftKey) {
           return true;
         }
         return buttonName.includes('shift') === e.shiftKey;
-      }
+      };
 
       if ((e as MouseEvent).button === rotateMouseBtnKey && checkShift(rotateMouseButton)) {
         this._mode = 'rotate';
