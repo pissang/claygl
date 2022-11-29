@@ -11,8 +11,13 @@ interface Vendor {
   request: {
     get: typeof get;
   };
-  addEventListener: (dom: any, type: string, func: Function, useCapture?: boolean) => void;
-  removeEventListener: (dom: any, type: string, func: Function) => void;
+  addEventListener: (
+    dom: any,
+    type: keyof DocumentEventMap,
+    func: Function,
+    useCapture?: boolean
+  ) => void;
+  removeEventListener: (dom: any, type: keyof DocumentEventMap, func: Function) => void;
 }
 const vendor = {} as Vendor;
 

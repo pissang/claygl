@@ -277,15 +277,12 @@ class OrbitControl extends Notifier {
   dispose() {
     const dom = this.domElement;
 
-    removeEvent(dom, 'touchstart', this._mouseDownHandler);
-    removeEvent(dom, 'touchmove', this._mouseMoveHandler);
-    removeEvent(dom, 'touchend', this._mouseUpHandler);
+    removeEvent(dom, 'pointerdown', this._mouseDownHandler);
+    removeEvent(dom, 'pointermove', this._mouseMoveHandler);
+    removeEvent(dom, 'pointerup', this._mouseUpHandler);
 
-    // removeEvent(dom, 'mousedown', this._mouseDownHandler);
-    // removeEvent(dom, 'mousemove', this._mouseMoveHandler);
-    // removeEvent(dom, 'mouseup', this._mouseUpHandler);
     removeEvent(dom, 'wheel', this._mouseWheelHandler);
-    removeEvent(dom, 'mouseout', this._mouseUpHandler);
+    removeEvent(dom, 'pointerout', this._mouseUpHandler);
 
     if (this.timeline) {
       this.timeline.off('frame', this.update);
