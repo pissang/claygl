@@ -33,6 +33,13 @@ type AnimatableControlOpts = Pick<
   'distance' | 'orthographicSize' | 'alpha' | 'beta' | 'center'
 >;
 
+type MouseButtons = 'left' | 'right' | 'middle';
+type AltKey = 'alt';
+type ShiftKey = 'shift';
+type MouseButtonsWithSpecialKey =
+  // | `${AltKey}+${MouseButtons}`
+  `${ShiftKey}+${MouseButtons}` | MouseButtons;
+
 interface OrbitControlOpts {
   target: ClayNode;
   timeline?: Timeline;
@@ -111,8 +118,8 @@ interface OrbitControlOpts {
    */
   autoRotateSpeed: number;
 
-  panMouseButton: 'middle' | 'left' | 'right';
-  rotateMouseButton: 'left' | 'middle' | 'right';
+  panMouseButton: MouseButtonsWithSpecialKey;
+  rotateMouseButton: MouseButtonsWithSpecialKey;
 
   damping: number;
 
@@ -252,9 +259,7 @@ class OrbitControl extends Notifier {
   init() {
     const dom = this.domElement;
 
-    addEvent(dom, 'touchstart', this._mouseDownHandler);
-
-    addEvent(dom, 'mousedown', this._mouseDownHandler);
+    addEvent(dom, 'pointerdown', this._mouseDownHandler);
     addEvent(dom, 'wheel', this._mouseWheelHandler);
 
     if (this.timeline) {
@@ -276,9 +281,9 @@ class OrbitControl extends Notifier {
     removeEvent(dom, 'touchmove', this._mouseMoveHandler);
     removeEvent(dom, 'touchend', this._mouseUpHandler);
 
-    removeEvent(dom, 'mousedown', this._mouseDownHandler);
-    removeEvent(dom, 'mousemove', this._mouseMoveHandler);
-    removeEvent(dom, 'mouseup', this._mouseUpHandler);
+    // removeEvent(dom, 'mousedown', this._mouseDownHandler);
+    // removeEvent(dom, 'mousemove', this._mouseMoveHandler);
+    // removeEvent(dom, 'mouseup', this._mouseUpHandler);
     removeEvent(dom, 'wheel', this._mouseWheelHandler);
     removeEvent(dom, 'mouseout', this._mouseUpHandler);
 
@@ -694,9 +699,25 @@ class OrbitControl extends Notifier {
 
       this._processGesture(e as TouchEvent, 'start');
     } else {
-      if ((e as MouseEvent).button === MOUSE_BUTTON_KEY_MAP[this.rotateMouseButton]) {
+      const { rotateMouseButton, panMouseButton } = this;
+      const rotateMouseBtnKey =
+        MOUSE_BUTTON_KEY_MAP[rotateMouseButton.split('+').pop()!.trim() as MouseButtons];
+      const panMouseBtnKey =
+        MOUSE_BUTTON_KEY_MAP[panMouseButton.split('+').pop()!.trim() as MouseButtons];
+
+      const needsCheckShiftKey =
+        rotateMouseButton.includes('shift') || panMouseButton.includes('shift');
+
+      function checkShift(buttonName: MouseButtonsWithSpecialKey) {
+        if (!needsCheckShiftKey) {
+          return true;
+        }
+        return buttonName.includes('shift') === e.shiftKey;
+      }
+
+      if ((e as MouseEvent).button === rotateMouseBtnKey && checkShift(rotateMouseButton)) {
         this._mode = 'rotate';
-      } else if ((e as MouseEvent).button === MOUSE_BUTTON_KEY_MAP[this.panMouseButton]) {
+      } else if ((e as MouseEvent).button === panMouseBtnKey && checkShift(panMouseButton)) {
         this._mode = 'pan';
 
         /**
@@ -712,12 +733,10 @@ class OrbitControl extends Notifier {
     }
 
     const dom = this.domElement;
-    addEvent(dom, 'touchmove', this._mouseMoveHandler);
-    addEvent(dom, 'touchend', this._mouseUpHandler);
 
-    addEvent(dom, 'mousemove', this._mouseMoveHandler);
-    addEvent(dom, 'mouseup', this._mouseUpHandler);
-    addEvent(dom, 'mouseout', this._mouseUpHandler);
+    addEvent(dom, 'pointermove', this._mouseMoveHandler);
+    addEvent(dom, 'pointerup', this._mouseUpHandler);
+    addEvent(dom, 'pointerout', this._mouseUpHandler);
 
     // Reset rotate velocity
     this._rotateVelocity.set(0, 0);
@@ -771,9 +790,12 @@ class OrbitControl extends Notifier {
   }
 
   _mouseWheelHandler(e: WheelEvent) {
+    console.log('wheel');
     if (this._isAnimating()) {
       return;
     }
+    e.preventDefault();
+    e.stopPropagation();
     const delta = e.deltaY;
     if (delta === 0) {
       return;
@@ -826,11 +848,9 @@ class OrbitControl extends Notifier {
 
   _mouseUpHandler(event: MouseEvent | TouchEvent) {
     const dom = this.domElement;
-    removeEvent(dom, 'touchmove', this._mouseMoveHandler);
-    removeEvent(dom, 'touchend', this._mouseUpHandler);
-    removeEvent(dom, 'mousemove', this._mouseMoveHandler);
-    removeEvent(dom, 'mouseup', this._mouseUpHandler);
-    removeEvent(dom, 'mouseout', this._mouseUpHandler);
+    removeEvent(dom, 'pointermove', this._mouseMoveHandler);
+    removeEvent(dom, 'pointerup', this._mouseUpHandler);
+    removeEvent(dom, 'pointerout', this._mouseUpHandler);
 
     this._processGesture(event as TouchEvent, 'end');
   }
