@@ -4,6 +4,7 @@ import type Renderer from '../Renderer';
 import type ClayNode from '../Node';
 import Scene from '../Scene';
 import { assign } from '../core/util';
+import Camera from '../Camera';
 
 // TODO Use pointer event
 const EVENT_NAMES = [
@@ -73,17 +74,23 @@ export class EventManager {
   private _renderer: Renderer;
   private _container: HTMLElement;
   private _scene: Scene;
-  constructor(container: HTMLElement, renderer: Renderer, scene: Scene) {
+  private _camera: Camera | undefined;
+
+  constructor(container: HTMLElement, renderer: Renderer, scene: Scene, camera?: Camera) {
     this._container = container;
     this._renderer = renderer;
     this._scene = scene;
+    this._camera = camera;
+  }
+
+  setCamera(camera?: Camera) {
+    this._camera = camera;
   }
 
   init() {
     const dom = this._container;
     const scene = this._scene;
     const renderer = this._renderer;
-    const mainCamera = scene.getMainCamera();
 
     let oldTarget: ClayNode | undefined;
     EVENT_NAMES.forEach((domEveType) => {
@@ -91,6 +98,7 @@ export class EventManager {
         dom,
         domEveType,
         ((this as any)[makeHandlerName(domEveType)] = (e: MouseEvent | TouchEvent) => {
+          const mainCamera = this._camera || scene.getMainCamera();
           if (!mainCamera) {
             // Not have camera yet.
             return;
