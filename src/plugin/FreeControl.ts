@@ -110,8 +110,6 @@ class FreeControl extends Notifier {
     addEvent(el, 'click', this._requestPointerLock);
 
     addEvent(document, 'pointerlockchange', this._lockChange);
-    addEvent(document, 'mozpointerlockchange', this._lockChange);
-    addEvent(document, 'webkitpointerlockchange', this._lockChange);
 
     addEvent(document, 'keydown', this._keyDown);
     addEvent(document, 'keyup', this._keyUp);
@@ -136,8 +134,6 @@ class FreeControl extends Notifier {
     removeEvent(el, 'click', this._requestPointerLock);
 
     removeEvent(document, 'pointerlockchange', this._lockChange);
-    removeEvent(document, 'mozpointerlockchange', this._lockChange);
-    removeEvent(document, 'webkitpointerlockchange', this._lockChange);
 
     removeEvent(document, 'keydown', this._keyDown);
     removeEvent(document, 'keyup', this._keyUp);

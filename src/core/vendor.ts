@@ -13,11 +13,15 @@ interface Vendor {
   };
   addEventListener: (
     dom: any,
-    type: keyof DocumentEventMap,
+    type: keyof DocumentEventMap | keyof WindowEventHandlersEventMap,
     func: Function,
     useCapture?: boolean
   ) => void;
-  removeEventListener: (dom: any, type: keyof DocumentEventMap, func: Function) => void;
+  removeEventListener: (
+    dom: any,
+    type: keyof DocumentEventMap | keyof WindowEventHandlersEventMap,
+    func: Function
+  ) => void;
 }
 const vendor = {} as Vendor;
 

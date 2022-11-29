@@ -10,21 +10,17 @@ import Camera from '../Camera';
 const EVENT_NAMES = [
   'click',
   'dblclick',
-  'mouseover',
-  'mouseout',
-  'mousemove',
-  'mousedown',
-  'mouseup',
-  'touchstart',
-  'touchend',
-  'touchmove',
-  'mousewheel'
+  'pointerout',
+  'pointermove',
+  'pointerdown',
+  'pointerup',
+  'wheel'
 ] as const;
 
 type ClayEventType =
   | 'click'
   | 'dblclick'
-  | 'mousewheel'
+  | 'wheel'
   | 'pointerdown'
   | 'pointermove'
   | 'pointerup'
@@ -109,9 +105,9 @@ export class EventManager {
           let offsetX, offsetY;
           let eveType: ClayEventType;
 
-          if (domEveType.indexOf('touch') >= 0) {
+          if ((e as TouchEvent).targetTouches) {
             const touch =
-              domEveType !== 'touchend'
+              domEveType !== 'pointerup'
                 ? (e as TouchEvent).targetTouches[0]
                 : (e as TouchEvent).changedTouches[0];
 
@@ -125,8 +121,8 @@ export class EventManager {
           const pickResult = rayPicking.pick(renderer, scene, mainCamera, offsetX, offsetY);
 
           let delta;
-          if (domEveType === 'mousewheel') {
-            delta = (e as any).wheelDelta ? (e as any).wheelDelta / 120 : -(e.detail || 0) / 3;
+          if (domEveType === 'wheel') {
+            delta = (e as WheelEvent).deltaY / 120;
           }
 
           if (pickResult) {
@@ -135,7 +131,7 @@ export class EventManager {
               return;
             }
 
-            if (domEveType === 'mousemove' || domEveType === 'touchmove') {
+            if (domEveType === 'pointermove') {
               // PENDING touchdown should trigger mouseover event ?
               const targetChanged = pickResult.target !== oldTarget;
               if (targetChanged) {
@@ -164,16 +160,7 @@ export class EventManager {
               }
             } else {
               // Map events
-              eveType =
-                domEveType === 'mousedown' || domEveType === 'touchstart'
-                  ? 'pointerdown'
-                  : domEveType === 'mouseup' || domEveType === 'touchend'
-                  ? 'pointerup'
-                  : domEveType === 'mouseover'
-                  ? 'pointerover'
-                  : domEveType === 'mouseout'
-                  ? 'pointerout'
-                  : domEveType;
+              eveType = domEveType;
               bubblingEvent(
                 pickResult.target,
                 packageEvent(eveType, pickResult, offsetX, offsetY, delta)

@@ -787,7 +787,6 @@ class OrbitControl extends Notifier {
   }
 
   _mouseWheelHandler(e: WheelEvent) {
-    console.log('wheel');
     if (this._isAnimating()) {
       return;
     }
