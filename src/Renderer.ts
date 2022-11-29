@@ -822,7 +822,11 @@ class Renderer extends Notifier {
   /**
    * Dispose renderer
    */
-  dispose() {}
+  dispose() {
+    // TODO
+    // @ts-ignore
+    delete (this.gl as ExtendedWebGLRenderingContext).targetRenderer;
+  }
 
   /**
    * Convert screen coords to normalized device coordinates(NDC)
