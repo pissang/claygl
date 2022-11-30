@@ -144,6 +144,8 @@ interface OrbitControl
   > {}
 
 class OrbitControl extends Notifier {
+  disabled = false;
+
   private _autoRotate: boolean = false;
   private _target?: ClayNode;
   private _center = new Vector3();
@@ -681,7 +683,7 @@ class OrbitControl extends Notifier {
   }
 
   _mouseDownHandler(e: MouseEvent | TouchEvent) {
-    if (this._isAnimating()) {
+    if (this.disabled || this._isAnimating()) {
       return;
     }
     let x = (e as MouseEvent).clientX;
@@ -747,7 +749,7 @@ class OrbitControl extends Notifier {
   }
 
   _mouseMoveHandler(e: MouseEvent | TouchEvent) {
-    if (this._isAnimating()) {
+    if (this.disabled || this._isAnimating()) {
       return;
     }
     let x = (e as MouseEvent).clientX;
@@ -787,11 +789,9 @@ class OrbitControl extends Notifier {
   }
 
   _mouseWheelHandler(e: WheelEvent) {
-    if (this._isAnimating()) {
+    if (this.disabled || this._isAnimating()) {
       return;
     }
-    e.preventDefault();
-    e.stopPropagation();
     const delta = e.deltaY;
     if (delta === 0) {
       return;
@@ -805,7 +805,7 @@ class OrbitControl extends Notifier {
   }
 
   _pinchHandler(e: PinchEvent) {
-    if (this._isAnimating()) {
+    if (this.disabled || this._isAnimating()) {
       return;
     }
     this._zoomHandler(e as any, e.pinchScale > 1 ? 0.4 : -0.4);
