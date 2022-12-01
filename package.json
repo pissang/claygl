@@ -17,8 +17,8 @@
   "jsdelivr": "dist/claygl.min.js",
   "sideEffects": false,
   "scripts": {
-    "build": "rm -r dist  && npx rollup -c && npx terser dist/claygl.js -c -m > dist/claygl.min.js",
-    "build:lib": "rm -r lib  && npx tsc",
+    "build": "rm -rf dist  && npx rollup -c && npx terser dist/claygl.js -c -m > dist/claygl.min.js",
+    "build:lib": "rm -rf lib  && npx tsc",
     "prepublishOnly": "npm run build && npm run build:lib",
     "prepare:nightly": "node build/prepareNightly.js",
     "prepare:nightly-next": "node build/prepareNightly.js --next",
