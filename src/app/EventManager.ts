@@ -6,16 +6,14 @@ import Scene from '../Scene';
 import { assign } from '../core/util';
 import Camera from '../Camera';
 
-// TODO Use pointer event
-const EVENT_NAMES = [
-  'click',
-  'dblclick',
-  'pointerout',
-  'pointermove',
-  'pointerdown',
-  'pointerup',
-  'wheel'
-] as const;
+const HOVER_EVENTS = ['pointerout', 'pointermove', 'pointerdown', 'pointerup'] as const;
+const CLICK_EVENTS = ['click', 'dblclick'] as const;
+const WHEEL_EVENTS = ['wheel'] as const;
+
+type ListenedEvents =
+  | typeof HOVER_EVENTS[number]
+  | typeof CLICK_EVENTS[number]
+  | typeof WHEEL_EVENTS[number];
 
 type ClayEventType =
   | 'click'
@@ -26,6 +24,8 @@ type ClayEventType =
   | 'pointerup'
   | 'pointerover'
   | 'pointerout';
+
+export type EventTriggers = 'hover' | 'click' | 'wheel';
 
 // TODO only mouseout event only have target property from Itersection
 export interface ClayMouseEvent extends Partial<rayPicking.Intersection> {
@@ -72,6 +72,8 @@ export class EventManager {
   private _scene: Scene;
   private _camera: Camera | undefined;
 
+  private _listenedEvents: ListenedEvents[] = [];
+
   constructor(container: HTMLElement, renderer: Renderer, scene: Scene, camera?: Camera) {
     this._container = container;
     this._renderer = renderer;
@@ -83,13 +85,26 @@ export class EventManager {
     this._camera = camera;
   }
 
-  init() {
+  enable(enabledTriggers?: EventTriggers[]) {
+    // Disable before enable.
+    this.disable();
+
     const dom = this._container;
     const scene = this._scene;
     const renderer = this._renderer;
 
+    enabledTriggers = enabledTriggers || ['click', 'hover', 'wheel'];
+
+    const eventNames = [
+      ...(enabledTriggers.indexOf('click') >= 0 ? CLICK_EVENTS : []),
+      ...(enabledTriggers.indexOf('hover') >= 0 ? HOVER_EVENTS : []),
+      ...(enabledTriggers.indexOf('wheel') >= 0 ? WHEEL_EVENTS : [])
+    ];
+
+    this._listenedEvents = eventNames;
+
     let oldTarget: ClayNode | undefined;
-    EVENT_NAMES.forEach((domEveType) => {
+    eventNames.forEach((domEveType) => {
       vendor.addEventListener(
         dom,
         domEveType,
@@ -99,7 +114,7 @@ export class EventManager {
             // Not have camera yet.
             return;
           }
-          e.preventDefault && e.preventDefault();
+          // e.preventDefault && e.preventDefault();
 
           const box = dom.getBoundingClientRect();
           let offsetX, offsetY;
@@ -118,7 +133,9 @@ export class EventManager {
             offsetY = (e as MouseEvent).clientY - box.top;
           }
 
-          const pickResult = rayPicking.pick(renderer, scene, mainCamera, offsetX, offsetY);
+          const pickResultAll = rayPicking.pickAll(renderer, scene, mainCamera, offsetX, offsetY);
+          // Just ignore silent element.
+          const pickResult = pickResultAll.find((result) => !result.target.silent);
 
           let delta;
           if (domEveType === 'wheel') {
@@ -126,11 +143,6 @@ export class EventManager {
           }
 
           if (pickResult) {
-            // Just ignore silent element.
-            if (pickResult.target.silent) {
-              return;
-            }
-
             if (domEveType === 'pointermove') {
               // PENDING touchdown should trigger mouseover event ?
               const targetChanged = pickResult.target !== oldTarget;
@@ -186,10 +198,15 @@ export class EventManager {
     });
   }
 
-  dispose() {
-    EVENT_NAMES.forEach((eveType) => {
+  disable() {
+    this._listenedEvents.forEach((eveType) => {
       const handler = (this as any)[makeHandlerName(eveType)];
       handler && vendor.removeEventListener(this._container, eveType, handler);
     });
+    this._listenedEvents = [];
+  }
+
+  dispose() {
+    this.disable();
   }
 }

@@ -28,7 +28,6 @@ import AmbientCubemapLight from './light/AmbientCubemap';
 import AmbientSHLight from './light/AmbientSH';
 import ShadowMapPass from './prePass/ShadowMap';
 import LRUCache from './core/LRU';
-import Skybox from './Skybox';
 import * as util from './core/util';
 import * as shUtil from './util/sh';
 import * as textureUtil from './util/texture';
@@ -37,13 +36,21 @@ import * as colorUtil from './core/color';
 import { Notifier } from './core';
 import GPUResourceManager from './app/GPUResourceManager';
 import Camera from './Camera';
-import { EventManager } from './app/EventManager';
+import { EventManager, EventTriggers } from './app/EventManager';
 import type Renderable from './Renderable';
 import Shader from './Shader';
 import { createStandardShader } from './shader/create';
 import Geometry from './Geometry';
 import { Color } from './core/type';
 
+interface App3DEventOpts {
+  /**
+   * Container that event will be listened to
+   */
+  enabled?: boolean;
+  trigger?: EventTriggers[];
+  container?: HTMLElement;
+}
 interface App3DGraphicOpts {
   /**
    * If enable shadow
@@ -78,7 +85,8 @@ interface App3DOpts {
   /**
    * If enable mouse/touch event. It will slow down the system if geometries are complex.
    */
-  event?: boolean;
+  event?: App3DEventOpts | boolean;
+
   /**
    * Graphic configuration including shadow, color space.
    */
@@ -219,6 +227,12 @@ class App3D extends Notifier {
     const height = opts.height || container.clientHeight;
 
     const timeline = (this._timeline = new Timeline());
+    const eventOpts =
+      typeof opts.event === 'boolean'
+        ? {
+            enabled: opts.event
+          }
+        : opts.event;
 
     this._gpuResourceManager = new GPUResourceManager(renderer);
 
@@ -226,9 +240,13 @@ class App3D extends Notifier {
       this._shadowPass = new ShadowMapPass();
     }
 
-    if (opts.event) {
-      this._eventManager = new EventManager(container, renderer, this._scene);
-      this._eventManager.init();
+    if (eventOpts && eventOpts.enabled) {
+      this._eventManager = new EventManager(
+        eventOpts.container || container,
+        renderer,
+        this._scene
+      );
+      this._eventManager.enable(eventOpts.trigger);
     }
     !isDomCanvas && container.appendChild(renderer.canvas);
 
