@@ -206,7 +206,7 @@ function intersectRenderable(
           renderable,
           [i1, i2, i3],
           i / 3,
-          Vector3.dist(pointW, ray.origin)
+          Vector3.dist(pointW, rawRay.origin)
         )
       );
     }
