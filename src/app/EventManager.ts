@@ -6,8 +6,8 @@ import Scene from '../Scene';
 import { assign } from '../core/util';
 import Camera from '../Camera';
 
-const HOVER_EVENTS = ['pointerout', 'pointermove', 'pointerdown', 'pointerup'] as const;
-const CLICK_EVENTS = ['click', 'dblclick'] as const;
+const HOVER_EVENTS = ['pointerout', 'pointermove'] as const;
+const CLICK_EVENTS = ['click', 'dblclick', 'pointerdown', 'pointerup'] as const;
 const WHEEL_EVENTS = ['wheel'] as const;
 
 type ListenedEvents =
@@ -104,6 +104,7 @@ export class EventManager {
     this._listenedEvents = eventNames;
 
     let oldTarget: ClayNode | undefined;
+    let downTarget: ClayNode | undefined;
     eventNames.forEach((domEveType) => {
       vendor.addEventListener(
         dom,
@@ -114,7 +115,6 @@ export class EventManager {
             // Not have camera yet.
             return;
           }
-          // e.preventDefault && e.preventDefault();
 
           const box = dom.getBoundingClientRect();
           let offsetX, offsetY;
@@ -137,12 +137,23 @@ export class EventManager {
           // Just ignore silent element.
           const pickResult = pickResultAll.find((result) => !result.target.silent);
 
+          if (domEveType === 'pointerdown') {
+            downTarget = pickResult && pickResult.target;
+          }
+
           let delta;
           if (domEveType === 'wheel') {
             delta = (e as WheelEvent).deltaY / 120;
           }
 
           if (pickResult) {
+            if (domEveType === 'click') {
+              // Not trigger click event if target is changed.
+              if (pickResult.target !== downTarget) {
+                return;
+              }
+            }
+
             if (domEveType === 'pointermove') {
               // PENDING touchdown should trigger mouseover event ?
               const targetChanged = pickResult.target !== oldTarget;
