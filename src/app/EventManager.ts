@@ -5,6 +5,7 @@ import type ClayNode from '../Node';
 import Scene from '../Scene';
 import { assign } from '../core/util';
 import Camera from '../Camera';
+import { dist } from '../glmatrix/vec2';
 
 const HOVER_EVENTS = ['pointerout', 'pointermove'] as const;
 const CLICK_EVENTS = ['click', 'dblclick', 'pointerdown', 'pointerup'] as const;
@@ -105,6 +106,7 @@ export class EventManager {
 
     let oldTarget: ClayNode | undefined;
     let downTarget: ClayNode | undefined;
+    let downPoint: [number, number];
     eventNames.forEach((domEveType) => {
       vendor.addEventListener(
         dom,
@@ -139,6 +141,7 @@ export class EventManager {
 
           if (domEveType === 'pointerdown') {
             downTarget = pickResult && pickResult.target;
+            downPoint = [offsetX, offsetY];
           }
 
           let delta;
@@ -148,8 +151,8 @@ export class EventManager {
 
           if (pickResult) {
             if (domEveType === 'click') {
-              // Not trigger click event if target is changed.
-              if (pickResult.target !== downTarget) {
+              // Not trigger click event if target is changed or move long distance.
+              if (pickResult.target !== downTarget || dist(downPoint, [offsetX, offsetY]) > 10) {
                 return;
               }
             }
