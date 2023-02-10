@@ -65,6 +65,7 @@ export interface RenderableOpts extends ClayNodeOpts {
    * If ignore picking
    */
   ignorePicking: boolean;
+
   /**
    * If Ignore prez
    */

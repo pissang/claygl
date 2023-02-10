@@ -68,16 +68,20 @@ function intersectNode(
   out: Intersection[],
   forcePickAll: boolean
 ) {
-  if (node.isRenderable && node.isRenderable()) {
+  const renderable = node as Renderable;
+  const geometry = renderable.geometry;
+
+  // TODO If should consider the invisible option?
+  if (geometry && geometry.vertexCount) {
     if (
-      (!node.ignorePicking || forcePickAll) &&
+      (!renderable.ignorePicking || forcePickAll) &&
       // Only triangle mesh support ray picking
-      ((node.mode === constants.TRIANGLES && node.geometry.isUseIndices()) ||
+      ((renderable.mode === constants.TRIANGLES && renderable.geometry.isUseIndices()) ||
         // Or if geometry has it's own pickByRay, pick, implementation
-        node.geometry.pickByRay ||
-        node.geometry.pick)
+        renderable.geometry.pickByRay ||
+        renderable.geometry.pick)
     ) {
-      intersectRenderable(renderer, camera, ray, ndc, node, out);
+      intersectRenderable(renderer, camera, ray, ndc, renderable, out);
     }
   }
   const childrenRef = node.childrenRef();
