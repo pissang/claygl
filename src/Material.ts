@@ -332,7 +332,7 @@ class Material<
    */
   isDefined(shaderType: ShaderType, symbol: string) {
     // PENDING hasOwnProperty ?
-    return this.getDefine(shaderType, symbol) === undefined;
+    return this.getDefine(shaderType, symbol) !== undefined;
   }
   /**
    * Get macro value defined in shader.
