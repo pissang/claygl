@@ -143,6 +143,8 @@ interface OrbitControl
     'autoRotate' | 'target' | 'distance' | 'orthographicSize' | 'alpha' | 'beta' | 'center'
   > {}
 
+const useTouchEvent = 'ontouchstart' in window;
+
 class OrbitControl extends Notifier {
   disabled = false;
 
@@ -221,10 +223,10 @@ class OrbitControl extends Notifier {
     this.target = opts.target;
 
     // Each OrbitControl has it's own handler
-    this._mouseDownHandler = this._mouseDownHandler.bind(this);
+    this._pointerDownHandler = this._pointerDownHandler.bind(this);
     this._mouseWheelHandler = this._mouseWheelHandler.bind(this);
-    this._mouseMoveHandler = this._mouseMoveHandler.bind(this);
-    this._mouseUpHandler = this._mouseUpHandler.bind(this);
+    this._pointerMoveHandler = this._pointerMoveHandler.bind(this);
+    this._pointerUpHandler = this._pointerUpHandler.bind(this);
     this._pinchHandler = this._pinchHandler.bind(this);
 
     this.init();
@@ -261,7 +263,11 @@ class OrbitControl extends Notifier {
   init() {
     const dom = this.domElement;
 
-    addEvent(dom, 'pointerdown', this._mouseDownHandler);
+    if (useTouchEvent) {
+      addEvent(dom, 'touchstart', this._pointerDownHandler);
+    } else {
+      addEvent(dom, 'mousedown', this._pointerDownHandler);
+    }
     addEvent(dom, 'wheel', this._mouseWheelHandler);
 
     if (this.timeline) {
@@ -279,12 +285,15 @@ class OrbitControl extends Notifier {
   dispose() {
     const dom = this.domElement;
 
-    removeEvent(dom, 'pointerdown', this._mouseDownHandler);
-    removeEvent(dom, 'pointermove', this._mouseMoveHandler);
-    removeEvent(dom, 'pointerup', this._mouseUpHandler);
+    if (useTouchEvent) {
+      removeEvent(dom, 'touchstart', this._pointerDownHandler);
+    } else {
+      removeEvent(dom, 'mousedown', this._pointerDownHandler);
+    }
+
+    this._releaseGlobalEvent();
 
     removeEvent(dom, 'wheel', this._mouseWheelHandler);
-    removeEvent(dom, 'pointerout', this._mouseUpHandler);
 
     if (this.timeline) {
       this.timeline.off('frame', this.update);
@@ -682,7 +691,7 @@ class OrbitControl extends Notifier {
     }
   }
 
-  _mouseDownHandler(e: MouseEvent | TouchEvent) {
+  _pointerDownHandler(e: MouseEvent | TouchEvent) {
     if (this.disabled || this._isAnimating()) {
       return;
     }
@@ -731,11 +740,15 @@ class OrbitControl extends Notifier {
       }
     }
 
-    const dom = this.domElement;
-
-    addEvent(dom, 'pointermove', this._mouseMoveHandler);
-    addEvent(dom, 'pointerup', this._mouseUpHandler);
-    addEvent(dom, 'pointerout', this._mouseUpHandler);
+    if (useTouchEvent) {
+      addEvent(window, 'touchmove', this._pointerMoveHandler);
+      addEvent(window, 'touchend', this._pointerUpHandler);
+      addEvent(window, 'touchcancel', this._pointerUpHandler);
+    } else {
+      addEvent(window, 'mousemove', this._pointerMoveHandler);
+      addEvent(window, 'mouseup', this._pointerUpHandler);
+      addEvent(window, 'mouseout', this._pointerUpHandler);
+    }
 
     // Reset rotate velocity
     this._rotateVelocity.set(0, 0);
@@ -748,7 +761,7 @@ class OrbitControl extends Notifier {
     this._mouseY = y;
   }
 
-  _mouseMoveHandler(e: MouseEvent | TouchEvent) {
+  _pointerMoveHandler(e: MouseEvent | TouchEvent) {
     if (this.disabled || this._isAnimating()) {
       return;
     }
@@ -808,6 +821,7 @@ class OrbitControl extends Notifier {
     if (this.disabled || this._isAnimating()) {
       return;
     }
+    e.preventDefault();
     this._zoomHandler(e as any, e.pinchScale > 1 ? 0.4 : -0.4);
   }
 
@@ -842,13 +856,21 @@ class OrbitControl extends Notifier {
     e.preventDefault && e.preventDefault();
   }
 
-  _mouseUpHandler(event: MouseEvent | TouchEvent) {
-    const dom = this.domElement;
-    removeEvent(dom, 'pointermove', this._mouseMoveHandler);
-    removeEvent(dom, 'pointerup', this._mouseUpHandler);
-    removeEvent(dom, 'pointerout', this._mouseUpHandler);
-
+  _pointerUpHandler(event: MouseEvent | TouchEvent) {
+    this._releaseGlobalEvent();
     this._processGesture(event as TouchEvent, 'end');
+  }
+
+  _releaseGlobalEvent() {
+    if (useTouchEvent) {
+      removeEvent(window, 'touchmove', this._pointerMoveHandler);
+      removeEvent(window, 'touchend', this._pointerUpHandler);
+      removeEvent(window, 'touchcancel', this._pointerUpHandler);
+    } else {
+      removeEvent(window, 'mousemove', this._pointerMoveHandler);
+      removeEvent(window, 'mouseup', this._pointerUpHandler);
+      removeEvent(window, 'mouseout', this._pointerUpHandler);
+    }
   }
 
   _addAnimator(animator: ProceduralKeyframeAnimator) {
