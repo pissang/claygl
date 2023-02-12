@@ -143,7 +143,7 @@ interface OrbitControl
     'autoRotate' | 'target' | 'distance' | 'orthographicSize' | 'alpha' | 'beta' | 'center'
   > {}
 
-const useTouchEvent = 'ontouchstart' in window;
+const useTouchEvent = typeof window !== 'undefined' && 'ontouchstart' in window;
 
 class OrbitControl extends Notifier {
   disabled = false;
