@@ -7,7 +7,7 @@ export const lensflareCompositeFragment = new FragmentShader({
     SAMPLE_NUMBER: 8
   },
   uniforms: {
-    texture: uniform('sampler2D'),
+    colorTex: uniform('sampler2D'),
     lenscolor: uniform('sampler2D'),
     textureSize: uniform('vec2', [512, 512]),
     dispersal: uniform('float', 0.3),
@@ -22,9 +22,9 @@ vec4 textureDistorted(
   in vec3 distortion
 ) {
   return vec4(
-    decodeHDR(texture(texture, texcoord + direction * distortion.r)).r,
-    decodeHDR(texture(texture, texcoord + direction * distortion.g)).g,
-    decodeHDR(texture(texture, texcoord + direction * distortion.b)).b,
+    decodeHDR(texture(colorTex, texcoord + direction * distortion.r)).r,
+    decodeHDR(texture(colorTex, texcoord + direction * distortion.g)).g,
+    decodeHDR(texture(colorTex, texcoord + direction * distortion.b)).b,
     1.0
   );
 }

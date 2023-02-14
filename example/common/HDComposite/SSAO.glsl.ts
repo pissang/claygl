@@ -91,13 +91,12 @@ void main()
 export const SSAOBlurFragment = new FragmentShader({
   name: 'SSAOBlurFrag',
   uniforms: {
-    texture: uniform('sampler2D'),
-    textureSize: uniform('vec2')
+    colorTex: uniform('sampler2D')
   },
   includes: [floatEncoderMixin],
   main: glsl`
 void main () {
-  vec2 texelSize = 1.0 / textureSize;
+  vec2 texelSize = 1.0 / vec2(textureSize(colorTex, 0));
 
   vec4 color = vec4(0.0);
   vec2 hlim = vec2(float(-BLUR_SIZE) * 0.5 + 0.5);

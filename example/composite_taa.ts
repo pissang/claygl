@@ -126,8 +126,8 @@ ssaoNode.inputs = {
   }
 };
 blendNode.inputs = {
-  texture1: sceneNode,
-  texture2: ssaoNode
+  colorTex1: sceneNode,
+  colorTex2: ssaoNode
 };
 blendNode.material.define('BLEND_METHOD', 1);
 blendNode.material.set('weight1', 1);
@@ -144,7 +144,7 @@ taaNode.inputs = {
   }
 };
 tonemappingNode.inputs = {
-  texture: taaNode
+  colorTex: taaNode
 };
 tonemappingNode.renderToScreen = true;
 taaNode.setDynamic(false);

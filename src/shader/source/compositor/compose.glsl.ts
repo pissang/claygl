@@ -45,12 +45,12 @@ export const composeCompositeFragment = new FragmentShader({
     DEBUG?: 1 | 2 | 3;
   },
   uniforms: {
-    texture: uniform('sampler2D'),
-    bloom: uniform('sampler2D'),
-    lensflare: uniform('sampler2D'),
-    lensdirt: uniform('sampler2D'),
-    lum: uniform('sampler2D'),
-    lut: uniform('sampler2D'),
+    colorTex: uniform('sampler2D'),
+    bloomTex: uniform('sampler2D'),
+    lensflareTex: uniform('sampler2D'),
+    lensdirtTex: uniform('sampler2D'),
+    lumTex: uniform('sampler2D'),
+    lutTex: uniform('sampler2D'),
     brightness: uniform('float', 0.0),
     contrast: uniform('float', 1.0),
     saturation: uniform('float', 1.0),
@@ -88,8 +88,8 @@ vec3 lutTransform(vec3 color) {
   texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);
   texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);
 
-  vec4 newColor1 = texture(lut, texPos1);
-  vec4 newColor2 = texture(lut, texPos2);
+  vec4 newColor1 = texture(lutTex, texPos1);
+  vec4 newColor2 = texture(lutTex, texPos2);
 
   vec4 newColor = mix(newColor1, newColor2, fract(blueColor));
   return newColor.rgb;
@@ -102,12 +102,12 @@ void main()
   vec4 texel = vec4(0.0);
   vec4 originalTexel = vec4(0.0);
 #ifdef TEXTURE_ENABLED
-  texel = decodeHDR(texture(texture, v_Texcoord));
+  texel = decodeHDR(texture(colorTex, v_Texcoord));
   originalTexel = texel;
 #endif
 
 #ifdef BLOOM_ENABLED
-  vec4 bloomTexel = decodeHDR(texture(bloom, v_Texcoord));
+  vec4 bloomTexel = decodeHDR(texture(bloomTex, v_Texcoord));
   texel.rgb += bloomTexel.rgb * bloomIntensity;
   // TODO If consider bloomInstensity.
   // There are shadow like blurred edge if not consider bloomIntensity. Which is not bad
@@ -115,7 +115,7 @@ void main()
 #endif
 
 #ifdef LENSFLARE_ENABLED
-  texel += decodeHDR(texture(lensflare, v_Texcoord)) * texture(lensdirt, v_Texcoord) * lensflareIntensity;
+  texel += decodeHDR(texture(lensflareTex, v_Texcoord)) * texture(lensdirtTex, v_Texcoord) * lensflareIntensity;
 #endif
 
   texel.a = min(texel.a, 1.0);
@@ -123,7 +123,7 @@ void main()
 // Adjust exposure
 // From KlayGE
 #ifdef LUM_ENABLED
-  float fLum = texture(lum, vec2(0.5, 0.5)).r;
+  float fLum = texture(lumTex, vec2(0.5, 0.5)).r;
   float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));
   float exposureBias = adaptedLumDest * exposure;
 #else

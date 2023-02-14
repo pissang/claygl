@@ -7,12 +7,12 @@ export const outputFragment = new FragmentShader({
     OUTPUT_ALPHA: null
   },
   uniforms: {
-    texture: createUniform('sampler2D')
+    colorTex: createUniform('sampler2D')
   },
   includes: [HDREncoderMixin],
   main: glsl`
 void main() {
-  vec4 tex = decodeHDR(texture(texture, v_Texcoord));
+  vec4 tex = decodeHDR(texture(colorTex, v_Texcoord));
 
 #if !defined(OUTPUT_ALPHA)
   tex.a = 1.0;

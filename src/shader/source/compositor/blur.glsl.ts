@@ -37,12 +37,10 @@ export const gaussianBlurCompositeFragment = new FragmentShader({
     /**
      * the texture with the scene you want to blur
      */
-    texture: uniform('sampler2D'),
+    colorTex: uniform('sampler2D'),
 
     blurSize: uniform('float', 2.0),
 
-    // texture size  will be updated by the compositor automatically.
-    textureSize: uniform('vec2'),
     /**
      * 0.0 is horizontal, 1.0 is vertical
      */
@@ -56,7 +54,7 @@ void main (void)
 {
   ${gaussianKernel9()}
 
-  vec2 off = blurSize / textureSize;
+  vec2 off = blurSize / vec2(textureSize(colorTex, 0));
   off *= vec2(1.0 - blurDir, blurDir);
 
   vec4 sum = vec4(0.0);
@@ -66,7 +64,7 @@ void main (void)
   for (int i = 0; i < 9; i++) {
     float w = gaussianKernel[i];
     // Premultiplied Alpha
-    vec4 texel = decodeHDR(clampSample(texture, v_Texcoord + float(i - 4) * off));
+    vec4 texel = decodeHDR(clampSample(colorTex, v_Texcoord + float(i - 4) * off));
     // TODO alpha blend?
     sum += texel * w;
     weightAll += w;

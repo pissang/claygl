@@ -6,12 +6,12 @@ const weightShader = 'const vec3 w = vec3(0.2125, 0.7154, 0.0721);';
 export const lumCompositeFragment = new FragmentShader({
   name: 'lumFrag',
   uniforms: {
-    texture: uniform('sampler2D')
+    colorTex: uniform('sampler2D')
   },
   main: glsl`
 ${weightShader}
 void main() {
-  vec4 tex = texture(texture, v_Texcoord);
+  vec4 tex = texture(colorTex, v_Texcoord);
   float luminance = dot(tex.rgb, w);
   out_color = vec4(vec3(luminance), 1.0);
 }
@@ -21,7 +21,7 @@ void main() {
 export const logLumCompositeFragment = new FragmentShader({
   name: 'logLumFrag',
   uniforms: {
-    texture: uniform('sampler2D')
+    colorTex: uniform('sampler2D')
   },
   includes: [HDREncoderMixin],
   main: glsl`
@@ -29,7 +29,7 @@ export const logLumCompositeFragment = new FragmentShader({
 ${weightShader}
 
 void main() {
-  vec4 tex = decodeHDR(texture(texture, v_Texcoord));
+  vec4 tex = decodeHDR(texture(colorTex, v_Texcoord));
   float luminance = dot(tex.rgb, w);
   luminance = log(luminance + 0.001);
   out_color = encodeHDR(vec4(vec3(luminance), 1.0));

@@ -8,7 +8,7 @@ import {
   blendCompositeFragment
 } from 'claygl/shaders';
 
-class BloomNode extends GroupCompositeNode<'texture', 'color'> {
+class BloomNode extends GroupCompositeNode<'colorTex', 'color'> {
   private _brightNode = new FilterCompositeNode<typeof brightCompositeFragment, 'color'>(
     brightCompositeFragment
   );
@@ -20,11 +20,11 @@ class BloomNode extends GroupCompositeNode<'texture', 'color'> {
     super();
 
     this._brightNode.inputs = {
-      texture: this.getGroupInput('texture')
+      colorTex: this.getGroupInput('colorTex')
     };
     this._brightNode.outputs = {
       color: {
-        type: constants.HALF_FLOAT_OES
+        type: constants.HALF_FLOAT
       }
     };
     this.addNode(this._brightNode);
@@ -33,12 +33,12 @@ class BloomNode extends GroupCompositeNode<'texture', 'color'> {
       // Downsamples
       const downsampleNode = new FilterCompositeNode(downsampleCompositeFragment);
       downsampleNode.inputs = {
-        texture: i === 0 ? this._brightNode : this._downsampleNodes[i - 1]
+        colorTex: i === 0 ? this._brightNode : this._downsampleNodes[i - 1]
       };
       downsampleNode.outputs = {
         color: {
           scale: 1 / 2,
-          type: constants.HALF_FLOAT_OES
+          type: constants.HALF_FLOAT
         }
       };
       this._downsampleNodes.push(downsampleNode);
@@ -49,21 +49,21 @@ class BloomNode extends GroupCompositeNode<'texture', 'color'> {
       // Upsamples
       const upsampleBlurHNode = new FilterCompositeNode(gaussianBlurCompositeFragment);
       upsampleBlurHNode.inputs = {
-        texture: this._downsampleNodes[5 - i]
+        colorTex: this._downsampleNodes[5 - i]
       };
       upsampleBlurHNode.outputs = {
         color: {
           scale: 2,
-          type: constants.HALF_FLOAT_OES
+          type: constants.HALF_FLOAT
         }
       };
       const upsampleBlurVNode = new FilterCompositeNode(gaussianBlurCompositeFragment);
       upsampleBlurVNode.inputs = {
-        texture: upsampleBlurHNode
+        colorTex: upsampleBlurHNode
       };
       upsampleBlurVNode.outputs = {
         color: {
-          type: constants.HALF_FLOAT_OES
+          type: constants.HALF_FLOAT
         }
       };
       upsampleBlurVNode.material.set('blurDir', 1);
@@ -78,15 +78,15 @@ class BloomNode extends GroupCompositeNode<'texture', 'color'> {
           blendCompositeFragment
         );
         blendNode.inputs = {
-          texture1: i === 1 ? this._upsampleNodes[i - 1] : this._blendNodes[i - 2],
-          texture2: upsampleBlurVNode
+          colorTex1: i === 1 ? this._upsampleNodes[i - 1] : this._blendNodes[i - 2],
+          colorTex2: upsampleBlurVNode
         };
         blendNode.outputs = {
           color:
             i === 5
               ? this.getGroupOutput('color')
               : {
-                  type: constants.HALF_FLOAT_OES
+                  type: constants.HALF_FLOAT
                 }
         };
         this._blendNodes.push(blendNode);

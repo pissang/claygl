@@ -320,7 +320,7 @@ vec3 ${FUNCTION_NAME_PLACEHOLDER}(in vec3 dir, in vec3 pos, in vec3 boxMin, in v
 export const clampSampleFunction = createShaderFunction(
   glsl`
 // Sample with stereo clamp
-vec4 ${FUNCTION_NAME_PLACEHOLDER}(const in sampler2D texture, const in vec2 coord)
+vec4 ${FUNCTION_NAME_PLACEHOLDER}(const in sampler2D tex, const in vec2 coord)
 {
 #ifdef STEREO
   // Left is 0.0 - 0.5, Right is 0.5 - 1.0, avoid leaking
@@ -330,7 +330,7 @@ vec4 ${FUNCTION_NAME_PLACEHOLDER}(const in sampler2D texture, const in vec2 coor
 #else
   vec2 coordClamped = clamp(coord, vec2(0.0), vec2(1.0));
 #endif
-  return texture(texture, coordClamped);
+  return texture(tex, coordClamped);
 }`,
   'clampSample'
 );

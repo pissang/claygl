@@ -54,7 +54,7 @@ compositor.addNode(sceneCompositeNode);
 
 const colorAdjustNode = new FilterCompositeNode(colorAdjustCompositeFragment);
 colorAdjustNode.inputs = {
-  texture: sceneCompositeNode
+  colorTex: sceneCompositeNode
 };
 colorAdjustNode.renderToScreen = true;
 colorAdjustNode.material.set('gamma', 1.2);

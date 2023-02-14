@@ -117,11 +117,11 @@ sceneNode.outputs = {
 };
 blendNode.inputs = {
   // Render scene node firstly
-  texture1: sceneNode,
-  texture2: alchemyAONode
+  colorTex1: sceneNode,
+  colorTex2: alchemyAONode
 };
 tonemappingNode.inputs = {
-  texture: blendNode
+  colorTex: blendNode
 };
 tonemappingNode.renderToScreen = true;
 

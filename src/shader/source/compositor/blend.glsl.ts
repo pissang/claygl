@@ -11,17 +11,17 @@ export const blendCompositeFragment = new FragmentShader({
     BLEND_METHOD: 0
   },
   uniforms: {
-    texture1: uniform('sampler2D'),
+    colorTex1: uniform('sampler2D'),
     weight1: uniform('float', 1.0),
-    texture2: uniform('sampler2D'),
+    colorTex2: uniform('sampler2D'),
     weight2: uniform('float', 1.0),
-    texture3: uniform('sampler2D'),
+    colorTex3: uniform('sampler2D'),
     weight3: uniform('float', 1.0),
-    texture4: uniform('sampler2D'),
+    colorTex4: uniform('sampler2D'),
     weight4: uniform('float', 1.0),
-    texture5: uniform('sampler2D'),
+    colorTex5: uniform('sampler2D'),
     weight5: uniform('float', 1.0),
-    texture6: uniform('sampler2D'),
+    colorTex6: uniform('sampler2D'),
     weight6: uniform('float', 1.0)
   },
   includes: [HDREncoderMixin],
@@ -39,23 +39,23 @@ void main() {
 #else
   vec4 tex = vec4(0.0);
 #endif
-#ifdef TEXTURE1_ENABLED
-  tex = blend(tex, decodeHDR(texture(texture1, v_Texcoord)), weight1);
+#ifdef COLOR1_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex1, v_Texcoord)), weight1);
 #endif
-#ifdef TEXTURE2_ENABLED
-  tex = blend(tex, decodeHDR(texture(texture2, v_Texcoord)), weight2);
+#ifdef COLOR2_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex2, v_Texcoord)), weight2);
 #endif
-#ifdef TEXTURE3_ENABLED
-  tex = blend(tex, decodeHDR(texture(texture3, v_Texcoord)), weight3);
+#ifdef COLOR3_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex3, v_Texcoord)), weight3);
 #endif
-#ifdef TEXTURE4_ENABLED
-  tex = blend(tex, decodeHDR(texture(texture4, v_Texcoord)), weight4);
+#ifdef COLOR4_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex4, v_Texcoord)), weight4);
 #endif
-#ifdef TEXTURE5_ENABLED
-  tex = blend(tex, decodeHDR(texture(texture5, v_Texcoord)), weight5);
+#ifdef COLOR5_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex5, v_Texcoord)), weight5);
 #endif
-#ifdef TEXTURE6_ENABLED
-  tex = blend(tex, decodeHDR(texture(texture6, v_Texcoord)), weight6);
+#ifdef COLOR6_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex6, v_Texcoord)), weight6);
 #endif
   out_color = encodeHDR(tex);
 }

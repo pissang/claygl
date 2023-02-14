@@ -9,7 +9,7 @@ import { HDREncoderMixin } from '../util.glsl';
 export const FXAA3CompositeFragment = new FragmentShader({
   name: 'FXAA3Frag',
   uniforms: {
-    texture: uniform('sampler2D'),
+    colorTex: uniform('sampler2D'),
     viewport: semanticUniform('vec4', 'VIEWPORT')
   },
   includes: [HDREncoderMixin],
@@ -26,11 +26,11 @@ vec4 FxaaPixelShader(
   vec2 posM;
   posM.x = pos.x;
   posM.y = pos.y;
-  vec4 rgbyM = decodeHDR(texture(texture, posM, 0.0));
-  float lumaS = FxaaLuma(decodeHDR(texture(texture, posM + (vec2( 0.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));
-  float lumaE = FxaaLuma(decodeHDR(texture(texture, posM + (vec2( 1.0, 0.0) * fxaaQualityRcpFrame.xy), 0.0)));
-  float lumaN = FxaaLuma(decodeHDR(texture(texture, posM + (vec2( 0.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));
-  float lumaW = FxaaLuma(decodeHDR(texture(texture, posM + (vec2(-1.0, 0.0) * fxaaQualityRcpFrame.xy), 0.0)));
+  vec4 rgbyM = decodeHDR(texture(colorTex, posM, 0.0));
+  float lumaS = FxaaLuma(decodeHDR(texture(colorTex, posM + (vec2( 0.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));
+  float lumaE = FxaaLuma(decodeHDR(texture(colorTex, posM + (vec2( 1.0, 0.0) * fxaaQualityRcpFrame.xy), 0.0)));
+  float lumaN = FxaaLuma(decodeHDR(texture(colorTex, posM + (vec2( 0.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));
+  float lumaW = FxaaLuma(decodeHDR(texture(colorTex, posM + (vec2(-1.0, 0.0) * fxaaQualityRcpFrame.xy), 0.0)));
 
   float maxSM = max(lumaS, rgbyM.y);
   float minSM = min(lumaS, rgbyM.y);
@@ -45,10 +45,10 @@ vec4 FxaaPixelShader(
   float rangeMaxClamped = max(fxaaQualityEdgeThresholdMin, rangeMaxScaled);
   bool earlyExit = range < rangeMaxClamped;
   if(earlyExit) return rgbyM;
-  float lumaNW = FxaaLuma(decodeHDR(texture(texture, posM + (vec2(-1.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));
-  float lumaSE = FxaaLuma(decodeHDR(texture(texture, posM + (vec2( 1.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));
-  float lumaNE = FxaaLuma(decodeHDR(texture(texture, posM + (vec2( 1.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));
-  float lumaSW = FxaaLuma(decodeHDR(texture(texture, posM + (vec2(-1.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));
+  float lumaNW = FxaaLuma(decodeHDR(texture(colorTex, posM + (vec2(-1.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));
+  float lumaSE = FxaaLuma(decodeHDR(texture(colorTex, posM + (vec2( 1.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));
+  float lumaNE = FxaaLuma(decodeHDR(texture(colorTex, posM + (vec2( 1.0,-1.0) * fxaaQualityRcpFrame.xy), 0.0)));
+  float lumaSW = FxaaLuma(decodeHDR(texture(colorTex, posM + (vec2(-1.0, 1.0) * fxaaQualityRcpFrame.xy), 0.0)));
 
   float lumaNS = lumaN + lumaS;
   float lumaWE = lumaW + lumaE;
@@ -99,9 +99,9 @@ vec4 FxaaPixelShader(
   posP.x = posB.x + offNP.x * 1.0;
   posP.y = posB.y + offNP.y * 1.0;
   float subpixD = ((-2.0)*subpixC) + 3.0;
-  float lumaEndN = FxaaLuma(decodeHDR(texture(texture, posN, 0.0)));
+  float lumaEndN = FxaaLuma(decodeHDR(texture(colorTex, posN, 0.0)));
   float subpixE = subpixC * subpixC;
-  float lumaEndP = FxaaLuma(decodeHDR(texture(texture, posP, 0.0)));
+  float lumaEndP = FxaaLuma(decodeHDR(texture(colorTex, posP, 0.0)));
   if(!pairN) lumaNN = lumaSS;
   float gradientScaled = gradient * 1.0/4.0;
   float lumaMM = rgbyM.y - lumaNN * 0.5;
@@ -117,8 +117,8 @@ vec4 FxaaPixelShader(
   if(!doneP) posP.x += offNP.x * 1.5;
   if(!doneP) posP.y += offNP.y * 1.5;
   if(doneNP) {
-    if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture(texture, posN.xy, 0.0)));
-    if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture(texture, posP.xy, 0.0)));
+    if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture(colorTex, posN.xy, 0.0)));
+    if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture(colorTex, posP.xy, 0.0)));
     if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
     if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
     doneN = abs(lumaEndN) >= gradientScaled;
@@ -130,8 +130,8 @@ vec4 FxaaPixelShader(
     if(!doneP) posP.y += offNP.y * 2.0;
 
     if(doneNP) {
-      if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture(texture, posN.xy, 0.0)));
-      if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture(texture, posP.xy, 0.0)));
+      if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture(colorTex, posN.xy, 0.0)));
+      if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture(colorTex, posP.xy, 0.0)));
       if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
       if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
       doneN = abs(lumaEndN) >= gradientScaled;
@@ -143,8 +143,8 @@ vec4 FxaaPixelShader(
       if(!doneP) posP.y += offNP.y * 4.0;
 
       if(doneNP) {
-        if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture(texture, posN.xy, 0.0)));
-        if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture(texture, posP.xy, 0.0)));
+        if(!doneN) lumaEndN = FxaaLuma(decodeHDR(texture(colorTex, posN.xy, 0.0)));
+        if(!doneP) lumaEndP = FxaaLuma(decodeHDR(texture(colorTex, posP.xy, 0.0)));
         if(!doneN) lumaEndN = lumaEndN - lumaNN * 0.5;
         if(!doneP) lumaEndP = lumaEndP - lumaNN * 0.5;
         doneN = abs(lumaEndN) >= gradientScaled;
@@ -175,7 +175,7 @@ vec4 FxaaPixelShader(
   float pixelOffsetSubpix = max(pixelOffsetGood, subpixH);
   if(!horzSpan) posM.x += pixelOffsetSubpix * lengthSign;
   if( horzSpan) posM.y += pixelOffsetSubpix * lengthSign;
-  return vec4(decodeHDR(texture(texture, posM, 0.0)).xyz, rgbyM.y);
+  return vec4(decodeHDR(texture(colorTex, posM, 0.0)).xyz, rgbyM.y);
 }
 
 void main() {

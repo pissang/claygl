@@ -29,7 +29,7 @@ class TAACompositeNode extends GroupCompositeNode<
     };
 
     this._outputNode.inputs = {
-      texture: this._taaNode
+      colorTex: this._taaNode
     };
     this._outputNode.outputs = {
       color: this.getGroupOutput('color')

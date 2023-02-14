@@ -6,12 +6,12 @@ import { createUniform as uniform, FragmentShader, glsl } from '../../../Shader'
 export const LUTCompositeFragment = new FragmentShader({
   name: 'LUTFrag',
   uniforms: {
-    texture: uniform('sampler2D'),
+    colorTex: uniform('sampler2D'),
     lookup: uniform('sampler2D')
   },
   main: glsl`
 void main() {
-  vec4 tex = texture(texture, v_Texcoord);
+  vec4 tex = texture(colorTex, v_Texcoord);
 
   float blueColor = tex.b * 63.0;
 

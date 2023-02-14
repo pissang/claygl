@@ -78,7 +78,7 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
     };
     this._estimateNode.pass.clearColor = [0, 0, 0, 0];
     this._blurNode.inputs = {
-      texture: this._estimateNode
+      colorTex: this._estimateNode
     };
     this._blurNode.outputs = {
       color: this.getGroupOutput('color')
@@ -101,13 +101,13 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
       } as SSAOCompositeNodeOpts,
       opts
     );
-    this._TAAJitter = opts.TAAJitter;
+    this._TAAJitter = opts!.TAAJitter;
 
-    this.setKernelSize(opts.kernelSize!);
+    this.setKernelSize(opts!.kernelSize!);
     this.setNoiseSize(4);
-    this.setEstimatePower(opts.power!);
-    this.setEstimateRadius(opts.radius!);
-    this.setBlurSize(opts.blurSize!);
+    this.setEstimatePower(opts!.power!);
+    this.setEstimateRadius(opts!.radius!);
+    this.setBlurSize(opts!.blurSize!);
   }
 
   prepare(renderer: Renderer): void {

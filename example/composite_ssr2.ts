@@ -148,11 +148,11 @@ ssrNode.inputs = {
   colorTexture: sceneNode
 };
 blendNode.inputs = {
-  texture1: sceneNode,
-  texture2: ssrNode
+  colorTex1: sceneNode,
+  colorTex2: ssrNode
 };
 tonemappingNode.inputs = {
-  texture: blendNode
+  colorTex: blendNode
 };
 
 tonemappingNode.renderToScreen = true;
