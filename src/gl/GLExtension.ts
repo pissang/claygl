@@ -22,12 +22,6 @@ class GLExtension {
     const gl = this.gl;
     if (gl.getExtension) {
       let ext = gl.getExtension(name);
-      if (!ext) {
-        ext = gl.getExtension('MOZ_' + name);
-      }
-      if (!ext) {
-        ext = gl.getExtension('WEBKIT_' + name);
-      }
       this._extensions[name] = ext;
     }
   }
