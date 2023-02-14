@@ -39,6 +39,10 @@ export interface TextureOpts {
    */
   format: GLEnum;
   /**
+   * Format of internal storage
+   */
+  internalFormat: GLEnum;
+  /**
    * Texture wrap. Default to be REPEAT.
    * Possible values:
    *  + {@link clay.constants.CLAMP_TO_EDGE}

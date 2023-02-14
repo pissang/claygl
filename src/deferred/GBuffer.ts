@@ -168,7 +168,7 @@ class DeferredGBuffer {
   // - A: glossiness
   private _gBufferTex1 = new Texture2D({
     // PENDING
-    type: constants.HALF_FLOAT_OES,
+    type: constants.HALF_FLOAT,
     ...commonTextureOpts
   });
 
@@ -178,7 +178,7 @@ class DeferredGBuffer {
     // type: constants.UNSIGNED_INT
 
     format: constants.DEPTH_STENCIL,
-    type: constants.UNSIGNED_INT_24_8_WEBGL,
+    type: constants.UNSIGNED_INT_24_8,
     ...commonTextureOpts
   });
 
@@ -190,7 +190,7 @@ class DeferredGBuffer {
 
   private _gBufferTex4 = new Texture2D({
     // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
-    type: constants.HALF_FLOAT_OES,
+    type: constants.HALF_FLOAT,
     ...commonTextureOpts
   });
 

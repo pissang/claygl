@@ -81,7 +81,7 @@ export function prefilterEnvironmentMap(
       width,
       height,
       // FIXME FLOAT type will cause GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT error on iOS
-      type: textureType === constants.FLOAT ? constants.HALF_FLOAT_OES : textureType
+      type: textureType === constants.FLOAT ? constants.HALF_FLOAT : textureType
     });
     panoramaToCubeMap(renderer, envMap, envCubemap, {
       // PENDING encodeRGBM so it can be decoded as RGBM
@@ -203,7 +203,7 @@ export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D)
   const texture = new Texture2D({
     width: 512,
     height: 256,
-    type: constants.HALF_FLOAT_OES,
+    type: constants.HALF_FLOAT,
     wrapS: constants.CLAMP_TO_EDGE,
     wrapT: constants.CLAMP_TO_EDGE,
     minFilter: constants.NEAREST,

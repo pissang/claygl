@@ -4,6 +4,28 @@ import Texture2D, { Texture2DData } from '../Texture2D';
 import TextureCube, { cubeTargets, TextureCubeData } from '../TextureCube';
 import GLExtension from './GLExtension';
 
+// Compatible with WebGL1 for float type storage.
+// PENDING
+function getInternalFormat(format: number, type: number) {
+  if (type === constants.HALF_FLOAT) {
+    return format === constants.RGBA
+      ? constants.RGBA16F
+      : format === constants.RGB
+      ? constants.RGB16F
+      : format === constants.RG
+      ? constants.RG16F
+      : constants.R16F;
+  } else if (type === constants.FLOAT) {
+    return format === constants.RGBA
+      ? constants.RGBA32F
+      : format === constants.RGB
+      ? constants.RGB32F
+      : format === constants.RG
+      ? constants.RG32F
+      : constants.R32F;
+  }
+  return format;
+}
 class GLTexture {
   /**
    * Slot been taken
@@ -52,6 +74,8 @@ class GLTexture {
     }
 
     const glFormat = texture.format;
+    const glInternalFormat =
+      texture.internalFormat || getInternalFormat(texture.format, texture.type);
     const mipmaps = texture.mipmaps || [];
     const mipmapsLen = mipmaps.length;
     let glType = texture.type;
@@ -84,6 +108,7 @@ class GLTexture {
           level,
           width,
           height,
+          glInternalFormat,
           glFormat,
           glType
         );
@@ -94,6 +119,7 @@ class GLTexture {
           level,
           width,
           height,
+          glInternalFormat,
           glFormat,
           glType
         );
@@ -123,11 +149,12 @@ class GLTexture {
     level: number,
     width: number,
     height: number,
+    glInternalFormat: GLEnum,
     glFormat: GLEnum,
     glType: GLEnum
   ) {
     if (data.image) {
-      gl.texImage2D(constants.TEXTURE_2D, level, glFormat, glFormat, glType, data.image);
+      gl.texImage2D(constants.TEXTURE_2D, level, glInternalFormat, glFormat, glType, data.image);
     } else {
       // Can be used as a blank texture when writing render to texture(RTT)
       if (
@@ -162,7 +189,7 @@ class GLTexture {
         gl.texImage2D(
           constants.TEXTURE_2D,
           level,
-          glFormat,
+          glInternalFormat,
           width,
           height,
           0,
@@ -180,6 +207,7 @@ class GLTexture {
     level: number,
     width: number,
     height: number,
+    glInternalFormat: GLEnum,
     glFormat: GLEnum,
     glType: GLEnum
   ) {
@@ -191,7 +219,7 @@ class GLTexture {
         _gl.texImage2D(
           constants.TEXTURE_CUBE_MAP_POSITIVE_X + i,
           level,
-          glFormat,
+          glInternalFormat,
           glFormat,
           glType,
           img
@@ -200,7 +228,7 @@ class GLTexture {
         _gl.texImage2D(
           constants.TEXTURE_CUBE_MAP_POSITIVE_X + i,
           level,
-          glFormat,
+          glInternalFormat,
           width,
           height,
           0,

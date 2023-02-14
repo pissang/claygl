@@ -76,7 +76,7 @@ class DeferredRenderer {
 
   private _lightAccumTex = new Texture2D({
     // FIXME Device not support float texture
-    type: constants.HALF_FLOAT_OES,
+    type: constants.HALF_FLOAT,
     minFilter: constants.NEAREST,
     magFilter: constants.NEAREST
   });
