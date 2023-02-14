@@ -57,11 +57,7 @@ void main()
   vec2 uv = vec2(theta / 2.0 / PI, phi / PI);
   vec4 texel = decodeHDR(texture(equirectangularMap, fract(uv)));
 #else
-  #if defined(LOD) || defined(SUPPORT_TEXTURE_LOD)
-  vec4 texel = decodeHDR(texture(cubeMap, V, lod));
-  #else
-  vec4 texel = decodeHDR(texture(cubeMap, V));
-  #endif
+  vec4 texel = decodeHDR(textureLod(cubeMap, V, lod));
 #endif
 
 #ifdef SRGB_DECODE

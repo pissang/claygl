@@ -8,7 +8,7 @@ import Material from './Material';
 import Vector2 from './math/Vector2';
 
 // Light header
-import Shader, { BASIC_MATRIX_SEMANTICS, MatrixSemantic } from './Shader';
+import Shader, { BASIC_MATRIX_SEMANTICS, MatrixSemantic, ShaderDefineValue } from './Shader';
 
 import * as mat4 from './glmatrix/mat4';
 import * as vec3 from './glmatrix/vec3';
@@ -592,21 +592,18 @@ class Renderer extends Notifier {
         }
         return key;
       },
-      getShaderDefineCode: (renderable) => {
+      getExtraDefines: (renderable) => {
         const lightsNumbers = scene ? scene.getLightsNumbers(renderable.lightGroup || 0) : {};
-        const commonDefineCode: string[] = [];
+        const extraDefines: Record<string, ShaderDefineValue> = {};
         if (lightsNumbers) {
           for (const lightType in lightsNumbers) {
             const count = lightsNumbers[lightType];
             if (count > 0) {
-              commonDefineCode.push('#define ' + lightType.toUpperCase() + '_COUNT ' + count);
+              extraDefines[lightType.toUpperCase() + '_COUNT'] = count;
             }
           }
         }
-        if (this.logDepthBuffer) {
-          commonDefineCode.push('#define LOG_DEPTH');
-        }
-        return commonDefineCode.join('\n');
+        return extraDefines;
       },
       programChanged: (program) => {
         // Set some common uniforms

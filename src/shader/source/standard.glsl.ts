@@ -471,11 +471,7 @@ void main() {
   vec3 envWeight2 = spec * brdfParam2.x + brdfParam2.y;
   vec3 envTexel2;
   for(int _idx_ = 0; _idx_ < AMBIENT_CUBEMAP_LIGHT_COUNT; _idx_++) {{
-  #ifdef SUPPORT_TEXTURE_LOD
-    envTexel2 = decodeRGBM(texture(ambientCubemapLightCubemap[_idx_], L, bias2), 8.12);
-  #else
-    envTexel2 = decodeRGBM(texture(ambientCubemapLightCubemap[_idx_], L), 8.12);
-  #endif
+    envTexel2 = decodeRGBM(textureLod(ambientCubemapLightCubemap[_idx_], L, bias2), 8.12);
     // TODO mix ?
     outColor.rgb += ambientCubemapLightColor[_idx_] * envTexel2 * envWeight2;
   }}

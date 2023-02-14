@@ -128,9 +128,9 @@ export interface GLRenderHooks<T extends GLRenderableObject = GLRenderableObject
     | Record<string, GeneralMaterialUniformObject>[];
 
   /**
-   * Get common shader header code in shader for program.
+   * Get extra defines in shader for program.
    */
-  getShaderDefineCode?(renderable: T, material: T['material']): string;
+  getExtraDefines?(renderable: T, material: T['material']): Record<string, ShaderDefineValue>;
   /**
    * Get extra key for program
    */
@@ -462,9 +462,7 @@ class GLRenderer {
         renderable,
         renderMaterial,
         (renderHooks.getProgramKey && renderHooks.getProgramKey(renderable, renderMaterial)) || '',
-        (renderHooks.getShaderDefineCode &&
-          renderHooks.getShaderDefineCode(renderable, renderMaterial)) ||
-          ''
+        renderHooks.getExtraDefines && renderHooks.getExtraDefines(renderable, renderMaterial)
       );
 
       this._validateProgram(program);
