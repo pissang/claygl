@@ -60,7 +60,7 @@ export interface GLMaterialObject {
   depthMask?: boolean;
   transparent?: boolean;
 
-  blend?: (gl: WebGLRenderingContext) => void;
+  blend?: (gl: WebGL2RenderingContext) => void;
 
   precision?: ShaderPrecision;
 
@@ -163,37 +163,31 @@ export interface GLRenderHooks<T extends GLRenderableObject = GLRenderableObject
   afterRender?: (renderable: T) => void;
 }
 
-const OES_texture = 'OES_texture';
 const WEBGL_compressed_texture = 'WEBGL_compressed_texture';
 
-const GL1_EXTENSION_LIST = [
-  `${OES_texture}_float`,
-  `${OES_texture}_half_float`,
-  `${OES_texture}_float_linear`,
-  `${OES_texture}_half_float_linear`,
-  'OES_standard_derivatives',
-  'OES_vertex_array_object',
-  'OES_element_index_uint',
-  `${WEBGL_compressed_texture}_s3tc`,
-  `${WEBGL_compressed_texture}_etc`,
-  `${WEBGL_compressed_texture}_etc1`,
-  `${WEBGL_compressed_texture}_pvrtc`,
-  `${WEBGL_compressed_texture}_atc`,
-  `${WEBGL_compressed_texture}_astc`,
-  'WEBGL_depth_texture',
-  'EXT_texture_filter_anisotropic',
-  'EXT_shader_texture_lod',
-  'WEBGL_draw_buffers',
-  'EXT_frag_depth',
-  'EXT_sRGB',
-  'ANGLE_instanced_arrays'
-] as const;
+export type SupportedExtension =
+  | 'EXT_color_buffer_float'
+  | 'EXT_color_buffer_half_float'
+  | 'EXT_disjoint_timer_query_webgl2'
+  | 'EXT_float_blend'
+  | 'EXT_texture_compression_rgtc'
+  | 'EXT_texture_filter_anisotropic'
+  | 'EXT_texture_norm16'
+  | 'KHR_parallel_shader_compile'
+  | 'OES_draw_buffers_indexed'
+  | 'OES_texture_float_linear'
+  | 'WEBGL_compressed_texture_s3tc'
+  | 'WEBGL_compressed_texture_s3tc_srgb'
+  | 'WEBGL_debug_renderer_info'
+  | 'WEBGL_debug_shaders'
+  | 'WEBGL_lose_context'
+  | 'WEBGL_multi_draw';
 
 /**
  * Basic webgl renderer without scene management.
  */
 class GLRenderer {
-  readonly gl: WebGLRenderingContext;
+  readonly gl: WebGL2RenderingContext;
 
   readonly uid = genGUID();
 
@@ -224,7 +218,7 @@ class GLRenderer {
   maxJointNumber = 20;
 
   constructor(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     opts?: {
       throwError?: boolean;
     }
@@ -233,7 +227,7 @@ class GLRenderer {
     this.gl = gl;
     // Init managers
     this._programMgr = new ProgramManager(this);
-    this._glext = new GLExtension(gl, GL1_EXTENSION_LIST);
+    this._glext = new GLExtension(gl, gl.getSupportedExtensions() || []);
     this.throwError = optional(opts.throwError, true);
   }
 
@@ -791,7 +785,7 @@ class GLRenderer {
 
   private _disposeResource<T extends GeometryBase | Texture | FrameBuffer | InstancedMesh>(
     // TODO provide disposable
-    storage: WeakMap<T, { dispose: (gl: WebGLRenderingContext) => void }>,
+    storage: WeakMap<T, { dispose: (gl: WebGL2RenderingContext) => void }>,
     resource: T
   ) {
     const obj = storage.get(resource);

@@ -121,7 +121,7 @@ class DeferredRenderer {
       deferredDirectionalLightFragment
     );
 
-    const lightAccumulateBlendFunc = function (gl: WebGLRenderingContext) {
+    const lightAccumulateBlendFunc = function (gl: WebGL2RenderingContext) {
       gl.blendEquation(gl.FUNC_ADD);
       gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
     };

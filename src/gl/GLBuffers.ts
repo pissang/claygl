@@ -3,7 +3,7 @@ import { AttributeSemantic } from '../Shader';
 import GLProgram from './GLProgram';
 import * as constants from '../core/constants';
 
-const enabledAttributesMap = new WeakMap<WebGLRenderingContext, number[]>();
+const enabledAttributesMap = new WeakMap<WebGL2RenderingContext, number[]>();
 
 export const attributeBufferTypeMap = {
   float: constants.FLOAT,
@@ -58,7 +58,7 @@ class GLBuffers {
     return this._idxBuff;
   }
 
-  update(gl: WebGLRenderingContext) {
+  update(gl: WebGL2RenderingContext) {
     const geometry = this._geometry;
     const attributesDirty = geometry.isAttributesDirty();
     const indicesDirty = geometry.__indicesDirty;
@@ -125,7 +125,7 @@ class GLBuffers {
     geometry.__indicesDirty = false;
   }
 
-  bindToProgram(gl: WebGLRenderingContext, program: GLProgram) {
+  bindToProgram(gl: WebGL2RenderingContext, program: GLProgram) {
     this.update(gl);
     // const geometry = this._geometry;
     // const isStatic = !geometry.dynamic;
@@ -192,7 +192,7 @@ class GLBuffers {
     // }
   }
 
-  // unbind(gl: WebGLRenderingContext) {
+  // unbind(gl: WebGL2RenderingContext) {
   //   if (this._vao) {
   //     this._vaoExt.bindVertexArrayOES(null);
   //   }
@@ -201,7 +201,7 @@ class GLBuffers {
   /**
    * Dispose geometry data in GL context.
    */
-  dispose(gl: WebGLRenderingContext) {
+  dispose(gl: WebGL2RenderingContext) {
     const attributeBuffers = this._attrbBuffs;
     const indicesBuffer = this._idxBuff;
     attributeBuffers && attributeBuffers.forEach((buffer) => gl.deleteBuffer(buffer.buffer));

@@ -54,7 +54,7 @@ export interface MaterialOpts {
    *  _gl.blendFunc(_gl.SRC_ALPHA, _gl.ONE_MINUS_SRC_ALPHA);
    * }
    */
-  blend?: (gl: WebGLRenderingContext) => void;
+  blend?: (gl: WebGL2RenderingContext) => void;
 
   vertexDefines: Record<string, ShaderDefineValue>;
   fragmentDefines: Record<string, ShaderDefineValue>;

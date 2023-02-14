@@ -64,19 +64,19 @@ class GLTexture {
     this._texture = texture;
   }
 
-  bind(gl: WebGLRenderingContext) {
+  bind(gl: WebGL2RenderingContext) {
     gl.bindTexture(this._getBindTarget(), this.getWebGLTexture(gl));
   }
 
-  unbind(gl: WebGLRenderingContext) {
+  unbind(gl: WebGL2RenderingContext) {
     gl.bindTexture(this._getBindTarget(), null);
   }
 
-  getWebGLTexture(gl: WebGLRenderingContext): WebGLTexture {
+  getWebGLTexture(gl: WebGL2RenderingContext): WebGLTexture {
     return this._webglIns || (this._webglIns = gl.createTexture()!);
   }
 
-  update(gl: WebGLRenderingContext, glExt: GLExtension) {
+  update(gl: WebGL2RenderingContext, glExt: GLExtension) {
     const texture = this._texture;
     const isTexture2D = texture.textureType === 'texture2D';
     const textureTarget = isTexture2D ? constants.TEXTURE_2D : constants.TEXTURE_CUBE_MAP;
@@ -154,7 +154,7 @@ class GLTexture {
     }
 
     const updateTextureData = (
-      gl: WebGLRenderingContext,
+      gl: WebGL2RenderingContext,
       data: Texture2DData | TextureCubeData,
       level: number,
       width: number,
@@ -203,7 +203,7 @@ class GLTexture {
   }
 
   private _updateTextureData2D(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     data: Texture2DData,
     level: number,
     width: number,
@@ -266,7 +266,7 @@ class GLTexture {
   }
 
   private _updateTextureDataCube(
-    _gl: WebGLRenderingContext,
+    _gl: WebGL2RenderingContext,
     data: TextureCubeData,
     level: number,
     width: number,
@@ -309,7 +309,7 @@ class GLTexture {
       : constants.TEXTURE_CUBE_MAP;
   }
 
-  generateMipmap(gl: WebGLRenderingContext) {
+  generateMipmap(gl: WebGL2RenderingContext) {
     const texture = this._texture;
     const bindTarget = this._getBindTarget();
     if (texture.useMipmap && texture.isPowerOfTwo() && texture.format === constants.RGBA) {
@@ -319,7 +319,7 @@ class GLTexture {
     }
   }
 
-  dispose(gl: WebGLRenderingContext) {
+  dispose(gl: WebGL2RenderingContext) {
     const webglTexture = this._webglIns;
     if (webglTexture) {
       gl.deleteTexture(webglTexture);

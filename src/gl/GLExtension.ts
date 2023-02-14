@@ -1,8 +1,8 @@
 class GLExtension {
   private _extensions: Record<string, any> = {};
-  gl: WebGLRenderingContext;
+  gl: WebGL2RenderingContext;
 
-  constructor(gl: WebGLRenderingContext, extensions: readonly string[]) {
+  constructor(gl: WebGL2RenderingContext, extensions: readonly string[]) {
     this.gl = gl;
     // Get webgl extension
     for (let i = 0; i < extensions.length; i++) {

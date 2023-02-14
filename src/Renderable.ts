@@ -34,7 +34,7 @@ export interface RenderableOpts extends ClayNodeOpts {
    *  + {@link clay.constants.BACK}
    *  + {@link clay.constants.FRONT}
    *  + {@link clay.constants.FRONT_AND_BACK}
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/cullFace
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/cullFace
    */
   cullFace: GLEnum;
 
@@ -43,7 +43,7 @@ export interface RenderableOpts extends ClayNodeOpts {
    * Possible values:
    *  + {@link clay.constants.CW}
    *  + {@link clay.constants.CCW}
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/frontFace
+   * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext/frontFace
    */
   frontFace: GLEnum;
 

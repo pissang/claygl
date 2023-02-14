@@ -19,7 +19,7 @@ class GLFrameBuffer {
   private _webglRbH?: number;
 
   // Bound context
-  private _bound?: WebGLRenderingContext | null;
+  private _bound?: WebGL2RenderingContext | null;
 
   // Attached textures, [texture, target, width, height]
   private _textures: Record<string, [GLTexture, GLEnum, number, number]> = {};
@@ -29,7 +29,7 @@ class GLFrameBuffer {
   }
 
   bind(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     helpers: {
       getGLTexture: (texture: Texture) => GLTexture;
       getGLExtension: (name: string) => any;
@@ -144,7 +144,7 @@ class GLFrameBuffer {
     this._bound = gl;
   }
 
-  unbind(gl: WebGLRenderingContext, nextFameBuffer?: GLFrameBuffer) {
+  unbind(gl: WebGL2RenderingContext, nextFameBuffer?: GLFrameBuffer) {
     if (this._bound) {
       // the _bound will keep since we know we will rebind again.
       if (nextFameBuffer !== this) {
@@ -161,7 +161,7 @@ class GLFrameBuffer {
     }
   }
 
-  updateMipmap(gl: WebGLRenderingContext) {
+  updateMipmap(gl: WebGL2RenderingContext) {
     const textures = this._textures;
     keys(textures).forEach((attachment) =>
       // FIXME some texture format can't generate mipmap
@@ -170,7 +170,7 @@ class GLFrameBuffer {
     );
   }
 
-  dispose(gl: WebGLRenderingContext) {
+  dispose(gl: WebGL2RenderingContext) {
     const webglFb = this._webglFb;
     const webglRb = this._webglRb;
     webglFb && gl.deleteFramebuffer(webglFb);
@@ -186,7 +186,7 @@ class GLFrameBuffer {
   // 0x8CD7, 36055, FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT
   // 0x8CD9, 36057, FRAMEBUFFER_INCOMPLETE_DIMENSIONS
   // 0x8CDD, 36061, FRAMEBUFFER_UNSUPPORTED
-  checkStatus(_gl: WebGLRenderingContext) {
+  checkStatus(_gl: WebGL2RenderingContext) {
     return _gl.checkFramebufferStatus(RENDERBUFFER);
   }
 }
