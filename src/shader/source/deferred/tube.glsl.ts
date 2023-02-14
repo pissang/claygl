@@ -54,10 +54,10 @@ void main() {
   // Specular fix
   glossiness = clamp(glossiness - 0.0 / 2.0 / dist, 0.0, 1.0);
 
-  gl_FragColor.rgb = lightColor * irra * lightAttenuation(dist, lightRange)
+  out_color.rgb = lightColor * irra * lightAttenuation(dist, lightRange)
     * (diffuseColor + D_Phong(glossiness, ndh) * F_Schlick(ndv, specularColor));
 
   // Specular luminance
-  gl_FragColor.a = 1.0;
+  out_color.a = 1.0;
 }`
 });

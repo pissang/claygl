@@ -69,11 +69,11 @@ export const preZFragment = new FragmentShader({
   main: glsl`
 void main() {
   if (alphaCutoff > 0.0) {
-    if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {
+    if (texture(alphaMap, v_Texcoord).a <= alphaCutoff) {
       discard;
     }
   }
-  gl_FragColor = vec4(0.0,0.0,0.0,1.0);
+  out_color = vec4(0.0,0.0,0.0,1.0);
 
   ${logDepthFragmentMixin.main}
 }`

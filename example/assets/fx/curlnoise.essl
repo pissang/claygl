@@ -7,7 +7,7 @@
 //     License : Copyright (C) 2011 Ashima Arts. All rights reserved.
 //               Distributed under the MIT License. See LICENSE file.
 //               https://github.com/ashima/webgl-noise
-// 
+//
 
 vec3 mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -101,7 +101,7 @@ void main()
     f.y = fBm_noise(p + 79.263);
     f.z = fBm_noise(p + 108.54);
 
-    gl_FragColor = vec4(f, 1.0);
+    out_color = vec4(f, 1.0);
 }
 @end
 
@@ -125,7 +125,7 @@ void main(){
     float z = spawnPosition.z + snoise(72.0*p + elapsedTime) * spawnSize;
     float t = snoise(83.0*p + elapsedTime) * 6.0+6.0;
 
-    gl_FragColor = vec4(x/10.0, y/10.0, z/10.0, t);
+    out_color = vec4(x/10.0, y/10.0, z/10.0, t);
 }
 
 @end
@@ -171,7 +171,7 @@ void main(){
         particle = texture2D(spawnTexture, v_Texcoord);
     }
 
-    gl_FragColor = particle;
+    out_color = particle;
 }
 
 @end
@@ -196,7 +196,7 @@ void main(){
         gl_Position = worldViewProjection * vec4(1000.0, 1000.0, 1000.0, 1.0);
     }
 
-    life = 1.0 - p.w / 6.0; 
+    life = 1.0 - p.w / 6.0;
     gl_PointSize = 4.0;
 
 }
@@ -213,9 +213,9 @@ uniform vec3 color : [0.0, 0.0, 0.0];
 
 void main(){
 
-    gl_FragColor = texture2D(spiritTexture, gl_PointCoord);
-    gl_FragColor.xyz *= color;
-    gl_FragColor.a *= (1.0 - life) * 0.8;
+    out_color = texture2D(spiritTexture, gl_PointCoord);
+    out_color.xyz *= color;
+    out_color.a *= (1.0 - life) * 0.8;
 }
 
 @end

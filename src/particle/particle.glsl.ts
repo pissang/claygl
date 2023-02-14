@@ -61,14 +61,14 @@ void main() {
   vec4 color = vec4(color, alpha);
 #ifdef SPRITE_ENABLED
   #ifdef UV_ANIMATION
-  color *= texture2D(sprite, mix(v_Uv0, v_Uv1, gl_PointCoord));
+  color *= texture(sprite, mix(v_Uv0, v_Uv1, gl_PointCoord));
   #else
-  color *= texture2D(sprite, gl_PointCoord);
+  color *= texture(sprite, gl_PointCoord);
   #endif
 #endif
 #ifdef GRADIENT_ENABLED
-  color *= texture2D(gradient, vec2(v_Age, 0.5));
+  color *= texture(gradient, vec2(v_Age, 0.5));
 #endif
-  gl_FragColor = color;
+  out_color = color;
 }`
 });

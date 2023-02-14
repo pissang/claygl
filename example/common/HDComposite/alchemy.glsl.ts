@@ -51,7 +51,7 @@ float ssaoEstimator(mat2 kernelBasis, vec2 sOrigin, vec3 cOrigin, vec3 cN, float
       continue;
     }
 
-    vec4 depthTexel = texture2D(gBufferTexture2, uv);
+    vec4 depthTexel = texture(gBufferTexture2, uv);
     float z = depthTexel.r * 2.0 - 1.0;
 
     vec4 projectedPos = vec4(uv * 2.0 - 1.0, z, 1.0);
@@ -101,7 +101,7 @@ float ssaoEstimator(mat2 kernelBasis, vec2 sOrigin, vec3 cOrigin, vec3 cN, float
 }
 
 void main() {
-  vec4 tex = texture2D(gBufferTexture1, v_Texcoord);
+  vec4 tex = texture(gBufferTexture1, v_Texcoord);
 
   // Is empty
   if (dot(tex.rgb, vec3(1.0)) == 0.0) {
@@ -113,7 +113,7 @@ void main() {
   // Convert to view space
   N = (viewInverseTranspose * vec4(N, 0.0)).xyz;
 
-  vec4 depthTexel = texture2D(gBufferTexture2, v_Texcoord);
+  vec4 depthTexel = texture(gBufferTexture2, v_Texcoord);
 #ifdef DEPTH_DECODE
   depthTexel.rgb /= depthTexel.a;
   float z = decodeFloat(depthTexel) * 2.0 - 1.0;
@@ -132,15 +132,15 @@ void main() {
   // Use 4x4 noise texture instead of completely random can reduce noise problem after filtering
   // http://www.gamedev.net/topic/648090-alchemy-ambient-occlusion/#entry5096131
   vec2 noiseTexCoord = gBufferTexture1Size / vec2(noiseTexSize) * v_Texcoord;
-  vec2 rvec = normalize(texture2D(noiseTex, noiseTexCoord).rg * 2.0 - 1.0);
+  vec2 rvec = normalize(texture(noiseTex, noiseTexCoord).rg * 2.0 - 1.0);
 
   mat2 kernelBasis = mat2(
     rvec, vec2(-rvec.y, rvec.x)
   );
 
-  gl_FragColor = vec4(vec3(ssaoEstimator(kernelBasis, v_Texcoord, cOrigin, N, sRadius)), 1.0);
+  out_color = vec4(vec3(ssaoEstimator(kernelBasis, v_Texcoord, cOrigin, N, sRadius)), 1.0);
 
-  // gl_FragColor = vec4(rvec, 0.0, 1.0);
+  // out_color = vec4(rvec, 0.0, 1.0);
 }`
 });
 
@@ -161,7 +161,7 @@ export const alchemyAOBlurFragment = new FragmentShader({
 void main() {
   ${gaussianKernel13()}
 
-  vec4 centerDepthTexel = texture2D(depthTex, v_Texcoord);
+  vec4 centerDepthTexel = texture(depthTex, v_Texcoord);
 
   vec2 off = blurSize / colorTexSize;
   vec2 coord = v_Texcoord;
@@ -175,11 +175,11 @@ void main() {
     vec2 coord = clamp(v_Texcoord + (float(i) - 6.0) * off, vec2(0.0), vec2(1.0));
     // Use depth in bilateral filter instead normal.
     // Use normal will cause jitter in the corner.
-    float w = gaussianKernel[i] * max(0.0, 1.0 - edgeSharpness * 1000.0 * abs(centerDepth - texture2D(depthTex, coord).r));
+    float w = gaussianKernel[i] * max(0.0, 1.0 - edgeSharpness * 1000.0 * abs(centerDepth - texture(depthTex, coord).r));
     weightAll += w;
-    sum += texture2D(colorTex, coord) * w;
+    sum += texture(colorTex, coord) * w;
   }
 
-  gl_FragColor = sum / weightAll;
+  out_color = sum / weightAll;
 }`
 });

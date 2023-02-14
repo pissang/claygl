@@ -22,6 +22,6 @@ export const VRDistorterFragment = new FragmentShader({
   },
   main: glsl`
 void main() {
-  gl_FragColor = texture2D(texture, v_Texcoord);
+  out_color = texture2D(texture, v_Texcoord);
 }`
 });

@@ -26,7 +26,7 @@ export const splitViewCompositeFragment = new FragmentShader({
   includes: [HDREncoderMixin],
   main: glsl`
 vec4 blend(sampler2D texture, float start, float end) {
-  vec4 col = decodeHDR(texture2D(texture, v_Texcoord));
+  vec4 col = decodeHDR(texture(texture, v_Texcoord));
 #if DIRECTION == 1
   float p = uv.y;
 #else
@@ -58,7 +58,7 @@ void main() {
 #ifdef TEXTURE6_ENABLED
   tex += blend(texture6, percent5, percent6);
 #endif
-  gl_FragColor = encodeHDR(tex);
+  out_color = encodeHDR(tex);
 }
 `
 });

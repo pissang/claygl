@@ -21,17 +21,17 @@ vec4 median(vec4 a, vec4 b, vec4 c) {
 }
 
 void main() {
-  vec4 texel = decodeHDR(texture2D(texture, v_Texcoord));
+  vec4 texel = decodeHDR(texture(texture, v_Texcoord));
 
 #ifdef ANTI_FLICKER
   // Use median filter to reduce noise
   // https://github.com/keijiro/KinoBloom/blob/master/Assets/Kino/Bloom/Shader/Bloom.cginc#L96
   vec3 d = 1.0 / textureSize.xyx * vec3(1.0, 1.0, 0.0);
 
-  vec4 s1 = decodeHDR(texture2D(texture, v_Texcoord - d.xz));
-  vec4 s2 = decodeHDR(texture2D(texture, v_Texcoord + d.xz));
-  vec4 s3 = decodeHDR(texture2D(texture, v_Texcoord - d.zy));
-  vec4 s4 = decodeHDR(texture2D(texture, v_Texcoord + d.zy));
+  vec4 s1 = decodeHDR(texture(texture, v_Texcoord - d.xz));
+  vec4 s2 = decodeHDR(texture(texture, v_Texcoord + d.xz));
+  vec4 s3 = decodeHDR(texture(texture, v_Texcoord - d.zy));
+  vec4 s4 = decodeHDR(texture(texture, v_Texcoord + d.zy));
   texel = median(median(texel, s1, s2), s3, s4);
 
 #endif
@@ -45,7 +45,7 @@ void main() {
     color = vec4(0.0);
   }
 
-  gl_FragColor = encodeHDR(color);
+  out_color = encodeHDR(color);
 }
   `
 });

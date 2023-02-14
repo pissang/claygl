@@ -14,7 +14,7 @@ export const colorAdjustCompositeFragment = new FragmentShader({
 // Values from "Graphics Shaders: Theory and Practice" by Bailey and Cunningham
 const vec3 w = vec3(0.2125, 0.7154, 0.0721);
 void main() {
-  vec4 tex = texture2D( texture, v_Texcoord);
+  vec4 tex = texture( texture, v_Texcoord);
 
   // brightness
   vec3 color = clamp(tex.rgb + vec3(brightness), 0.0, 1.0);
@@ -28,7 +28,7 @@ void main() {
   float luminance = dot( color, w );
   color = mix(vec3(luminance), color, saturation);
 
-  gl_FragColor = vec4(color, tex.a);
+  out_color = vec4(color, tex.a);
 }`
 });
 
@@ -41,9 +41,9 @@ export const brightnessCompositeFragment = new FragmentShader({
   },
   main: glsl`
 void main() {
-  vec4 tex = texture2D( texture, v_Texcoord);
+  vec4 tex = texture( texture, v_Texcoord);
   vec3 color = tex.rgb + vec3(brightness);
-  gl_FragColor = vec4(color, tex.a);
+  out_color = vec4(color, tex.a);
 }`
 });
 
@@ -55,9 +55,9 @@ export const contrastCompositeFragment = new FragmentShader({
   },
   main: glsl`
 void main() {
-  vec4 tex = texture2D( texture, v_Texcoord);
+  vec4 tex = texture( texture, v_Texcoord);
   vec3 color = (tex.rgb-vec3(0.5))*contrast+vec3(0.5);
-  gl_FragColor = vec4(color, tex.a);
+  out_color = vec4(color, tex.a);
 }`
 });
 
@@ -69,9 +69,9 @@ export const exposureCompositeFragment = new FragmentShader({
   },
   main: glsl`
 void main() {
-  vec4 tex = texture2D(texture, v_Texcoord);
+  vec4 tex = texture(texture, v_Texcoord);
   vec3 color = tex.rgb * pow(2.0, exposure);
-  gl_FragColor = vec4(color, tex.a);
+  out_color = vec4(color, tex.a);
 }`
 });
 
@@ -83,9 +83,9 @@ export const gammaCompositeFragment = new FragmentShader({
   },
   main: glsl`
 void main() {
-  vec4 tex = texture2D(texture, v_Texcoord);
+  vec4 tex = texture(texture, v_Texcoord);
   vec3 color = pow(tex.rgb, vec3(gamma));
-  gl_FragColor = vec4(color, tex.a);
+  out_color = vec4(color, tex.a);
 }`
 });
 
@@ -98,10 +98,10 @@ export const saturationCompositeFragment = new FragmentShader({
   main: glsl`
 const vec3 w = vec3(0.2125, 0.7154, 0.0721);
 void main() {
-  vec4 tex = texture2D(texture, v_Texcoord);
+  vec4 tex = texture(texture, v_Texcoord);
   vec3 color = tex.rgb;
   float luminance = dot(color, w);
   color = mix(vec3(luminance), color, saturation);
-  gl_FragColor = vec4(color, tex.a);
+  out_color = vec4(color, tex.a);
 }`
 });

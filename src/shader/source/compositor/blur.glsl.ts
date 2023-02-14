@@ -71,7 +71,7 @@ void main (void)
     sum += texel * w;
     weightAll += w;
   }
-  gl_FragColor = encodeHDR(sum / max(weightAll, 0.01));
+  out_color = encodeHDR(sum / max(weightAll, 0.01));
 }
 
   `

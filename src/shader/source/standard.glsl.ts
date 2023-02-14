@@ -189,18 +189,18 @@ float D_GGX(float g, float ndh) {
   return a / (PI * tmp * tmp);
 }
 
-mat3 transpose(in mat3 inMat)
-{
-  vec3 i0 = inMat[0];
-  vec3 i1 = inMat[1];
-  vec3 i2 = inMat[2];
+// mat3 transpose(in mat3 inMat)
+// {
+//   vec3 i0 = inMat[0];
+//   vec3 i1 = inMat[1];
+//   vec3 i2 = inMat[2];
 
-  return mat3(
-    vec3(i0.x, i1.x, i2.x),
-    vec3(i0.y, i1.y, i2.y),
-    vec3(i0.z, i1.z, i2.z)
-  );
-}
+//   return mat3(
+//     vec3(i0.x, i1.x, i2.x),
+//     vec3(i0.y, i1.y, i2.y),
+//     vec3(i0.z, i1.z, i2.z)
+//   );
+// }
 // Modified from http://apoorvaj.io/exploring-bump-mapping-with-webgl.html
 vec2 parallaxUv(vec2 uv, vec3 viewDir)
 {
@@ -211,12 +211,12 @@ vec2 parallaxUv(vec2 uv, vec3 viewDir)
   vec2 deltaUv = viewDir.xy * parallaxOcclusionScale / (viewDir.z * numLayers);
   vec2 curUv = uv;
 
-  float height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;
+  float height = 1.0 - texture(parallaxOcclusionMap, curUv).r;
 
   for (int i = 0; i < 30; i++) {
     curLayerHeight += layerHeight;
     curUv -= deltaUv;
-    height = 1.0 - texture2D(parallaxOcclusionMap, curUv).r;
+    height = 1.0 - texture(parallaxOcclusionMap, curUv).r;
     if (height < curLayerHeight) {
       break;
     }
@@ -225,7 +225,7 @@ vec2 parallaxUv(vec2 uv, vec3 viewDir)
   // Parallax occlusion mapping
   vec2 prevUv = curUv + deltaUv;
   float next = height - curLayerHeight;
-  float prev = 1.0 - texture2D(parallaxOcclusionMap, prevUv).r - curLayerHeight + layerHeight;
+  float prev = 1.0 - texture(parallaxOcclusionMap, prevUv).r - curLayerHeight + layerHeight;
   return mix(curUv, prevUv, next / (next - prev));
 }
 
@@ -254,7 +254,7 @@ void main() {
   uv = parallaxUv(v_Texcoord, normalize(transpose(tbn) * -V));
 #endif
 #ifdef DIFFUSEMAP_ENABLED
-  vec4 texel = texture2D(diffuseMap, uv);
+  vec4 texel = texture(diffuseMap, uv);
   #ifdef SRGB_DECODE
   texel = sRGBToLinear(texel);
   #endif
@@ -270,7 +270,7 @@ void main() {
   float m = metalness;
 
   #ifdef METALNESSMAP_ENABLED
-  float m2 = texture2D(metalnessMap, uv)[METALNESS_CHANNEL];
+  float m2 = texture(metalnessMap, uv)[METALNESS_CHANNEL];
   // Adjust the brightness
   m = clamp(m2 + (m - 0.5) * 2.0, 0.0, 1.0);
   #endif
@@ -283,14 +283,14 @@ void main() {
 #ifdef SPECULAR_WORKFLOW
   float g = glossiness;
   #ifdef GLOSSINESSMAP_ENABLED
-  float g2 = texture2D(glossinessMap, uv)[GLOSSINESS_CHANNEL];
+  float g2 = texture(glossinessMap, uv)[GLOSSINESS_CHANNEL];
   // Adjust the brightness
   g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
   #endif
 #else
   float g = clamp(1.0 - roughness, 0.0, 1.0);
   #ifdef ROUGHNESSMAP_ENABLED
-  float g2 = 1.0 - texture2D(roughnessMap, uv)[ROUGHNESS_CHANNEL];
+  float g2 = 1.0 - texture(roughnessMap, uv)[ROUGHNESS_CHANNEL];
   // Adjust the brightness
   g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
   #endif
@@ -298,7 +298,7 @@ void main() {
 
 #ifdef SPECULARMAP_ENABLED
   // Convert to linear space.
-  spec *= sRGBToLinear(texture2D(specularMap, uv)).rgb;
+  spec *= sRGBToLinear(texture(specularMap, uv)).rgb;
 #endif
 
   vec3 N = v_Normal;
@@ -311,7 +311,7 @@ void main() {
 
 #ifdef NORMALMAP_ENABLED
   if (dot(v_Tangent, v_Tangent) > 0.0) {
-    vec3 normalTexel = texture2D(normalMap, uv).xyz;
+    vec3 normalTexel = texture(normalMap, uv).xyz;
     if (dot(normalTexel, normalTexel) > 0.0) { // Valid normal map
       N = (normalTexel * 2.0 - 1.0);
       // Apply scalar multiplier to normal vector of texture.
@@ -467,14 +467,14 @@ void main() {
   // FIXME fixed maxMipmapLevel ?
   float bias2 = rough2 * 5.0;
   // One brdf lookup is enough
-  vec2 brdfParam2 = texture2D(ambientCubemapLightBRDFLookup[0], vec2(rough2, ndv)).xy;
+  vec2 brdfParam2 = texture(ambientCubemapLightBRDFLookup[0], vec2(rough2, ndv)).xy;
   vec3 envWeight2 = spec * brdfParam2.x + brdfParam2.y;
   vec3 envTexel2;
   for(int _idx_ = 0; _idx_ < AMBIENT_CUBEMAP_LIGHT_COUNT; _idx_++) {{
   #ifdef SUPPORT_TEXTURE_LOD
-    envTexel2 = decodeRGBM(textureCubeLodEXT(ambientCubemapLightCubemap[_idx_], L, bias2), 8.12);
+    envTexel2 = decodeRGBM(texture(ambientCubemapLightCubemap[_idx_], L, bias2), 8.12);
   #else
-    envTexel2 = decodeRGBM(textureCube(ambientCubemapLightCubemap[_idx_], L), 8.12);
+    envTexel2 = decodeRGBM(texture(ambientCubemapLightCubemap[_idx_], L), 8.12);
   #endif
     // TODO mix ?
     outColor.rgb += ambientCubemapLightColor[_idx_] * envTexel2 * envWeight2;
@@ -495,17 +495,17 @@ void main() {
   float bias = rough * maxMipmapLevel;
   // PENDING Only env map can have HDR
     #ifdef SUPPORT_TEXTURE_LOD
-  vec3 envTexel = decodeHDR(textureCubeLodEXT(environmentMap, L, bias)).rgb;
+  vec3 envTexel = decodeHDR(texture(environmentMap, L, bias)).rgb;
     #else
-  vec3 envTexel = decodeHDR(textureCube(environmentMap, L)).rgb;
+  vec3 envTexel = decodeHDR(texture(environmentMap, L)).rgb;
     #endif
 
     #ifdef BRDFLOOKUP_ENABLED
-  vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;
+  vec2 brdfParam = texture(brdfLookup, vec2(rough, ndv)).xy;
   envWeight = spec * brdfParam.x + brdfParam.y;
     #endif
   #else
-  vec3 envTexel = textureCube(environmentMap, L).xyz;
+  vec3 envTexel = texture(environmentMap, L).xyz;
   #endif
 
   outColor.rgb += envTexel * envWeight;
@@ -514,23 +514,23 @@ void main() {
   float aoFactor = 1.0;
 #ifdef SSAOMAP_ENABLED
   // PENDING
-  aoFactor = min(texture2D(ssaoMap, (gl_FragCoord.xy - viewport.xy) / viewport.zw).r, aoFactor);
+  aoFactor = min(texture(ssaoMap, (gl_FragCoord.xy - viewport.xy) / viewport.zw).r, aoFactor);
 #endif
 
 #ifdef AOMAP_ENABLED
-  aoFactor = min(1.0 - clamp((1.0 - texture2D(aoMap, v_Texcoord2).r) * aoIntensity, 0.0, 1.0), aoFactor);
+  aoFactor = min(1.0 - clamp((1.0 - texture(aoMap, v_Texcoord2).r) * aoIntensity, 0.0, 1.0), aoFactor);
 #endif
 
 #ifdef OCCLUSIONMAP_ENABLED
   // Use R channel for occlusion. Same with glTF.
-  aoFactor = min(1.0 - clamp((1.0 - texture2D(occlusionMap, v_Texcoord).r), 0.0, 1.0), aoFactor);
+  aoFactor = min(1.0 - clamp((1.0 - texture(occlusionMap, v_Texcoord).r), 0.0, 1.0), aoFactor);
 #endif
 
   outColor.rgb *= aoFactor;
 
   vec3 lEmission = emission;
 #ifdef EMISSIVEMAP_ENABLED
-  lEmission *= texture2D(emissiveMap, uv).rgb;
+  lEmission *= texture(emissiveMap, uv).rgb;
 #endif
   outColor.rgb += lEmission * emissionIntensity;
 
@@ -550,7 +550,7 @@ void main() {
 #ifdef SRGB_ENCODE
   outColor = linearTosRGB(outColor);
 #endif
-  gl_FragColor = encodeHDR(outColor);
+  out_color = encodeHDR(outColor);
 
   ${logDepthFragmentMixin.main}
 }`

@@ -111,5 +111,5 @@ void main()
         sampleSide(up) +
         sampleSide(down)
     ) / 6.0;
-    gl_FragColor = vec4(result, 1.0);
+    out_color = vec4(result, 1.0);
 }

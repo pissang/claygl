@@ -88,8 +88,8 @@ vec3 lutTransform(vec3 color) {
   texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.r);
   texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * color.g);
 
-  vec4 newColor1 = texture2D(lut, texPos1);
-  vec4 newColor2 = texture2D(lut, texPos2);
+  vec4 newColor1 = texture(lut, texPos1);
+  vec4 newColor2 = texture(lut, texPos2);
 
   vec4 newColor = mix(newColor1, newColor2, fract(blueColor));
   return newColor.rgb;
@@ -102,12 +102,12 @@ void main()
   vec4 texel = vec4(0.0);
   vec4 originalTexel = vec4(0.0);
 #ifdef TEXTURE_ENABLED
-  texel = decodeHDR(texture2D(texture, v_Texcoord));
+  texel = decodeHDR(texture(texture, v_Texcoord));
   originalTexel = texel;
 #endif
 
 #ifdef BLOOM_ENABLED
-  vec4 bloomTexel = decodeHDR(texture2D(bloom, v_Texcoord));
+  vec4 bloomTexel = decodeHDR(texture(bloom, v_Texcoord));
   texel.rgb += bloomTexel.rgb * bloomIntensity;
   // TODO If consider bloomInstensity.
   // There are shadow like blurred edge if not consider bloomIntensity. Which is not bad
@@ -115,7 +115,7 @@ void main()
 #endif
 
 #ifdef LENSFLARE_ENABLED
-  texel += decodeHDR(texture2D(lensflare, v_Texcoord)) * texture2D(lensdirt, v_Texcoord) * lensflareIntensity;
+  texel += decodeHDR(texture(lensflare, v_Texcoord)) * texture(lensdirt, v_Texcoord) * lensflareIntensity;
 #endif
 
   texel.a = min(texel.a, 1.0);
@@ -123,7 +123,7 @@ void main()
 // Adjust exposure
 // From KlayGE
 #ifdef LUM_ENABLED
-  float fLum = texture2D(lum, vec2(0.5, 0.5)).r;
+  float fLum = texture(lum, vec2(0.5, 0.5)).r;
   float adaptedLumDest = 3.0 / (max(0.1, 1.0 + 10.0*eyeAdaption(fLum)));
   float exposureBias = adaptedLumDest * exposure;
 #else
@@ -159,31 +159,31 @@ void main()
   texel.rgb = mix(texel.rgb, vec3(1.0 - vignetteDarkness), dot(uv, uv));
 #endif
 
-  gl_FragColor = encodeHDR(texel);
+  out_color = encodeHDR(texel);
 
 #ifdef DEBUG
   // Debug output original
   #if DEBUG == 1
-  gl_FragColor = encodeHDR(decodeHDR(texture2D(texture, v_Texcoord)));
+  out_color = encodeHDR(decodeHDR(texture(texture, v_Texcoord)));
   // Debug output bloom
   #elif DEBUG == 2
-  gl_FragColor = encodeHDR(decodeHDR(texture2D(bloom, v_Texcoord)) * bloomIntensity);
+  out_color = encodeHDR(decodeHDR(texture(bloom, v_Texcoord)) * bloomIntensity);
   // Debug output lensflare
   #elif DEBUG == 3
-  gl_FragColor = encodeHDR(decodeHDR(texture2D(lensflare, v_Texcoord) * lensflareIntensity));
+  out_color = encodeHDR(decodeHDR(texture(lensflare, v_Texcoord) * lensflareIntensity));
   #endif
 #endif
 
-  if (originalTexel.a <= 0.01 && gl_FragColor.a > 1e-5) {
+  if (originalTexel.a <= 0.01 && out_color.a > 1e-5) {
     // bloom and lensflare out of main scene should be additive blending with the background dom.
     // Here is the tricky part. Use lum to simulate alpha and use browser's default blending.
-    gl_FragColor.a = dot(gl_FragColor.rgb, vec3(0.2125, 0.7154, 0.0721));
+    out_color.a = dot(out_color.rgb, vec3(0.2125, 0.7154, 0.0721));
   }
 
   // Premultiply alpha if there is no blending.
   // webgl will divide alpha.
 #ifdef PREMULTIPLY_ALPHA
-  gl_FragColor.rgb *= gl_FragColor.a;
+  out_color.rgb *= out_color.a;
 #endif
 }`
 });

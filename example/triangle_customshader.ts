@@ -31,7 +31,7 @@ const fs = new Shader.Fragment({
   },
   main: glsl`
 void main() {
-  gl_FragColor = vec4(color, 1.0);
+  out_color = vec4(color, 1.0);
 }
 `
 });

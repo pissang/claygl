@@ -37,7 +37,7 @@ void main()
   float ndh = clamp(dot(N, H), 0.0, 1.0);
   float ndv = clamp(dot(N, V), 0.0, 1.0);
 
-  gl_FragColor.rgb = lightEquation(
+  out_color.rgb = lightEquation(
     lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness
   );
 
@@ -56,9 +56,9 @@ void main()
     }
   }}
 
-  gl_FragColor.rgb *= shadowContrib;
+  out_color.rgb *= shadowContrib;
 #endif
 
-  gl_FragColor.a = 1.0;
+  out_color.a = 1.0;
 }`
 });

@@ -43,6 +43,6 @@ void main() {
   color *= 0.25;
 #endif
 
-  gl_FragColor = encodeHDR(color);
+  out_color = encodeHDR(color);
 }`
 });

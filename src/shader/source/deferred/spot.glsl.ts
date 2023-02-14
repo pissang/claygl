@@ -50,7 +50,7 @@ void main() {
   float ndv = clamp(dot(N, V), 0.0, 1.0);
 
   // Diffuse term
-  gl_FragColor.rgb = (1.0 - falloff) * attenuation * lightEquation(
+  out_color.rgb = (1.0 - falloff) * attenuation * lightEquation(
     lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness
   );
 
@@ -58,9 +58,9 @@ void main() {
   float shadowContrib = computeShadowContrib(
     lightShadowMap, lightMatrix, position, lightShadowMapSize
   );
-  gl_FragColor.rgb *= shadowContrib;
+  out_color.rgb *= shadowContrib;
 #endif
 
-  gl_FragColor.a = 1.0;
+  out_color.a = 1.0;
 }`
 });

@@ -55,12 +55,12 @@ void main()
   // atan(y, x) is same with atan2 ?
   float theta = atan(-V.x, V.z) + PI * 0.5;
   vec2 uv = vec2(theta / 2.0 / PI, phi / PI);
-  vec4 texel = decodeHDR(texture2D(equirectangularMap, fract(uv)));
+  vec4 texel = decodeHDR(texture(equirectangularMap, fract(uv)));
 #else
   #if defined(LOD) || defined(SUPPORT_TEXTURE_LOD)
-  vec4 texel = decodeHDR(textureCubeLodEXT(cubeMap, V, lod));
+  vec4 texel = decodeHDR(texture(cubeMap, V, lod));
   #else
-  vec4 texel = decodeHDR(textureCube(cubeMap, V));
+  vec4 texel = decodeHDR(texture(cubeMap, V));
   #endif
 #endif
 
@@ -76,7 +76,7 @@ void main()
   texel = linearTosRGB(texel);
 #endif
 
-  gl_FragColor = encodeHDR(vec4(texel.rgb, 1.0));
+  out_color = encodeHDR(vec4(texel.rgb, 1.0));
 
 #ifdef SUPPORT_FRAG_DEPTH
   // PENDING 1.0 - 1e-6 will be smaller than the depth texture precision.

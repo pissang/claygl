@@ -979,7 +979,7 @@
             'varying vec2 vTexCoord;',
 
             'void main() {',
-            '  gl_FragColor = texture2D(diffuse, vTexCoord);',
+            '  out_color = texture2D(diffuse, vTexCoord);',
             '}'
           ].join('\n');
 
@@ -1706,7 +1706,7 @@
             'uniform vec4 color;',
 
             'void main() {',
-            '  gl_FragColor = color;',
+            '  out_color = color;',
             '}'
           ].join('\n');
 

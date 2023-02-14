@@ -14,9 +14,9 @@ export const vignetteCompositeFragment = new FragmentShader({
   includes: [HDREncoderMixin],
   main: glsl`
 void main() {
-  vec4 texel = decodeHDR(texture2D(texture, v_Texcoord));
+  vec4 texel = decodeHDR(texture(texture, v_Texcoord));
   vec2 uv = (v_Texcoord - vec2(0.5)) * vec2(offset);
-  gl_FragColor = encodeHDR(vec4(mix(texel.rgb, vec3(1.0 - darkness), dot(uv, uv)), texel.a));
+  out_color = encodeHDR(vec4(mix(texel.rgb, vec3(1.0 - darkness), dot(uv, uv)), texel.a));
 }
 
   `

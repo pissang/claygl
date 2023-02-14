@@ -37,10 +37,6 @@ class AmbientCubemapLight extends Light {
    * @param {number} [size=32]
    */
   prefilter(renderer: Renderer, size?: number) {
-    if (!renderer.getWebGLExtension('EXT_shader_texture_lod')) {
-      console.warn('Device not support textureCubeLodEXT');
-      return;
-    }
     if (!this._brdfLookup) {
       this._normalDistribution = generateNormalDistribution();
       this._brdfLookup = integrateBRDF(renderer, this._normalDistribution);

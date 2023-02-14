@@ -79,15 +79,15 @@ function getDefineCode(defines: Record<string, ShaderDefineValue>, enabledTextur
   return defineStr.join('\n');
 }
 
-function getExtensionCode(exts: string[][]) {
-  // Extension declaration must before all non-preprocessor codes
-  // TODO vertex ? extension enum ?
-  const extensionStr = [];
-  for (let i = 0; i < exts.length; i++) {
-    extensionStr.push('#extension GL_' + exts[i][0] + ' : enable');
-  }
-  return extensionStr.join('\n');
-}
+// function getExtensionCode(exts: string[][]) {
+//   // Extension declaration must before all non-preprocessor codes
+//   // TODO vertex ? extension enum ?
+//   const extensionStr = [];
+//   for (let i = 0; i < exts.length; i++) {
+//     extensionStr.push('#extension GL_' + exts[i][0] + ' : enable');
+//   }
+//   return extensionStr.join('\n');
+// }
 
 function getPrecisionCode(precision: ShaderPrecision) {
   return (
@@ -205,31 +205,30 @@ class ProgramManager {
     let vertexDefineStr = commonDefineCode + getDefineCode(vertexDefines, enabledTextures);
     // FRAGMENT
     let fragmentDefineStr = commonDefineCode + getDefineCode(fragmentDefines, enabledTextures);
+    const versionStr = shader.version === 3 ? `#version 300 es\n` : '';
 
-    const extensions = [
-      ['OES_standard_derivatives', 'STANDARD_DERIVATIVES'],
-      ['EXT_shader_texture_lod', 'TEXTURE_LOD'],
-      ['EXT_frag_depth', 'FRAG_DEPTH']
-    ].filter(function (ext) {
-      return renderer.getWebGLExtension(ext[0]) != null;
-    });
+    // const extensions = [
+    //   ['OES_standard_derivatives', 'STANDARD_DERIVATIVES'],
+    // ].filter(function (ext) {
+    //   return renderer.getWebGLExtension(ext[0]) != null;
+    // });
 
-    for (let i = 0; i < extensions.length; i++) {
-      const extDefineCode = '\n#define SUPPORT_' + extensions[i][1];
-      fragmentDefineStr += extDefineCode;
-      vertexDefineStr += extDefineCode;
-    }
+    // for (let i = 0; i < extensions.length; i++) {
+    //   const extDefineCode = '\n#define SUPPORT_' + extensions[i][1];
+    //   fragmentDefineStr += extDefineCode;
+    //   vertexDefineStr += extDefineCode;
+    // }
 
-    const vertexCode = vertexDefineStr + '\n' + shader.vertex;
+    const vertexCode = versionStr + vertexDefineStr + '\n' + shader.vertex;
 
     const fragmentCode =
-      getExtensionCode(extensions) +
-      '\n' +
-      getPrecisionCode(material.precision || 'highp') +
-      '\n' +
-      fragmentDefineStr +
-      '\n' +
-      shader.fragment;
+      versionStr +
+      [
+        // getExtensionCode(extensions),
+        getPrecisionCode(material.precision || 'highp'),
+        fragmentDefineStr,
+        shader.fragment
+      ].join('\n');
 
     // const finalVertexCode = unrollLoop(vertexCode, material.vertexDefines, lightsNumbers);
     // const finalFragmentCode = unrollLoop(fragmentCode, material.fragmentDefines, lightsNumbers);

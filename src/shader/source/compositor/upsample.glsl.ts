@@ -31,7 +31,7 @@ void main() {
   s += decodeHDR(clampSample(texture, v_Texcoord + d.wy)) * 2.0;
   s += decodeHDR(clampSample(texture, v_Texcoord + d.xy));
 
-  gl_FragColor = encodeHDR(s / 16.0);
+  out_color = encodeHDR(s / 16.0);
 #else
   // 4-tap bilinear upsampler
   vec4 d = vec4(-1.0, -1.0, +1.0, +1.0) / textureSize.xyxy;
@@ -42,7 +42,7 @@ void main() {
   s += decodeHDR(clampSample(texture, v_Texcoord + d.xw));
   s += decodeHDR(clampSample(texture, v_Texcoord + d.zw));
 
-  gl_FragColor = encodeHDR(s / 4.0);
+  out_color = encodeHDR(s / 4.0);
 #endif
 }
   `

@@ -21,6 +21,6 @@ void main() {
   if (weight == 0.0) {
     discard;
   }
-  gl_FragColor = encodeHDR(vec4(weight * color * strength, 1.0));
+  out_color = encodeHDR(vec4(weight * color * strength, 1.0));
 }`
 });

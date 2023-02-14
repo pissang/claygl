@@ -40,24 +40,24 @@ void main() {
   vec4 tex = vec4(0.0);
 #endif
 #ifdef TEXTURE1_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture1, v_Texcoord)), weight1);
+  tex = blend(tex, decodeHDR(texture(texture1, v_Texcoord)), weight1);
 #endif
 #ifdef TEXTURE2_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture2, v_Texcoord)), weight2);
+  tex = blend(tex, decodeHDR(texture(texture2, v_Texcoord)), weight2);
 #endif
 #ifdef TEXTURE3_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture3, v_Texcoord)), weight3);
+  tex = blend(tex, decodeHDR(texture(texture3, v_Texcoord)), weight3);
 #endif
 #ifdef TEXTURE4_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture4, v_Texcoord)), weight4);
+  tex = blend(tex, decodeHDR(texture(texture4, v_Texcoord)), weight4);
 #endif
 #ifdef TEXTURE5_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture5, v_Texcoord)), weight5);
+  tex = blend(tex, decodeHDR(texture(texture5, v_Texcoord)), weight5);
 #endif
 #ifdef TEXTURE6_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture6, v_Texcoord)), weight6);
+  tex = blend(tex, decodeHDR(texture(texture6, v_Texcoord)), weight6);
 #endif
-  gl_FragColor = encodeHDR(tex);
+  out_color = encodeHDR(tex);
 }
 `
 });

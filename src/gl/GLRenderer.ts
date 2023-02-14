@@ -163,8 +163,6 @@ export interface GLRenderHooks<T extends GLRenderableObject = GLRenderableObject
   afterRender?: (renderable: T) => void;
 }
 
-const WEBGL_compressed_texture = 'WEBGL_compressed_texture';
-
 export type SupportedExtension =
   | 'EXT_color_buffer_float'
   | 'EXT_color_buffer_half_float'

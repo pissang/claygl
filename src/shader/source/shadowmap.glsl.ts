@@ -72,7 +72,7 @@ void main(){
   // float depth = gl_FragCoord.z / gl_FragCoord.w;
 
   if (alphaCutoff > 0.0) {
-    if (texture2D(alphaMap, v_Texcoord).a <= alphaCutoff) {
+    if (texture(alphaMap, v_Texcoord).a <= alphaCutoff) {
       discard;
     }
   }
@@ -85,7 +85,7 @@ void main(){
   depth += bias;
   #endif
 
-  gl_FragColor = encodeFloat(depth * 0.5 + 0.5);
+  out_color = encodeFloat(depth * 0.5 + 0.5);
 }`
 });
 
@@ -97,12 +97,12 @@ export const shadowMapDepthDebugFragment = new FragmentShader({
   includes: [floatEncoderMixin],
   main: glsl`
 void main() {
-    vec4 tex = texture2D(depthMap, v_Texcoord);
+    vec4 tex = texture(depthMap, v_Texcoord);
 #ifdef USE_VSM
-    gl_FragColor = vec4(tex.rgb, 1.0);
+    out_color = vec4(tex.rgb, 1.0);
 #else
     float depth = decodeFloat(tex);
-    gl_FragColor = vec4(depth, depth, depth, 1.0);
+    out_color = vec4(depth, depth, depth, 1.0);
 #endif
 }`
 });
@@ -148,14 +148,14 @@ export const shadowMapDistanceFragment = new FragmentShader({
 void main(){
   float dist = distance(lightPosition, v_WorldPosition);
   dist = dist / range;
-  gl_FragColor = encodeFloat(dist);
+  out_color = encodeFloat(dist);
 }`
 });
 
 // TODO reduce shadow glsl code size.
 export const shadowMapFunction = createShaderFunction(glsl`
 float tapShadowMap(sampler2D map, vec2 uv, float z) {
-  vec4 tex = texture2D(map, uv);
+  vec4 tex = texture(map, uv);
   return step(z, decodeFloat(tex));
 }
 
@@ -189,7 +189,7 @@ float findBlocker(sampler2D shadowMap, vec2 uv, float z, float textureSize) {
   float rot = rand(uv) * 6.28;
 
   for (int i = 0; i < PCF_KERNEL_SIZE; i++) {
-    float shadowMapDepth = decodeFloat(texture2D(shadowMap, uv + rotateVec2(pcfKernel[i] * searchRadius, rot)));
+    float shadowMapDepth = decodeFloat(texture(shadowMap, uv + rotateVec2(pcfKernel[i] * searchRadius, rot)));
     if (shadowMapDepth < z) {
       blockerDepthSum += shadowMapDepth;
       numBlockers++;
@@ -242,7 +242,7 @@ float computeShadowContrib(sampler2D map, mat4 lightVPM, vec3 position, float te
 
 float computeShadowContribOmni(samplerCube map, vec3 direction, float range) {
   float dist = length(direction);
-  vec4 shadowTex = textureCube(map, direction);
+  vec4 shadowTex = texture(map, direction);
   return step(dist, (decodeFloat(shadowTex) + 0.0002) * range);
 }
 

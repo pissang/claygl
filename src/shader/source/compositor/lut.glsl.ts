@@ -11,7 +11,7 @@ export const LUTCompositeFragment = new FragmentShader({
   },
   main: glsl`
 void main() {
-  vec4 tex = texture2D(texture, v_Texcoord);
+  vec4 tex = texture(texture, v_Texcoord);
 
   float blueColor = tex.b * 63.0;
 
@@ -31,10 +31,10 @@ void main() {
   texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * tex.r);
   texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * tex.g);
 
-  vec4 newColor1 = texture2D(lookup, texPos1);
-  vec4 newColor2 = texture2D(lookup, texPos2);
+  vec4 newColor1 = texture(lookup, texPos1);
+  vec4 newColor2 = texture(lookup, texPos2);
 
   vec4 newColor = mix(newColor1, newColor2, fract(blueColor));
-  gl_FragColor = vec4(newColor.rgb, tex.w);
+  out_color = vec4(newColor.rgb, tex.w);
 }`
 });

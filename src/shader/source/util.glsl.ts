@@ -241,10 +241,10 @@ mat4 getSkinMatrix(sampler2D tex, float idx) {
   float y = floor(j / skinMatricesTextureSize) + 0.5;
   vec2 scale = vec2(skinMatricesTextureSize);
   return mat4(
-    texture2D(tex, vec2(x + 0.5, y) / scale),
-    texture2D(tex, vec2(x + 1.5, y) / scale),
-    texture2D(tex, vec2(x + 2.5, y) / scale),
-    texture2D(tex, vec2(x + 3.5, y) / scale)
+    texture(tex, vec2(x + 0.5, y) / scale),
+    texture(tex, vec2(x + 1.5, y) / scale),
+    texture(tex, vec2(x + 2.5, y) / scale),
+    texture(tex, vec2(x + 3.5, y) / scale)
   );
 }
 mat4 getSkinMatrix(float idx) {
@@ -330,7 +330,7 @@ vec4 ${FUNCTION_NAME_PLACEHOLDER}(const in sampler2D texture, const in vec2 coor
 #else
   vec2 coordClamped = clamp(coord, vec2(0.0), vec2(1.0));
 #endif
-  return texture2D(texture, coordClamped);
+  return texture(texture, coordClamped);
 }`,
   'clampSample'
 );
