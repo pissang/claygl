@@ -44,8 +44,10 @@ class GBufferCompositeNode extends CompositeNode<never, GBufferOutput> {
         ...commonTextureOpts
       },
       texture2: {
-        type: constants.UNSIGNED_INT_24_8,
+        // TODO DEPTH_STENCIL have invalid internalFormat error.
+        internalFormat: constants.DEPTH24_STENCIL8,
         format: constants.DEPTH_STENCIL,
+        type: constants.UNSIGNED_INT_24_8,
         attachment: constants.DEPTH_ATTACHMENT,
         disabled: !this.enableTexture2,
         ...commonTextureOpts

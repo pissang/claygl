@@ -174,11 +174,12 @@ class DeferredGBuffer {
 
   // - R: depth
   private _gBufferTex2 = new Texture2D({
-    // format: constants.DEPTH_COMPONENT,
-    // type: constants.UNSIGNED_INT
-
+    // TODO DEPTH_STENCIL have invalid internalFormat error.
+    internalFormat: constants.DEPTH24_STENCIL8,
     format: constants.DEPTH_STENCIL,
     type: constants.UNSIGNED_INT_24_8,
+
+    // format: constants.DEPTH_STENCIL,
     ...commonTextureOpts
   });
 

@@ -261,7 +261,7 @@ class DeferredRenderer {
     );
 
     if (!opts.targetTexture) {
-      this._outputPass.material.set('texture', lightAccumTex);
+      this._outputPass.material.set('colorTex', lightAccumTex);
       this._outputPass.render(renderer);
       // this._gBuffer.renderDebug(renderer, camera, 'normal');
     }

@@ -1,31 +1,10 @@
 import * as constants from '../core/constants';
 import { GLEnum } from '../core/type';
+import { getPossiblelInternalFormat } from '../Texture';
 import Texture2D, { Texture2DData } from '../Texture2D';
 import TextureCube, { cubeTargets, TextureCubeData } from '../TextureCube';
 import GLExtension from './GLExtension';
 
-// Compatible with WebGL1 for float type storage.
-// PENDING
-function getInternalFormat(format: number, type: number) {
-  if (type === constants.HALF_FLOAT) {
-    return format === constants.RGBA
-      ? constants.RGBA16F
-      : format === constants.RGB
-      ? constants.RGB16F
-      : format === constants.RG
-      ? constants.RG16F
-      : constants.R16F;
-  } else if (type === constants.FLOAT) {
-    return format === constants.RGBA
-      ? constants.RGBA32F
-      : format === constants.RGB
-      ? constants.RGB32F
-      : format === constants.RG
-      ? constants.RG32F
-      : constants.R32F;
-  }
-  return format;
-}
 class GLTexture {
   /**
    * Slot been taken
@@ -75,7 +54,7 @@ class GLTexture {
 
     const glFormat = texture.format;
     const glInternalFormat =
-      texture.internalFormat || getInternalFormat(texture.format, texture.type);
+      texture.internalFormat || getPossiblelInternalFormat(texture.format, texture.type);
     const mipmaps = texture.mipmaps || [];
     const mipmapsLen = mipmaps.length;
     let glType = texture.type;

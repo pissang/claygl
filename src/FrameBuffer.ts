@@ -1,9 +1,7 @@
 import Texture from './Texture';
 import * as constants from './core/constants';
-import Renderer, { RendererViewport } from './Renderer';
+import { RendererViewport } from './Renderer';
 import { GLEnum } from './core/type';
-
-const GL_DEPTH_ATTACHMENT = constants.DEPTH_ATTACHMENT;
 
 interface FrameBufferOpts {
   /**
@@ -79,23 +77,6 @@ class FrameBuffer {
     if (!texture.width) {
       throw new Error('The texture attached to color buffer is not a valid.');
     }
-
-    if (attachment === GL_DEPTH_ATTACHMENT || attachment === constants.DEPTH_STENCIL_ATTACHMENT) {
-      // const extension = renderer.getGLExtension('WEBGL_depth_texture');
-      // if (!extension) {
-      //   console.error('Depth texture is not supported by the browser');
-      //   // Still trying to use the depth texture extension.
-      //   // canAttach = false;
-      // }
-      if (
-        texture.format !== constants.DEPTH_COMPONENT &&
-        texture.format !== constants.DEPTH_STENCIL
-      ) {
-        console.error('The texture attached to depth buffer is not a valid.');
-        return;
-      }
-    }
-    // TODO width and height check
 
     // If the depth_texture extension is enabled, developers
     // Can attach a depth texture to the depth buffer
