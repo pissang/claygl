@@ -77,7 +77,7 @@ const defaultParams: Partial<TexturePoolParameters> = {
   format: constants.RGBA,
   wrapS: constants.CLAMP_TO_EDGE,
   wrapT: constants.CLAMP_TO_EDGE,
-  minFilter: constants.LINEAR_MIPMAP_LINEAR,
+  minFilter: constants.LINEAR,
   magFilter: constants.LINEAR,
   useMipmap: true,
   anisotropic: 1
