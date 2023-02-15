@@ -11,17 +11,17 @@ export const blendCompositeFragment = new FragmentShader({
     BLEND_METHOD: 0
   },
   uniforms: {
-    texture1: uniform('sampler2D'),
+    colorTex1: uniform('sampler2D'),
     weight1: uniform('float', 1.0),
-    texture2: uniform('sampler2D'),
+    colorTex2: uniform('sampler2D'),
     weight2: uniform('float', 1.0),
-    texture3: uniform('sampler2D'),
+    colorTex3: uniform('sampler2D'),
     weight3: uniform('float', 1.0),
-    texture4: uniform('sampler2D'),
+    colorTex4: uniform('sampler2D'),
     weight4: uniform('float', 1.0),
-    texture5: uniform('sampler2D'),
+    colorTex5: uniform('sampler2D'),
     weight5: uniform('float', 1.0),
-    texture6: uniform('sampler2D'),
+    colorTex6: uniform('sampler2D'),
     weight6: uniform('float', 1.0)
   },
   includes: [HDREncoderMixin],
@@ -39,25 +39,25 @@ void main() {
 #else
   vec4 tex = vec4(0.0);
 #endif
-#ifdef TEXTURE1_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture1, v_Texcoord)), weight1);
+#ifdef COLORTEX1_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex1, v_Texcoord)), weight1);
 #endif
-#ifdef TEXTURE2_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture2, v_Texcoord)), weight2);
+#ifdef COLORTEX2_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex2, v_Texcoord)), weight2);
 #endif
-#ifdef TEXTURE3_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture3, v_Texcoord)), weight3);
+#ifdef COLORTEX3_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex3, v_Texcoord)), weight3);
 #endif
-#ifdef TEXTURE4_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture4, v_Texcoord)), weight4);
+#ifdef COLORTEX4_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex4, v_Texcoord)), weight4);
 #endif
-#ifdef TEXTURE5_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture5, v_Texcoord)), weight5);
+#ifdef COLORTEX5_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex5, v_Texcoord)), weight5);
 #endif
-#ifdef TEXTURE6_ENABLED
-  tex = blend(tex, decodeHDR(texture2D(texture6, v_Texcoord)), weight6);
+#ifdef COLORTEX6_ENABLED
+  tex = blend(tex, decodeHDR(texture(colorTex6, v_Texcoord)), weight6);
 #endif
-  gl_FragColor = encodeHDR(tex);
+  out_color = encodeHDR(tex);
 }
 `
 });

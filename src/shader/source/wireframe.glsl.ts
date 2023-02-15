@@ -51,7 +51,7 @@ export const wireframeFragment = new FragmentShader({
   includes: [floatEncoderMixin, wireframeMixin],
   main: glsl`
 void main() {
-  gl_FragColor.rgb = color;
-  gl_FragColor.a = (1.0-edgeFactor(lineWidth)) * alpha;
+  out_color.rgb = color;
+  out_color.a = (1.0-edgeFactor(lineWidth)) * alpha;
 }`
 });

@@ -6,7 +6,7 @@ interface GaussianBlurCompositeNodeOpts {
   blurSize?: number;
 }
 
-class GaussianBlurCompositeNode extends GroupCompositeNode<'texture', 'color'> {
+class GaussianBlurCompositeNode extends GroupCompositeNode<'colorTex', 'color'> {
   private _blurH = new FilterCompositeNode<typeof gaussianBlurCompositeFragment, 'color'>(
     gaussianBlurCompositeFragment
   );
@@ -17,26 +17,23 @@ class GaussianBlurCompositeNode extends GroupCompositeNode<'texture', 'color'> {
   constructor(opts?: GaussianBlurCompositeNodeOpts) {
     super();
 
-    opts = Object.assign(
-      {},
-      {
-        downscale: 1,
-        blurSize: 1
-      } as GaussianBlurCompositeNodeOpts,
-      opts
-    );
+    opts = {
+      downscale: 1,
+      blurSize: 1,
+      ...opts
+    };
 
     const blurV = this._blurV;
     const blurH = this._blurH;
 
     blurH.inputs = {
-      texture: this.getGroupInput('texture')
+      colorTex: this.getGroupInput('colorTex')
     };
     blurH.outputs = {
       color: {}
     };
     blurV.inputs = {
-      texture: blurH
+      colorTex: blurH
     };
     blurV.outputs = {
       color: this.getGroupOutput('color')

@@ -39,7 +39,7 @@ export const SSRTraceFragment = new FragmentShader({
 
   main: glsl`
 float fetchDepth(sampler2D depthTexture, vec2 uv) {
-  vec4 depthTexel = texture2D(depthTexture, uv);
+  vec4 depthTexel = texture(depthTexture, uv);
 #ifdef DEPTH_DECODE
   return decodeFloat(depthTexel) * 2.0 - 1.0;
 #else
@@ -231,7 +231,7 @@ float calculateAlpha(
 }
 
 void main() {
-  vec4 normalAndGloss = texture2D(gBufferTexture1, v_Texcoord);
+  vec4 normalAndGloss = texture(gBufferTexture1, v_Texcoord);
 
   // Is empty
   if (dot(normalAndGloss.rgb, vec3(1.0)) == 0.0) {
@@ -267,7 +267,7 @@ void main() {
 
   float alpha = calculateAlpha(iterationCount, reflectivity, hitPixel, hitPoint, dist, rayDir) * float(intersect);
 
-  vec3 hitNormal = texture2D(gBufferTexture1, hitPixel).rgb * 2.0 - 1.0;
+  vec3 hitNormal = texture(gBufferTexture1, hitPixel).rgb * 2.0 - 1.0;
   hitNormal = normalize((viewInverseTranspose * vec4(hitNormal, 0.0)).xyz);
 
   // Ignore the pixel not face the ray
@@ -282,10 +282,10 @@ void main() {
   if (!intersect) {
     discard;
   }
-  vec4 color = decodeHDR(texture2D(colorTex, hitPixel));
-  gl_FragColor = encodeHDR(vec4(color.rgb * alpha, color.a));
+  vec4 color = decodeHDR(texture(colorTex, hitPixel));
+  out_color = encodeHDR(vec4(color.rgb * alpha, color.a));
 
-  // gl_FragColor = vec4(vec3(iterationCount / 2.0), 1.0);
+  // out_color = vec4(vec3(iterationCount / 2.0), 1.0);
 }`
 });
 
@@ -294,8 +294,6 @@ export const SSRBlurFragment = new FragmentShader({
   uniforms: {
     colorTex: uniform('sampler2D'),
     gBufferTexture1: uniform('sampler2D'),
-    // colorTexSize will be updated by the compositor automatically.
-    colorTexSize: uniform('vec2'),
     blurSize: uniform('float', 1),
     /**
      * 0.0 is horizontal, 1.0 is vertical
@@ -309,10 +307,10 @@ export const SSRBlurFragment = new FragmentShader({
 void main() {
   ${gaussianKernel13()}
 
-  vec4 centerNormalTexel = texture2D(gBufferTexture1, v_Texcoord);
+  vec4 centerNormalTexel = texture(gBufferTexture1, v_Texcoord);
   float g = centerNormalTexel.a;
   // Add 0.1000 bias to filling holes from missed rays.
-  vec2 off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.1000) / colorTexSize;
+  vec2 off = (clamp(1.0 - g, 0.0, 1.0) * blurSize + 0.1000) / vec2(textureSize(colorTex, 0));
   off *= vec2(1.0 - blurDir, blurDir);
 
   vec2 coord = v_Texcoord;
@@ -323,11 +321,11 @@ void main() {
   vec3 centerNormal = centerNormalTexel.rgb * 2.0 - 1.0;
   for (int i = 0; i < 13; i++) {
     vec2 coord = clamp(v_Texcoord + (float(i) - 6.0) * off, vec2(0.0), vec2(1.0));
-    float w = gaussianKernel[i] * clamp(dot(centerNormal, texture2D(gBufferTexture1, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
+    float w = gaussianKernel[i] * clamp(dot(centerNormal, texture(gBufferTexture1, coord).rgb * 2.0 - 1.0), 0.0, 1.0);
     weightAll += w;
-    sum += decodeHDR(texture2D(colorTex, coord)) * w;
+    sum += decodeHDR(texture(colorTex, coord)) * w;
   }
 
-  gl_FragColor = encodeHDR(sum / weightAll);
+  out_color = encodeHDR(sum / weightAll);
 }`
 });

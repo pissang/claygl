@@ -791,10 +791,10 @@ class ShadowMapPass extends Notifier {
   }
 
   /**
-   * @param  {clay.Renderer|WebGLRenderingContext} [renderer]
+   * @param  {clay.Renderer|WebGL2RenderingContext} [renderer]
    * @memberOf clay.prePass.ShadowMap.prototype
    */
-  // PENDING Renderer or WebGLRenderingContext
+  // PENDING Renderer or WebGL2RenderingContext
   dispose(renderer: Renderer) {
     if (this._frameBuffer) {
       renderer.disposeFrameBuffer(this._frameBuffer);

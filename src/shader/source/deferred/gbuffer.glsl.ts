@@ -167,14 +167,14 @@ void main() {
     }
   }
   if (alphaCutoff > 0.0) {
-    float a = texture2D(diffuseMap, v_Texcoord).a * alpha;
+    float a = texture(diffuseMap, v_Texcoord).a * alpha;
     if (a < alphaCutoff) {
       discard;
     }
   }
 
   if (dot(v_Tangent, v_Tangent) > 0.0) {
-    vec3 normalTexel = texture2D(normalMap, v_Texcoord).xyz;
+    vec3 normalTexel = texture(normalMap, v_Texcoord).xyz;
     if (dot(normalTexel, normalTexel) > 0.0) { // Valid normal map
       N = normalTexel * 2.0 - 1.0;
       mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
@@ -183,16 +183,16 @@ void main() {
     }
   }
 
-  gl_FragColor.rgb = (N + 1.0) * 0.5;
+  out_color.rgb = (N + 1.0) * 0.5;
 
   // FIXME Have precision problem http://aras-p.info/texts/CompactNormalStorage.html
   // N.z can be recovered from sqrt(1 - dot(N.xy, N.xy));
-  // gl_FragColor.rg = (N.xy + 1.0) * 0.5;
+  // out_color.rg = (N.xy + 1.0) * 0.5;
 
   float g = glossiness;
 
   if (useRoughGlossMap) {
-    float g2 = indexingTexel(texture2D(roughGlossMap, v_Texcoord), roughGlossChannel);
+    float g2 = indexingTexel(texture(roughGlossMap, v_Texcoord), roughGlossChannel);
     if (useRoughness) {
       g2 = 1.0 - g2;
     }
@@ -200,11 +200,11 @@ void main() {
   }
 
   // PENDING Alpha can't be zero.
-  gl_FragColor.a = g + 0.005;
+  out_color.a = g + 0.005;
 
   // Pack sign of normal to metalness
   // Add 0.001 to avoid m is 0
-  // gl_FragColor.a = sign(N.z) * (m + 0.001) * 0.5 + 0.5;
+  // out_color.a = sign(N.z) * (m + 0.001) * 0.5 + 0.5;
 }`
 });
 
@@ -234,10 +234,10 @@ void main()
   float m = metalness;
 
   if (useMetalnessMap) {
-    vec4 metalnessTexel = texture2D(metalnessMap, v_Texcoord);
+    vec4 metalnessTexel = texture(metalnessMap, v_Texcoord);
     m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);
   }
-  vec4 texel = texture2D(diffuseMap, v_Texcoord);
+  vec4 texel = texture(diffuseMap, v_Texcoord);
   if (linear) {
     texel = sRGBToLinear(texel);
   }
@@ -248,10 +248,10 @@ void main()
     }
   }
 
-  gl_FragColor.rgb = texel.rgb * color;
+  out_color.rgb = texel.rgb * color;
 
   // PENDING Alpha can't be zero.
-  gl_FragColor.a = m + 0.005;
+  out_color.a = m + 0.005;
 }`
 });
 
@@ -269,10 +269,10 @@ void main() {
   vec2 b = v_PrevViewPosition.xy / v_PrevViewPosition.w;
 
   if (firstRender) {
-    gl_FragColor = vec4(0.0);
+    out_color = vec4(0.0);
   }
   else {
-    gl_FragColor = vec4((a - b) * 0.5 + 0.5, 0.0, 1.0);
+    out_color = vec4((a - b) * 0.5 + 0.5, 0.0, 1.0);
   }
 }`
 });
@@ -301,22 +301,22 @@ void main() {
   ${gBufferReadMixin.main}
 
   if (debug == 0) {
-    gl_FragColor = vec4(N, 1.0);
+    out_color = vec4(N, 1.0);
   } else if (debug == 1) {
-    gl_FragColor = vec4(vec3(z), 1.0);
+    out_color = vec4(vec3(z), 1.0);
   } else if (debug == 2) {
-    gl_FragColor = vec4(position, 1.0);
+    out_color = vec4(position, 1.0);
   } else if (debug == 3) {
-    gl_FragColor = vec4(vec3(glossiness), 1.0);
+    out_color = vec4(vec3(glossiness), 1.0);
   } else if (debug == 4) {
-    gl_FragColor = vec4(vec3(metalness), 1.0);
+    out_color = vec4(vec3(metalness), 1.0);
   } else if (debug == 5) {
-    gl_FragColor = vec4(albedo, 1.0);
+    out_color = vec4(albedo, 1.0);
   } else {
-    vec4 color = texture2D(gBufferTexture4, uv);
+    vec4 color = texture(gBufferTexture4, uv);
     color.rg -= 0.5;
     color.rg *= 2.0;
-    gl_FragColor = color;
+    out_color = color;
   }
 }`
 });

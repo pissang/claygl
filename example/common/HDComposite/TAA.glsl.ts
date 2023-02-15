@@ -33,13 +33,13 @@ vec2 GetClosestFragment(vec2 uv) {
   vec2 k = 1.0 / velocityTexSize.xy;
 
   vec4 neighborhood = vec4(
-    texture2D(depthTex, uv - k).r,
-    texture2D(depthTex, uv + vec2(k.x, -k.y)).r,
-    texture2D(depthTex, uv + vec2(-k.x, k.y)).r,
-    texture2D(depthTex, uv + k).r
+    texture(depthTex, uv - k).r,
+    texture(depthTex, uv + vec2(k.x, -k.y)).r,
+    texture(depthTex, uv + vec2(-k.x, k.y)).r,
+    texture(depthTex, uv + k).r
   );
 
-  vec3 result = vec3(0.0, 0.0, texture2D(depthTex, uv));
+  vec3 result = vec3(0.0, 0.0, texture(depthTex, uv));
   result = mix(result, vec3(-1.0, -1.0, neighborhood.x), compareDepth(neighborhood.x, result.z));
   result = mix(result, vec3( 1.0, -1.0, neighborhood.y), compareDepth(neighborhood.y, result.z));
   result = mix(result, vec3(-1.0,  1.0, neighborhood.z), compareDepth(neighborhood.z, result.z));
@@ -73,15 +73,15 @@ vec4 Untonemap(vec4 color) {
 void main()
 {
   if (frame == 0.0) {
-    gl_FragColor = texture2D(currTex, v_Texcoord);
+    out_color = texture(currTex, v_Texcoord);
     return;
   }
 
   if (still) {
-    gl_FragColor = Untonemap(
+    out_color = Untonemap(
       mix(
-        Tonemap(texture2D(currTex, v_Texcoord)),
-        Tonemap(texture2D(prevTex, v_Texcoord)),
+        Tonemap(texture(currTex, v_Texcoord)),
+        Tonemap(texture(prevTex, v_Texcoord)),
         stillBlending
       )
     );
@@ -89,11 +89,11 @@ void main()
   }
 
   vec2 closest = GetClosestFragment(v_Texcoord);
-  vec4 motionTexel = texture2D(velocityTex, closest);
+  vec4 motionTexel = texture(velocityTex, closest);
 
 
   if (motionTexel.a < 0.1) {
-    gl_FragColor = texture2D(currTex, v_Texcoord);
+    out_color = texture(currTex, v_Texcoord);
     return;
   }
 
@@ -102,10 +102,10 @@ void main()
   vec2 k = 1.0 / currTexSize.xy;
   vec2 uv = v_Texcoord;
 
-  vec4 color = texture2D(currTex, uv);
+  vec4 color = texture(currTex, uv);
 
-  vec4 topLeft = texture2D(currTex, uv - k * 0.5);
-  vec4 bottomRight = texture2D(currTex, uv + k * 0.5);
+  vec4 topLeft = texture(currTex, uv - k * 0.5);
+  vec4 bottomRight = texture(currTex, uv + k * 0.5);
 
   vec4 corners = 4.0 * (topLeft + bottomRight) - 2.0 * color;
 
@@ -116,7 +116,7 @@ void main()
 
   vec4 average = (corners + color) * 0.142857;
 
-  vec4 history = texture2D(prevTex, v_Texcoord - motion);
+  vec4 history = texture(prevTex, v_Texcoord - motion);
 
   float motionLength = length(motion);
   vec2 luma = vec2(Luminance(average), Luminance(color));
@@ -138,7 +138,7 @@ void main()
   color = mix(Tonemap(color), Tonemap(history), weight);
   color = Untonemap(clamp(color, 0.0, 1.0));
 
-  gl_FragColor = color;
+  out_color = color;
 }`
 });
 

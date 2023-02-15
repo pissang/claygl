@@ -18,7 +18,7 @@ export const cubemapPrefilterFragment = new FragmentShader({
   includes: [HDREncoderMixin],
   main: glsl`
 vec3 importanceSampleNormal(float i, float roughness, vec3 N) {
-  vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;
+  vec3 H = texture(normalDistribution, vec2(roughness, i)).rgb;
 
   vec3 upVector = abs(N.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
   vec3 tangentX = normalize(cross(N, upVector));
@@ -44,12 +44,12 @@ void main() {
 
     float NoL = clamp(dot(N, L), 0.0, 1.0);
     if (NoL > 0.0) {
-      prefilteredColor += decodeHDR(textureCube(environmentMap, L)).rgb * NoL;
+      prefilteredColor += decodeHDR(texture(environmentMap, L)).rgb * NoL;
       totalWeight += NoL;
     }
   }
 
-  gl_FragColor = encodeHDR(vec4(prefilteredColor / totalWeight, 1.0));
+  out_color = encodeHDR(vec4(prefilteredColor / totalWeight, 1.0));
 }
   `
 });

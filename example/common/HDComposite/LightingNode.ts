@@ -28,7 +28,7 @@ class LightingCompositeNode extends CompositeNode<
 
     this.outputs = {
       color: {
-        type: constants.HALF_FLOAT_OES
+        type: constants.HALF_FLOAT
       }
     };
   }

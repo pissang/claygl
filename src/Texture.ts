@@ -11,6 +11,28 @@ import { assign } from './core/util';
 export type TextureImageSource = HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
 export type TexturePixelSource = Uint8Array | Float32Array;
 
+// Compatible with WebGL1 for float type storage.
+// PENDING
+export function getPossiblelInternalFormat(format: number, type: number) {
+  if (type === constants.HALF_FLOAT) {
+    return format === constants.RGBA
+      ? constants.RGBA16F
+      : format === constants.RGB
+      ? constants.RGB16F
+      : format === constants.RG
+      ? constants.RG16F
+      : constants.R16F;
+  } else if (type === constants.FLOAT) {
+    return format === constants.RGBA
+      ? constants.RGBA32F
+      : format === constants.RGB
+      ? constants.RGB32F
+      : format === constants.RG
+      ? constants.RG32F
+      : constants.R32F;
+  }
+  return format;
+}
 export interface TextureOpts {
   /**
    * Texture width, readonly when the texture source is image
@@ -38,6 +60,10 @@ export interface TextureOpts {
    *  + {@link clay.constants.DEPTH_STENCIL}
    */
   format: GLEnum;
+  /**
+   * Format of internal storage
+   */
+  internalFormat: GLEnum;
   /**
    * Texture wrap. Default to be REPEAT.
    * Possible values:

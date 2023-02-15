@@ -9,7 +9,7 @@ import { HDREncoderMixin } from '../util.glsl';
 export const FXAACompositeFragment = new FragmentShader({
   name: 'FXAAFrag',
   uniforms: {
-    texture: uniform('sampler2D'),
+    colorTex: uniform('sampler2D'),
     viewport: semanticUniform('vec4', 'VIEWPORT')
   },
   includes: [HDREncoderMixin],
@@ -19,11 +19,11 @@ export const FXAACompositeFragment = new FragmentShader({
 #define FXAA_SPAN_MAX     8.0
 void main() {
   vec2 resolution = 1.0 / viewport.zw;
-  vec3 rgbNW = decodeHDR(texture2D(texture, v_Texcoord + vec2(-1.0, -1.0) * resolution)).xyz;
-  vec3 rgbNE = decodeHDR(texture2D(texture, v_Texcoord + vec2(1.0, -1.0) * resolution)).xyz;
-  vec3 rgbSW = decodeHDR(texture2D(texture, v_Texcoord + vec2(-1.0, 1.0) * resolution)).xyz;
-  vec3 rgbSE = decodeHDR(texture2D(texture, v_Texcoord + vec2(1.0, 1.0) * resolution)).xyz;
-  vec4 rgbaM = decodeHDR(texture2D(texture,  v_Texcoord));
+  vec3 rgbNW = decodeHDR(texture(colorTex, v_Texcoord + vec2(-1.0, -1.0) * resolution)).xyz;
+  vec3 rgbNE = decodeHDR(texture(colorTex, v_Texcoord + vec2(1.0, -1.0) * resolution)).xyz;
+  vec3 rgbSW = decodeHDR(texture(colorTex, v_Texcoord + vec2(-1.0, 1.0) * resolution)).xyz;
+  vec3 rgbSE = decodeHDR(texture(colorTex, v_Texcoord + vec2(1.0, 1.0) * resolution)).xyz;
+  vec4 rgbaM = decodeHDR(texture(colorTex,  v_Texcoord));
   vec3 rgbM = rgbaM.xyz;
   float opacity  = rgbaM.w;
 
@@ -48,12 +48,12 @@ void main() {
       max(vec2(-FXAA_SPAN_MAX, -FXAA_SPAN_MAX),
         dir * rcpDirMin)) * resolution;
 
-  vec3 rgbA = decodeHDR(texture2D(texture, v_Texcoord + dir * (1.0 / 3.0 - 0.5))).xyz;
-  rgbA += decodeHDR(texture2D(texture, v_Texcoord + dir * (2.0 / 3.0 - 0.5))).xyz;
+  vec3 rgbA = decodeHDR(texture(colorTex, v_Texcoord + dir * (1.0 / 3.0 - 0.5))).xyz;
+  rgbA += decodeHDR(texture(colorTex, v_Texcoord + dir * (2.0 / 3.0 - 0.5))).xyz;
   rgbA *= 0.5;
 
-  vec3 rgbB = decodeHDR(texture2D(texture, v_Texcoord + dir * -0.5)).xyz;
-  rgbB += decodeHDR(texture2D(texture, v_Texcoord + dir * 0.5)).xyz;
+  vec3 rgbB = decodeHDR(texture(colorTex, v_Texcoord + dir * -0.5)).xyz;
+  rgbB += decodeHDR(texture(colorTex, v_Texcoord + dir * 0.5)).xyz;
   rgbB *= 0.25;
   rgbB += rgbA * 0.5;
 
@@ -61,9 +61,9 @@ void main() {
 
   if ((lumaB < lumaMin) || (lumaB > lumaMax)) {
     // FXAA Must be last step
-    gl_FragColor = vec4(rgbA, opacity);
+    out_color = vec4(rgbA, opacity);
   } else {
-    gl_FragColor = vec4(rgbB, opacity);
+    out_color = vec4(rgbB, opacity);
   }
 }`
 });

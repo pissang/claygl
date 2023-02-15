@@ -434,6 +434,7 @@ export class FragmentShader<
   TMixins extends ShaderMixinLoose[] = never
   // TVaryings extends Dict<ShaderVaringLoose> = Dict<ShaderVaringLoose>
 > extends StageShader<TDefines, TUniforms, never, never, TMixins> {
+  outputs: string[];
   constructor(options: {
     name?: string;
     defines?: TDefines;
@@ -442,18 +443,24 @@ export class FragmentShader<
      * uniform, defines, attributes, varyings，functions in mixins will be merged automatically.
      */
     includes?: TMixins;
+    /**
+     * Fragment shader outputs. Default to be ['color']
+     */
+    outputs?: string[];
     // varyings will be shared from vertex
     // varyings?: TVaryings;
     main: string;
   }) {
     super(options);
+
+    this.outputs = options.outputs || ['color'];
   }
 }
 
 /**
  * Compose each part to a final shader string
  */
-function composeShaderString(stageShader: StageShader) {
+function composeShaderString(stageShader: StageShader, isVertex: boolean) {
   // TODO If compose based on #ifdef condition.
   function normalizeUniformType(type: string) {
     return type === 'rgb' ? 'vec3' : type === 'rgba' ? 'vec4' : type;
@@ -461,10 +468,7 @@ function composeShaderString(stageShader: StageShader) {
 
   // Only compose the uniform, attributes, varying, and codes.
   // Defines will be composed dynamically in GLProgram based on the material
-  function composePart(
-    varType: 'uniform' | 'attribute' | 'varying',
-    obj: Dict<ShaderUniformLoose>
-  ) {
+  function composePart(varType: 'uniform' | 'in' | 'out', obj: Dict<ShaderUniformLoose>) {
     return keys(obj)
       .map((symbol) => {
         const item = obj[symbol];
@@ -481,10 +485,17 @@ function composeShaderString(stageShader: StageShader) {
   }
 
   return `
+${
+  isVertex
+    ? ''
+    : (stageShader as FragmentShader).outputs
+        // TODO is highp necessary?
+        .map((output, index) => `layout(location = ${index}) out highp vec4 out_${output};`)
+        .join('\n')
+}
 ${composePart('uniform', stageShader.uniforms as any)}
-${composePart('attribute', stageShader.attributes as any)}
-${composePart('varying', stageShader.varyings as any)}
-
+${composePart('in', stageShader.attributes as any)}
+${composePart(isVertex ? 'out' : 'in', stageShader.varyings as any)}
 ${stageShader.functions.map((func) => func()).join('\n')}
 
 ${stageShader.main}
@@ -606,6 +617,8 @@ export class Shader<
 
   private readonly _shaderID: string;
 
+  version: 3 = 3;
+
   get shaderID() {
     return this._shaderID;
   }
@@ -711,12 +724,13 @@ export class Shader<
     this.matrixSemantics = matrixSemantics;
     this.attributes = attributes;
 
-    const vertex = (this.vertex = composeShaderString(vert));
+    const vertex = (this.vertex = composeShaderString(vert, true));
     // Force sharing varyings between vert and frag.
     const fragment = (this.fragment = composeShaderString(
       assign({}, frag, {
         varyings: vert.varyings
-      })
+      }),
+      false
     ));
 
     this._shaderID = getShaderID(vertex, fragment);

@@ -29,7 +29,7 @@ const material = new Material(createWireframeShader(), {
   transparent: true,
   depthTest: false
 });
-material.set('width', 2);
+material.set('lineWidth', 2);
 
 camera.position.set(0, 1, 2);
 camera.lookAt(scene.position);

@@ -7,8 +7,8 @@ export const depthWriteFragment = new FragmentShader({
   },
   main: glsl`
 void main() {
-  gl_FragColor = vec4(1.0);
-  vec4 depthTexel = texture2D(gBufferTexture2, v_Texcoord);
-  gl_FragDepthEXT = depthTexel.r;
+  out_color = vec4(1.0);
+  vec4 depthTexel = texture(gBufferTexture2, v_Texcoord);
+  gl_FragDepth = depthTexel.r;
 }`
 });

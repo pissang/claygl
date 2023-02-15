@@ -1,63 +1,58 @@
 import { keys } from '../core/util';
 import Material from '../Material';
-import { ShaderDefineValue, ShaderPrecision } from '../Shader';
+import Shader, { ShaderDefineValue, ShaderPrecision } from '../Shader';
 import GLProgram from './GLProgram';
 import GLRenderer, { GLMaterialObject, GLRenderableObject } from './GLRenderer';
 
-// const loopRegex =
-//   /for\s*?\(int\s*?_idx_\s*=\s*([\w-]+);\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
+const loopRegex =
+  /for\s*?\(int\s*?_idx_\s*=\s*([\w-]+);\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
 
-// function unrollLoop(
-//   shaderStr: string,
-//   defines: Record<string, ShaderDefineValue>,
-//   lightsNumbers: Record<string, number>
-// ) {
-//   // Loop unroll from three.js, https://github.com/mrdoob/three.js/blob/master/src/renderers/webgl/WebGLProgram.js#L175
-//   // In some case like shadowMap in loop use 'i' to index value much slower.
+function unrollLoop(
+  shaderStr: string,
+  defines: Record<string, ShaderDefineValue>,
+  extraDefines: Record<string, ShaderDefineValue>
+) {
+  // In some case like shadowMap in loop use 'i' to index value much slower.
 
-//   // Loop use _idx_ and increased with _idx_++ will be unrolled
-//   // Use {{ }} to match the pair so the if statement will not be affected
-//   // Write like following
-//   // for (int _idx_ = 0; _idx_ < 4; _idx_++) {{
-//   //     vec3 color = texture2D(textures[_idx_], uv).rgb;
-//   // }}
-//   function replace(match: string, start: string, end: string, snippet: string) {
-//     let unroll = '';
-//     // Try to treat as define
-//     if (isNaN(start as any as number)) {
-//       if (start in defines) {
-//         start = defines[start] as string;
-//       } else {
-//         start = lightNumberDefines[start] as any as string;
-//       }
-//     }
-//     if (isNaN(end as any as number)) {
-//       if (end in defines) {
-//         end = defines[end] as string;
-//       } else {
-//         end = lightNumberDefines[end] as any as string;
-//       }
-//     }
-//     // TODO Error checking
-//     for (let idx = parseInt(start); idx < parseInt(end); idx++) {
-//       // PENDING Add scope?
-//       unroll +=
-//         '{' +
-//         snippet
-//           .replace(/float\s*\(\s*_idx_\s*\)/g, idx.toFixed(1))
-//           .replace(/_idx_/g, idx as any as string) +
-//         '}';
-//     }
+  // Loop use _idx_ and increased with _idx_++ will be unrolled
+  // Use {{ }} to match the pair so the if statement will not be affected
+  // Write like following
+  // for (int _idx_ = 0; _idx_ < 4; _idx_++) {{
+  //     vec3 color = texture2D(textures[_idx_], uv).rgb;
+  // }}
+  function replace(match: string, start: string, end: string, snippet: string) {
+    let unroll = '';
+    // Try to treat as define
+    if (isNaN(start as any as number)) {
+      if (start in defines) {
+        start = defines[start] as string;
+      } else {
+        start = extraDefines[start] as any as string;
+      }
+    }
+    if (isNaN(end as any as number)) {
+      if (end in defines) {
+        end = defines[end] as string;
+      } else {
+        end = extraDefines[end] as any as string;
+      }
+    }
+    // TODO Error checking
+    for (let idx = parseInt(start); idx < parseInt(end); idx++) {
+      // PENDING Add scope?
+      unroll +=
+        '{' +
+        snippet
+          .replace(/float\s*\(\s*_idx_\s*\)/g, idx.toFixed(1))
+          .replace(/_idx_/g, idx as any as string) +
+        '}';
+    }
 
-//     return unroll;
-//   }
+    return unroll;
+  }
 
-//   const lightNumberDefines: Record<string, number> = {};
-//   for (const lightType in lightsNumbers) {
-//     lightNumberDefines[lightType + '_COUNT'] = lightsNumbers[lightType];
-//   }
-//   return shaderStr.replace(loopRegex, replace);
-// }
+  return shaderStr.replace(loopRegex, replace);
+}
 
 function getDefineCode(defines: Record<string, ShaderDefineValue>, enabledTextures?: string[]) {
   const defineStr = [];
@@ -79,15 +74,15 @@ function getDefineCode(defines: Record<string, ShaderDefineValue>, enabledTextur
   return defineStr.join('\n');
 }
 
-function getExtensionCode(exts: string[][]) {
-  // Extension declaration must before all non-preprocessor codes
-  // TODO vertex ? extension enum ?
-  const extensionStr = [];
-  for (let i = 0; i < exts.length; i++) {
-    extensionStr.push('#extension GL_' + exts[i][0] + ' : enable');
-  }
-  return extensionStr.join('\n');
-}
+// function getExtensionCode(exts: string[][]) {
+//   // Extension declaration must before all non-preprocessor codes
+//   // TODO vertex ? extension enum ?
+//   const extensionStr = [];
+//   for (let i = 0; i < exts.length; i++) {
+//     extensionStr.push('#extension GL_' + exts[i][0] + ' : enable');
+//   }
+//   return extensionStr.join('\n');
+// }
 
 function getPrecisionCode(precision: ShaderPrecision) {
   return (
@@ -148,7 +143,7 @@ class ProgramManager {
     renderable: GLRenderableObject,
     material: GLMaterialObject,
     extraKey: string,
-    extraDefineCode: string
+    extraDefines?: Record<string, ShaderDefineValue>
   ) {
     const cache = this._cache;
     const renderer = this._renderer;
@@ -197,46 +192,45 @@ class ProgramManager {
     if (isInstancedMesh) {
       commonDefineCode += '\n#define INSTANCING\n';
     }
-    if (extraDefineCode) {
-      commonDefineCode += extraDefineCode + '\n';
+    if (extraDefines) {
+      commonDefineCode += getDefineCode(extraDefines) + '\n';
     }
     // TODO Optimize key generation
     // VERTEX
     let vertexDefineStr = commonDefineCode + getDefineCode(vertexDefines, enabledTextures);
     // FRAGMENT
     let fragmentDefineStr = commonDefineCode + getDefineCode(fragmentDefines, enabledTextures);
+    const versionStr = shader.version === 3 ? `#version 300 es\n` : '';
 
-    const extensions = [
-      ['OES_standard_derivatives', 'STANDARD_DERIVATIVES'],
-      ['EXT_shader_texture_lod', 'TEXTURE_LOD'],
-      ['EXT_frag_depth', 'FRAG_DEPTH']
-    ].filter(function (ext) {
-      return renderer.getWebGLExtension(ext[0]) != null;
-    });
+    // const extensions = [
+    //   ['OES_standard_derivatives', 'STANDARD_DERIVATIVES'],
+    // ].filter(function (ext) {
+    //   return renderer.getWebGLExtension(ext[0]) != null;
+    // });
 
-    for (let i = 0; i < extensions.length; i++) {
-      const extDefineCode = '\n#define SUPPORT_' + extensions[i][1];
-      fragmentDefineStr += extDefineCode;
-      vertexDefineStr += extDefineCode;
-    }
+    // for (let i = 0; i < extensions.length; i++) {
+    //   const extDefineCode = '\n#define SUPPORT_' + extensions[i][1];
+    //   fragmentDefineStr += extDefineCode;
+    //   vertexDefineStr += extDefineCode;
+    // }
 
-    const vertexCode = vertexDefineStr + '\n' + shader.vertex;
+    const vertexCode = versionStr + vertexDefineStr + '\n' + shader.vertex;
 
     const fragmentCode =
-      getExtensionCode(extensions) +
-      '\n' +
-      getPrecisionCode(material.precision || 'highp') +
-      '\n' +
-      fragmentDefineStr +
-      '\n' +
-      shader.fragment;
+      versionStr +
+      [
+        // getExtensionCode(extensions),
+        getPrecisionCode(material.precision || 'highp'),
+        fragmentDefineStr,
+        shader.fragment
+      ].join('\n');
 
-    // const finalVertexCode = unrollLoop(vertexCode, material.vertexDefines, lightsNumbers);
-    // const finalFragmentCode = unrollLoop(fragmentCode, material.fragmentDefines, lightsNumbers);
+    const finalVertexCode = unrollLoop(vertexCode, vertexDefines, extraDefines);
+    const finalFragmentCode = unrollLoop(fragmentCode, fragmentDefines, extraDefines);
 
     program = new GLProgram();
     program.attributes = shader.attributes;
-    const errorMsg = program.buildProgram(_gl, shader, vertexCode, fragmentCode);
+    const errorMsg = program.buildProgram(_gl, shader, finalVertexCode, finalFragmentCode);
     program.__error = errorMsg;
 
     cache[key] = program;

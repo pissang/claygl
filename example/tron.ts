@@ -65,7 +65,7 @@ const tonemappingNode = new FilterCompositeNode(composeCompositeFragment);
 const taaNode = new TAACompositeNode(camera, taaCameraJitter);
 
 bloomNode.inputs = {
-  texture: taaNode
+  colorTex: taaNode
 };
 bloomNode.setBrightThreshold(0.6);
 taaNode.inputs = {
@@ -73,8 +73,8 @@ taaNode.inputs = {
 };
 taaNode.setDynamic(false);
 tonemappingNode.inputs = {
-  texture: taaNode,
-  bloom: bloomNode
+  colorTex: taaNode,
+  bloomTex: bloomNode
 };
 tonemappingNode.renderToScreen = true;
 compositor.addNode(sceneNode, bloomNode, tonemappingNode, taaNode);

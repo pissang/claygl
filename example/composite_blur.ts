@@ -51,7 +51,7 @@ const sceneCompositeNode = new SceneCompositeNode(scene, camera);
 
 const blurNode = new GaussianBlurCompositeNode();
 blurNode.inputs = {
-  texture: sceneCompositeNode
+  colorTex: sceneCompositeNode
 };
 blurNode.renderToScreen = true;
 compositor.addNode(sceneCompositeNode, blurNode);

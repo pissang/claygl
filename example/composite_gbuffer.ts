@@ -85,7 +85,7 @@ compositor.addNode(outputNode);
 
 startTimeline(() => {
   outputNode.inputs = {
-    texture: {
+    colorTex: {
       node: gbufferNode,
       output: config.debugType
     }

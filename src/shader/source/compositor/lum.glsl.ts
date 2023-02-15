@@ -6,14 +6,14 @@ const weightShader = 'const vec3 w = vec3(0.2125, 0.7154, 0.0721);';
 export const lumCompositeFragment = new FragmentShader({
   name: 'lumFrag',
   uniforms: {
-    texture: uniform('sampler2D')
+    colorTex: uniform('sampler2D')
   },
   main: glsl`
 ${weightShader}
 void main() {
-  vec4 tex = texture2D(texture, v_Texcoord);
+  vec4 tex = texture(colorTex, v_Texcoord);
   float luminance = dot(tex.rgb, w);
-  gl_FragColor = vec4(vec3(luminance), 1.0);
+  out_color = vec4(vec3(luminance), 1.0);
 }
   `
 });
@@ -21,7 +21,7 @@ void main() {
 export const logLumCompositeFragment = new FragmentShader({
   name: 'logLumFrag',
   uniforms: {
-    texture: uniform('sampler2D')
+    colorTex: uniform('sampler2D')
   },
   includes: [HDREncoderMixin],
   main: glsl`
@@ -29,10 +29,10 @@ export const logLumCompositeFragment = new FragmentShader({
 ${weightShader}
 
 void main() {
-  vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));
+  vec4 tex = decodeHDR(texture(colorTex, v_Texcoord));
   float luminance = dot(tex.rgb, w);
   luminance = log(luminance + 0.001);
-  gl_FragColor = encodeHDR(vec4(vec3(luminance), 1.0));
+  out_color = encodeHDR(vec4(vec3(luminance), 1.0));
 }`
 });
 
@@ -46,10 +46,10 @@ export const lumAdaptionCompositeFragment = new FragmentShader({
   includes: [HDREncoderMixin],
   main: glsl`
 void main() {
-  float fAdaptedLum = decodeHDR(texture2D(adaptedLum, vec2(0.5, 0.5))).r;
-  float fCurrentLum = exp(encodeHDR(texture2D(currentLum, vec2(0.5, 0.5))).r);
+  float fAdaptedLum = decodeHDR(texture(adaptedLum, vec2(0.5, 0.5))).r;
+  float fCurrentLum = exp(encodeHDR(texture(currentLum, vec2(0.5, 0.5))).r);
 
   fAdaptedLum += (fCurrentLum - fAdaptedLum) * (1.0 - pow(0.98, 30.0 * frameTime));
-  gl_FragColor = encodeHDR(vec4(vec3(fAdaptedLum), 1.0));
+  out_color = encodeHDR(vec4(vec3(fAdaptedLum), 1.0));
 }`
 });

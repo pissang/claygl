@@ -53,7 +53,10 @@ class SSRCompositeNode extends GroupCompositeNode<
       zThicknessThreshold: 0.1
     };
 
-    opts = Object.assign({}, defaultOpts, opts);
+    opts = {
+      ...defaultOpts,
+      ...opts
+    };
 
     ssrNode.pass!.clearColor = [0, 0, 0, 0];
     ssrNode.inputs = {

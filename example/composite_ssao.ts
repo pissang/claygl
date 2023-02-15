@@ -104,11 +104,11 @@ ssaoNode.inputs = {
 };
 blendNode.inputs = {
   // Render scene node firstly
-  texture1: sceneNode,
-  texture2: ssaoNode
+  colorTex1: sceneNode,
+  colorTex2: ssaoNode
 };
 tonemappingNode.inputs = {
-  texture: blendNode
+  colorTex: blendNode
 };
 tonemappingNode.renderToScreen = true;
 

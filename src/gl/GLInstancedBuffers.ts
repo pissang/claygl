@@ -19,7 +19,7 @@ class GLInstancedBuffers {
     this._mesh = instancedMesh;
   }
 
-  update(gl: WebGLRenderingContext) {
+  update(gl: WebGL2RenderingContext) {
     const mesh = this._mesh;
     if (!mesh.__dirty) {
       return;
@@ -51,7 +51,7 @@ class GLInstancedBuffers {
     mesh.__dirty = false;
   }
 
-  bindToProgram(gl: WebGLRenderingContext, program: GLProgram, ext: any) {
+  bindToProgram(gl: WebGL2RenderingContext, program: GLProgram) {
     this.update(gl);
     const instancedBuffers = this._buffers!;
     const locations: number[] = [];
@@ -67,13 +67,13 @@ class GLInstancedBuffers {
       locations.push(location);
       gl.bindBuffer(constants.ARRAY_BUFFER, bufferObj.buffer);
       gl.vertexAttribPointer(location, bufferObj.size, glType, false, 0, 0);
-      ext.vertexAttribDivisorANGLE(location, bufferObj.divisor);
+      gl.vertexAttribDivisor(location, bufferObj.divisor);
     });
 
     return locations;
   }
 
-  dispose(gl: WebGLRenderingContext) {
+  dispose(gl: WebGL2RenderingContext) {
     this._buffers &&
       this._buffers.forEach((buffer) => {
         gl.deleteBuffer(buffer.buffer);

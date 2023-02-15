@@ -8,7 +8,7 @@ import Material from './Material';
 import Vector2 from './math/Vector2';
 
 // Light header
-import Shader, { BASIC_MATRIX_SEMANTICS, MatrixSemantic } from './Shader';
+import Shader, { BASIC_MATRIX_SEMANTICS, MatrixSemantic, ShaderDefineValue } from './Shader';
 
 import * as mat4 from './glmatrix/mat4';
 import * as vec3 from './glmatrix/vec3';
@@ -32,7 +32,7 @@ import GeometryBase from './GeometryBase';
 
 const mat4Create = mat4.create;
 
-interface ExtendedWebGLRenderingContext extends WebGLRenderingContext {
+interface ExtendedWebGL2RenderingContext extends WebGL2RenderingContext {
   targetRenderer: Renderer;
 }
 
@@ -41,11 +41,11 @@ export type RenderHooks = GLRenderHooks<RenderableObject> & {
   /**
    * Do preparation like color clear before render and after framebuffer bound.
    */
-  prepare?(gl: WebGLRenderingContext): void;
+  prepare?(gl: WebGL2RenderingContext): void;
   /**
    * Do cleanup like restore gl state after pass rendered, before framebuffer unbound.
    */
-  cleanup?(gl: WebGLRenderingContext): void;
+  cleanup?(gl: WebGL2RenderingContext): void;
 };
 
 export interface RendererViewport {
@@ -159,7 +159,7 @@ class Renderer extends Notifier {
   /**
    * WebGL Context created from given canvas
    */
-  readonly gl: ExtendedWebGLRenderingContext;
+  readonly gl: ExtendedWebGL2RenderingContext;
   /**
    * Renderer viewport, read-only, can be set by setViewport method
    * @type {Object}
@@ -191,10 +191,13 @@ class Renderer extends Notifier {
         preserveDrawingBuffer: optional(opts.preserveDrawingBuffer, false)
       };
 
-      const gl = (this.gl = canvas.getContext('webgl', webglOpts) as ExtendedWebGLRenderingContext);
+      const gl = (this.gl = canvas.getContext(
+        'webgl2',
+        webglOpts
+      ) as ExtendedWebGL2RenderingContext);
 
       if (!this.gl) {
-        throw new Error();
+        throw new Error('WebGL 2.0 is not supported.');
       }
 
       if (gl.targetRenderer) {
@@ -589,21 +592,18 @@ class Renderer extends Notifier {
         }
         return key;
       },
-      getShaderDefineCode: (renderable) => {
+      getExtraDefines: (renderable) => {
         const lightsNumbers = scene ? scene.getLightsNumbers(renderable.lightGroup || 0) : {};
-        const commonDefineCode: string[] = [];
+        const extraDefines: Record<string, ShaderDefineValue> = {};
         if (lightsNumbers) {
           for (const lightType in lightsNumbers) {
             const count = lightsNumbers[lightType];
             if (count > 0) {
-              commonDefineCode.push('#define ' + lightType.toUpperCase() + '_COUNT ' + count);
+              extraDefines[lightType.toUpperCase() + '_COUNT'] = count;
             }
           }
         }
-        if (this.logDepthBuffer) {
-          commonDefineCode.push('#define LOG_DEPTH');
-        }
-        return commonDefineCode.join('\n');
+        return extraDefines;
       },
       programChanged: (program) => {
         // Set some common uniforms
@@ -825,7 +825,7 @@ class Renderer extends Notifier {
   dispose() {
     // TODO
     // @ts-ignore
-    delete (this.gl as ExtendedWebGLRenderingContext).targetRenderer;
+    delete (this.gl as ExtendedWebGL2RenderingContext).targetRenderer;
   }
 
   /**

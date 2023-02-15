@@ -31,6 +31,6 @@ export const colorFragment = new FragmentShader({
   },
   main: glsl`
 void main() {
-  gl_FragColor = color;
+  out_color = color;
 }`
 });

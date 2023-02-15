@@ -4,7 +4,7 @@ const { uniform, attribute } = Shader;
 
 const canvas = document.getElementById('main') as HTMLCanvasElement;
 setCanvasSize(canvas, 400, 400);
-const gl = canvas.getContext('webgl')!;
+const gl = canvas.getContext('webgl2')!;
 gl.viewport(0, 0, 400, 400);
 const renderer = new GLRenderer(gl);
 
@@ -31,7 +31,7 @@ const fs = new Shader.Fragment({
   },
   main: glsl`
 void main() {
-  gl_FragColor = vec4(color, 1.0);
+  out_color = vec4(color, 1.0);
 }
 `
 });

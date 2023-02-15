@@ -45,15 +45,15 @@ void main()
   float ndv = clamp(dot(N, V), 0.0, 1.0);
   float attenuation = lightAttenuation(dist, lightRange);
   // Diffuse term
-  gl_FragColor.rgb = lightColor * ndl * attenuation;
+  out_color.rgb = lightColor * ndl * attenuation;
 
   // Specular fix
   glossiness = clamp(glossiness - lightRadius / 2.0 / dist, 0.0, 1.0);
 
-  gl_FragColor.rgb = attenuation * lightEquation(
+  out_color.rgb = attenuation * lightEquation(
     lightColor, diffuseColor, specularColor, ndl, ndh, ndv, glossiness
   );
 
-  gl_FragColor.a = 1.0;
+  out_color.a = 1.0;
 }`
 });

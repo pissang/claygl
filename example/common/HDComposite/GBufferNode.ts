@@ -39,24 +39,26 @@ class GBufferCompositeNode extends CompositeNode<never, GBufferOutput> {
     };
     this.outputs = {
       texture1: {
-        type: constants.HALF_FLOAT_OES,
+        type: constants.HALF_FLOAT,
         disabled: !this.enableTexture1,
         ...commonTextureOpts
       },
       texture2: {
-        type: constants.UNSIGNED_INT_24_8_WEBGL,
+        // TODO DEPTH_STENCIL have invalid internalFormat error.
+        internalFormat: constants.DEPTH24_STENCIL8,
         format: constants.DEPTH_STENCIL,
+        type: constants.UNSIGNED_INT_24_8,
         attachment: constants.DEPTH_ATTACHMENT,
         disabled: !this.enableTexture2,
         ...commonTextureOpts
       },
       texture3: {
-        type: constants.HALF_FLOAT_OES,
+        type: constants.HALF_FLOAT,
         disabled: !this.enableTexture3,
         ...commonTextureOpts
       },
       texture4: {
-        type: constants.HALF_FLOAT_OES,
+        type: constants.HALF_FLOAT,
         disabled: !this.enableTexture4,
         ...commonTextureOpts
       }

@@ -31,8 +31,8 @@ vec2 uv = gl_FragCoord.xy / windowSize;
 // uv in viewport, for position reconstruct
 vec2 uv2 = (gl_FragCoord.xy - viewport.xy) / viewport.zw;
 
-vec4 texel1 = texture2D(gBufferTexture1, uv);
-vec4 texel3 = texture2D(gBufferTexture3, uv);
+vec4 texel1 = texture(gBufferTexture1, uv);
+vec4 texel3 = texture(gBufferTexture3, uv);
 // Is empty
 if (dot(texel1.rgb, vec3(1.0)) == 0.0) {
     discard;
@@ -48,7 +48,7 @@ float metalness = texel3.a;
 vec3 N = texel1.rgb * 2.0 - 1.0;
 
 // Depth buffer range is 0.0 - 1.0
-float z = texture2D(gBufferTexture2, uv).r * 2.0 - 1.0;
+float z = texture(gBufferTexture2, uv).r * 2.0 - 1.0;
 
 vec2 xy = uv2 * 2.0 - 1.0;
 

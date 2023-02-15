@@ -4,8 +4,7 @@ import { clampSampleFunction, HDREncoderMixin } from '../util.glsl';
 export const downsampleCompositeFragment = new FragmentShader({
   name: 'downSampleFrag',
   uniforms: {
-    texture: uniform('sampler2D'),
-    textureSize: uniform('vec2', [512, 512])
+    colorTex: uniform('sampler2D')
   },
   includes: [HDREncoderMixin],
   main: glsl`
@@ -14,15 +13,15 @@ float brightness(vec3 c) {
   return max(max(c.r, c.g), c.b);
 }
 void main() {
-  vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / textureSize.xyxy;
+  vec4 d = vec4(-1.0, -1.0, 1.0, 1.0) / vec2(textureSize(colorTex, 0)).xyxy;
 
 #ifdef ANTI_FLICKER
   // https://github.com/keijiro/KinoBloom/blob/master/Assets/Kino/Bloom/Shader/Bloom.cginc#L96
   // TODO
-  vec3 s1 = decodeHDR(clampSample(texture, v_Texcoord + d.xy)).rgb;
-  vec3 s2 = decodeHDR(clampSample(texture, v_Texcoord + d.zy)).rgb;
-  vec3 s3 = decodeHDR(clampSample(texture, v_Texcoord + d.xw)).rgb;
-  vec3 s4 = decodeHDR(clampSample(texture, v_Texcoord + d.zw)).rgb;
+  vec3 s1 = decodeHDR(clampSample(colorTex, v_Texcoord + d.xy)).rgb;
+  vec3 s2 = decodeHDR(clampSample(colorTex, v_Texcoord + d.zy)).rgb;
+  vec3 s3 = decodeHDR(clampSample(colorTex, v_Texcoord + d.xw)).rgb;
+  vec3 s4 = decodeHDR(clampSample(colorTex, v_Texcoord + d.zw)).rgb;
 
   // Karis's luma weighted average (using brightness instead of luma)
   float s1w = 1.0 / (brightness(s1) + 1.0);
@@ -36,13 +35,13 @@ void main() {
     1.0
   );
 #else
-  vec4 color = decodeHDR(clampSample(texture, v_Texcoord + d.xy));
-  color += decodeHDR(clampSample(texture, v_Texcoord + d.zy));
-  color += decodeHDR(clampSample(texture, v_Texcoord + d.xw));
-  color += decodeHDR(clampSample(texture, v_Texcoord + d.zw));
+  vec4 color = decodeHDR(clampSample(colorTex, v_Texcoord + d.xy));
+  color += decodeHDR(clampSample(colorTex, v_Texcoord + d.zy));
+  color += decodeHDR(clampSample(colorTex, v_Texcoord + d.xw));
+  color += decodeHDR(clampSample(colorTex, v_Texcoord + d.zw));
   color *= 0.25;
 #endif
 
-  gl_FragColor = encodeHDR(color);
+  out_color = encodeHDR(color);
 }`
 });

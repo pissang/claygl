@@ -16,7 +16,7 @@ function addLineNumbers(string: string) {
 
 // Return true or error msg if error happened
 function checkShaderErrorMsg(
-  _gl: WebGLRenderingContext,
+  _gl: WebGL2RenderingContext,
   shader: WebGLShader,
   shaderString: string
 ) {
@@ -50,7 +50,7 @@ class GLProgram {
 
   constructor() {}
 
-  bind(gl: WebGLRenderingContext) {
+  bind(gl: WebGL2RenderingContext) {
     // Reset texture slot
     this._textureSlot = 0;
     if (this._program) {
@@ -68,7 +68,7 @@ class GLProgram {
     return location !== null && location !== undefined;
   }
 
-  useTextureSlot(gl: WebGLRenderingContext, texture: GLTexture | undefined, slot: number) {
+  useTextureSlot(gl: WebGL2RenderingContext, texture: GLTexture | undefined, slot: number) {
     if (texture) {
       gl.activeTexture(constants.TEXTURE0 + slot);
       texture.bind(gl);
@@ -83,14 +83,14 @@ class GLProgram {
     this._textureSlot = slot || 0;
   }
 
-  takeTextureSlot(gl: WebGLRenderingContext, texture?: GLTexture) {
+  takeTextureSlot(gl: WebGL2RenderingContext, texture?: GLTexture) {
     const textureSlot = this._textureSlot;
     this.useTextureSlot(gl, texture, textureSlot);
     this._textureSlot++;
     return textureSlot;
   }
 
-  set(_gl: WebGLRenderingContext, type: string, symbol: string, value: any, force?: boolean) {
+  set(_gl: WebGL2RenderingContext, type: string, symbol: string, value: any, force?: boolean) {
     const locationMap = this._uniformLocations;
     const location = locationMap[symbol];
     const valueCache = this._valueCache;
@@ -195,7 +195,7 @@ class GLProgram {
     return true;
   }
 
-  setSemanticUniform(_gl: WebGLRenderingContext, semantic: string, val: any) {
+  setSemanticUniform(_gl: WebGL2RenderingContext, semantic: string, val: any) {
     const semanticInfo = this.semanticsMap[semantic as UniformSemantic];
     if (semanticInfo) {
       // Force set for semantic uniforms.
@@ -205,7 +205,7 @@ class GLProgram {
   }
 
   getAttributeLocation(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     attribBuffer: {
       name: string;
       semantic?: AttributeSemantic;
@@ -229,7 +229,7 @@ class GLProgram {
   }
 
   buildProgram(
-    gl: WebGLRenderingContext,
+    gl: WebGL2RenderingContext,
     shader: Shader,
     vertexShaderCode: string,
     fragmentShaderCode: string

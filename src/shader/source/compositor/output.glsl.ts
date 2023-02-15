@@ -7,12 +7,12 @@ export const outputFragment = new FragmentShader({
     OUTPUT_ALPHA: null
   },
   uniforms: {
-    texture: createUniform('sampler2D')
+    colorTex: createUniform('sampler2D')
   },
   includes: [HDREncoderMixin],
   main: glsl`
 void main() {
-  vec4 tex = decodeHDR(texture2D(texture, v_Texcoord));
+  vec4 tex = decodeHDR(texture(colorTex, v_Texcoord));
 
 #if !defined(OUTPUT_ALPHA)
   tex.a = 1.0;
@@ -22,7 +22,7 @@ void main() {
 #ifdef PREMULTIPLY_ALPHA
   tex.rgb *= tex.a;
 #endif
-  gl_FragColor = tex;
+  out_color = tex;
 }
   `
 });

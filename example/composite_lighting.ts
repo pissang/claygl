@@ -136,7 +136,7 @@ taaNode.inputs = {
   }
 };
 tonemappingNode.inputs = {
-  texture: taaNode
+  colorTex: taaNode
 };
 tonemappingNode.renderToScreen = true;
 

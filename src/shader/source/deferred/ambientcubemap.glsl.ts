@@ -32,13 +32,13 @@ void main()
   // FIXME fixed maxMipmapLevel ?
   float bias = rough * 5.0;
   // One brdf lookup is enough
-  vec2 brdfParam = texture2D(brdfLookup, vec2(rough, ndv)).xy;
+  vec2 brdfParam = texture(brdfLookup, vec2(rough, ndv)).xy;
   vec3 envWeight = specularColor * brdfParam.x + brdfParam.y;
 
-  vec3 envTexel = decodeRGBM(textureCubeLodEXT(lightCubemap, L, bias), 8.12);
+  vec3 envTexel = decodeRGBM(texture(lightCubemap, L, bias), 8.12);
   // TODO mix ?
-  gl_FragColor.rgb = lightColor * envTexel * envWeight;
+  out_color.rgb = lightColor * envTexel * envWeight;
 
-  gl_FragColor.a = 1.0;
+  out_color.a = 1.0;
 }`
 });

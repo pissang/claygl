@@ -11,6 +11,6 @@ fetch('assets/textures/hdr/pisa.hdr')
       canvas: document.getElementById('Main') as HTMLCanvasElement
     });
     const pass = new FullscreenQuadPass(outputTextureFragment);
-    pass.material.set('texture', texture);
+    pass.material.set('colorTex', texture!);
     pass.render(renderer);
   });

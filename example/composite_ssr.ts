@@ -108,8 +108,8 @@ ssrNode.inputs = {
   colorTexture: sceneNode
 };
 blendNode.inputs = {
-  texture1: sceneNode,
-  texture2: ssrNode
+  colorTex1: sceneNode,
+  colorTex2: ssrNode
 };
 
 blendNode.renderToScreen = true;

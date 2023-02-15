@@ -116,24 +116,24 @@ export const lambertFragment = new FragmentShader({
 ${ACESToneMappingFunction()}
 
 void main() {
-  gl_FragColor = vec4(color, alpha);
+  out_color = vec4(color, alpha);
 
 #ifdef VERTEX_COLOR
-  gl_FragColor *= v_Color;
+  out_color *= v_Color;
 #endif
 
 #ifdef SRGB_DECODE
-  gl_FragColor = sRGBToLinear(gl_FragColor);
+  out_color = sRGBToLinear(out_color);
 #endif
 
 #ifdef DIFFUSEMAP_ENABLED
-  vec4 tex = texture2D( diffuseMap, v_Texcoord );
+  vec4 tex = texture( diffuseMap, v_Texcoord );
 #ifdef SRGB_DECODE
   tex.rgb = pow(tex.rgb, vec3(2.2));
 #endif
-  gl_FragColor.rgb *= tex.rgb;
+  out_color.rgb *= tex.rgb;
 #ifdef DIFFUSEMAP_ALPHA_ALPHA
-  gl_FragColor.a *= tex.a;
+  out_color.a *= tex.a;
 #endif
 #endif
 
@@ -252,26 +252,26 @@ void main() {
   }}
 #endif
 
-  gl_FragColor.rgb *= diffuseColor;
-  gl_FragColor.rgb += emission;
+  out_color.rgb *= diffuseColor;
+  out_color.rgb += emission;
   if(lineWidth > 0.) {
-    gl_FragColor.rgb = mix(gl_FragColor.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);
+    out_color.rgb = mix(out_color.rgb, lineColor.rgb, (1.0 - edgeFactor(lineWidth)) * lineColor.a);
   }
 
 #ifdef ALPHA_TEST
-  if (gl_FragColor.a < alphaCutoff) {
+  if (out_color.a < alphaCutoff) {
     discard;
   }
 #endif
 
 #ifdef TONEMAPPING
-  gl_FragColor.rgb = ACESToneMapping(gl_FragColor.rgb);
+  out_color.rgb = ACESToneMapping(out_color.rgb);
 #endif
 #ifdef SRGB_ENCODE
-  gl_FragColor = linearTosRGB(gl_FragColor);
+  out_color = linearTosRGB(out_color);
 #endif
 
-  gl_FragColor = encodeHDR(gl_FragColor);
+  out_color = encodeHDR(out_color);
 
   ${logDepthFragmentMixin.main}
 }`

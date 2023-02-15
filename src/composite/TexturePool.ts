@@ -4,6 +4,7 @@ import Texture2D, { Texture2DOpts } from '../Texture2D';
 import * as constants from '../core/constants';
 import * as util from '../core/util';
 import Renderer from '../Renderer';
+import { getPossiblelInternalFormat } from '../Texture';
 
 export type TexturePoolParameters = Pick<
   Texture2DOpts,
@@ -11,6 +12,7 @@ export type TexturePoolParameters = Pick<
   | 'height'
   | 'type'
   | 'format'
+  | 'internalFormat'
   | 'wrapS'
   | 'wrapT'
   | 'minFilter'
@@ -75,9 +77,10 @@ const defaultParams: Partial<TexturePoolParameters> = {
   format: constants.RGBA,
   wrapS: constants.CLAMP_TO_EDGE,
   wrapT: constants.CLAMP_TO_EDGE,
-  minFilter: constants.LINEAR_MIPMAP_LINEAR,
+  minFilter: constants.LINEAR,
   magFilter: constants.LINEAR,
-  useMipmap: true,
+  // Not generate mipmap by default. It will cause huge performance drop.
+  useMipmap: false,
   anisotropic: 1
 } as const;
 
@@ -85,43 +88,15 @@ const defaultParamPropList = util.keys(defaultParams);
 
 function generateKey(parameters: Partial<TexturePoolParameters>) {
   util.defaults(parameters, defaultParams);
-  fallBack(parameters);
+  // CAUTION: DO NOT MODIFY THE PARAM
+  // parameters.internalFormat =
+  //   parameters.internalFormat || getPossiblelInternalFormat(parameters.format!, parameters.type!);
 
   let key = '';
   for (let i = 0; i < defaultParamPropList.length; i++) {
     key += (parameters as any)[defaultParamPropList[i]].toString();
   }
   return key;
-}
-
-function fallBack(target: any) {
-  const IPOT = isPowerOfTwo(target.width, target.height);
-
-  if (target.format === constants.DEPTH_COMPONENT) {
-    target.useMipmap = false;
-  }
-
-  if (!IPOT || !target.useMipmap) {
-    if (
-      target.minFilter == constants.NEAREST_MIPMAP_NEAREST ||
-      target.minFilter == constants.NEAREST_MIPMAP_LINEAR
-    ) {
-      target.minFilter = constants.NEAREST;
-    } else if (
-      target.minFilter == constants.LINEAR_MIPMAP_LINEAR ||
-      target.minFilter == constants.LINEAR_MIPMAP_NEAREST
-    ) {
-      target.minFilter = constants.LINEAR;
-    }
-  }
-  if (!IPOT) {
-    target.wrapS = constants.CLAMP_TO_EDGE;
-    target.wrapT = constants.CLAMP_TO_EDGE;
-  }
-}
-
-function isPowerOfTwo(width: number, height: number) {
-  return (width & (width - 1)) === 0 && (height & (height - 1)) === 0;
 }
 
 export default TexturePool;

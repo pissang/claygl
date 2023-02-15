@@ -76,17 +76,12 @@ export const lightAttenuationMixin = createShaderMixin({
  */
 export const edgeFactorFunction = createShaderFunction(
   glsl`
-#ifdef SUPPORT_STANDARD_DERIVATIVES
 float ${FUNCTION_NAME_PLACEHOLDER}(float width) {
   vec3 d = fwidth(v_Barycentric);
   vec3 a3 = smoothstep(vec3(0.0), d * width, v_Barycentric);
   return min(min(a3.x, a3.y), a3.z);
 }
-#else
-float ${FUNCTION_NAME_PLACEHOLDER}(float width) {
-  return 1.0;
-}
-#endif`,
+`,
   'edgeFactor'
 );
 
@@ -241,10 +236,10 @@ mat4 getSkinMatrix(sampler2D tex, float idx) {
   float y = floor(j / skinMatricesTextureSize) + 0.5;
   vec2 scale = vec2(skinMatricesTextureSize);
   return mat4(
-    texture2D(tex, vec2(x + 0.5, y) / scale),
-    texture2D(tex, vec2(x + 1.5, y) / scale),
-    texture2D(tex, vec2(x + 2.5, y) / scale),
-    texture2D(tex, vec2(x + 3.5, y) / scale)
+    texture(tex, vec2(x + 0.5, y) / scale),
+    texture(tex, vec2(x + 1.5, y) / scale),
+    texture(tex, vec2(x + 2.5, y) / scale),
+    texture(tex, vec2(x + 3.5, y) / scale)
   );
 }
 mat4 getSkinMatrix(float idx) {
@@ -320,7 +315,7 @@ vec3 ${FUNCTION_NAME_PLACEHOLDER}(in vec3 dir, in vec3 pos, in vec3 boxMin, in v
 export const clampSampleFunction = createShaderFunction(
   glsl`
 // Sample with stereo clamp
-vec4 ${FUNCTION_NAME_PLACEHOLDER}(const in sampler2D texture, const in vec2 coord)
+vec4 ${FUNCTION_NAME_PLACEHOLDER}(const in sampler2D tex, const in vec2 coord)
 {
 #ifdef STEREO
   // Left is 0.0 - 0.5, Right is 0.5 - 1.0, avoid leaking
@@ -330,7 +325,7 @@ vec4 ${FUNCTION_NAME_PLACEHOLDER}(const in sampler2D texture, const in vec2 coor
 #else
   vec2 coordClamped = clamp(coord, vec2(0.0), vec2(1.0));
 #endif
-  return texture2D(texture, coordClamped);
+  return texture(tex, coordClamped);
 }`,
   'clampSample'
 );
@@ -363,12 +358,7 @@ export const logDepthVertexMixin = createShaderMixin({
   },
   main: glsl`
 #ifdef LOG_DEPTH
-#ifdef SUPPORT_FRAG_DEPTH
     v_FragDepth = 1.0 + gl_Position.w;
-#else
-    gl_Position.z = log2(max(1e-6, gl_Position.w + 1.0)) * logDepthBufFC - 1.0;
-    gl_Position.z *= gl_Position.w;
-#endif
 #endif`
 });
 
@@ -380,8 +370,8 @@ export const logDepthFragmentMixin = createShaderMixin({
     logDepthBufFC: uniform('float', 0, 'LOG_DEPTH_BUFFER_FC')
   },
   main: glsl`
-#if defined(LOG_DEPTH) && defined(SUPPORT_FRAG_DEPTH)
-  gl_FragDepthEXT = log2(v_FragDepth) * logDepthBufFC * 0.5;
+#if defined(LOG_DEPTH)
+  gl_FragDepth = log2(v_FragDepth) * logDepthBufFC * 0.5;
 #endif
 `
 });

@@ -15,7 +15,7 @@ const vec3 N = vec3(0.0, 0.0, 1.0);
 const float fSampleNumber = float(SAMPLE_NUMBER);
 
 vec3 importanceSampleNormal(float i, float roughness, vec3 N) {
-  vec3 H = texture2D(normalDistribution, vec2(roughness, i)).rgb;
+  vec3 H = texture(normalDistribution, vec2(roughness, i)).rgb;
 
   vec3 upVector = abs(N.y) > 0.999 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
   vec3 tangentX = normalize(cross(N, upVector));
@@ -61,6 +61,6 @@ void main() {
       }
   }
 
-  gl_FragColor = vec4(vec2(A, B) / fSampleNumber, 0.0, 1.0);
+  out_color = vec4(vec2(A, B) / fSampleNumber, 0.0, 1.0);
 }`
 });

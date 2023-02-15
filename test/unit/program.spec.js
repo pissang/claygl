@@ -29,7 +29,7 @@ const vertexCode = `
     }
     `;
 
-const fragmentCode =  `
+const fragmentCode = `
     precision mediump float;
 
     // our texture
@@ -39,117 +39,115 @@ const fragmentCode =  `
     varying vec2 v_texCoord;
 
     void main() {
-    gl_FragColor = texture2D(u_image, v_texCoord);
+    out_color = texture2D(u_image, v_texCoord);
     }
     `;
 
 function createMesh() {
-    const shader = new clay.Shader(vertexCode, fragmentCode);
-    const material = new clay.Material({
-        shader: shader
-    });
-    const mesh = new clay.Mesh({
-        material: material,
-        geometry: new clay.geometry.Cube()
-    });
-    return mesh;
+  const shader = new clay.Shader(vertexCode, fragmentCode);
+  const material = new clay.Material({
+    shader: shader
+  });
+  const mesh = new clay.Mesh({
+    material: material,
+    geometry: new clay.geometry.Cube()
+  });
+  return mesh;
 }
 
 describe('Program.Spec', function () {
-    it('constructor', function () {
-        const shader = new clay.Shader(vertexCode, fragmentCode);
+  it('constructor', function () {
+    const shader = new clay.Shader(vertexCode, fragmentCode);
 
-        assert(shader.attributeSemantics['POSITION']);
-        assert(shader.attributeSemantics['TEXCOORD']);
-    });
+    assert(shader.attributeSemantics['POSITION']);
+    assert(shader.attributeSemantics['TEXCOORD']);
+  });
 
+  it('define and undefine a macro', function () {
+    const mesh = createMesh();
+    const macroContent = 'macro content';
+    mesh.material.define('fragment', 'SHADOWMAP_ENABLED', macroContent);
+    assert(mesh.material.getDefine('fragment', 'SHADOWMAP_ENABLED') === macroContent);
 
-    it('define and undefine a macro', function () {
-        const mesh = createMesh();
-        const macroContent = 'macro content';
-        mesh.material.define('fragment', 'SHADOWMAP_ENABLED', macroContent);
-        assert(mesh.material.getDefine('fragment', 'SHADOWMAP_ENABLED') === macroContent);
+    assert(mesh.material.isDefined('fragment', 'SHADOWMAP_ENABLED'));
 
-        assert(mesh.material.isDefined('fragment', 'SHADOWMAP_ENABLED'));
+    mesh.material.undefine('fragment', 'SHADOWMAP_ENABLED');
+    assert(mesh.material.getDefine('fragment', 'SHADOWMAP_ENABLED') === undefined);
+  });
 
-        mesh.material.undefine('fragment', 'SHADOWMAP_ENABLED');
-        assert(mesh.material.getDefine('fragment', 'SHADOWMAP_ENABLED') === undefined);
-    });
+  it('enableTexture/disableTexture, enableTexturesAll/disableTexturesAll', function () {
+    const { renderer, scene, camera } = helper.createClayScene();
 
+    const mesh = createMesh();
+    const material = mesh.material;
 
-    it('enableTexture/disableTexture, enableTexturesAll/disableTexturesAll', function () {
-        const { renderer, scene, camera } = helper.createClayScene();
+    material.enableTexture('u_image');
+    assert(material.isTextureEnabled('u_image'));
+    assert(material.getEnabledTextures().length === 1);
 
-        const mesh = createMesh();
-        const material = mesh.material;
+    var program = renderer.getProgram(mesh);
+    const vstart = program.vertexCode.substring(0, 23);
+    const fstart = program.fragmentCode.substring(0, 23);
+    assert(vstart === '#define U_IMAGE_ENABLED', vstart);
+    assert(fstart === '#extension GL_OES_stand', fstart);
 
-        material.enableTexture('u_image');
-        assert(material.isTextureEnabled('u_image'));
-        assert(material.getEnabledTextures().length === 1);
+    material.disableTexture('u_image');
 
-        var program = renderer.getProgram(mesh);
-        const vstart = program.vertexCode.substring(0, 23);
-        const fstart = program.fragmentCode.substring(0, 23);
-        assert(vstart === '#define U_IMAGE_ENABLED', vstart);
-        assert(fstart === '#extension GL_OES_stand', fstart);
+    program = renderer.getProgram(mesh);
+    const nvstart = program.vertexCode.substring(0, 23);
+    assert(nvstart !== vstart);
 
-        material.disableTexture('u_image');
+    //----enableTexturesAll-----
+    material.enableTexturesAll();
+    program = renderer.getProgram(mesh);
+    const nnvstart = program.vertexCode.substring(0, 23);
+    assert(nnvstart === vstart);
 
-        program = renderer.getProgram(mesh);
-        const nvstart = program.vertexCode.substring(0, 23);
-        assert(nvstart !== vstart);
+    //----disableTexturesAll-----
+    material.disableTexturesAll();
+    program = renderer.getProgram(mesh);
+    const nnnvstart = program.vertexCode.substring(0, 23);
+    assert(nnnvstart !== vstart);
+  });
 
-        //----enableTexturesAll-----
-        material.enableTexturesAll();
-        program = renderer.getProgram(mesh);
-        const nnvstart = program.vertexCode.substring(0, 23);
-        assert(nnvstart === vstart);
+  it('#hasUniform', function () {
+    const { renderer, scene, camera } = helper.createClayScene();
 
-        //----disableTexturesAll-----
-        material.disableTexturesAll();
-        program = renderer.getProgram(mesh);
-        const nnnvstart = program.vertexCode.substring(0, 23);
-        assert(nnnvstart !== vstart);
-    });
+    const mesh = createMesh();
+    var program = renderer.getProgram(mesh);
 
-    it('#hasUniform', function () {
-        const { renderer, scene, camera } = helper.createClayScene();
+    assert(program.hasUniform('u_image'));
+  });
 
-        const mesh = createMesh();
-        var program = renderer.getProgram(mesh);
+  it('textureslot methods', function () {
+    const { renderer, scene, camera } = helper.createClayScene();
 
-        assert(program.hasUniform('u_image'));
-    });
+    const mesh = createMesh();
+    var program = renderer.getProgram(mesh);
 
-    it('textureslot methods', function () {
-        const { renderer, scene, camera } = helper.createClayScene();
+    program.bind(renderer);
 
-        const mesh = createMesh();
-        var program = renderer.getProgram(mesh);
+    assert(program.currentTextureSlot() === 0);
+    program.resetTextureSlot(1);
+    assert(program.currentTextureSlot() === 1);
+    program.resetTextureSlot(0);
 
-        program.bind(renderer);
+    const texture = new clay.Texture();
+    program.takeCurrentTextureSlot(renderer, texture);
 
-        assert(program.currentTextureSlot() === 0);
-        program.resetTextureSlot(1);
-        assert(program.currentTextureSlot() === 1);
-        program.resetTextureSlot(0);
+    assert(program.currentTextureSlot() === 1);
+  });
 
-        const texture = new clay.Texture();
-        program.takeCurrentTextureSlot(renderer, texture);
+  it('#setUnform', function () {
+    //TODO or escape it as other cases will cover this method
+  });
 
-        assert(program.currentTextureSlot() === 1);
-    });
+  it('#enableAttributes shoud return actual attrib locations', function () {
+    const { renderer, scene, camera } = helper.createClayScene();
+    const mesh = createMesh();
+    var program = renderer.getProgram(mesh);
 
-    it('#setUnform', function () {
-        //TODO or escape it as other cases will cover this method
-    });
-
-    it('#enableAttributes shoud return actual attrib locations', function () {
-        const { renderer, scene, camera } = helper.createClayScene();
-        const mesh = createMesh();
-        var program = renderer.getProgram(mesh);
-
-        const locationList = program.enableAttributes(renderer, ['position', 'texCoord']);
-        assert.deepEqual(locationList, [0, 1], JSON.stringify(locationList));
-    });
+    const locationList = program.enableAttributes(renderer, ['position', 'texCoord']);
+    assert.deepEqual(locationList, [0, 1], JSON.stringify(locationList));
+  });
 });
