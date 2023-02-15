@@ -1,8 +1,0 @@
-machine:
-  node:
-    version: 8.8.0
-test:
-  override:
-    - npm run test:cov
-  post:
-    - bash <(curl -s https://codecov.io/bash)
