@@ -485,9 +485,6 @@ function composeShaderString(stageShader: StageShader, isVertex: boolean) {
   }
 
   return `
-${composePart('uniform', stageShader.uniforms as any)}
-${composePart('in', stageShader.attributes as any)}
-${composePart(isVertex ? 'out' : 'in', stageShader.varyings as any)}
 ${
   isVertex
     ? ''
@@ -496,6 +493,9 @@ ${
         .map((output, index) => `layout(location = ${index}) out highp vec4 out_${output};`)
         .join('\n')
 }
+${composePart('uniform', stageShader.uniforms as any)}
+${composePart('in', stageShader.attributes as any)}
+${composePart(isVertex ? 'out' : 'in', stageShader.varyings as any)}
 ${stageShader.functions.map((func) => func()).join('\n')}
 
 ${stageShader.main}

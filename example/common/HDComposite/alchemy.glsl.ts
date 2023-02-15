@@ -149,7 +149,6 @@ export const alchemyAOBlurFragment = new FragmentShader({
   uniforms: {
     colorTex: uniform('sampler2D'),
     depthTex: uniform('sampler2D'),
-    colorTexSize: uniform('vec2'),
     blurSize: uniform('float', 1),
     /**
      * 0.0 is horizontal, 1.0 is vertical
@@ -163,7 +162,7 @@ void main() {
 
   vec4 centerDepthTexel = texture(depthTex, v_Texcoord);
 
-  vec2 off = blurSize / colorTexSize;
+  vec2 off = blurSize / vec2(textureSize(depthTex, 0));
   vec2 coord = v_Texcoord;
   off *= vec2(1.0 - blurDir, blurDir);
 
