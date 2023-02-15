@@ -115,10 +115,6 @@ class GLTexture {
       }
     }
 
-    if (gl.getError()) {
-      debugger;
-    }
-
     this.unbind(gl);
   }
 
