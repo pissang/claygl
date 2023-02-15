@@ -358,12 +358,7 @@ export const logDepthVertexMixin = createShaderMixin({
   },
   main: glsl`
 #ifdef LOG_DEPTH
-#ifdef SUPPORT_FRAG_DEPTH
     v_FragDepth = 1.0 + gl_Position.w;
-#else
-    gl_Position.z = log2(max(1e-6, gl_Position.w + 1.0)) * logDepthBufFC - 1.0;
-    gl_Position.z *= gl_Position.w;
-#endif
 #endif`
 });
 
@@ -375,7 +370,7 @@ export const logDepthFragmentMixin = createShaderMixin({
     logDepthBufFC: uniform('float', 0, 'LOG_DEPTH_BUFFER_FC')
   },
   main: glsl`
-#if defined(LOG_DEPTH) && defined(SUPPORT_FRAG_DEPTH)
+#if defined(LOG_DEPTH)
   gl_FragDepth = log2(v_FragDepth) * logDepthBufFC * 0.5;
 #endif
 `

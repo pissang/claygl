@@ -490,11 +490,7 @@ void main() {
   float rough = clamp(1.0 - g, 0.0, 1.0);
   float bias = rough * maxMipmapLevel;
   // PENDING Only env map can have HDR
-    #ifdef SUPPORT_TEXTURE_LOD
   vec3 envTexel = decodeHDR(texture(environmentMap, L, bias)).rgb;
-    #else
-  vec3 envTexel = decodeHDR(texture(environmentMap, L)).rgb;
-    #endif
 
     #ifdef BRDFLOOKUP_ENABLED
   vec2 brdfParam = texture(brdfLookup, vec2(rough, ndv)).xy;

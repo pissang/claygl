@@ -74,9 +74,7 @@ void main()
 
   out_color = encodeHDR(vec4(texel.rgb, 1.0));
 
-#ifdef SUPPORT_FRAG_DEPTH
   // PENDING 1.0 - 1e-6 will be smaller than the depth texture precision.
   gl_FragDepth = 1.0 - 1e-5;
-#endif
 }`
 });
