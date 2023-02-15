@@ -39,22 +39,22 @@ void main() {
 #else
   vec4 tex = vec4(0.0);
 #endif
-#ifdef COLOR1_ENABLED
+#ifdef COLORTEX1_ENABLED
   tex = blend(tex, decodeHDR(texture(colorTex1, v_Texcoord)), weight1);
 #endif
-#ifdef COLOR2_ENABLED
+#ifdef COLORTEX2_ENABLED
   tex = blend(tex, decodeHDR(texture(colorTex2, v_Texcoord)), weight2);
 #endif
-#ifdef COLOR3_ENABLED
+#ifdef COLORTEX3_ENABLED
   tex = blend(tex, decodeHDR(texture(colorTex3, v_Texcoord)), weight3);
 #endif
-#ifdef COLOR4_ENABLED
+#ifdef COLORTEX4_ENABLED
   tex = blend(tex, decodeHDR(texture(colorTex4, v_Texcoord)), weight4);
 #endif
-#ifdef COLOR5_ENABLED
+#ifdef COLORTEX5_ENABLED
   tex = blend(tex, decodeHDR(texture(colorTex5, v_Texcoord)), weight5);
 #endif
-#ifdef COLOR6_ENABLED
+#ifdef COLORTEX6_ENABLED
   tex = blend(tex, decodeHDR(texture(colorTex6, v_Texcoord)), weight6);
 #endif
   out_color = encodeHDR(tex);

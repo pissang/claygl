@@ -76,7 +76,7 @@ void main()
 
 #ifdef SUPPORT_FRAG_DEPTH
   // PENDING 1.0 - 1e-6 will be smaller than the depth texture precision.
-  gl_FragDepthEXT = 1.0 - 1e-5;
+  gl_FragDepth = 1.0 - 1e-5;
 #endif
 }`
 });

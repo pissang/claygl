@@ -100,18 +100,18 @@ void main () {
 
   vec4 color = vec4(0.0);
   vec2 hlim = vec2(float(-BLUR_SIZE) * 0.5 + 0.5);
-  vec4 centerColor = texture(texture, v_Texcoord);
+  vec4 centerColor = texture(colorTex, v_Texcoord);
   float weightAll = 0.0;
   float boxWeight = 1.0 / float(BLUR_SIZE) * float(BLUR_SIZE);
   for (int x = 0; x < BLUR_SIZE; x++) {
     for (int y = 0; y < BLUR_SIZE; y++) {
       vec2 coord = (vec2(float(x), float(y)) + hlim) * texelSize + v_Texcoord;
-      vec4 sample = texture(texture, coord);
+      vec4 texel = texture(colorTex, coord);
       // http://stackoverflow.com/questions/6538310/anyone-know-where-i-can-find-a-glsl-implementation-of-a-bilateral-filter-blur
       // PENDING
-      float closeness = 1.0 - distance(sample, centerColor) / sqrt(3.0);
+      float closeness = 1.0 - distance(texel, centerColor) / sqrt(3.0);
       float weight = boxWeight * closeness;
-      color += weight * sample;
+      color += weight * texel;
       weightAll += weight;
     }
   }

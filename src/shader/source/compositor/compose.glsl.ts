@@ -101,12 +101,12 @@ void main()
   // TODO alpha blend
   vec4 texel = vec4(0.0);
   vec4 originalTexel = vec4(0.0);
-#ifdef TEXTURE_ENABLED
+#ifdef COLORTEX_ENABLED
   texel = decodeHDR(texture(colorTex, v_Texcoord));
   originalTexel = texel;
 #endif
 
-#ifdef BLOOM_ENABLED
+#ifdef BLOOMTEX_ENABLED
   vec4 bloomTexel = decodeHDR(texture(bloomTex, v_Texcoord));
   texel.rgb += bloomTexel.rgb * bloomIntensity;
   // TODO If consider bloomInstensity.
@@ -114,7 +114,7 @@ void main()
   texel.a += bloomTexel.a * bloomIntensity;
 #endif
 
-#ifdef LENSFLARE_ENABLED
+#ifdef LENSFLARETEX_ENABLED
   texel += decodeHDR(texture(lensflareTex, v_Texcoord)) * texture(lensdirtTex, v_Texcoord) * lensflareIntensity;
 #endif
 
@@ -140,7 +140,7 @@ void main()
   texel = linearTosRGB(texel);
 
 // Color lut
-#ifdef LUT_ENABLED
+#ifdef LUTTEX_ENABLED
   texel.rgb = lutTransform(clamp(texel.rgb,vec3(0.0),vec3(1.0)));
 #endif
 

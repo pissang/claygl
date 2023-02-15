@@ -381,7 +381,7 @@ export const logDepthFragmentMixin = createShaderMixin({
   },
   main: glsl`
 #if defined(LOG_DEPTH) && defined(SUPPORT_FRAG_DEPTH)
-  gl_FragDepthEXT = log2(v_FragDepth) * logDepthBufFC * 0.5;
+  gl_FragDepth = log2(v_FragDepth) * logDepthBufFC * 0.5;
 #endif
 `
 });
