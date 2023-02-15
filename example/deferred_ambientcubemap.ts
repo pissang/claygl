@@ -32,7 +32,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   const suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
 
   const cubemap = new TextureCube({
-    type: constants.HALF_FLOAT_OES,
+    type: constants.HALF_FLOAT,
     width: 128,
     height: 128
   });

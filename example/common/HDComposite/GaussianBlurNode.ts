@@ -17,14 +17,11 @@ class GaussianBlurCompositeNode extends GroupCompositeNode<'colorTex', 'color'> 
   constructor(opts?: GaussianBlurCompositeNodeOpts) {
     super();
 
-    opts = Object.assign(
-      {},
-      {
-        downscale: 1,
-        blurSize: 1
-      } as GaussianBlurCompositeNodeOpts,
-      opts
-    );
+    opts = {
+      downscale: 1,
+      blurSize: 1,
+      ...opts
+    };
 
     const blurV = this._blurV;
     const blurH = this._blurH;

@@ -40,19 +40,19 @@ vec4 blend(sampler2D tex, float start, float end) {
 
 void main() {
   vec4 tex = vec4(0.0);
-#ifdef TEXTURE1_ENABLED
+#ifdef COLORTEX1_ENABLED
   tex += blend(colorTex1, 0.0, percent1);
 #endif
-#ifdef TEXTURE2_ENABLED
+#ifdef COLORTEX2_ENABLED
   tex += blend(texture2, percent1, percent2);
 #endif
-#ifdef TEXTURE3_ENABLED
+#ifdef COLORTEX3_ENABLED
   tex += blend(colorTex3, percent2, percent3);
 #endif
-#ifdef TEXTURE4_ENABLED
+#ifdef COLORTEX4_ENABLED
   tex += blend(colorTex4, percent3, percent4);
 #endif
-#ifdef TEXTURE5_ENABLED
+#ifdef COLORTEX5_ENABLED
   tex += blend(colorTex5, percent4, percent5);
 #endif
   out_color = encodeHDR(tex);

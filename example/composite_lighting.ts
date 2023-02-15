@@ -83,7 +83,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
 
 const lights: ClayNode[] = [];
 const sphereGeo = new SphereGeometry();
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 1; i++) {
   const rootNode = new ClayNode();
   const pointLight = new PointLight({
     color: [Math.random(), Math.random(), Math.random()],

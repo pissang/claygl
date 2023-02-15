@@ -534,15 +534,7 @@ class GLRenderer {
       glDrawMode = 0x0004;
     }
 
-    let instancedExt;
     const isInstanced = renderable.isInstancedMesh && renderable.isInstancedMesh();
-    if (isInstanced) {
-      instancedExt = glext.getExtension('ANGLE_instanced_arrays');
-      if (!instancedExt) {
-        console.warn('Device not support ANGLE_instanced_arrays extension');
-        return;
-      }
-    }
 
     let instancedAttrLocations: number[] | undefined;
     if (isInstanced) {
@@ -555,7 +547,7 @@ class GLRenderer {
         buffer = new GLInstancedBuffers(renderable as InstancedMesh);
         instancedBufferMap.set(renderable as InstancedMesh, buffer);
       }
-      instancedAttrLocations = buffer.bindToProgram(this.gl, program, instancedExt);
+      instancedAttrLocations = buffer.bindToProgram(this.gl, program);
     }
 
     const indicesBuffer = buffer.getIndicesBuffer();
@@ -566,7 +558,7 @@ class GLRenderer {
       const indicesType = useUintExt ? constants.UNSIGNED_INT : constants.UNSIGNED_SHORT;
 
       if (isInstanced) {
-        instancedExt.drawElementsInstancedANGLE(
+        _gl.drawElementsInstanced(
           glDrawMode,
           indicesBuffer.count,
           indicesType,
@@ -578,12 +570,7 @@ class GLRenderer {
       }
     } else {
       if (isInstanced) {
-        instancedExt.drawArraysInstancedANGLE(
-          glDrawMode,
-          0,
-          geometry.vertexCount,
-          renderable.getInstanceCount()
-        );
+        _gl.drawArraysInstanced(glDrawMode, 0, geometry.vertexCount, renderable.getInstanceCount());
       } else {
         // FIXME Use vertex number in buffer
         // vertexCount may get the wrong value when geometry forget to mark dirty after update
@@ -594,7 +581,7 @@ class GLRenderer {
     if (instancedAttrLocations) {
       for (let i = 0; i < instancedAttrLocations.length; i++) {
         _gl.disableVertexAttribArray(instancedAttrLocations[i]);
-        instancedExt.vertexAttribDivisorANGLE(instancedAttrLocations[i], 0);
+        _gl.vertexAttribDivisor(instancedAttrLocations[i], 0);
       }
     }
   }

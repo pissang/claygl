@@ -121,7 +121,10 @@ class AlchemyAOCompositeNode extends GroupCompositeNode<
       radius: 1.5,
       power: 1
     };
-    opts = Object.assign({}, defaultOpts, opts);
+    opts = {
+      ...defaultOpts,
+      ...opts
+    };
     this.setParams(opts);
   }
 

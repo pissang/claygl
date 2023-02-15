@@ -91,16 +91,13 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
 
     this.addNode(this._estimateNode, this._blurNode);
 
-    opts = Object.assign(
-      {},
-      {
-        kernelSize: 64,
-        blurSize: 3,
-        radius: 1.5,
-        power: 2
-      } as SSAOCompositeNodeOpts,
-      opts
-    );
+    opts = {
+      kernelSize: 64,
+      blurSize: 3,
+      radius: 1.5,
+      power: 2,
+      ...opts
+    };
     this._TAAJitter = opts!.TAAJitter;
 
     this.setKernelSize(opts!.kernelSize!);

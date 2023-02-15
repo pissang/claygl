@@ -163,11 +163,7 @@ class GLFrameBuffer {
 
   updateMipmap(gl: WebGL2RenderingContext) {
     const textures = this._textures;
-    keys(textures).forEach((attachment) =>
-      // FIXME some texture format can't generate mipmap
-      // TODO check LINEAR_MIPMAP_LINEAR?
-      textures[attachment]![0].generateMipmap(gl)
-    );
+    keys(textures).forEach((attachment) => textures[attachment]![0].generateMipmap(gl));
   }
 
   dispose(gl: WebGL2RenderingContext) {

@@ -17,7 +17,5 @@ void main() {
   vec4 texel = decodeHDR(texture(colorTex, v_Texcoord));
   vec2 uv = (v_Texcoord - vec2(0.5)) * vec2(offset);
   out_color = encodeHDR(vec4(mix(texel.rgb, vec3(1.0 - darkness), dot(uv, uv)), texel.a));
-}
-
-  `
+}`
 });

@@ -51,7 +51,7 @@ class GLInstancedBuffers {
     mesh.__dirty = false;
   }
 
-  bindToProgram(gl: WebGL2RenderingContext, program: GLProgram, ext: any) {
+  bindToProgram(gl: WebGL2RenderingContext, program: GLProgram) {
     this.update(gl);
     const instancedBuffers = this._buffers!;
     const locations: number[] = [];
@@ -67,7 +67,7 @@ class GLInstancedBuffers {
       locations.push(location);
       gl.bindBuffer(constants.ARRAY_BUFFER, bufferObj.buffer);
       gl.vertexAttribPointer(location, bufferObj.size, glType, false, 0, 0);
-      ext.vertexAttribDivisorANGLE(location, bufferObj.divisor);
+      gl.vertexAttribDivisor(location, bufferObj.divisor);
     });
 
     return locations;
