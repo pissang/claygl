@@ -79,7 +79,8 @@ const defaultParams: Partial<TexturePoolParameters> = {
   wrapT: constants.CLAMP_TO_EDGE,
   minFilter: constants.LINEAR,
   magFilter: constants.LINEAR,
-  useMipmap: true,
+  // Not generate mipmap by default. It will cause huge performance drop.
+  useMipmap: false,
   anisotropic: 1
 } as const;
 

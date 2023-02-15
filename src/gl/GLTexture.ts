@@ -5,6 +5,18 @@ import Texture2D, { Texture2DData } from '../Texture2D';
 import TextureCube, { cubeTargets, TextureCubeData } from '../TextureCube';
 import GLExtension from './GLExtension';
 
+function getAvailableMinFilter(texture: Texture2D | TextureCube) {
+  const minFilter = texture.minFilter;
+  if (!texture.useMipmap) {
+    return minFilter === constants.NEAREST_MIPMAP_NEAREST
+      ? constants.NEAREST
+      : minFilter === constants.LINEAR_MIPMAP_LINEAR
+      ? constants.LINEAR
+      : minFilter;
+  } else {
+    return minFilter;
+  }
+}
 class GLTexture {
   /**
    * Slot been taken
@@ -61,7 +73,7 @@ class GLTexture {
     gl.texParameteri(textureTarget, constants.TEXTURE_WRAP_T, texture.wrapT);
 
     gl.texParameteri(textureTarget, constants.TEXTURE_MAG_FILTER, texture.magFilter);
-    gl.texParameteri(textureTarget, constants.TEXTURE_MIN_FILTER, texture.minFilter);
+    gl.texParameteri(textureTarget, constants.TEXTURE_MIN_FILTER, getAvailableMinFilter(texture));
 
     const anisotropicExt = glExt.getExtension('EXT_texture_filter_anisotropic');
     const anisotropic = texture.anisotropic;
@@ -225,8 +237,13 @@ class GLTexture {
     const texture = this._texture;
     const bindTarget = this._getBindTarget();
     // TODO check LINEAR_MIPMAP_LINEAR?
-    if (texture.useMipmap && texture.format === constants.RGBA) {
+    if (
+      texture.useMipmap &&
+      texture.format === constants.RGBA &&
+      texture.minFilter === constants.LINEAR_MIPMAP_LINEAR
+    ) {
       gl.bindTexture(bindTarget, this.getWebGLTexture(gl));
+      // TODO Not all texture use mipmap.
       gl.generateMipmap(bindTarget);
       gl.bindTexture(bindTarget, null);
     }
