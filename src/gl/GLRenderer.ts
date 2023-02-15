@@ -553,9 +553,8 @@ class GLRenderer {
     const indicesBuffer = buffer.getIndicesBuffer();
 
     if (indicesBuffer) {
-      const uintExt = glext.getExtension('OES_element_index_uint');
-      const useUintExt = uintExt && geometry.indices instanceof Uint32Array;
-      const indicesType = useUintExt ? constants.UNSIGNED_INT : constants.UNSIGNED_SHORT;
+      const isUint = geometry.indices instanceof Uint32Array;
+      const indicesType = isUint ? constants.UNSIGNED_INT : constants.UNSIGNED_SHORT;
 
       if (isInstanced) {
         _gl.drawElementsInstanced(

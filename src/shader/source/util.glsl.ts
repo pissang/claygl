@@ -76,17 +76,12 @@ export const lightAttenuationMixin = createShaderMixin({
  */
 export const edgeFactorFunction = createShaderFunction(
   glsl`
-#ifdef SUPPORT_STANDARD_DERIVATIVES
 float ${FUNCTION_NAME_PLACEHOLDER}(float width) {
   vec3 d = fwidth(v_Barycentric);
   vec3 a3 = smoothstep(vec3(0.0), d * width, v_Barycentric);
   return min(min(a3.x, a3.y), a3.z);
 }
-#else
-float ${FUNCTION_NAME_PLACEHOLDER}(float width) {
-  return 1.0;
-}
-#endif`,
+`,
   'edgeFactor'
 );
 

@@ -77,13 +77,9 @@ void main(){
     }
   }
   // Add slope scaled bias using partial derivative
-  #ifdef SUPPORT_STANDARD_DERIVATIVES
   float dx = dFdx(depth);
   float dy = dFdy(depth);
   depth += sqrt(dx*dx + dy*dy) * slopeScale + bias;
-  #else
-  depth += bias;
-  #endif
 
   out_color = encodeFloat(depth * 0.5 + 0.5);
 }`
