@@ -81,11 +81,6 @@ class FilterCompositeNode<
       // Enabled the pin texture in shader
       material.enableTexture(inputName as any);
       material.set(inputName, texture);
-
-      const textureSizeName = inputName + 'Size';
-      // Try setting size automatically
-      material.uniforms[textureSizeName] &&
-        (material.uniforms[textureSizeName].value = [texture.width, texture.height]);
     });
 
     // Output

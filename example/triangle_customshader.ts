@@ -4,7 +4,7 @@ const { uniform, attribute } = Shader;
 
 const canvas = document.getElementById('main') as HTMLCanvasElement;
 setCanvasSize(canvas, 400, 400);
-const gl = canvas.getContext('webgl')!;
+const gl = canvas.getContext('webgl2')!;
 gl.viewport(0, 0, 400, 400);
 const renderer = new GLRenderer(gl);
 

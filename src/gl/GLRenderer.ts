@@ -80,7 +80,7 @@ export interface GLRenderableObject<T extends GLMaterialObject = GLMaterialObjec
   geometry: GeometryBase;
   material: T;
   mode?: GLEnum;
-  lightGroup: number;
+  lightGroup?: number;
   worldTransform?: Matrix4;
 
   cullFace?: GLEnum;

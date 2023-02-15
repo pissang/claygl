@@ -19,10 +19,10 @@ vec4 median(vec4 a, vec4 b, vec4 c) {
 }
 
 void main() {
-  vec4 texel = decodeHDR(texture(colroTex, v_Texcoord));
+  vec4 texel = decodeHDR(texture(colorTex, v_Texcoord));
 
 #ifdef ANTI_FLICKER
-  vec2 size = vec2(textureSize(colroTex, 0));
+  vec2 size = vec2(textureSize(colorTex, 0));
   // Use median filter to reduce noise
   // https://github.com/keijiro/KinoBloom/blob/master/Assets/Kino/Bloom/Shader/Bloom.cginc#L96
   vec3 d = 1.0 / size.xyx * vec3(1.0, 1.0, 0.0);
