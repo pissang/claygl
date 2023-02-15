@@ -10,7 +10,7 @@ const loopRegex =
 function unrollLoop(
   shaderStr: string,
   defines: Record<string, ShaderDefineValue>,
-  extraDefines: Record<string, ShaderDefineValue>
+  extraDefines?: Record<string, ShaderDefineValue>
 ) {
   // In some case like shadowMap in loop use 'i' to index value much slower.
 
@@ -26,14 +26,14 @@ function unrollLoop(
     if (isNaN(start as any as number)) {
       if (start in defines) {
         start = defines[start] as string;
-      } else {
+      } else if (extraDefines) {
         start = extraDefines[start] as any as string;
       }
     }
     if (isNaN(end as any as number)) {
       if (end in defines) {
         end = defines[end] as string;
-      } else {
+      } else if (extraDefines) {
         end = extraDefines[end] as any as string;
       }
     }
