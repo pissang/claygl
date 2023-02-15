@@ -87,8 +87,9 @@ const defaultParamPropList = util.keys(defaultParams);
 
 function generateKey(parameters: Partial<TexturePoolParameters>) {
   util.defaults(parameters, defaultParams);
-  parameters.internalFormat =
-    parameters.internalFormat || getPossiblelInternalFormat(parameters.format!, parameters.type!);
+  // CAUTION: DO NOT MODIFY THE PARAM
+  // parameters.internalFormat =
+  //   parameters.internalFormat || getPossiblelInternalFormat(parameters.format!, parameters.type!);
 
   let key = '';
   for (let i = 0; i < defaultParamPropList.length; i++) {

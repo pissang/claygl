@@ -46,13 +46,9 @@ class GLTexture {
     gl.pixelStorei(constants.UNPACK_ALIGNMENT, texture.unpackAlignment);
 
     let useMipmap = texture.useMipmap;
-    // Use of none-power of two texture
-    // http://www.khronos.org/webgl/wiki/WebGL_and_OpenGL_Differences
-    if (texture.format === constants.DEPTH_COMPONENT) {
-      useMipmap = false;
-    }
 
     const glFormat = texture.format;
+
     const glInternalFormat =
       texture.internalFormat || getPossiblelInternalFormat(texture.format, texture.type);
     const mipmaps = texture.mipmaps || [];
@@ -117,6 +113,10 @@ class GLTexture {
       if (useMipmap) {
         gl.generateMipmap(textureTarget);
       }
+    }
+
+    if (gl.getError()) {
+      debugger;
     }
 
     this.unbind(gl);
