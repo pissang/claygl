@@ -312,17 +312,17 @@ class ShadowMapPass extends Notifier {
       const directionalLightShadowMapSizes = directionalLightShadowMaps.map(getSize);
       shadowUniforms.directionalLightShadowMaps = {
         value: directionalLightShadowMaps,
-        type: 't',
+        type: 'sampler2D',
         array: true
       };
       shadowUniforms.directionalLightMatrices = {
         value: directionalLightMatrices,
-        type: 'm4',
+        type: 'mat4',
         array: true
       };
       shadowUniforms.directionalLightShadowMapSizes = {
         value: directionalLightShadowMapSizes,
-        type: '1f',
+        type: 'float',
         array: true
       };
       if (dirLightHasCascade) {
@@ -338,12 +338,12 @@ class ShadowMapPass extends Notifier {
         directionalLightMatrices.reverse();
         shadowUniforms.shadowCascadeClipsNear = {
           value: shadowCascadeClipsNear,
-          type: '1f',
+          type: 'float',
           array: true
         };
         shadowUniforms.shadowCascadeClipsFar = {
           value: shadowCascadeClipsFar,
-          type: '1f',
+          type: 'float',
           array: true
         };
       }
@@ -352,17 +352,25 @@ class ShadowMapPass extends Notifier {
     if (spotLightShadowMaps.length > 0) {
       const spotLightShadowMapSizes = spotLightShadowMaps.map(getSize);
       const shadowUniforms = scene.shadowUniforms;
-      shadowUniforms.spotLightShadowMaps = { value: spotLightShadowMaps, type: 't', array: true };
-      shadowUniforms.spotLightMatrices = { value: spotLightMatrices, type: 'm4', array: true };
+      shadowUniforms.spotLightShadowMaps = {
+        value: spotLightShadowMaps,
+        type: 'sampler2D',
+        array: true
+      };
+      shadowUniforms.spotLightMatrices = { value: spotLightMatrices, type: 'mat4', array: true };
       shadowUniforms.spotLightShadowMapSizes = {
         value: spotLightShadowMapSizes,
-        type: '1f',
+        type: 'float',
         array: true
       };
     }
 
     if (pointLightShadowMaps.length > 0) {
-      shadowUniforms.pointLightShadowMaps = { value: pointLightShadowMaps, type: 't', array: true };
+      shadowUniforms.pointLightShadowMaps = {
+        value: pointLightShadowMaps,
+        type: 'samplerCube',
+        array: true
+      };
     }
   }
 

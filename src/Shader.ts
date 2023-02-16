@@ -14,25 +14,21 @@ export type ShaderDefineValue = boolean | string | number | undefined | null;
 export type ShaderPrecision = 'highp' | 'lowp' | 'mediump';
 export type ShaderType = 'vertex' | 'fragment';
 
-const uniformTypeMap = {
-  bool: '1i',
-  int: '1i',
-  sampler2D: 't',
-  samplerCube: 't',
-  float: '1f',
-  vec2: '2f',
-  vec3: '3f',
-  vec4: '4f',
-  ivec2: '2i',
-  ivec3: '3i',
-  ivec4: '4i',
-  mat2: 'm2',
-  mat3: 'm3',
-  mat4: 'm4',
-  // It's not builtin glsl type. But a special type that support string and will be parsed in material
-  rgb: '3f',
-  rgba: '4f'
-} as const;
+export type UniformType =
+  | 'bool'
+  | 'int'
+  | 'sampler2D'
+  | 'samplerCube'
+  | 'float'
+  | 'vec2'
+  | 'vec3'
+  | 'vec4'
+  | 'ivec2'
+  | 'ivec3'
+  | 'ivec4'
+  | 'mat2'
+  | 'mat3'
+  | 'mat4';
 
 const attributeSizeMap = {
   vec2: 2,
@@ -41,8 +37,6 @@ const attributeSizeMap = {
   float: 1
 } as const;
 
-type NativeToMaterialUniformTypeMap = typeof uniformTypeMap;
-type NativeUniformType = keyof NativeToMaterialUniformTypeMap;
 type NativeUniformValueMap = {
   bool: number;
   int: number;
@@ -84,14 +78,6 @@ type NativeUniformArrayValueMap = {
 };
 
 type NativeAttributeType = 'float' | 'vec2' | 'vec3' | 'vec4';
-type NativeToClayAttributeMap = {
-  float: 'float';
-  vec2: 'float';
-  vec3: 'float';
-  vec4: 'float';
-};
-
-export type MaterialUniformType = NativeToMaterialUniformTypeMap[NativeUniformType];
 
 export type AttributeSemantic =
   | 'POSITION'
@@ -161,7 +147,7 @@ export type MatrixSemantic =
   | 'VIEWPROJECTIONINVERSETRANSPOSE'
   | 'WORLDVIEWPROJECTIONINVERSETRANSPOSE';
 
-// type ShaderUniform<T extends NativeUniformType> = {
+// type ShaderUniform<T extends UniformType> = {
 //   type: T;
 //   value: NativeUniformValueMap[T];
 //   semantic?: string;
@@ -180,7 +166,7 @@ export function glsl(strings: TemplateStringsArray, ...values: string[]) {
 }
 
 type ShaderUniformLoose = {
-  type: NativeUniformType | Record<string, NativeUniformType>;
+  type: UniformType;
   // Default value
   value?: unknown;
   semantic?: AttributeSemantic | UniformSemantic | MatrixSemantic;
@@ -194,11 +180,11 @@ type ShaderAttributeLoose = {
 };
 
 type ShaderVaringLoose = {
-  type: NativeUniformType;
+  type: UniformType;
 };
 
 export function createStructUniform<
-  T extends Record<string, NativeUniformType>,
+  T extends Record<string, UniformType>,
   S extends number | string | undefined
 >(type: T, value?: Record<keyof T, NativeUniformValueMap[T[keyof T]]>, len?: S) {
   return {
@@ -210,7 +196,7 @@ export function createStructUniform<
 }
 
 export function createUniform<
-  T extends NativeUniformType,
+  T extends UniformType,
   S extends MatrixSemantic | UniformSemantic
   // don't support string color to be default value.
   // Avoid including color as core module.
@@ -223,7 +209,7 @@ export function createUniform<
 }
 
 export function createSemanticUniform<
-  T extends NativeUniformType,
+  T extends UniformType,
   S extends MatrixSemantic | UniformSemantic
 >(type: T, semantic: S) {
   return {
@@ -232,7 +218,7 @@ export function createSemanticUniform<
   };
 }
 
-export function createArrayUniform<T extends NativeUniformType>(
+export function createArrayUniform<T extends UniformType>(
   type: T,
   len: string | number, // Can be a define SKIN_COUNT or literal number
   value?: NativeUniformArrayValueMap[T]
@@ -256,7 +242,7 @@ export function createAttribute<T extends NativeAttributeType, S extends Attribu
   };
 }
 
-export function createVarying<T extends NativeUniformType>(type: T) {
+export function createVarying<T extends UniformType>(type: T) {
   return { type };
 }
 
@@ -450,7 +436,7 @@ export class FragmentShader<
 function composeShaderString(stageShader: StageShader, isVertex: boolean) {
   // TODO If compose based on #ifdef condition.
   function normalizeUniformType(type: string) {
-    return type === 'rgb' ? 'vec3' : type === 'rgba' ? 'vec4' : type;
+    return type;
   }
 
   // Only compose the uniform, attributes, varying, and codes.
@@ -489,17 +475,7 @@ ${stageShader.main}
     `;
 }
 
-type ConvertShaderUniformToMaterialUniform<T extends Dict<ShaderUniformLoose>> = {
-  [key in keyof T]: {
-    value: T[key]['value'];
-    array: NonNullable<T[key]['array']>;
-    // TODO Needs more precise type
-    type: NativeToMaterialUniformTypeMap[T[key]['type']];
-    semantic?: T[key]['semantic'];
-  };
-};
-
-function cloneUniformVal(type: MaterialUniformType, array: boolean, val: any) {
+function cloneUniformVal(type: UniformType, array: boolean, val: any) {
   if (val && val.length != null) {
     return array ? val.map((item: any) => cloneUniformVal(type, false, item)) : Array.from(val);
   }
@@ -560,7 +536,7 @@ export class Shader<
   /**
    * Processed uniform for material
    */
-  readonly uniformTpls: ConvertShaderUniformToMaterialUniform<V['uniforms'] & F['uniforms']>;
+  readonly uniformTpls: V['uniforms'] & F['uniforms'];
   // TODO More precise attributes type
   /**
    * Processed attributes for geometry
@@ -586,7 +562,7 @@ export class Shader<
         MatrixSemantic | UniformSemantic,
         {
           name: string;
-          type: MaterialUniformType;
+          type: UniformType;
           isTranspose?: boolean;
           isInverse?: boolean;
           semanticNoTranspose?: MatrixSemanticNoTranpose;
@@ -638,8 +614,8 @@ export class Shader<
     function processUniforms(uniforms: Dict<ShaderUniformLoose>, shaderType: ShaderType) {
       keys(uniforms).forEach((uniformName) => {
         const uniform = uniforms[uniformName];
-        const uniformType = uniform.type as NativeUniformType;
-        const uniformValue = uniform.value as NativeUniformType;
+        const uniformType = uniform.type as UniformType;
+        const uniformValue = uniform.value as UniformType;
         const uniformSemantic = uniform.semantic;
         if (uniformType === 'sampler2D' || uniformType === 'samplerCube') {
           textures[uniformName] = {
@@ -650,7 +626,7 @@ export class Shader<
         const materialUniformObj = {
           name: uniformName,
           array: uniform.array || false,
-          type: uniformTypeMap[uniformType]
+          type: uniformType
         };
 
         if (uniformSemantic) {
@@ -671,12 +647,6 @@ export class Shader<
             matrixSemantics.push(uniformSemantic as MatrixSemantic);
           }
         } else {
-          // don't support string color to be default value.
-          // Avoid including color as core module.
-          // (materialUniformObj as any).value =
-          //   (uniformType === 'rgb' || uniformType === 'rgba') && isString(uniformValue)
-          //     ? parseToFloat(uniformValue)
-          //     : uniformValue;
           (materialUniformObj as any).value = uniformValue;
 
           // semantic uniform can't be set in material.
@@ -731,6 +701,10 @@ export class Shader<
 
   static Vertex = VertexShader;
   static Fragment = FragmentShader;
+}
+
+export function isTextureUniform(uniform: { type: UniformType | Record<string, UniformType> }) {
+  return uniform.type === 'sampler2D' || uniform.type === 'samplerCube';
 }
 
 export default Shader;

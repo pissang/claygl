@@ -6,10 +6,13 @@ import Shader, {
   ShaderType,
   VertexShader,
   FragmentShader,
-  MaterialUniformType
+  UniformType,
+  isTextureUniform
 } from './Shader';
 import { defaultGetMaterialProgramKey } from './gl/ProgramManager';
 import Texture from './Texture';
+import Texture2D from './Texture2D';
+import TextureCube from './TextureCube';
 
 const programKeyCache: Record<string, string> = {};
 
@@ -62,17 +65,27 @@ export interface MaterialOpts {
 
 export type GeneralMaterialUniformObject =
   | {
-      type: 't';
+      type: 'sampler2D';
       array: false;
-      value: Texture;
+      value: Texture2D;
     }
   | {
-      type: 't';
+      type: 'sampler2D';
       array: true;
-      value: Texture[];
+      value: Texture2D[];
     }
   | {
-      type: Exclude<MaterialUniformType, 't'>;
+      type: 'samplerCube';
+      array: false;
+      value: TextureCube;
+    }
+  | {
+      type: 'samplerCube';
+      array: true;
+      value: TextureCube[];
+    }
+  | {
+      type: Exclude<UniformType, 'sampler2D' | 'samplerCube'>;
       array: boolean;
       value: any;
     };
@@ -83,7 +96,7 @@ type UniformValueRecord<T extends Shader['uniformTpls']> = {
 type PickTextureUniforms<T extends Shader['uniformTpls']> = Pick<
   T,
   {
-    [key in keyof T]: T[key]['type'] extends 't' ? key : never;
+    [key in keyof T]: T[key]['type'] extends 'sampler2D' | 'samplerCube' ? key : never;
   }[keyof T]
 >;
 
@@ -139,10 +152,9 @@ class Material<
     const enabledUniforms = (this._enabledUniforms = util
       .keys(uniforms)
       .sort() as (keyof T['uniformTpls'])[]);
-    this._textureUniforms = enabledUniforms.filter((uniformName) => {
-      const type = uniforms[uniformName].type as MaterialUniformType;
-      return type === 't';
-    }) as (keyof PickTextureUniforms<T['uniformTpls']>)[];
+    this._textureUniforms = enabledUniforms.filter((uniformName) =>
+      isTextureUniform(uniforms[uniformName])
+    ) as (keyof PickTextureUniforms<T['uniformTpls']>)[];
 
     this.vertexDefines = util.clone(shader.vertexDefines);
     this.fragmentDefines = util.clone(shader.fragmentDefines);
@@ -186,13 +198,12 @@ class Material<
     if (uniform) {
       if (util.isString(value)) {
         // Try to parse as a color. Invalid color string will return null.
-        // PENDING check rgb/rgba type?
         value = colorUtil.parseToFloat(value) || value;
       }
 
       uniform.value = value;
 
-      if (this.autoUpdateTextureStatus && uniform.type === 't') {
+      if (this.autoUpdateTextureStatus && isTextureUniform(uniform)) {
         value ? this.enableTexture(symbol as any) : this.disableTexture(symbol as any);
       }
     }

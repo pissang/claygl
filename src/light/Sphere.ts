@@ -27,25 +27,25 @@ class SphereLight extends Light {
 
 SphereLight.prototype.uniformTemplates = {
   sphereLightPosition: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       return instance.getWorldPosition().array;
     }
   },
   sphereLightRange: {
-    type: '1f',
+    type: 'float',
     value(instance) {
       return (instance as SphereLight).range;
     }
   },
   sphereLightRadius: {
-    type: '1f',
+    type: 'float',
     value(instance) {
       return (instance as SphereLight).radius;
     }
   },
   sphereLightColor: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       const color = instance.color;
       const intensity = instance.intensity;

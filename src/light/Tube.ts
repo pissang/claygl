@@ -29,14 +29,14 @@ class TubeLight extends Light {
 
 TubeLight.prototype.uniformTemplates = {
   tubeLightPosition: {
-    type: '3f',
+    type: 'vec3',
     value: function (instance) {
       return instance.getWorldPosition().array;
     }
   },
 
   tubeLightExtend: {
-    type: '3f',
+    type: 'vec3',
     value: (function () {
       const x = new Vector3();
       return function (instance) {
@@ -50,14 +50,14 @@ TubeLight.prototype.uniformTemplates = {
   },
 
   tubeLightRange: {
-    type: '1f',
+    type: 'float',
     value: function (instance) {
       return (instance as TubeLight).range;
     }
   },
 
   tubeLightColor: {
-    type: '3f',
+    type: 'vec3',
     value: function (instance) {
       const color = instance.color;
       const intensity = instance.intensity;

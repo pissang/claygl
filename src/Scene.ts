@@ -424,14 +424,15 @@ class Scene extends ClayNode {
         }
         const lu = lightUniforms[group][symbol];
         switch (uniformTpl.type) {
-          case '1i':
-          case '1f':
-          case 't':
+          case 'int':
+          case 'float':
+          case 'sampler2D':
+          case 'samplerCube':
             lu.value.push(value);
             break;
-          case '2f':
-          case '3f':
-          case '4f':
+          case 'vec2':
+          case 'vec3':
+          case 'vec4':
             for (let j = 0; j < value.length; j++) {
               lu.value.push(value[j]);
             }

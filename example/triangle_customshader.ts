@@ -27,7 +27,7 @@ void main() {
 });
 const fs = new Shader.Fragment({
   uniforms: {
-    color: uniform('rgb', [1, 0, 0])
+    color: uniform('vec3', [1, 0, 0])
   },
   main: glsl`
 void main() {

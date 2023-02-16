@@ -17,7 +17,7 @@ import GLTexture from './GLTexture';
 import TextureCube from '../TextureCube';
 import GLBuffers from './GLBuffers';
 import * as constants from '../core/constants';
-import Shader, { ShaderDefineValue, ShaderPrecision } from '../Shader';
+import Shader, { isTextureUniform, ShaderDefineValue, ShaderPrecision } from '../Shader';
 import GLInstancedBuffers from './GLInstancedBuffers';
 import GLFrameBuffer from './GLFrameBuffer';
 
@@ -515,11 +515,11 @@ class GLRenderer {
       if (object.joints.length > this.maxJointNumber) {
         const skinMatricesTexture = skeleton.getSubSkinMatricesTexture(object.uid, object.joints);
         program.useTextureSlot(gl, this._getGLTexture(skinMatricesTexture), slot);
-        program.set(gl, '1i', 'skinMatricesTexture', slot, false);
-        program.set(gl, '1f', 'skinMatricesTextureSize', skinMatricesTexture.width, false);
+        program.set(gl, 'int', 'skinMatricesTexture', slot, false);
+        program.set(gl, 'float', 'skinMatricesTextureSize', skinMatricesTexture.width, false);
       } else {
         const skinMatricesArray = skeleton.getSubSkinMatrices(object.uid, object.joints);
-        program.set(gl, 'm4', 'skinMatrix', skinMatricesArray, true);
+        program.set(gl, 'mat4', 'skinMatrix', skinMatricesArray, true);
       }
     }
   }
@@ -604,7 +604,7 @@ class GLRenderer {
       if (!program.hasUniform(symbol)) {
         continue;
       }
-      if (lu.type === 't') {
+      if (isTextureUniform(lu)) {
         if (lu.array) {
           const texSlots = [];
           for (let i = 0; i < lu.value.length; i++) {
@@ -612,11 +612,11 @@ class GLRenderer {
             const slot = program.takeTextureSlot(gl, this._getGLTexture(texture));
             texSlots.push(slot);
           }
-          program.set(gl, '1i', symbol, texSlots, true);
+          program.set(gl, 'int', symbol, texSlots, true);
         } else {
           program.set(
             gl,
-            '1i',
+            'int',
             symbol,
             program.takeTextureSlot(gl, this._getGLTexture(lu.value)),
             false
@@ -644,7 +644,7 @@ class GLRenderer {
       : keys(uniforms);
     const textureUniforms = material.getTextureUniforms
       ? material.getTextureUniforms()
-      : enabledUniforms.filter((uniformName) => uniforms[uniformName].type === 't');
+      : enabledUniforms.filter((uniformName) => isTextureUniform(uniforms[uniformName]));
     const placeholderTexture = this._getBlankTexture();
 
     const getGLTexture = (texture: Texture) => {
@@ -654,8 +654,7 @@ class GLRenderer {
     for (let u = 0; u < textureUniforms.length; u++) {
       const symbol = textureUniforms[u];
       const uniformValue = getUniformValue!(renderable, material, symbol);
-      const uniformType = uniforms[symbol].type;
-      if (uniformType === 't') {
+      if (isTextureUniform(uniforms[symbol])) {
         // Reset slot
         if (uniforms[symbol].array) {
           // TODO
@@ -679,7 +678,7 @@ class GLRenderer {
       const isUniformValueArray = uniform.array;
       let uniformValue = getUniformValue!(renderable, material, symbol);
       const uniformType = uniform.type;
-      const isTexture = uniformType === 't';
+      const isTexture = isTextureUniform(uniform);
 
       if (isTexture) {
         if (!uniformValue || !uniformValue.isRenderable()) {
@@ -693,7 +692,7 @@ class GLRenderer {
         const glTexture = getGLTexture(uniformValue);
         if (glTexture.slot < 0) {
           const slot = program.currentTextureSlot();
-          const res = program.set(gl, '1i', symbol, slot, false);
+          const res = program.set(gl, 'int', symbol, slot, false);
           if (res) {
             // Texture uniform is enabled
             program.takeTextureSlot(gl, glTexture);
@@ -702,14 +701,14 @@ class GLRenderer {
         }
         // Multiple uniform use same texture..
         else {
-          program.set(gl, '1i', symbol, glTexture.slot, false);
+          program.set(gl, 'int', symbol, glTexture.slot, false);
         }
       } else if (isArray(uniformValue)) {
         if (uniformValue.length === 0) {
           continue;
         }
         // Texture Array
-        if (uniformType === 't' && isUniformValueArray) {
+        if (isTexture && isUniformValueArray) {
           if (!program.hasUniform(symbol)) {
             continue;
           }
@@ -727,12 +726,12 @@ class GLRenderer {
             }
           }
 
-          program.set(gl, '1i', symbol, arr, true);
+          program.set(gl, 'int', symbol, arr, true);
         } else {
-          program.set(gl, uniform.type as string, symbol, uniformValue, isUniformValueArray);
+          program.set(gl, uniform.type, symbol, uniformValue, isUniformValueArray || false);
         }
       } else {
-        program.set(gl, uniform.type as string, symbol, uniformValue, isUniformValueArray);
+        program.set(gl, uniform.type, symbol, uniformValue, isUniformValueArray || false);
       }
     }
     const newSlot = program.currentTextureSlot();

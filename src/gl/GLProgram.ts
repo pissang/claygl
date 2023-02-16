@@ -1,5 +1,5 @@
 import { assign, genGUID, isArray, keys } from '../core/util';
-import Shader, { AttributeSemantic, UniformSemantic } from '../Shader';
+import Shader, { AttributeSemantic, UniformSemantic, UniformType } from '../Shader';
 import * as constants from '../core/constants';
 import GLTexture from './GLTexture';
 
@@ -92,7 +92,7 @@ class GLProgram {
 
   set(
     _gl: WebGL2RenderingContext,
-    type: string,
+    type: UniformType,
     symbol: string,
     value: any,
     valueArray: boolean,
@@ -115,7 +115,7 @@ class GLProgram {
     valueCache[symbol] = value;
 
     switch (type) {
-      case 'm4':
+      case 'mat4':
         if (valueArray) {
           if (isArray(value) && isArray(value[0])) {
             const tmpArray = new Float32Array(value.length * 16);
@@ -140,42 +140,43 @@ class GLProgram {
         }
         _gl.uniformMatrix4fv(location, false, value);
         break;
-      case '2i':
-        valueArray ? _gl.uniform2iv(location, value) : _gl.uniform2i(location, value[0], value[1]);
+      case 'float':
+        valueArray ? _gl.uniform1fv(location, value) : _gl.uniform1f(location, value);
         break;
-      case '2f':
+      case 'vec2':
         valueArray ? _gl.uniform2fv(location, value) : _gl.uniform2f(location, value[0], value[1]);
         break;
-      case '3i':
-        valueArray
-          ? _gl.uniform3iv(location, value)
-          : _gl.uniform3i(location, value[0], value[1], value[2]);
-        break;
-      case '3f':
+      case 'vec3':
         valueArray
           ? _gl.uniform3fv(location, value)
           : _gl.uniform3f(location, value[0], value[1], value[2]);
         break;
-      case '4i':
-        valueArray
-          ? _gl.uniform4iv(location, value)
-          : _gl.uniform4i(location, value[0], value[1], value[2], value[3]);
-        break;
-      case '4f':
+      case 'vec4':
         valueArray
           ? _gl.uniform4fv(location, value)
           : _gl.uniform4f(location, value[0], value[1], value[2], value[3]);
         break;
-      case '1i':
+      case 'int':
+      case 'bool':
         valueArray ? _gl.uniform1iv(location, value) : _gl.uniform1i(location, value);
         break;
-      case '1f':
-        valueArray ? _gl.uniform1fv(location, value) : _gl.uniform1f(location, value);
+      case 'ivec2':
+        valueArray ? _gl.uniform2iv(location, value) : _gl.uniform2i(location, value[0], value[1]);
         break;
-      case 'm2':
+      case 'ivec3':
+        valueArray
+          ? _gl.uniform3iv(location, value)
+          : _gl.uniform3i(location, value[0], value[1], value[2]);
+        break;
+      case 'ivec4':
+        valueArray
+          ? _gl.uniform4iv(location, value)
+          : _gl.uniform4i(location, value[0], value[1], value[2], value[3]);
+        break;
+      case 'mat2':
         _gl.uniformMatrix2fv(location, false, value);
         break;
-      case 'm3':
+      case 'mat3':
         _gl.uniformMatrix3fv(location, false, value);
         break;
       default:

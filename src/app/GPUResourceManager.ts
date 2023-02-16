@@ -4,6 +4,7 @@ import type Material from '../Material';
 import Renderable from '../Renderable';
 import type Renderer from '../Renderer';
 import type Scene from '../Scene';
+import { isTextureUniform } from '../Shader';
 import Texture from '../Texture';
 
 type Resource = Geometry | Texture;
@@ -54,11 +55,10 @@ function collectResources(
           const uniformName = textureUniforms[u];
           const uniformObj = material.uniforms[uniformName];
           const val = uniformObj.value;
-          const uniformType = uniformObj.type;
           if (!val) {
             continue;
           }
-          if (uniformType === 't') {
+          if (isTextureUniform(uniformObj)) {
             if (uniformObj.array) {
               for (let k = 0; k < val.length; k++) {
                 if (val[k]) {

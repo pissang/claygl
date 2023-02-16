@@ -8,7 +8,12 @@ import Material from './Material';
 import Vector2 from './math/Vector2';
 
 // Light header
-import Shader, { BASIC_MATRIX_SEMANTICS, MatrixSemantic, ShaderDefineValue } from './Shader';
+import Shader, {
+  BASIC_MATRIX_SEMANTICS,
+  isTextureUniform,
+  MatrixSemantic,
+  ShaderDefineValue
+} from './Shader';
 
 import * as mat4 from './glmatrix/mat4';
 import * as vec3 from './glmatrix/vec3';
@@ -791,7 +796,7 @@ class Renderer extends Notifier {
           if (!val) {
             continue;
           }
-          if (uniformType === 't') {
+          if (isTextureUniform(uniformObj)) {
             if (uniformObj.array) {
               for (let k = 0; k < val.length; k++) {
                 if (val[k]) {

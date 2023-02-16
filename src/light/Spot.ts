@@ -38,37 +38,37 @@ class SpotLight extends Light {
 
 SpotLight.prototype.uniformTemplates = {
   spotLightPosition: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       return instance.getWorldPosition().array;
     }
   },
   spotLightRange: {
-    type: '1f',
+    type: 'float',
     value(instance) {
       return (instance as SpotLight).range;
     }
   },
   spotLightUmbraAngleCosine: {
-    type: '1f',
+    type: 'float',
     value(instance) {
       return Math.cos(((instance as SpotLight).umbraAngle * Math.PI) / 180);
     }
   },
   spotLightPenumbraAngleCosine: {
-    type: '1f',
+    type: 'float',
     value(instance) {
       return Math.cos(((instance as SpotLight).penumbraAngle * Math.PI) / 180);
     }
   },
   spotLightFalloffFactor: {
-    type: '1f',
+    type: 'float',
     value(instance) {
       return (instance as SpotLight).falloffFactor;
     }
   },
   spotLightDirection: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       // TODO
       // Direction is target to eye
@@ -76,7 +76,7 @@ SpotLight.prototype.uniformTemplates = {
     }
   },
   spotLightColor: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       const color = instance.color;
       const intensity = instance.intensity;
