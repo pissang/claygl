@@ -7,7 +7,8 @@ import Shader, {
   VertexShader,
   FragmentShader,
   UniformType,
-  isTextureUniform
+  isTextureUniform,
+  NativeUniformType
 } from './Shader';
 import { defaultGetMaterialProgramKey } from './gl/ProgramManager';
 import Texture from './Texture';
@@ -83,6 +84,12 @@ export type GeneralMaterialUniformObject =
       type: 'samplerCube';
       array: true;
       value: TextureCube[];
+    }
+  | {
+      type: '_struct';
+      struct: Record<string, NativeUniformType>;
+      array: boolean;
+      value: Record<string, any>;
     }
   | {
       type: Exclude<UniformType, 'sampler2D' | 'samplerCube'>;
@@ -190,9 +197,9 @@ class Material<
    * @param value
    */
   set<K extends keyof T['uniformTpls']>(symbol: K, value: T['uniformTpls'][K]['value']) {
+    // PENDING. Should we GIVE WARN when value is undefined?
     if (value === undefined) {
       return;
-      // console.warn('Uniform value "' + symbol + '" is undefined');
     }
     const uniform = this.uniforms[symbol];
     if (uniform) {
@@ -204,7 +211,7 @@ class Material<
       uniform.value = value;
 
       if (this.autoUpdateTextureStatus && isTextureUniform(uniform)) {
-        value ? this.enableTexture(symbol as any) : this.disableTexture(symbol as any);
+        this[value ? 'enableTexture' : 'disableTexture'](symbol as any);
       }
     }
   }

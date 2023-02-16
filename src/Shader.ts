@@ -28,7 +28,11 @@ export type UniformType =
   | 'ivec4'
   | 'mat2'
   | 'mat3'
-  | 'mat4';
+  | 'mat4'
+  // Struct type
+  | '_struct';
+
+export type NativeUniformType = Exclude<UniformType, '_struct'>;
 
 const attributeSizeMap = {
   vec2: 2,
@@ -72,9 +76,6 @@ type NativeUniformArrayValueMap = {
   mat2: ArrayLike<number>;
   mat3: ArrayLike<number>;
   mat4: ArrayLike<number>;
-  // TODO
-  rgb: ArrayLike<number>;
-  rgba: ArrayLike<number>;
 };
 
 type NativeAttributeType = 'float' | 'vec2' | 'vec3' | 'vec4';
@@ -167,6 +168,7 @@ export function glsl(strings: TemplateStringsArray, ...values: string[]) {
 
 type ShaderUniformLoose = {
   type: UniformType;
+  struct?: Dict<NativeUniformType>;
   // Default value
   value?: unknown;
   semantic?: AttributeSemantic | UniformSemantic | MatrixSemantic;
@@ -184,11 +186,12 @@ type ShaderVaringLoose = {
 };
 
 export function createStructUniform<
-  T extends Record<string, UniformType>,
+  T extends Record<string, NativeUniformType>,
   S extends number | string | undefined
->(type: T, value?: Record<keyof T, NativeUniformValueMap[T[keyof T]]>, len?: S) {
+>(struct: T, value?: Record<keyof T, NativeUniformValueMap[T[keyof T]]>, len?: S) {
   return {
-    type,
+    type: '_struct' as const,
+    struct,
     value,
     len,
     array: !!len as S extends undefined ? false : true
@@ -196,7 +199,7 @@ export function createStructUniform<
 }
 
 export function createUniform<
-  T extends UniformType,
+  T extends NativeUniformType,
   S extends MatrixSemantic | UniformSemantic
   // don't support string color to be default value.
   // Avoid including color as core module.
@@ -218,7 +221,7 @@ export function createSemanticUniform<
   };
 }
 
-export function createArrayUniform<T extends UniformType>(
+export function createArrayUniform<T extends NativeUniformType>(
   type: T,
   len: string | number, // Can be a define SKIN_COUNT or literal number
   value?: NativeUniformArrayValueMap[T]
@@ -434,10 +437,20 @@ export class FragmentShader<
  * Compose each part to a final shader string
  */
 function composeShaderString(stageShader: StageShader, isVertex: boolean) {
-  // TODO If compose based on #ifdef condition.
-  function normalizeUniformType(type: string) {
-    return type;
+  function getStructName(symbol: string) {
+    return '__Struct' + symbol[0].toUpperCase() + symbol.slice(1);
   }
+  function composeStruct(struct: ShaderUniformLoose['struct'], symbol: string) {
+    return struct
+      ? `struct ${getStructName(symbol)} {
+${keys(struct)
+  .map((key) => `  ${struct[key]} ${key};`)
+  .join('\n')}
+}
+`
+      : '';
+  }
+  // TODO If compose based on #ifdef condition.
 
   // Only compose the uniform, attributes, varying, and codes.
   // Defines will be composed dynamically in GLProgram based on the material
@@ -450,7 +463,8 @@ function composeShaderString(stageShader: StageShader, isVertex: boolean) {
         const arrayExpr = item.array ? `[${item.len}]` : '';
         return (
           (isDefinedLen ? `#ifdef ${item.len!}\n` : '') +
-          `${varType} ${normalizeUniformType(item.type)} ${symbol}${arrayExpr};` +
+          `${composeStruct(item.struct, symbol)}` +
+          `${varType} ${item.struct ? getStructName(symbol) : item.type} ${symbol}${arrayExpr};` +
           (isDefinedLen ? `\n#endif` : '')
         );
       })
