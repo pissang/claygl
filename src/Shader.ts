@@ -28,9 +28,9 @@ export type UniformType =
   | 'ivec4'
   | 'mat2'
   | 'mat3'
-  | 'mat4'
-  // Struct type
-  | '_struct';
+  | 'mat4';
+// // Struct type
+// | '_struct';
 
 export type NativeUniformType = Exclude<UniformType, '_struct'>;
 
@@ -168,7 +168,7 @@ export function glsl(strings: TemplateStringsArray, ...values: string[]) {
 
 type ShaderUniformLoose = {
   type: UniformType;
-  struct?: Dict<NativeUniformType>;
+  // struct?: Dict<NativeUniformType>;
   // Default value
   value?: unknown;
   semantic?: AttributeSemantic | UniformSemantic | MatrixSemantic;
@@ -185,18 +185,18 @@ type ShaderVaringLoose = {
   type: UniformType;
 };
 
-export function createStructUniform<
-  T extends Record<string, NativeUniformType>,
-  S extends number | string | undefined
->(struct: T, value?: Record<keyof T, NativeUniformValueMap[T[keyof T]]>, len?: S) {
-  return {
-    type: '_struct' as const,
-    struct,
-    value,
-    len,
-    array: !!len as S extends undefined ? false : true
-  };
-}
+// export function createStructUniform<
+//   T extends Record<string, NativeUniformType>,
+//   S extends number | string | undefined
+// >(struct: T, value?: Record<keyof T, NativeUniformValueMap[T[keyof T]]>, len?: S) {
+//   return {
+//     type: '_struct' as const,
+//     struct,
+//     value,
+//     len,
+//     array: !!len as S extends undefined ? false : true
+//   };
+// }
 
 export function createUniform<
   T extends NativeUniformType,
@@ -440,16 +440,16 @@ function composeShaderString(stageShader: StageShader, isVertex: boolean) {
   function getStructName(symbol: string) {
     return '__Struct' + symbol[0].toUpperCase() + symbol.slice(1);
   }
-  function composeStruct(struct: ShaderUniformLoose['struct'], symbol: string) {
-    return struct
-      ? `struct ${getStructName(symbol)} {
-${keys(struct)
-  .map((key) => `  ${struct[key]} ${key};`)
-  .join('\n')}
-}
-`
-      : '';
-  }
+  //   function composeStruct(struct: ShaderUniformLoose['struct'], symbol: string) {
+  //     return struct
+  //       ? `struct ${getStructName(symbol)} {
+  // ${keys(struct)
+  //   .map((key) => `  ${struct[key]} ${key};`)
+  //   .join('\n')}
+  // }
+  // `
+  //       : '';
+  //   }
   // TODO If compose based on #ifdef condition.
 
   // Only compose the uniform, attributes, varying, and codes.
@@ -463,8 +463,11 @@ ${keys(struct)
         const arrayExpr = item.array ? `[${item.len}]` : '';
         return (
           (isDefinedLen ? `#ifdef ${item.len!}\n` : '') +
-          `${composeStruct(item.struct, symbol)}` +
-          `${varType} ${item.struct ? getStructName(symbol) : item.type} ${symbol}${arrayExpr};` +
+          // `${composeStruct(item.struct, symbol)}` +
+          `${varType} ${
+            // item.struct ? getStructName(symbol) :
+            item.type
+          } ${symbol}${arrayExpr};` +
           (isDefinedLen ? `\n#endif` : '')
         );
       })
@@ -708,7 +711,7 @@ export class Shader<
 
   static uniform = createUniform;
   static arrayUniform = createArrayUniform;
-  static structUniform = createStructUniform;
+  // static structUniform = createStructUniform;
   static attribute = createAttribute;
   static varying = createVarying;
   static semanticUniform = createSemanticUniform;

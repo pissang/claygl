@@ -179,6 +179,8 @@ class GLProgram {
       case 'mat3':
         _gl.uniformMatrix3fv(location, false, value);
         break;
+      case '_struct':
+
       default:
         throw 'Unknown type ' + type;
     }

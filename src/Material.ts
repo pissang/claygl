@@ -85,12 +85,12 @@ export type GeneralMaterialUniformObject =
       array: true;
       value: TextureCube[];
     }
-  | {
-      type: '_struct';
-      struct: Record<string, NativeUniformType>;
-      array: boolean;
-      value: Record<string, any>;
-    }
+  // | {
+  //     type: '_struct';
+  //     struct: Record<string, NativeUniformType>;
+  //     array: boolean;
+  //     value: Record<string, any>;
+  //   }
   | {
       type: Exclude<UniformType, 'sampler2D' | 'samplerCube'>;
       array: boolean;

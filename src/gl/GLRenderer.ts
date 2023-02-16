@@ -702,7 +702,9 @@ class GLRenderer {
 
       if (uniformValue == null) {
         continue;
-      } else if (isTexture) {
+      }
+
+      if (isTexture) {
         // Texture Array
         if (isUniformValueArray) {
           uniformValue = [];
