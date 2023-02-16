@@ -63,14 +63,17 @@ export interface MaterialOpts {
 export type GeneralMaterialUniformObject =
   | {
       type: 't';
+      array: false;
       value: Texture;
     }
   | {
-      type: 'tv';
+      type: 't';
+      array: true;
       value: Texture[];
     }
   | {
-      type: Exclude<MaterialUniformType, 't' | 'tv'>;
+      type: Exclude<MaterialUniformType, 't'>;
+      array: boolean;
       value: any;
     };
 
@@ -80,7 +83,7 @@ type UniformValueRecord<T extends Shader['uniformTpls']> = {
 type PickTextureUniforms<T extends Shader['uniformTpls']> = Pick<
   T,
   {
-    [key in keyof T]: T[key]['type'] extends 't' | 'tv' ? key : never;
+    [key in keyof T]: T[key]['type'] extends 't' ? key : never;
   }[keyof T]
 >;
 
@@ -138,7 +141,7 @@ class Material<
       .sort() as (keyof T['uniformTpls'])[]);
     this._textureUniforms = enabledUniforms.filter((uniformName) => {
       const type = uniforms[uniformName].type as MaterialUniformType;
-      return type === 't' || type === 'tv';
+      return type === 't';
     }) as (keyof PickTextureUniforms<T['uniformTpls']>)[];
 
     this.vertexDefines = util.clone(shader.vertexDefines);

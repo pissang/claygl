@@ -90,7 +90,14 @@ class GLProgram {
     return textureSlot;
   }
 
-  set(_gl: WebGL2RenderingContext, type: string, symbol: string, value: any, force?: boolean) {
+  set(
+    _gl: WebGL2RenderingContext,
+    type: string,
+    symbol: string,
+    value: any,
+    valueArray: boolean,
+    force?: boolean
+  ) {
     const locationMap = this._uniformLocations;
     const location = locationMap[symbol];
     const valueCache = this._valueCache;
@@ -109,88 +116,70 @@ class GLProgram {
 
     switch (type) {
       case 'm4':
-        if (!(value instanceof Float32Array)) {
-          // Use Float32Array is much faster than array when uniformMatrix4fv.
-          for (let i = 0; i < value.length; i++) {
-            tmpFloat32Array16[i] = value[i];
+        if (valueArray) {
+          if (isArray(value) && isArray(value[0])) {
+            const tmpArray = new Float32Array(value.length * 16);
+            let cursor = 0;
+            for (let i = 0; i < value.length; i++) {
+              const item = value[i];
+              for (let j = 0; j < 16; j++) {
+                tmpArray[cursor++] = item[j];
+              }
+            }
+            value = tmpArray;
           }
-          value = tmpFloat32Array16;
+          // else ArrayBufferView
+        } else {
+          if (!(value instanceof Float32Array)) {
+            // Use Float32Array is much faster than array when uniformMatrix4fv.
+            for (let i = 0; i < value.length; i++) {
+              tmpFloat32Array16[i] = value[i];
+            }
+            value = tmpFloat32Array16;
+          }
         }
         _gl.uniformMatrix4fv(location, false, value);
         break;
       case '2i':
-        _gl.uniform2i(location, value[0], value[1]);
+        valueArray ? _gl.uniform2iv(location, value) : _gl.uniform2i(location, value[0], value[1]);
         break;
       case '2f':
-        _gl.uniform2f(location, value[0], value[1]);
+        valueArray ? _gl.uniform2fv(location, value) : _gl.uniform2f(location, value[0], value[1]);
         break;
       case '3i':
-        _gl.uniform3i(location, value[0], value[1], value[2]);
+        valueArray
+          ? _gl.uniform3iv(location, value)
+          : _gl.uniform3i(location, value[0], value[1], value[2]);
         break;
       case '3f':
-        _gl.uniform3f(location, value[0], value[1], value[2]);
+        valueArray
+          ? _gl.uniform3fv(location, value)
+          : _gl.uniform3f(location, value[0], value[1], value[2]);
         break;
       case '4i':
-        _gl.uniform4i(location, value[0], value[1], value[2], value[3]);
+        valueArray
+          ? _gl.uniform4iv(location, value)
+          : _gl.uniform4i(location, value[0], value[1], value[2], value[3]);
         break;
       case '4f':
-        _gl.uniform4f(location, value[0], value[1], value[2], value[3]);
+        valueArray
+          ? _gl.uniform4fv(location, value)
+          : _gl.uniform4f(location, value[0], value[1], value[2], value[3]);
         break;
       case '1i':
-        _gl.uniform1i(location, value);
+        valueArray ? _gl.uniform1iv(location, value) : _gl.uniform1i(location, value);
         break;
       case '1f':
-        _gl.uniform1f(location, value);
-        break;
-      case '1fv':
-        _gl.uniform1fv(location, value);
-        break;
-      case '1iv':
-        _gl.uniform1iv(location, value);
-        break;
-      case '2iv':
-        _gl.uniform2iv(location, value);
-        break;
-      case '2fv':
-        _gl.uniform2fv(location, value);
-        break;
-      case '3iv':
-        _gl.uniform3iv(location, value);
-        break;
-      case '3fv':
-        _gl.uniform3fv(location, value);
-        break;
-      case '4iv':
-        _gl.uniform4iv(location, value);
-        break;
-      case '4fv':
-        _gl.uniform4fv(location, value);
+        valueArray ? _gl.uniform1fv(location, value) : _gl.uniform1f(location, value);
         break;
       case 'm2':
-      case 'm2v':
         _gl.uniformMatrix2fv(location, false, value);
         break;
       case 'm3':
-      case 'm3v':
         _gl.uniformMatrix3fv(location, false, value);
         break;
-      case 'm4v':
-        // Raw value
-        if (isArray(value) && isArray(value[0])) {
-          const array = new Float32Array(value.length * 16);
-          let cursor = 0;
-          for (let i = 0; i < value.length; i++) {
-            const item = value[i];
-            for (let j = 0; j < 16; j++) {
-              array[cursor++] = item[j];
-            }
-          }
-          _gl.uniformMatrix4fv(location, false, array);
-        } else {
-          // ArrayBufferView
-          _gl.uniformMatrix4fv(location, false, value);
-        }
-        break;
+      default:
+        throw 'Unknown type ' + type;
     }
     return true;
   }
@@ -198,8 +187,9 @@ class GLProgram {
   setSemanticUniform(_gl: WebGL2RenderingContext, semantic: string, val: any) {
     const semanticInfo = this.semanticsMap[semantic as UniformSemantic];
     if (semanticInfo) {
+      // Uniform with semantic can't be array.
       // Force set for semantic uniforms.
-      return this.set(_gl, semanticInfo.type, semanticInfo.name, val, true);
+      return this.set(_gl, semanticInfo.type, semanticInfo.name, val, false, true);
     }
     return false;
   }

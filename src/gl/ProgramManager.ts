@@ -98,9 +98,7 @@ function getPrecisionCode(precision: ShaderPrecision) {
 
 function defaultGetEnabledTextures(material: Material) {
   const uniforms = material.uniforms;
-  return keys(uniforms).filter(
-    (uniformName) => uniforms[uniformName].type === 't' || uniforms[uniformName].type === 'tv'
-  );
+  return keys(uniforms).filter((uniformName) => uniforms[uniformName].type === 't');
 }
 
 function getDefineKey(defines: Record<string, ShaderDefineValue>) {

@@ -312,12 +312,18 @@ class ShadowMapPass extends Notifier {
       const directionalLightShadowMapSizes = directionalLightShadowMaps.map(getSize);
       shadowUniforms.directionalLightShadowMaps = {
         value: directionalLightShadowMaps,
-        type: 'tv'
+        type: 't',
+        array: true
       };
-      shadowUniforms.directionalLightMatrices = { value: directionalLightMatrices, type: 'm4v' };
+      shadowUniforms.directionalLightMatrices = {
+        value: directionalLightMatrices,
+        type: 'm4',
+        array: true
+      };
       shadowUniforms.directionalLightShadowMapSizes = {
         value: directionalLightShadowMapSizes,
-        type: '1fv'
+        type: '1f',
+        array: true
       };
       if (dirLightHasCascade) {
         const shadowCascadeClipsNear = shadowCascadeClips.slice();
@@ -330,21 +336,33 @@ class ShadowMapPass extends Notifier {
         shadowCascadeClipsFar.reverse();
         // directionalLightShadowMaps.reverse();
         directionalLightMatrices.reverse();
-        shadowUniforms.shadowCascadeClipsNear = { value: shadowCascadeClipsNear, type: '1fv' };
-        shadowUniforms.shadowCascadeClipsFar = { value: shadowCascadeClipsFar, type: '1fv' };
+        shadowUniforms.shadowCascadeClipsNear = {
+          value: shadowCascadeClipsNear,
+          type: '1f',
+          array: true
+        };
+        shadowUniforms.shadowCascadeClipsFar = {
+          value: shadowCascadeClipsFar,
+          type: '1f',
+          array: true
+        };
       }
     }
 
     if (spotLightShadowMaps.length > 0) {
       const spotLightShadowMapSizes = spotLightShadowMaps.map(getSize);
       const shadowUniforms = scene.shadowUniforms;
-      shadowUniforms.spotLightShadowMaps = { value: spotLightShadowMaps, type: 'tv' };
-      shadowUniforms.spotLightMatrices = { value: spotLightMatrices, type: 'm4v' };
-      shadowUniforms.spotLightShadowMapSizes = { value: spotLightShadowMapSizes, type: '1fv' };
+      shadowUniforms.spotLightShadowMaps = { value: spotLightShadowMaps, type: 't', array: true };
+      shadowUniforms.spotLightMatrices = { value: spotLightMatrices, type: 'm4', array: true };
+      shadowUniforms.spotLightShadowMapSizes = {
+        value: spotLightShadowMapSizes,
+        type: '1f',
+        array: true
+      };
     }
 
     if (pointLightShadowMaps.length > 0) {
-      shadowUniforms.pointLightShadowMaps = { value: pointLightShadowMaps, type: 'tv' };
+      shadowUniforms.pointLightShadowMaps = { value: pointLightShadowMaps, type: 't', array: true };
     }
   }
 

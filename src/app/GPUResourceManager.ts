@@ -52,18 +52,21 @@ function collectResources(
         const textureUniforms = material.getTextureUniforms();
         for (let u = 0; u < textureUniforms.length; u++) {
           const uniformName = textureUniforms[u];
-          const val = material.uniforms[uniformName].value;
-          const uniformType = material.uniforms[uniformName].type;
+          const uniformObj = material.uniforms[uniformName];
+          const val = uniformObj.value;
+          const uniformType = uniformObj.type;
           if (!val) {
             continue;
           }
           if (uniformType === 't') {
-            updateUsed(val, textureResourceList);
-          } else if (uniformType === 'tv') {
-            for (let k = 0; k < val.length; k++) {
-              if (val[k]) {
-                updateUsed(val[k], textureResourceList);
+            if (uniformObj.array) {
+              for (let k = 0; k < val.length; k++) {
+                if (val[k]) {
+                  updateUsed(val[k], textureResourceList);
+                }
               }
+            } else {
+              updateUsed(val, textureResourceList);
             }
           }
         }

@@ -673,7 +673,7 @@ class Renderer extends Notifier {
           }
           // Force set the uniform. Because underhood it only compares reference.
           // And we share reference between renderables.
-          program.set(gl, semanticInfo.type, semanticInfo.name, matrix, true);
+          program.set(gl, semanticInfo.type, semanticInfo.name, matrix, false, true);
         }
       }
     };
@@ -785,18 +785,21 @@ class Renderer extends Notifier {
         const textureUniforms = material.getTextureUniforms();
         for (let u = 0; u < textureUniforms.length; u++) {
           const uniformName = textureUniforms[u];
-          const val = material.uniforms[uniformName].value as any;
-          const uniformType = material.uniforms[uniformName].type;
+          const uniformObj = material.uniforms[uniformName];
+          const val = uniformObj.value as any;
+          const uniformType = uniformObj.type;
           if (!val) {
             continue;
           }
           if (uniformType === 't') {
-            glRenderer.disposeTexture(val);
-          } else if (uniformType === 'tv') {
-            for (let k = 0; k < val.length; k++) {
-              if (val[k]) {
-                glRenderer.disposeTexture(val[k]);
+            if (uniformObj.array) {
+              for (let k = 0; k < val.length; k++) {
+                if (val[k]) {
+                  glRenderer.disposeTexture(val[k]);
+                }
               }
+            } else {
+              glRenderer.disposeTexture(val);
             }
           }
         }

@@ -91,28 +91,7 @@ type NativeToClayAttributeMap = {
   vec4: 'float';
 };
 
-type NativeToMaterialUniformArrayTypeMap = {
-  bool: '1iv';
-  int: '1iv';
-  sampler2D: 'tv';
-  samplerCube: 'tv';
-  float: '1fv';
-  vec2: '2fv';
-  vec3: '3fv';
-  vec4: '4fv';
-  ivec2: '2iv';
-  ivec3: '3iv';
-  ivec4: '4iv';
-  mat2: 'm2v';
-  mat3: 'm3v';
-  mat4: 'm4v';
-  rgb: '3fv';
-  rgba: '4fv';
-};
-
-export type MaterialUniformType =
-  | NativeToMaterialUniformTypeMap[NativeUniformType]
-  | NativeToMaterialUniformArrayTypeMap[keyof NativeToMaterialUniformArrayTypeMap];
+export type MaterialUniformType = NativeToMaterialUniformTypeMap[NativeUniformType];
 
 export type AttributeSemantic =
   | 'POSITION'
@@ -187,11 +166,6 @@ export type MatrixSemantic =
 //   value: NativeUniformValueMap[T];
 //   semantic?: string;
 // };
-export interface MaterialUniform {
-  type: MaterialUniformType;
-  value: any;
-  semantic?: string;
-}
 
 // Tagged template
 export function glsl(strings: TemplateStringsArray, ...values: string[]) {
@@ -206,7 +180,8 @@ export function glsl(strings: TemplateStringsArray, ...values: string[]) {
 }
 
 type ShaderUniformLoose = {
-  type: NativeUniformType;
+  type: NativeUniformType | Record<string, NativeUniformType>;
+  // Default value
   value?: unknown;
   semantic?: AttributeSemantic | UniformSemantic | MatrixSemantic;
   len?: number | string;
@@ -221,6 +196,18 @@ type ShaderAttributeLoose = {
 type ShaderVaringLoose = {
   type: NativeUniformType;
 };
+
+export function createStructUniform<
+  T extends Record<string, NativeUniformType>,
+  S extends number | string | undefined
+>(type: T, value?: Record<keyof T, NativeUniformValueMap[T[keyof T]]>, len?: S) {
+  return {
+    type,
+    value,
+    len,
+    array: !!len as S extends undefined ? false : true
+  };
+}
 
 export function createUniform<
   T extends NativeUniformType,
@@ -505,19 +492,16 @@ ${stageShader.main}
 type ConvertShaderUniformToMaterialUniform<T extends Dict<ShaderUniformLoose>> = {
   [key in keyof T]: {
     value: T[key]['value'];
+    array: NonNullable<T[key]['array']>;
     // TODO Needs more precise type
-    type: T[key]['array'] extends true
-      ? NativeToMaterialUniformArrayTypeMap[T[key]['type']]
-      : NativeToMaterialUniformTypeMap[T[key]['type']];
+    type: NativeToMaterialUniformTypeMap[T[key]['type']];
     semantic?: T[key]['semantic'];
   };
 };
 
-function cloneUniformVal(type: MaterialUniformType, val: any) {
+function cloneUniformVal(type: MaterialUniformType, array: boolean, val: any) {
   if (val && val.length != null) {
-    return type.endsWith('v')
-      ? val.map((item: any) => cloneUniformVal(type.slice(0, -1) as MaterialUniformType, item))
-      : Array.from(val);
+    return array ? val.map((item: any) => cloneUniformVal(type, false, item)) : Array.from(val);
   }
   return val;
 }
@@ -632,7 +616,8 @@ export class Shader<
       const tpl = (uniformTpls as any)[uniformName];
       uniforms[uniformName] = {
         type: tpl.type,
-        value: cloneUniformVal(tpl.type, tpl.value) // Default value?
+        array: tpl.array,
+        value: cloneUniformVal(tpl.type, tpl.array, tpl.value) // Default value?
       };
     });
 
@@ -664,7 +649,8 @@ export class Shader<
         }
         const materialUniformObj = {
           name: uniformName,
-          type: (uniformTypeMap[uniformType] + (uniform.array ? 'v' : '')) as MaterialUniformType
+          array: uniform.array || false,
+          type: uniformTypeMap[uniformType]
         };
 
         if (uniformSemantic) {
@@ -738,6 +724,7 @@ export class Shader<
 
   static uniform = createUniform;
   static arrayUniform = createArrayUniform;
+  static structUniform = createStructUniform;
   static attribute = createAttribute;
   static varying = createVarying;
   static semanticUniform = createSemanticUniform;
