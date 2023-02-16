@@ -23,7 +23,7 @@ class AmbientSHLight extends Light {
 
 AmbientSHLight.prototype.uniformTemplates = {
   ambientSHLightColor: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       const color = instance.color;
       const intensity = instance.intensity;
@@ -32,7 +32,7 @@ AmbientSHLight.prototype.uniformTemplates = {
   },
 
   ambientSHLightCoefficients: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       const coefficientsTmpArr = (instance as AmbientSHLight).__coefficientsTmpArr;
       for (let i = 0; i < (instance as AmbientSHLight).coefficients.length; i++) {

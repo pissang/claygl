@@ -24,19 +24,19 @@ class PointLight extends Light {
 
 PointLight.prototype.uniformTemplates = {
   pointLightPosition: {
-    type: '3f',
+    type: 'vec3',
     value: function (instance) {
       return instance.getWorldPosition().array;
     }
   },
   pointLightRange: {
-    type: '1f',
+    type: 'float',
     value: function (instance) {
       return (instance as PointLight).range;
     }
   },
   pointLightColor: {
-    type: '3f',
+    type: 'vec3',
     value: function (instance) {
       const color = instance.color;
       const intensity = instance.intensity;

@@ -201,12 +201,12 @@ class RenderGraphNode {
     // Clear before rebind.
     sharedFrameBuffer && sharedFrameBuffer.clearTextures();
 
-    outputNames.forEach((outputName) => {
+    outputNames.forEach((outputName, idx) => {
       const parameters = this.getTextureParams(outputName, renderer);
       // TODO Avoid reading from composite node too much
       const outputInfo = this._compositeNode.outputs![outputName];
       const texture = texturePool.allocate(parameters);
-      const attachment = outputInfo.attachment || COLOR_ATTACHMENT0;
+      const attachment = outputInfo.attachment || COLOR_ATTACHMENT0 + idx;
       this._outputTextures[outputName] = texture;
       outputTextures![outputName] = texture;
 

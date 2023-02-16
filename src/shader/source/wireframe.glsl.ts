@@ -44,7 +44,7 @@ void main() {
 export const wireframeFragment = new FragmentShader({
   name: 'wireframeFrag',
   uniforms: {
-    color: uniform('rgb', [0, 0, 0]),
+    color: uniform('vec3', [0, 0, 0]),
     alpha: uniform('float', 1),
     lineWidth: uniform('float', 0)
   },

@@ -69,7 +69,7 @@ class AmbientCubemapLight extends Light {
 
 AmbientCubemapLight.prototype.uniformTemplates = {
   ambientCubemapLightColor: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       const color = instance.color;
       const intensity = instance.intensity;
@@ -78,14 +78,14 @@ AmbientCubemapLight.prototype.uniformTemplates = {
   },
 
   ambientCubemapLightCubemap: {
-    type: 't',
+    type: 'samplerCube',
     value(instance) {
       return (instance as AmbientCubemapLight).cubemap;
     }
   },
 
   ambientCubemapLightBRDFLookup: {
-    type: 't',
+    type: 'sampler2D',
     value(instance) {
       return (instance as AmbientCubemapLight)._brdfLookup;
     }

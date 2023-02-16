@@ -9,8 +9,8 @@ import Matrix4 from './math/Matrix4';
 import type Renderable from './Renderable';
 import type Material from './Material';
 import Mesh from './Mesh';
-import { MaterialUniform, MaterialUniformType } from './Shader';
 import Skybox from './Skybox';
+import { GeneralMaterialUniformObject } from './Material';
 
 const IDENTITY = mat4.create();
 const WORLDVIEW = mat4.create();
@@ -86,7 +86,7 @@ class Scene extends ClayNode {
   viewBoundingBoxLastFrame = new BoundingBox();
 
   // Uniforms for shadow map.
-  shadowUniforms: Record<string, MaterialUniform> = {};
+  shadowUniforms: Record<string, GeneralMaterialUniformObject> = {};
 
   skybox?: Skybox;
 
@@ -94,7 +94,7 @@ class Scene extends ClayNode {
 
   // Properties to save the light information in the scene
   // Will be set in the render function
-  private _lightUniforms: Record<string, Record<string, MaterialUniform>> = {};
+  private _lightUniforms: Record<string, Record<string, GeneralMaterialUniformObject>> = {};
 
   private _previousLightNumber: Record<string, Record<string, number>> = {};
 
@@ -417,20 +417,22 @@ class Scene extends ClayNode {
         }
         if (!lightUniforms[group][symbol]) {
           lightUniforms[group][symbol] = {
+            type: uniformTpl.type,
+            array: true,
             value: []
-          } as MaterialUniform;
+          } as GeneralMaterialUniformObject;
         }
         const lu = lightUniforms[group][symbol];
-        lu.type = (uniformTpl.type + 'v') as MaterialUniformType;
         switch (uniformTpl.type) {
-          case '1i':
-          case '1f':
-          case 't':
+          case 'int':
+          case 'float':
+          case 'sampler2D':
+          case 'samplerCube':
             lu.value.push(value);
             break;
-          case '2f':
-          case '3f':
-          case '4f':
+          case 'vec2':
+          case 'vec3':
+          case 'vec4':
             for (let j = 0; j < value.length; j++) {
               lu.value.push(value[j]);
             }

@@ -49,7 +49,7 @@ class DirectionalLight extends Light {
 
 DirectionalLight.prototype.uniformTemplates = {
   directionalLightDirection: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       const dir = new Vector3();
       // Direction is target to eye
@@ -57,7 +57,7 @@ DirectionalLight.prototype.uniformTemplates = {
     }
   },
   directionalLightColor: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       const color = instance.color;
       const intensity = instance.intensity;

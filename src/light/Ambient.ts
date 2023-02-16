@@ -7,7 +7,7 @@ class AmbientLight extends Light {
 }
 AmbientLight.prototype.uniformTemplates = {
   ambientLightColor: {
-    type: '3f',
+    type: 'vec3',
     value(instance) {
       const color = instance.color;
       const intensity = instance.intensity;

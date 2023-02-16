@@ -2,6 +2,7 @@ import { Color } from './core/type';
 import { assign } from './core/util';
 import type Mesh from './Mesh';
 import ClayNode, { ClayNodeOpts } from './Node';
+import { UniformType } from './Shader';
 
 export interface LightOpts extends ClayNodeOpts {
   /**
@@ -55,7 +56,7 @@ class Light extends ClayNode {
   uniformTemplates?: Record<
     string,
     {
-      type: string;
+      type: UniformType;
       value: (instance: Light) => any;
     }
   >;

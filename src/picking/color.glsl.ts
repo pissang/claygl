@@ -27,7 +27,7 @@ void main(){
 export const colorFragment = new FragmentShader({
   name: 'colorFrag',
   uniforms: {
-    color: createUniform('rgba', [1, 1, 1, 1])
+    color: createUniform('vec4', [1, 1, 1, 1])
   },
   main: glsl`
 void main() {

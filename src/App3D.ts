@@ -38,7 +38,7 @@ import GPUResourceManager from './app/GPUResourceManager';
 import Camera from './Camera';
 import { EventManager, EventTriggers } from './app/EventManager';
 import type Renderable from './Renderable';
-import Shader from './Shader';
+import Shader, { isTextureUniform } from './Shader';
 import { createStandardShader } from './shader/create';
 import Geometry from './Geometry';
 import { Color } from './core/type';
@@ -628,7 +628,7 @@ class App3D extends Notifier {
       const uniformObj = (uniforms as any)[uniformName] as GeneralMaterialUniformObject;
       if (uniformObj && val != null) {
         if (
-          ((uniforms as any)[uniformName].type === 't' || isImageLikeElement(val)) &&
+          (isTextureUniform(uniformObj) || isImageLikeElement(val)) &&
           !(val instanceof Texture)
         ) {
           // Try to load a texture.

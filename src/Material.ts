@@ -6,10 +6,14 @@ import Shader, {
   ShaderType,
   VertexShader,
   FragmentShader,
-  MaterialUniformType
+  UniformType,
+  isTextureUniform,
+  NativeUniformType
 } from './Shader';
 import { defaultGetMaterialProgramKey } from './gl/ProgramManager';
 import Texture from './Texture';
+import Texture2D from './Texture2D';
+import TextureCube from './TextureCube';
 
 const programKeyCache: Record<string, string> = {};
 
@@ -62,15 +66,34 @@ export interface MaterialOpts {
 
 export type GeneralMaterialUniformObject =
   | {
-      type: 't';
-      value: Texture;
+      type: 'sampler2D';
+      array: false;
+      value: Texture2D;
     }
   | {
-      type: 'tv';
-      value: Texture[];
+      type: 'sampler2D';
+      array: true;
+      value: Texture2D[];
     }
   | {
-      type: Exclude<MaterialUniformType, 't' | 'tv'>;
+      type: 'samplerCube';
+      array: false;
+      value: TextureCube;
+    }
+  | {
+      type: 'samplerCube';
+      array: true;
+      value: TextureCube[];
+    }
+  // | {
+  //     type: '_struct';
+  //     struct: Record<string, NativeUniformType>;
+  //     array: boolean;
+  //     value: Record<string, any>;
+  //   }
+  | {
+      type: Exclude<UniformType, 'sampler2D' | 'samplerCube'>;
+      array: boolean;
       value: any;
     };
 
@@ -80,7 +103,7 @@ type UniformValueRecord<T extends Shader['uniformTpls']> = {
 type PickTextureUniforms<T extends Shader['uniformTpls']> = Pick<
   T,
   {
-    [key in keyof T]: T[key]['type'] extends 't' | 'tv' ? key : never;
+    [key in keyof T]: T[key]['type'] extends 'sampler2D' | 'samplerCube' ? key : never;
   }[keyof T]
 >;
 
@@ -136,10 +159,9 @@ class Material<
     const enabledUniforms = (this._enabledUniforms = util
       .keys(uniforms)
       .sort() as (keyof T['uniformTpls'])[]);
-    this._textureUniforms = enabledUniforms.filter((uniformName) => {
-      const type = uniforms[uniformName].type as MaterialUniformType;
-      return type === 't' || type === 'tv';
-    }) as (keyof PickTextureUniforms<T['uniformTpls']>)[];
+    this._textureUniforms = enabledUniforms.filter((uniformName) =>
+      isTextureUniform(uniforms[uniformName])
+    ) as (keyof PickTextureUniforms<T['uniformTpls']>)[];
 
     this.vertexDefines = util.clone(shader.vertexDefines);
     this.fragmentDefines = util.clone(shader.fragmentDefines);
@@ -175,22 +197,21 @@ class Material<
    * @param value
    */
   set<K extends keyof T['uniformTpls']>(symbol: K, value: T['uniformTpls'][K]['value']) {
+    // PENDING. Should we GIVE WARN when value is undefined?
     if (value === undefined) {
       return;
-      // console.warn('Uniform value "' + symbol + '" is undefined');
     }
     const uniform = this.uniforms[symbol];
     if (uniform) {
       if (util.isString(value)) {
         // Try to parse as a color. Invalid color string will return null.
-        // PENDING check rgb/rgba type?
         value = colorUtil.parseToFloat(value) || value;
       }
 
       uniform.value = value;
 
-      if (this.autoUpdateTextureStatus && uniform.type === 't') {
-        value ? this.enableTexture(symbol as any) : this.disableTexture(symbol as any);
+      if (this.autoUpdateTextureStatus && isTextureUniform(uniform)) {
+        this[value ? 'enableTexture' : 'disableTexture'](symbol as any);
       }
     }
   }

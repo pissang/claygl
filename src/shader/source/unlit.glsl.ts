@@ -73,12 +73,12 @@ void main()
 
 export const sharedBasicFragmentUniforms = {
   diffuseMap: uniform('sampler2D'),
-  color: uniform('rgb', [1, 1, 1]),
+  color: uniform('vec3', [1, 1, 1]),
   emission: uniform('vec3', [0, 0, 0]),
   alpha: uniform('float', 1),
   alphaCutoff: uniform('float', 0.9),
   lineWidth: uniform('float', 0),
-  lineColor: uniform('rgba', [0, 0, 0, 0.6])
+  lineColor: uniform('vec4', [0, 0, 0, 0.6])
 };
 
 export const unlitFragment = new FragmentShader({
