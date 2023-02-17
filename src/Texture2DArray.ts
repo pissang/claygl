@@ -6,19 +6,7 @@ export type Texture2DArrayData = {
   pixels?: TexturePixelSource[];
 };
 
-export interface Texture2DArrayOpts extends TextureOpts {
-  /**
-   * @example
-   *     [{
-   *         image: mipmap0,
-   *         pixels: null
-   *     }, {
-   *         image: mipmap1,
-   *         pixels: null
-   *     }, ....]
-   */
-  mipmaps?: Texture2DArrayData[];
-}
+export interface Texture2DArrayOpts extends TextureOpts, Texture2DArrayData {}
 
 interface Texture2DArray extends Omit<Texture2DArrayOpts, 'image'> {}
 class Texture2DArray extends Texture {
@@ -28,6 +16,9 @@ class Texture2DArray extends Texture {
 
   constructor(opts?: Partial<Texture2DArrayOpts>) {
     super(opts);
+    // TODO _image default value is inited after super().
+    this.image = (opts && opts.image) || [];
+    this.pixels = (opts && opts.pixels) || [];
   }
 
   hasImage() {

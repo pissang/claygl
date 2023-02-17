@@ -85,15 +85,9 @@ function getDefineCode(defines: Record<string, ShaderDefineValue>, enabledTextur
 // }
 
 function getPrecisionCode(precision: ShaderPrecision) {
-  return (
-    ['precision', precision, 'float'].join(' ') +
-    ';\n' +
-    ['precision', precision, 'int'].join(' ') +
-    ';\n' +
-    // depth texture may have precision problem on iOS device.
-    ['precision', precision, 'sampler2D'].join(' ') +
-    ';\n'
-  );
+  return ['float', 'int', 'sampler2D', 'sampler2DArray']
+    .map((type) => `precision ${precision} ${type};`)
+    .join('\n');
 }
 
 function getDefineKey(defines: Record<string, ShaderDefineValue>) {

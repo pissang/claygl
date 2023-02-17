@@ -120,6 +120,7 @@ class GLTexture {
       }
     } else {
       updateTextureData(gl, texture, 0, width, height);
+      // TODO check minFilter
       if (useMipmap) {
         gl.generateMipmap(textureTarget);
       }
@@ -198,26 +199,29 @@ class GLTexture {
     glFormat: GLEnum,
     glType: GLEnum
   ) {
-    const source = data.image || data.pixels;
-    if (source) {
+    // TODO mipmap
+    const sources = data.image || data.pixels;
+    if (sources) {
+      // TODO
       _gl.texStorage3D(
         constants.TEXTURE_2D_ARRAY,
-        level,
+        1,
         glInternalFormat,
         width,
         height,
-        source.length
+        sources.length
       );
-      source.forEach((source, idx) =>
+      sources.forEach((source, idx) =>
+        // TODO check image size are equal
         _gl.texSubImage3D(
           constants.TEXTURE_2D_ARRAY,
-          level,
           0,
           0,
+          0,
+          idx,
           width,
           height,
-          idx,
-          0,
+          1,
           glFormat,
           glType,
           source as HTMLImageElement
@@ -293,9 +297,7 @@ class GLTexture {
   }
 
   private _getBindTarget() {
-    return this._texture.textureType === 'texture2D'
-      ? constants.TEXTURE_2D
-      : constants.TEXTURE_CUBE_MAP;
+    return textureTargetMap[this._texture.textureType];
   }
 
   generateMipmap(gl: WebGL2RenderingContext) {

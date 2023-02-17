@@ -26,6 +26,8 @@ export { Timeline };
 
 export { default as Texture } from './Texture';
 export { default as Texture2D } from './Texture2D';
+export { default as Texture2DArray } from './Texture2DArray';
+export { default as Texture3D } from './Texture3D';
 export { default as TextureCube } from './TextureCube';
 
 export function startTimeline(onframe?: (deltaTime: number) => void) {

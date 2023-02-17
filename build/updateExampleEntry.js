@@ -1,6 +1,10 @@
-const { writeFileSync, existsSync } = require('fs');
-const glob = require('glob');
-const path = require('path');
+import { writeFileSync, existsSync } from 'fs';
+import glob from 'glob';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const html = (strings, ...vars) => {
   let result = '';

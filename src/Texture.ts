@@ -14,22 +14,31 @@ export type TexturePixelSource = Uint8Array | Float32Array;
 // Compatible with WebGL1 for float type storage.
 // PENDING
 export function getPossiblelInternalFormat(format: number, type: number) {
-  if (type === constants.HALF_FLOAT) {
-    return format === constants.RGBA
-      ? constants.RGBA16F
-      : format === constants.RGB
-      ? constants.RGB16F
-      : format === constants.RG
-      ? constants.RG16F
-      : constants.R16F;
-  } else if (type === constants.FLOAT) {
-    return format === constants.RGBA
-      ? constants.RGBA32F
-      : format === constants.RGB
-      ? constants.RGB32F
-      : format === constants.RG
-      ? constants.RG32F
-      : constants.R32F;
+  switch (type) {
+    case constants.HALF_FLOAT:
+      return format === constants.RGBA
+        ? constants.RGBA16F
+        : format === constants.RGB
+        ? constants.RGB16F
+        : format === constants.RG
+        ? constants.RG16F
+        : constants.R16F;
+    case constants.FLOAT:
+      return format === constants.RGBA
+        ? constants.RGBA32F
+        : format === constants.RGB
+        ? constants.RGB32F
+        : format === constants.RG
+        ? constants.RG32F
+        : constants.R32F;
+    case constants.UNSIGNED_BYTE:
+      return format === constants.RGBA
+        ? constants.RGBA8
+        : format === constants.RGB
+        ? constants.RGB8
+        : format === constants.RG
+        ? constants.RG8
+        : constants.R8;
   }
   return format;
 }
