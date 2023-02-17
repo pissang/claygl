@@ -40,7 +40,7 @@ const fs = new Shader.Fragment({
   },
   main: glsl`
 void main() {
-  out_color = vec4(texture(colorTex, vec3(0.0, 0.0,float(index))).rgb, 1.0);
+  out_color = vec4(texture(colorTex, vec3(0.0, 0.0, float(index))).rgb, 1.0);
 }`
 });
 
@@ -49,18 +49,16 @@ const uniforms = shader.createUniforms();
 
 function createCanvas(color: string) {
   const canvas = document.createElement('canvas');
-  canvas.width = 64;
-  canvas.height = 64;
+  canvas.width = 1;
+  canvas.height = 1;
   const ctx = canvas.getContext('2d')!;
   ctx.fillStyle = color;
-  ctx.fillRect(0, 0, 64, 64);
+  ctx.fillRect(0, 0, 1, 1);
   return canvas;
 }
 
 uniforms.colorTex.value = new Texture2DArray({
-  image: [createCanvas('red'), createCanvas('green')],
-  useMipmap: false,
-  minFilter: constants.LINEAR
+  image: [createCanvas('red'), createCanvas('green')]
 });
 
 let idx = 0;

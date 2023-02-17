@@ -108,8 +108,6 @@ interface App3DOpts {
 type StandardShader = ReturnType<typeof createStandardShader>;
 type CreateMaterialConfig<T extends Material['shader'] = StandardShader> = Partial<MaterialOpts> & {
   shader?: T;
-  // Textures opts
-  textureConvertToPOT?: boolean;
   textureFlipY?: boolean;
 
   textureLoaded?: (textureName: string, texture: Texture) => void;
@@ -598,7 +596,6 @@ class App3D extends Notifier {
    *                                 Uniforms can be `color`, `alpha` `diffuseMap` etc.
    * @param {string|clay.Shader} Default to be standard shader with metalness and roughness workflow.
    * @param {boolean} [transparent=false] If material is transparent.
-   * @param {boolean} [textureConvertToPOT=false] Force convert None Power of Two texture to Power of two so it can be tiled.
    * @param {boolean} [textureFlipY=true] If flip y of texture.
    * @param {Function} [textureLoaded] Callback when single texture loaded.
    * @param {Function} [texturesReady] Callback when all texture loaded.
@@ -634,7 +631,6 @@ class App3D extends Notifier {
           // Try to load a texture.
           texturesLoading.push(
             this.loadTexture(val, {
-              convertToPOT: matConfig!.textureConvertToPOT || false,
               flipY: util.optional(matConfig!.textureFlipY, true)
             }).then(makeTextureSetter(uniformName))
           );

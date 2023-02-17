@@ -8,6 +8,8 @@ import { Dict, UnionToIntersection } from './core/type';
 import { assign, genGUID, isString, keys } from './core/util';
 import { mat2, mat3, mat4, vec2, vec3, vec4 } from './glmatrix';
 import Texture2D from './Texture2D';
+import Texture2DArray from './Texture2DArray';
+import Texture3D from './Texture3D';
 import TextureCube from './TextureCube';
 
 export type ShaderDefineValue = boolean | string | number | undefined | null;
@@ -19,6 +21,7 @@ export type UniformType =
   | 'int'
   | 'sampler2D'
   | 'sampler2DArray'
+  | 'sampler3D'
   | 'samplerCube'
   | 'float'
   | 'vec2'
@@ -47,6 +50,8 @@ type NativeUniformValueMap = {
   int: number;
   sampler2D: Texture2D;
   samplerCube: TextureCube;
+  sampler3D: Texture3D;
+  sampler2DArray: Texture2DArray;
   float: number;
   vec2: vec2.Vec2Array;
   vec3: vec3.Vec3Array;
@@ -57,9 +62,6 @@ type NativeUniformValueMap = {
   mat2: mat2.Mat2Array;
   mat3: mat3.Mat3Array;
   mat4: mat4.Mat4Array;
-  // Special type color that support string
-  rgb: vec3.Vec3Array | string;
-  rgba: vec4.Vec4Array | string;
 };
 
 type NativeUniformArrayValueMap = {
@@ -67,6 +69,8 @@ type NativeUniformArrayValueMap = {
   int: ArrayLike<number>;
   sampler2D: Texture2D[];
   samplerCube: TextureCube[];
+  sampler3D: Texture3D[];
+  sampler2DArray: Texture2DArray[];
   float: ArrayLike<number>;
   vec2: ArrayLike<number>;
   vec3: ArrayLike<number>;
