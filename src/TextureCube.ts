@@ -1,9 +1,6 @@
 import Texture, { TextureImageSource, TextureOpts, TexturePixelSource } from './Texture';
-import * as constants from './core/constants';
 import * as mathUtil from './math/util';
 import vendor from './core/vendor';
-import Renderer from './Renderer';
-import { GLEnum } from './core/type';
 import { keys } from './core/util';
 
 const isPowerOfTwo = mathUtil.isPowerOfTwo;
@@ -125,25 +122,20 @@ class TextureCube extends Texture {
     let loading = 0;
     this.image = {} as Record<CubeTarget, TextureImageSource>;
     (keys(imageList) as CubeTarget[]).forEach((target) => {
-      const src = imageList[target];
-      const image = vendor.createImage();
-      if (crossOrigin) {
-        image.crossOrigin = crossOrigin;
-      }
-      image.onload = () => {
-        loading--;
-        if (loading === 0) {
-          this.dirty();
-          this.trigger('success', this);
+      this.image![target] = vendor.loadImage(
+        imageList[target],
+        crossOrigin,
+        () => {
+          if (--loading === 0) {
+            this.dirty();
+            this.trigger('success', this);
+          }
+        },
+        () => {
+          loading--;
         }
-      };
-      image.onerror = function () {
-        loading--;
-      };
-
+      );
       loading++;
-      image.src = src;
-      this.image![target] = image;
     });
 
     return this;

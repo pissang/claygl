@@ -1,7 +1,5 @@
 import Texture, { TextureImageSource, TextureOpts, TexturePixelSource } from './Texture';
-import * as constants from './core/constants';
 import vendor from './core/vendor';
-import Renderer from './Renderer';
 
 export interface Texture2DData {
   image?: TextureImageSource;
@@ -23,7 +21,6 @@ export interface Texture2DOpts extends TextureOpts, Texture2DData {
    *     }, ....]
    */
   mipmaps?: Texture2DData[];
-  convertToPOT?: boolean;
 }
 /**
  * @example
@@ -104,25 +101,20 @@ class Texture2D extends Texture {
   }
 
   load(src: string, crossOrigin?: string) {
-    const image = vendor.createImage();
-    if (crossOrigin) {
-      image.crossOrigin = crossOrigin;
-    }
-    image.onload = () => {
-      this.dirty();
-      this.trigger('load', this);
-    };
-    image.onerror = () => {
-      this.trigger('error', this);
-    };
-
-    image.src = src;
-    this.image = image;
+    this.image = vendor.loadImage(
+      src,
+      crossOrigin,
+      () => {
+        this.dirty();
+        this.trigger('load', this);
+      },
+      () => {
+        this.trigger('error', this);
+      }
+    );
 
     return this;
   }
 }
-
-Texture2D.prototype.convertToPOT = false;
 
 export default Texture2D;

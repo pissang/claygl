@@ -2,10 +2,21 @@ import * as constants from '../core/constants';
 import { GLEnum } from '../core/type';
 import { getPossiblelInternalFormat } from '../Texture';
 import Texture2D, { Texture2DData } from '../Texture2D';
+import Texture2DArray, { Texture2DArrayData } from '../Texture2DArray';
+import Texture3D, { Texture3DData } from '../Texture3D';
 import TextureCube, { cubeTargets, TextureCubeData } from '../TextureCube';
 import GLExtension from './GLExtension';
 
-function getAvailableMinFilter(texture: Texture2D | TextureCube) {
+type AllTextureType = Texture2D | TextureCube | Texture2DArray | Texture3D;
+
+const textureTargetMap = {
+  texture2D: constants.TEXTURE_2D,
+  textureCube: constants.TEXTURE_CUBE_MAP,
+  texture2DArray: constants.TEXTURE_2D_ARRAY,
+  texture3D: constants.TEXTURE_3D
+};
+
+function getAvailableMinFilter(texture: AllTextureType) {
   const minFilter = texture.minFilter;
   if (!texture.useMipmap) {
     return minFilter === constants.NEAREST_MIPMAP_NEAREST
@@ -23,14 +34,14 @@ class GLTexture {
    */
   slot: number = -1;
 
-  private _texture: Texture2D | TextureCube;
+  private _texture: AllTextureType;
 
   /**
    * Instance of webgl texture
    */
   private _webglIns?: WebGLTexture;
 
-  constructor(texture: Texture2D | TextureCube) {
+  constructor(texture: AllTextureType) {
     this._texture = texture;
   }
 
@@ -48,8 +59,7 @@ class GLTexture {
 
   update(gl: WebGL2RenderingContext, glExt: GLExtension) {
     const texture = this._texture;
-    const isTexture2D = texture.textureType === 'texture2D';
-    const textureTarget = isTexture2D ? constants.TEXTURE_2D : constants.TEXTURE_CUBE_MAP;
+    const textureTarget = textureTargetMap[texture.textureType];
     this.bind(gl);
 
     // Pixel storage
@@ -63,7 +73,7 @@ class GLTexture {
 
     const glInternalFormat =
       texture.internalFormat || getPossiblelInternalFormat(texture.format, texture.type);
-    const mipmaps = texture.mipmaps || [];
+    const mipmaps = (texture as Texture2D).mipmaps || [];
     const mipmapsLen = mipmaps.length;
     let glType = texture.type;
     let width = texture.width;
@@ -83,34 +93,22 @@ class GLTexture {
 
     const updateTextureData = (
       gl: WebGL2RenderingContext,
-      data: Texture2DData | TextureCubeData,
+      data: Texture2DData | Texture3DData | Texture2DArrayData | TextureCubeData,
       level: number,
       width: number,
       height: number
     ) => {
-      if (isTexture2D) {
-        this._updateTextureData2D(
-          gl,
-          data as Texture2DData,
-          level,
-          width,
-          height,
-          glInternalFormat,
-          glFormat,
-          glType
-        );
-      } else {
-        this._updateTextureDataCube(
-          gl,
-          data as TextureCubeData,
-          level,
-          width,
-          height,
-          glInternalFormat,
-          glFormat,
-          glType
-        );
-      }
+      this[`_update_${texture.textureType}`](
+        gl,
+        data as any,
+        level,
+        width,
+        height,
+        (texture as Texture3D).depth || 0,
+        glInternalFormat,
+        glFormat,
+        glType
+      );
     };
 
     if (mipmapsLen) {
@@ -130,12 +128,13 @@ class GLTexture {
     this.unbind(gl);
   }
 
-  private _updateTextureData2D(
+  private _update_texture2D(
     gl: WebGL2RenderingContext,
     data: Texture2DData,
     level: number,
     width: number,
     height: number,
+    depth: number,
     glInternalFormat: GLEnum,
     glFormat: GLEnum,
     glType: GLEnum
@@ -188,12 +187,78 @@ class GLTexture {
     }
   }
 
-  private _updateTextureDataCube(
+  private _update_texture2DArray(
+    _gl: WebGL2RenderingContext,
+    data: Texture2DArrayData,
+    level: number,
+    width: number,
+    height: number,
+    depth: number,
+    glInternalFormat: GLEnum,
+    glFormat: GLEnum,
+    glType: GLEnum
+  ) {
+    const source = data.image || data.pixels;
+    if (source) {
+      _gl.texStorage3D(
+        constants.TEXTURE_2D_ARRAY,
+        level,
+        glInternalFormat,
+        width,
+        height,
+        source.length
+      );
+      source.forEach((source, idx) =>
+        _gl.texSubImage3D(
+          constants.TEXTURE_2D_ARRAY,
+          level,
+          0,
+          0,
+          width,
+          height,
+          idx,
+          0,
+          glFormat,
+          glType,
+          source as HTMLImageElement
+        )
+      );
+    }
+  }
+
+  private _update_texture3D(
+    _gl: WebGL2RenderingContext,
+    data: Texture3DData,
+    level: number,
+    width: number,
+    height: number,
+    depth: number,
+    glInternalFormat: GLEnum,
+    glFormat: GLEnum,
+    glType: GLEnum
+  ) {
+    const source = data.pixels;
+    _gl.texImage3D(
+      constants.TEXTURE_3D,
+      level,
+      glInternalFormat,
+      width,
+      height,
+      depth,
+      0,
+      glFormat,
+      glType,
+      source || null
+    );
+  }
+
+  private _update_textureCube(
     _gl: WebGL2RenderingContext,
     data: TextureCubeData,
     level: number,
     width: number,
     height: number,
+    depth: number,
     glInternalFormat: GLEnum,
     glFormat: GLEnum,
     glType: GLEnum

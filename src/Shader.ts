@@ -18,6 +18,7 @@ export type UniformType =
   | 'bool'
   | 'int'
   | 'sampler2D'
+  | 'sampler2DArray'
   | 'samplerCube'
   | 'float'
   | 'vec2'
@@ -720,8 +721,8 @@ export class Shader<
   static Fragment = FragmentShader;
 }
 
-export function isTextureUniform(uniform: { type: UniformType | Record<string, UniformType> }) {
-  return uniform.type === 'sampler2D' || uniform.type === 'samplerCube';
+export function isTextureUniform(uniform: { type: UniformType }) {
+  return uniform.type.startsWith('sampler');
 }
 
 export default Shader;

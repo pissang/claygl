@@ -8,6 +8,12 @@ interface Vendor {
   createCanvas: () => HTMLCanvasElement;
   createBlankCanvas: (color: string) => HTMLCanvasElement;
   createImage: () => HTMLImageElement;
+  loadImage: (
+    src: string,
+    crossOrigin?: string,
+    onload?: () => void,
+    onerror?: () => void
+  ) => HTMLImageElement;
   request: {
     get: typeof get;
   };
@@ -66,6 +72,21 @@ vendor.createCanvas = function () {
 
 vendor.createImage = function () {
   return new g.Image();
+};
+
+vendor.loadImage = function (src, crossOrigin, onload, onerror) {
+  const image = vendor.createImage();
+  if (crossOrigin) {
+    image.crossOrigin = crossOrigin;
+  }
+  image.onload = function () {
+    onload && onload();
+  };
+  image.onerror = function () {
+    onerror && onerror();
+  };
+  image.src = src;
+  return image;
 };
 
 vendor.request = {
