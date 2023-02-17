@@ -9,7 +9,7 @@ import type BoundingBox from './math/BoundingBox';
 import type { Intersection } from './picking/rayPicking';
 import { AttributeSemantic } from './Shader';
 
-export type AttributeType = 'byte' | 'ubyte' | 'short' | 'ushort' | 'float';
+export type AttributeType = 'byte' | 'ubyte' | 'short' | 'ushort' | 'float' | 'int';
 export type AttributeSize = 1 | 2 | 3 | 4;
 export type AttributeValue = {
   [key: number]: number;
