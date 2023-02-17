@@ -1059,6 +1059,8 @@ function parseMeshes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpt
           attributeType = 'ubyte';
         } else if (attributeArray instanceof Int8Array) {
           attributeType = 'byte';
+        } else if (attributeArray instanceof Uint32Array) {
+          attributeType = 'int';
         }
         // TODO
         (geometry.attributes[attributeName] as any).type = attributeType;

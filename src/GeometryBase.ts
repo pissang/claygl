@@ -9,7 +9,7 @@ import type BoundingBox from './math/BoundingBox';
 import type { Intersection } from './picking/rayPicking';
 import { AttributeSemantic } from './Shader';
 
-export type AttributeType = 'int' | 'float';
+export type AttributeType = 'byte' | 'ubyte' | 'short' | 'ushort' | 'float';
 export type AttributeSize = 1 | 2 | 3 | 4;
 export type AttributeValue = {
   [key: number]: number;
@@ -19,7 +19,11 @@ export type AttributeValue = {
 function getArrayCtorByType(type: AttributeType) {
   return (
     {
-      int: Int32Array,
+      byte: Int8Array,
+      ubyte: Uint8Array,
+      short: Int16Array,
+      ushort: Uint16Array,
+      int: Uint32Array,
       float: Float32Array
     }[type] || Float32Array
   );

@@ -7,7 +7,11 @@ const enabledAttributesMap = new WeakMap<WebGL2RenderingContext, number[]>();
 
 export const attributeBufferTypeMap = {
   float: constants.FLOAT,
-  int: constants.INT
+  int: constants.INT,
+  byte: constants.BYTE,
+  ubyte: constants.UNSIGNED_BYTE,
+  short: constants.SHORT,
+  ushort: constants.UNSIGNED_SHORT
 };
 
 export class GLAttributeBuffer {
@@ -161,7 +165,7 @@ class GLBuffers {
 
       const buffer = attributeBufferInfo.buffer;
       const size = attributeBufferInfo.size;
-      const glType = attributeBufferTypeMap[attributeBufferInfo.type];
+      const glType = attributeBufferTypeMap[attributeBufferInfo.type] || constants.FLOAT;
 
       gl.bindBuffer(constants.ARRAY_BUFFER, buffer);
       if (glType === constants.INT) {
@@ -169,6 +173,7 @@ class GLBuffers {
       } else {
         gl.vertexAttribPointer(location, size, glType, false, 0, 0);
       }
+
       currentEnabledAttributes[location] = 1;
       if (!lastEnabledAttributes[location]) {
         gl.enableVertexAttribArray(location);
