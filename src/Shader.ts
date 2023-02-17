@@ -42,7 +42,11 @@ const attributeSizeMap = {
   vec2: 2,
   vec3: 3,
   vec4: 4,
-  float: 1
+  ivec2: 2,
+  ivec3: 3,
+  ivec4: 4,
+  float: 1,
+  int: 1
 } as const;
 
 type NativeUniformValueMap = {
@@ -83,7 +87,7 @@ type NativeUniformArrayValueMap = {
   mat4: ArrayLike<number>;
 };
 
-type NativeAttributeType = 'float' | 'vec2' | 'vec3' | 'vec4';
+type NativeAttributeType = keyof typeof attributeSizeMap;
 
 export type AttributeSemantic =
   | 'POSITION'
@@ -459,17 +463,22 @@ function composeShaderString(stageShader: StageShader, isVertex: boolean) {
 
   // Only compose the uniform, attributes, varying, and codes.
   // Defines will be composed dynamically in GLProgram based on the material
-  function composePart(varType: 'uniform' | 'in' | 'out', obj: Dict<ShaderUniformLoose>) {
+  function composePart(
+    varType: 'uniform' | 'in' | 'out',
+    obj: Dict<ShaderUniformLoose>,
+    isVaring?: boolean
+  ) {
     return keys(obj)
       .map((symbol) => {
         const item = obj[symbol];
         // Use #define to define the length. Need to check #ifdef here.
         const isDefinedLen = item.array && isNaN(+item.len!);
         const arrayExpr = item.array ? `[${item.len}]` : '';
+        const needsFlat = isVaring && item.type.startsWith('i');
         return (
           (isDefinedLen ? `#ifdef ${item.len!}\n` : '') +
           // `${composeStruct(item.struct, symbol)}` +
-          `${varType} ${
+          `${needsFlat ? 'flat ' : ''}${varType} ${
             // item.struct ? getStructName(symbol) :
             item.type
           } ${symbol}${arrayExpr};` +
@@ -490,7 +499,7 @@ ${
 }
 ${composePart('uniform', stageShader.uniforms as any)}
 ${composePart('in', stageShader.attributes as any)}
-${composePart(isVertex ? 'out' : 'in', stageShader.varyings as any)}
+${composePart(isVertex ? 'out' : 'in', stageShader.varyings as any, true)}
 ${stageShader.functions.map((func) => func()).join('\n')}
 
 ${stageShader.main}
@@ -566,8 +575,7 @@ export class Shader<
   readonly attributes: Record<
     string,
     {
-      // TODO Can only be float
-      type: 'float';
+      type: 'float' | 'int';
       size: number;
       semantic?: string;
     }
@@ -690,7 +698,7 @@ export class Shader<
         };
       }
       attributes[attrName] = {
-        type: 'float',
+        type: attrName.startsWith('i') ? 'int' : 'float',
         semantic,
         size: attributeSizeMap[attr.type]
       };
