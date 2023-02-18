@@ -14,6 +14,8 @@ import { defaultGetMaterialProgramKey } from './gl/ProgramManager';
 import Texture from './Texture';
 import Texture2D from './Texture2D';
 import TextureCube from './TextureCube';
+import Texture2DArray from './Texture2DArray';
+import Texture3D from './Texture3D';
 
 const programKeyCache: Record<string, string> = {};
 
@@ -64,27 +66,23 @@ export interface MaterialOpts {
   fragmentDefines: Record<string, ShaderDefineValue>;
 }
 
+type CreateSamplerMaterialUniformObject<Type, Value> =
+  | {
+      type: Type;
+      array: false;
+      value: Value | null;
+    }
+  | {
+      type: Type;
+      array: true;
+      value: Value[] | null;
+    };
+
 export type GeneralMaterialUniformObject =
-  | {
-      type: 'sampler2D';
-      array: false;
-      value: Texture2D;
-    }
-  | {
-      type: 'sampler2D';
-      array: true;
-      value: Texture2D[];
-    }
-  | {
-      type: 'samplerCube';
-      array: false;
-      value: TextureCube;
-    }
-  | {
-      type: 'samplerCube';
-      array: true;
-      value: TextureCube[];
-    }
+  | CreateSamplerMaterialUniformObject<'sampler2D', Texture2D>
+  | CreateSamplerMaterialUniformObject<'samplerCube', TextureCube>
+  | CreateSamplerMaterialUniformObject<'sampler2DArray', Texture2DArray>
+  | CreateSamplerMaterialUniformObject<'sampler3D', Texture3D>
   // | {
   //     type: '_struct';
   //     struct: Record<string, NativeUniformType>;
@@ -92,13 +90,13 @@ export type GeneralMaterialUniformObject =
   //     value: Record<string, any>;
   //   }
   | {
-      type: Exclude<UniformType, 'sampler2D' | 'samplerCube'>;
+      type: Exclude<UniformType, 'sampler2D' | 'samplerCube' | 'sampler2DArray' | 'sampler3D'>;
       array: boolean;
       value: any;
     };
 
 type UniformValueRecord<T extends Shader['uniformTpls']> = {
-  [key in keyof T]?: T[key]['value'];
+  [key in keyof T]?: T[key]['value'] | null;
 };
 type PickTextureUniforms<T extends Shader['uniformTpls']> = Pick<
   T,
@@ -196,7 +194,7 @@ class Material<
    * @param symbol
    * @param value
    */
-  set<K extends keyof T['uniformTpls']>(symbol: K, value: T['uniformTpls'][K]['value']) {
+  set<K extends keyof T['uniformTpls']>(symbol: K, value: T['uniformTpls'][K]['value'] | null) {
     // PENDING. Should we GIVE WARN when value is undefined?
     if (value === undefined) {
       return;
