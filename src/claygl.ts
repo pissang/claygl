@@ -115,10 +115,14 @@ export { default as App3D } from './App3D';
 // Composite
 export { default as FullscreenQuadPass } from './composite/Pass';
 export { default as Compositor } from './composite/Compositor';
-export { default as CompositeNode } from './composite/CompositeNode';
+export {
+  default as CompositeNode,
+  CompositeNodeOutput,
+  CompositeNodeInput
+} from './composite/CompositeNode';
 export { default as FilterCompositeNode } from './composite/FilterNode';
 export { default as SceneCompositeNode } from './composite/SceneNode';
-export { default as GroupCompositeNode } from './composite/GroupNode';
+export { default as GroupCompositeNode, GroupOutput, GroupInput } from './composite/GroupNode';
 
 // Deferred renderer
 export { default as DeferredGBuffer } from './deferred/GBuffer';
