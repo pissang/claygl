@@ -45,6 +45,10 @@ export interface CompositeNodeOutput
    * If this output is disabled.
    */
   disabled?: boolean;
+  /**
+   * If texture will be persisted.
+   */
+  persist?: boolean;
 }
 
 /**

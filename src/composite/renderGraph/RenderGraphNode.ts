@@ -93,6 +93,11 @@ class RenderGraphNode {
       params.width = Math.round(params.width);
       params.height = Math.round(params.height);
 
+      // Not generate mipmap by default. It will cause huge performance drop.
+      if (params.useMipmap == null) {
+        params.useMipmap = false;
+      }
+
       textureParams[outputName] = params;
     }
     return textureParams[outputName];
@@ -184,6 +189,8 @@ class RenderGraphNode {
     const outputNames = hasOutput ? keys(outputLinks) : [];
     const sharedFrameBuffer = hasOutput ? renderGraph.getFrameBuffer() : undefined;
     const texturePool = renderGraph.getTexturePool();
+    const outputTextures = this._outputTextures;
+    const compositeNode = this._compositeNode;
 
     const inputTextures: Record<string, Texture> = {};
     inputNames.forEach((inputName) => {
@@ -194,34 +201,38 @@ class RenderGraphNode {
       }
     });
 
-    // MRT Support in chrome
-    // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-    const outputTextures: Record<string, Texture> | undefined = hasOutput ? {} : undefined;
+    const MRTOutputTextures: Record<string, Texture> | undefined = hasOutput ? {} : undefined;
 
     // Clear before rebind.
     sharedFrameBuffer && sharedFrameBuffer.clearTextures();
 
     outputNames.forEach((outputName, idx) => {
+      const outputInfo = compositeNode.outputs![outputName];
       const parameters = this.getTextureParams(outputName, renderer);
-      // TODO Avoid reading from composite node too much
-      const outputInfo = this._compositeNode.outputs![outputName];
-      const texture = texturePool.allocate(parameters);
+      let texture: Texture2D;
+      if (!outputInfo.persist) {
+        texture = texturePool.allocate(parameters);
+      } else {
+        texture = outputTextures[outputName] || new Texture2D();
+        // PENDING
+        assign(texture, parameters);
+      }
       const attachment = outputInfo.attachment || COLOR_ATTACHMENT0 + idx;
-      this._outputTextures[outputName] = texture;
-      outputTextures![outputName] = texture;
+
+      outputTextures[outputName] = texture;
+      MRTOutputTextures![outputName] = texture;
 
       // FIXME attachment changes in different nodes
       sharedFrameBuffer!.attach(texture, +attachment);
     });
 
-    const compositeNode = this._compositeNode;
     // TODO. Getting viewport in the beforeRender hook will be wrong because frame buffer is not bound yet.
     compositeNode.beforeRender &&
-      compositeNode.beforeRender(renderer, inputTextures, outputTextures);
+      compositeNode.beforeRender(renderer, inputTextures, MRTOutputTextures);
     compositeNode.render(
       renderer,
       inputTextures,
-      outputTextures,
+      MRTOutputTextures,
       sharedFrameBuffer || finalFrameBuffer
     );
     compositeNode.afterRender && compositeNode.afterRender();
@@ -233,8 +244,9 @@ class RenderGraphNode {
 
     // Release textures that are not linked
     outputNames.forEach((outputName) => {
-      const texture = outputTextures![outputName] as Texture2D;
-      if (!outputLinks[outputName].length) {
+      const texture = MRTOutputTextures![outputName] as Texture2D;
+      const outputInfo = compositeNode.outputs![outputName];
+      if (!outputLinks[outputName].length && !outputInfo.persist) {
         texturePool.release(texture);
       }
     });
@@ -300,9 +312,10 @@ class RenderGraphNode {
     // Put back all the textures to pool
     keys(this._outputs).forEach((outputName) => {
       const outputTexture = this._outputTextures[outputName];
+      const outputInfo = this._compositeNode.outputs![outputName];
       if (this._needsKeepPrevFrame[outputName]) {
         this._prevOutputTextures[outputName] = outputTexture;
-      } else {
+      } else if (!outputInfo.persist) {
         texturePool.release(outputTexture);
       }
     });
@@ -314,7 +327,8 @@ class RenderGraphNode {
     const refCount = link.prevFrame ? this._prevOutputRefCount : this._outputRefCount;
     refCount[outputName]--;
     if (refCount[outputName] <= 0) {
-      if (link.prevFrame || !this._needsKeepPrevFrame[outputName]) {
+      const outputInfo = this._compositeNode.outputs![outputName];
+      if (!outputInfo.persist && (link.prevFrame || !this._needsKeepPrevFrame[outputName])) {
         texturePool.release(texture as Texture2D);
       }
     }

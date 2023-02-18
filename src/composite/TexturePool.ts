@@ -71,16 +71,13 @@ class TexturePool {
   }
 }
 const defaultParams: Partial<TexturePoolParameters> = {
-  width: 512,
-  height: 512,
   type: constants.UNSIGNED_BYTE,
   format: constants.RGBA,
   wrapS: constants.CLAMP_TO_EDGE,
   wrapT: constants.CLAMP_TO_EDGE,
-  minFilter: constants.LINEAR,
+  minFilter: constants.LINEAR_MIPMAP_LINEAR,
   magFilter: constants.LINEAR,
-  // Not generate mipmap by default. It will cause huge performance drop.
-  useMipmap: false,
+  useMipmap: true,
   anisotropic: 1
 } as const;
 
