@@ -2,7 +2,7 @@ import { setCanvasSize } from './core/util';
 import Timeline from './Timeline';
 
 // Core
-export { default as Renderer } from './Renderer';
+export { default as Renderer, RenderHooks, RenderableObject } from './Renderer';
 export { default as Material } from './Material';
 export { default as Shader, glsl, createShaderMixin, VertexShader, FragmentShader } from './Shader';
 import { default as Node } from './Node';
