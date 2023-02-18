@@ -58,7 +58,7 @@ class Texture2DArray extends Texture<TextureSource[]> {
   }
 
   load(srcList: string[], crossOrigin?: string): Promise<void> {
-    return (this._loadingPromise = new Promise((resolve, reject) => {
+    return this.startLoading((resolve, reject) => {
       this.source = [];
       let loading = 0;
       const done = () => {
@@ -71,7 +71,7 @@ class Texture2DArray extends Texture<TextureSource[]> {
         this.source![idx] = vendor.loadImage(src, crossOrigin, done, done);
         loading++;
       });
-    }));
+    });
   }
 }
 

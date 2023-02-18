@@ -73,7 +73,7 @@ class Texture2D extends Texture<TextureSource> {
   }
 
   load(src: string, crossOrigin?: string): Promise<void> {
-    return (this._loadingPromise = new Promise((resolve, reject) => {
+    return this.startLoading((resolve, reject) => {
       this.source = vendor.loadImage(
         src,
         crossOrigin,
@@ -82,10 +82,10 @@ class Texture2D extends Texture<TextureSource> {
           resolve();
         },
         (e) => {
-          reject(e);
+          reject();
         }
       );
-    }));
+    });
   }
 }
 

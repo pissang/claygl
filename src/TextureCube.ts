@@ -116,7 +116,7 @@ class TextureCube extends Texture<TextureCubeSource> {
   }
 
   load(srcList: Record<CubeTarget, string>, crossOrigin?: string): Promise<void> {
-    return (this._loadingPromise = new Promise((resolve, reject) => {
+    return this.startLoading((resolve, reject) => {
       this.source = {} as Record<CubeTarget, TextureImageSource>;
       let loading = 0;
       const done = () => {
@@ -129,7 +129,7 @@ class TextureCube extends Texture<TextureCubeSource> {
         this.source![target] = vendor.loadImage(srcList[target], crossOrigin, done, done);
         loading++;
       });
-    }));
+    });
   }
 }
 

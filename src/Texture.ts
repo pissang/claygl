@@ -168,7 +168,7 @@ abstract class Texture<TSource = unknown> {
 
   private _source?: TSource;
 
-  protected _loadingPromise?: Promise<void>;
+  private _loadingPromise?: Promise<void>;
 
   constructor(opts?: Partial<TextureOpts>) {
     assign(this, opts);
@@ -231,10 +231,10 @@ abstract class Texture<TSource = unknown> {
     return this.isRenderable() ? Promise.resolve() : this._loadingPromise;
   }
 
-  startLoading(doLoading: (onFinished: () => void) => void) {
-    this._loadingPromise = new Promise((resolve) => {
-      doLoading(resolve);
-    });
+  startLoading(doLoading: (resolve: () => void, reject: () => void) => void) {
+    return (this._loadingPromise = new Promise((resolve, reject) => {
+      doLoading(resolve, reject);
+    }));
   }
 
   // TODO check ready
