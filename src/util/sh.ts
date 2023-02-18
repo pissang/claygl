@@ -159,7 +159,7 @@ export function projectEnvironmentMap(
       environmentMap: envMap
     });
   } else {
-    size = envMap.image && envMap.image.px ? envMap.image.px.width : envMap.width;
+    size = envMap.source && envMap.source.px ? envMap.source.px.width : envMap.width;
     skybox = new Skybox({
       environmentMap: envMap
     });

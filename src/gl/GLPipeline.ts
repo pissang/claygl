@@ -588,7 +588,7 @@ class GLPipeline {
     return (
       this._blankTexture ||
       (this._blankTexture = new Texture2D({
-        image: vendor.createBlankCanvas('#000')
+        source: vendor.createBlankCanvas('#000')
       }))
     );
   }
