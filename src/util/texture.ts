@@ -92,7 +92,7 @@ export function loadTextureSync(
     });
   } else {
     texture = new Texture2D();
-    texture.load(path).then(() => (onload as TextureOnload)(texture), onerror);
+    texture.load(path).then(() => onload && onload(texture), onerror);
   }
   return texture;
 }
