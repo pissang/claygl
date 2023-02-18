@@ -1,43 +1,64 @@
 import Texture, { TextureOpts, TexturePixelSource } from './Texture';
 
-export interface Texture3DData {
-  /**
-   * Pixels data. Will be ignored if image is set.
-   */
-  pixels?: TexturePixelSource;
-}
+export interface Texture3DOpts extends TextureOpts<TexturePixelSource> {}
 
-export interface Texture3DOpts extends TextureOpts, Texture3DData {}
-
-interface Texture3D extends Texture3DOpts {}
-class Texture3D extends Texture {
+class Texture3D extends Texture<TexturePixelSource> {
   readonly textureType = 'texture3D';
 
   private _depth: number = 512;
 
-  pixels?: TexturePixelSource;
-
-  constructor(opts?: TextureOpts) {
+  constructor(opts?: Partial<Texture3DOpts>) {
     super(opts);
   }
 
   get width() {
+    if (this.source) {
+      return this.source.width;
+    }
     return this._width;
   }
   set width(value: number) {
-    this._width = value;
+    if (this.source) {
+      console.warn("Texture from source can't set width");
+    } else {
+      if (this._width !== value) {
+        this.dirty();
+      }
+      this._width = value;
+    }
   }
   get height() {
+    if (this.source) {
+      return this.source.height;
+    }
     return this._height;
   }
   set height(value: number) {
-    this._height = value;
+    if (this.source) {
+      console.warn("Texture from source can't set height");
+    } else {
+      if (this._height !== value) {
+        this.dirty();
+      }
+      this._height = value;
+    }
   }
+
   get depth() {
+    if (this.source) {
+      return this.source.depth!;
+    }
     return this._depth;
   }
   set depth(value: number) {
-    this._depth = value;
+    if (this.source) {
+      console.warn("Texture from source can't set depth");
+    } else {
+      if (this._depth !== value) {
+        this.dirty();
+      }
+      this._depth = value;
+    }
   }
 
   isRenderable() {

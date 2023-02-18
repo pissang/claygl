@@ -1,4 +1,9 @@
-import Texture, { TextureImageSource, TextureOpts, TexturePixelSource } from './Texture';
+import Texture, {
+  TextureImageSource,
+  TextureOpts,
+  TexturePixelSource,
+  TextureSource
+} from './Texture';
 import * as mathUtil from './math/util';
 import vendor from './core/vendor';
 import { keys } from './core/util';
@@ -8,21 +13,11 @@ const isPowerOfTwo = mathUtil.isPowerOfTwo;
 export const cubeTargets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
 export type CubeTarget = 'px' | 'nx' | 'py' | 'ny' | 'pz' | 'nz';
 
-export interface TextureCubeData {
-  image?: Record<CubeTarget, TextureImageSource>;
-  /**
-   * Pixels data. Will be ignored if image is set.
-   */
-  pixels?: Record<CubeTarget, TexturePixelSource>;
-}
-export interface TextureCubeOpts extends TextureOpts, TextureCubeData {
-  /**
-   * @type {Array.<Object>}
-   */
-  mipmaps?: TextureCubeData[];
+export type TextureCubeSource = Record<CubeTarget, TextureSource | undefined>;
+export interface TextureCubeOpts extends TextureOpts<TextureCubeSource> {
+  mipmaps?: Record<CubeTarget, TextureSource>[];
 }
 
-interface TextureCube extends TextureCubeOpts {}
 /**
  * @constructor clay.TextureCube
  * @extends clay.Texture
@@ -50,24 +45,26 @@ interface TextureCube extends TextureCubeOpts {}
  *         });
  *     });
  */
-class TextureCube extends Texture {
+class TextureCube extends Texture<TextureCubeSource> {
   readonly textureType = 'textureCube';
+
+  mipmaps?: Record<CubeTarget, TextureSource>[];
 
   constructor(opts?: Partial<TextureCubeOpts>) {
     super(opts);
   }
 
   get width() {
-    const images = this.image;
-    if (images && images.px) {
-      return images.px.width;
+    const source = this.source;
+    if (source && source.px) {
+      return source.px.width;
     }
     return this._width;
   }
   set width(value: number) {
-    const images = this.image;
-    if (images && images.px) {
-      console.warn("Texture from image can't set width");
+    const source = this.source;
+    if (source && source.px) {
+      console.warn("Texture from source can't set width");
     } else {
       if (this._width !== value) {
         this.dirty();
@@ -76,15 +73,15 @@ class TextureCube extends Texture {
     }
   }
   get height() {
-    const images = this.image;
-    if (images && images.px) {
-      return images.px.height;
+    const source = this.source;
+    if (source && source.px) {
+      return source.px.height;
     }
     return this._height;
   }
   set height(value: number) {
-    const images = this.image;
-    if (images && images.px) {
+    const source = this.source;
+    if (source && source.px) {
       console.warn("Texture from image can't set height");
     } else {
       if (this._height !== value) {
@@ -96,54 +93,48 @@ class TextureCube extends Texture {
 
   // Overwrite the isPowerOfTwo method
   isPowerOfTwo() {
-    if (this.image && this.image.px) {
-      return isPowerOfTwo(this.image.px.width) && isPowerOfTwo(this.image.px.height);
+    if (this.source && this.source.px) {
+      return isPowerOfTwo(this.source.px.width) && isPowerOfTwo(this.source.px.height);
     } else {
       return isPowerOfTwo(this.width) && isPowerOfTwo(this.height);
     }
   }
 
   isRenderable() {
-    if (this.image && this.image.px) {
+    if (this.source && this.source.px) {
       return (
-        isImageRenderable(this.image.px) &&
-        isImageRenderable(this.image.nx) &&
-        isImageRenderable(this.image.py) &&
-        isImageRenderable(this.image.ny) &&
-        isImageRenderable(this.image.pz) &&
-        isImageRenderable(this.image.nz)
+        isImageRenderable(this.source.px) &&
+        isImageRenderable(this.source.nx) &&
+        isImageRenderable(this.source.py) &&
+        isImageRenderable(this.source.ny) &&
+        isImageRenderable(this.source.pz) &&
+        isImageRenderable(this.source.nz)
       );
     } else {
       return !!(this.width && this.height);
     }
   }
 
-  load(imageList: Record<CubeTarget, string>, crossOrigin?: string) {
-    let loading = 0;
-    this.image = {} as Record<CubeTarget, TextureImageSource>;
-    (keys(imageList) as CubeTarget[]).forEach((target) => {
-      this.image![target] = vendor.loadImage(
-        imageList[target],
-        crossOrigin,
-        () => {
-          if (--loading === 0) {
-            this.dirty();
-            this.trigger('success', this);
-          }
-        },
-        () => {
-          loading--;
+  load(srcList: Record<CubeTarget, string>, crossOrigin?: string): Promise<void> {
+    return (this._loadingPromise = new Promise((resolve, reject) => {
+      this.source = {} as Record<CubeTarget, TextureImageSource>;
+      let loading = 0;
+      const done = () => {
+        if (--loading === 0) {
+          this.dirty();
+          resolve();
         }
-      );
-      loading++;
-    });
-
-    return this;
+      };
+      (keys(srcList) as CubeTarget[]).forEach((target) => {
+        this.source![target] = vendor.loadImage(srcList[target], crossOrigin, done, done);
+        loading++;
+      });
+    }));
   }
 }
 
-function isImageRenderable(image: TextureImageSource) {
-  return image.width > 0 && image.height > 0;
+function isImageRenderable(image: TextureSource | undefined) {
+  return image != null && image.width > 0 && image.height > 0;
 }
 
 export default TextureCube;

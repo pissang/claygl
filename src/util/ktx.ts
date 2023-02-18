@@ -102,7 +102,7 @@ export function parse(arraybuffer: ArrayBuffer, loadMipmaps?: boolean, out?: Tex
     for (let face = 0; face < numberOfFaces; face++) {
       const byteArray = new Uint8Array(arraybuffer, dataOffset + 4, imageSize);
       mipmaps.push({
-        pixels: byteArray,
+        data: byteArray,
         width: width,
         height: height
       });
@@ -117,15 +117,16 @@ export function parse(arraybuffer: ArrayBuffer, loadMipmaps?: boolean, out?: Tex
   out =
     out ||
     new Texture2D({
-      width: pixelWidth,
-      height: pixelHeight,
       format: glInternalFormat
     });
   if (loadMipmaps) {
     out.mipmaps = mipmaps;
     // res.mipmapCount = numberOfMipmapLevels;
-  } else {
-    out.pixels = mipmaps[0].pixels;
   }
+  out.source = {
+    data: mipmaps[0].data,
+    width: pixelWidth,
+    height: pixelHeight
+  };
   return out;
 }

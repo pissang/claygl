@@ -2,7 +2,8 @@ import { setCanvasSize } from './core/util';
 import Timeline from './Timeline';
 
 // Core
-export { default as Renderer, RenderHooks, RenderableObject } from './Renderer';
+export { default as Renderer } from './Renderer';
+export type { RenderHooks, RenderableObject } from './Renderer';
 export { default as Material } from './Material';
 export { default as Shader, glsl, createShaderMixin, VertexShader, FragmentShader } from './Shader';
 import { default as Node } from './Node';
@@ -25,6 +26,7 @@ export { default as StandardMaterial } from './StandardMaterial';
 export { Timeline };
 
 export { default as Texture } from './Texture';
+export type { TextureImageSource, TexturePixelSource, TextureSource } from './Texture';
 export { default as Texture2D } from './Texture2D';
 export { default as Texture2DArray } from './Texture2DArray';
 export { default as Texture3D } from './Texture3D';
@@ -115,14 +117,12 @@ export { default as App3D } from './App3D';
 // Composite
 export { default as FullscreenQuadPass } from './composite/Pass';
 export { default as Compositor } from './composite/Compositor';
-export {
-  default as CompositeNode,
-  CompositeNodeOutput,
-  CompositeNodeInput
-} from './composite/CompositeNode';
+export { default as CompositeNode } from './composite/CompositeNode';
+export type { CompositeNodeOutput, CompositeNodeInput } from './composite/CompositeNode';
 export { default as FilterCompositeNode } from './composite/FilterNode';
 export { default as SceneCompositeNode } from './composite/SceneNode';
-export { default as GroupCompositeNode, GroupOutput, GroupInput } from './composite/GroupNode';
+export { default as GroupCompositeNode } from './composite/GroupNode';
+export type { GroupOutput, GroupInput } from './composite/GroupNode';
 
 // Deferred renderer
 export { default as DeferredGBuffer } from './deferred/GBuffer';
@@ -134,6 +134,5 @@ export { default as ParticleRenderable } from './particle/ParticleRenderable';
 export { default as ForceField } from './particle/ForceField';
 
 // Some useful types
-// export { RenderHooks, RenderableObject, MaterialObject };
 
 export { vec2, vec3, vec4, mat2, mat2d, mat3, mat4, quat } from './glmatrix';

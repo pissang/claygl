@@ -28,7 +28,7 @@ const material = new Material(createUnlitShader());
 const image = new Image();
 image.src = 'assets/textures/ground_tile.jpg';
 const texture = new Texture2D({
-  image: image,
+  source: image,
   wrapS: constants.REPEAT,
   wrapT: constants.REPEAT,
   anisotropic: 16

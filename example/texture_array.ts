@@ -62,7 +62,7 @@ function createCanvas(color: string) {
 }
 
 uniforms.colorTex.value = new Texture2DArray({
-  image: [createCanvas('red'), createCanvas('green')]
+  source: [createCanvas('red'), createCanvas('green')]
 });
 
 function render() {

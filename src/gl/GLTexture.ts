@@ -1,10 +1,15 @@
 import * as constants from '../core/constants';
 import { GLEnum } from '../core/type';
-import { getPossiblelInternalFormat } from '../Texture';
-import Texture2D, { Texture2DData } from '../Texture2D';
-import Texture2DArray, { Texture2DArrayData } from '../Texture2DArray';
-import Texture3D, { Texture3DData } from '../Texture3D';
-import TextureCube, { cubeTargets, TextureCubeData } from '../TextureCube';
+import {
+  getPossiblelInternalFormat,
+  isPixelSource,
+  TexturePixelSource,
+  TextureSource
+} from '../Texture';
+import Texture2D from '../Texture2D';
+import Texture2DArray from '../Texture2DArray';
+import Texture3D from '../Texture3D';
+import TextureCube, { cubeTargets, TextureCubeSource } from '../TextureCube';
 import GLExtension from './GLExtension';
 
 type AllTextureType = Texture2D | TextureCube | Texture2DArray | Texture3D;
@@ -93,14 +98,14 @@ class GLTexture {
 
     const updateTextureData = (
       gl: WebGL2RenderingContext,
-      data: Texture2DData | Texture3DData | Texture2DArrayData | TextureCubeData,
+      source: TextureSource | TextureSource[] | TextureCubeSource,
       level: number,
       width: number,
       height: number
     ) => {
       this[`_update_${texture.textureType}`](
         gl,
-        data as any,
+        source as any,
         level,
         width,
         height,
@@ -119,7 +124,7 @@ class GLTexture {
         height = Math.max(height / 2, 1);
       }
     } else {
-      updateTextureData(gl, texture, 0, width, height);
+      updateTextureData(gl, texture.source as any, 0, width, height);
       // TODO check minFilter
       if (useMipmap) {
         gl.generateMipmap(textureTarget);
@@ -131,7 +136,7 @@ class GLTexture {
 
   private _update_texture2D(
     gl: WebGL2RenderingContext,
-    data: Texture2DData,
+    source: TextureSource | undefined,
     level: number,
     width: number,
     height: number,
@@ -140,9 +145,7 @@ class GLTexture {
     glFormat: GLEnum,
     glType: GLEnum
   ) {
-    if (data.image) {
-      gl.texImage2D(constants.TEXTURE_2D, level, glInternalFormat, glFormat, glType, data.image);
-    } else {
+    if (isPixelSource(source) || !source) {
       // Can be used as a blank texture when writing render to texture(RTT)
       if (
         // S3TC
@@ -158,7 +161,7 @@ class GLTexture {
         glFormat === constants.COMPRESSED_RGBA_ATC_EXPLICIT_ALPHA_WEBGL ||
         glFormat === constants.COMPRESSED_RGBA_ATC_INTERPOLATED_ALPHA_WEBGL
       ) {
-        if (data.pixels) {
+        if (source && source.data) {
           gl.compressedTexImage2D(
             constants.TEXTURE_2D,
             level,
@@ -166,31 +169,34 @@ class GLTexture {
             width,
             height,
             0,
-            data.pixels
+            source.data
           );
         } else {
           console.error(`Format ${glFormat} should have pixels data.`);
         }
-      } else {
-        // Is a render target if pixels is null
-        gl.texImage2D(
-          constants.TEXTURE_2D,
-          level,
-          glInternalFormat,
-          width,
-          height,
-          0,
-          glFormat,
-          glType,
-          data.pixels || null
-        );
       }
+
+      gl.texImage2D(
+        constants.TEXTURE_2D,
+        level,
+        glInternalFormat,
+        width,
+        height,
+        0,
+        glFormat,
+        glType,
+        (source && source.data) || null
+      );
+    } else {
+      // Try as image source.
+      // TODO check?
+      gl.texImage2D(constants.TEXTURE_2D, level, glInternalFormat, glFormat, glType, source);
     }
   }
 
   private _update_texture2DArray(
     _gl: WebGL2RenderingContext,
-    data: Texture2DArrayData,
+    source: TextureSource[] | undefined,
     level: number,
     width: number,
     height: number,
@@ -200,8 +206,8 @@ class GLTexture {
     glType: GLEnum
   ) {
     // TODO mipmap
-    const sources = data.image || data.pixels;
-    if (sources) {
+    // TODO render target
+    if (source) {
       // TODO
       _gl.texStorage3D(
         constants.TEXTURE_2D_ARRAY,
@@ -209,9 +215,9 @@ class GLTexture {
         glInternalFormat,
         width,
         height,
-        sources.length
+        source.length
       );
-      sources.forEach((source, idx) =>
+      source.forEach((sourceSlice, idx) =>
         // TODO check image size are equal
         _gl.texSubImage3D(
           constants.TEXTURE_2D_ARRAY,
@@ -224,7 +230,7 @@ class GLTexture {
           1,
           glFormat,
           glType,
-          source as HTMLImageElement
+          (isPixelSource(sourceSlice) ? sourceSlice.data : sourceSlice) as HTMLImageElement
         )
       );
     }
@@ -232,7 +238,7 @@ class GLTexture {
 
   private _update_texture3D(
     _gl: WebGL2RenderingContext,
-    data: Texture3DData,
+    source: TexturePixelSource | undefined,
     level: number,
     width: number,
     height: number,
@@ -241,7 +247,6 @@ class GLTexture {
     glFormat: GLEnum,
     glType: GLEnum
   ) {
-    const source = data.pixels;
     _gl.texImage3D(
       constants.TEXTURE_3D,
       level,
@@ -252,13 +257,13 @@ class GLTexture {
       0,
       glFormat,
       glType,
-      source || null
+      (source && source.data) || null
     );
   }
 
   private _update_textureCube(
     _gl: WebGL2RenderingContext,
-    data: TextureCubeData,
+    source: TextureCubeSource | undefined,
     level: number,
     width: number,
     height: number,
@@ -269,20 +274,11 @@ class GLTexture {
   ) {
     for (let i = 0; i < 6; i++) {
       const target = cubeTargets[i];
-      const img = data.image && data.image[target];
-      const pixels = data.pixels && data.pixels[target];
-      if (img) {
+      const sourceSide = source && source[target];
+      const glTarget = constants.TEXTURE_CUBE_MAP_POSITIVE_X + i;
+      if (isPixelSource(sourceSide) || !sourceSide) {
         _gl.texImage2D(
-          constants.TEXTURE_CUBE_MAP_POSITIVE_X + i,
-          level,
-          glInternalFormat,
-          glFormat,
-          glType,
-          img
-        );
-      } else {
-        _gl.texImage2D(
-          constants.TEXTURE_CUBE_MAP_POSITIVE_X + i,
+          glTarget,
           level,
           glInternalFormat,
           width,
@@ -290,8 +286,10 @@ class GLTexture {
           0,
           glFormat,
           glType,
-          pixels || null
+          (sourceSide && sourceSide.data) || null
         );
+      } else {
+        _gl.texImage2D(glTarget, level, glInternalFormat, glFormat, glType, sourceSide);
       }
     }
   }

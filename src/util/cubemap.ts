@@ -2,7 +2,7 @@
 // http://www.unrealengine.com/files/downloads/2013SiggraphPresentationsNotes.pdf
 // http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
 import Texture2D from '../Texture2D';
-import TextureCube, { TextureCubeOpts } from '../TextureCube';
+import TextureCube, { TextureCubeOpts, TextureCubeSource } from '../TextureCube';
 import FrameBuffer from '../FrameBuffer';
 import FullscreenQuadPass from '../composite/Pass';
 import Material from '../Material';
@@ -123,9 +123,7 @@ export function prefilterEnvironmentMap(
   // container.style.cssText = 'position: absolute; left: 0; top: 0;';
 
   for (let i = 0; i < mipmapNum; i++) {
-    prefilteredCubeMap.mipmaps[i] = {
-      pixels: {} as TextureCubeOpts['pixels']
-    };
+    prefilteredCubeMap.mipmaps[i] = {} as TextureCubeSource;
     prefilterMaterial.set('roughness', i / (mipmapNum - 1));
 
     // Tweak fov. TODO It will cause leaking on the edge in the latest chrome
@@ -150,22 +148,6 @@ export function prefilterEnvironmentMap(
         textureType,
         pixels
       );
-
-      // const canvas = document.createElement('canvas');
-      // const ctx = canvas.getContext('2d')!;
-      // canvas.width = renderTargetTmp.width;
-      // canvas.height = renderTargetTmp.height;
-      // const imageData = ctx.createImageData(renderTargetTmp.width, renderTargetTmp.height);
-      // for (let k = 0; k < pixels.length; k += 4) {
-      //   const a = pixels[k + 3] / 255;
-      //   const range = 8.12;
-      //   imageData.data[k] = pixels[k] * a * range;
-      //   imageData.data[k + 1] = pixels[k + 1] * a * range;
-      //   imageData.data[k + 2] = pixels[k + 2] * a * range;
-      //   imageData.data[k + 3] = 255;
-      // }
-      // ctx.putImageData(imageData, 0, 0);
-      // container.appendChild(canvas);
 
       prefilteredCubeMap.mipmaps[i].pixels![targets[j]] = pixels;
     }

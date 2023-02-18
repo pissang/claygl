@@ -59,36 +59,40 @@ export function loadTextureSync(
       height: 0,
       sRGB: false
     });
-    fetchTexture(
-      path,
-      (data: ArrayBuffer) => {
-        hdr.parseRGBE(data, texture, (option as LoadTextureOpts).exposure);
-        texture.dirty();
-        onload && onload(texture);
-      },
-      onerror
-    );
+
+    texture.startLoading((finished) => {
+      fetchTexture(
+        path,
+        (data: ArrayBuffer) => {
+          hdr.parseRGBE(data, texture, (option as LoadTextureOpts).exposure);
+          texture.dirty();
+          finished();
+          onload && onload(texture);
+        },
+        onerror
+      );
+    });
     return texture;
   } else if (path.match(/.dds$/) || option.fileType === 'dds') {
     texture = new Texture2D({
       width: 0,
       height: 0
     });
-    fetchTexture(
-      path,
-      (data: ArrayBuffer) => {
-        dds.parse(data, texture);
-        texture.dirty();
-        onload && onload(texture);
-      },
-      onerror
-    );
+    texture.startLoading((finished) => {
+      fetchTexture(
+        path,
+        (data: ArrayBuffer) => {
+          dds.parse(data, texture);
+          texture.dirty();
+          finished();
+          onload && onload(texture);
+        },
+        onerror
+      );
+    });
   } else {
     texture = new Texture2D();
-    texture
-      .load(path)
-      .onload(onload as TextureOnload)
-      .onerror(onerror as TextureOnerror);
+    texture.load(path).then(() => (onload as TextureOnload)(texture), onerror);
   }
   return texture;
 }
@@ -293,7 +297,7 @@ export function createChessboard(size: number, unitSize: number, color1: string,
   }
 
   const texture = new Texture2D({
-    image: canvas,
+    source: canvas,
     anisotropic: 8
   });
 
@@ -307,6 +311,6 @@ export function createChessboard(size: number, unitSize: number, color1: string,
  */
 export function createBlank(color: string) {
   return new Texture2D({
-    image: vendor.createBlankCanvas(color)
+    source: vendor.createBlankCanvas(color)
   });
 }

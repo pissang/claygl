@@ -442,22 +442,18 @@ class App3D extends Notifier {
     }
     const promise = new Promise((resolve, reject) => {
       const texture = this.loadTextureSync(urlOrImg, opts);
-      if (!texture.isRenderable()) {
-        texture.onload(() => {
-          if (this._disposed) {
-            return;
+      texture.checkReady()?.then(
+        () => {
+          if (!this._disposed) {
+            resolve(texture);
           }
-          resolve(texture);
-        });
-        texture.onerror(() => {
-          if (this._disposed) {
-            return;
+        },
+        () => {
+          if (!this._disposed) {
+            reject();
           }
-          reject();
-        });
-      } else {
-        resolve(texture);
-      }
+        }
+      );
     });
     if (useCache) {
       this._texCache.put(key, promise);
@@ -494,24 +490,17 @@ class App3D extends Notifier {
     let texture = new Texture2D(opts);
     if (typeof urlOrImg === 'string') {
       if (urlOrImg.match(/.hdr$|^data:application\/octet-stream/)) {
-        texture = textureUtil.loadTextureSync(
-          urlOrImg,
-          {
-            exposure: opts && opts.exposure,
-            fileType: 'hdr'
-          },
-          function () {
-            texture.dirty();
-            texture.trigger('load', texture);
-          }
-        );
+        texture = textureUtil.loadTextureSync(urlOrImg, {
+          exposure: opts && opts.exposure,
+          fileType: 'hdr'
+        });
 
         util.assign(texture, opts);
       } else {
         texture.load(urlOrImg);
       }
     } else if (isImageLikeElement(urlOrImg)) {
-      texture.image = urlOrImg;
+      texture.source = urlOrImg;
       texture.dynamic = urlOrImg instanceof HTMLVideoElement;
     }
     return texture;
@@ -536,19 +525,7 @@ class App3D extends Notifier {
     opts?: Partial<TextureCubeOpts>
   ): Promise<TextureCube> {
     const textureCube = this.loadTextureCubeSync(imgList, opts);
-    return new Promise(function (resolve, reject) {
-      if (textureCube.isRenderable()) {
-        resolve(textureCube);
-      } else {
-        textureCube
-          .onload(function () {
-            resolve(textureCube);
-          })
-          .onerror(function () {
-            reject();
-          });
-      }
-    });
+    return textureCube.checkReady()!.then(() => textureCube);
   }
 
   /**
@@ -585,7 +562,7 @@ class App3D extends Notifier {
     if (typeof imgList.px === 'string') {
       textureCube.load(imgList as Record<CubeTarget, string>);
     } else {
-      textureCube.image = util.assign({}, imgList) as Record<CubeTarget, TextureImageSource>;
+      textureCube.source = util.assign({}, imgList) as Record<CubeTarget, TextureImageSource>;
     }
     return textureCube;
   }
@@ -1068,13 +1045,7 @@ class App3D extends Notifier {
 
     let loadPromise;
     if ((envImage as TextureCube).textureType === 'textureCube') {
-      loadPromise = (envImage as TextureCube).isRenderable()
-        ? Promise.resolve(envImage)
-        : new Promise(function (resolve) {
-            (envImage as TextureCube).onload(() => {
-              resolve(envImage);
-            });
-          });
+      loadPromise = (envImage as TextureCube).checkReady()!.then(() => envImage);
     } else {
       loadPromise = this.loadTexture(envImage as string | TextureImageSource, {
         exposure
@@ -1186,17 +1157,7 @@ class App3D extends Notifier {
           if (!opts!.waitTextureLoaded) {
             afterLoad(result);
           } else {
-            Promise.all(
-              result.textures.map(function (texture) {
-                if (texture.isRenderable()) {
-                  return Promise.resolve(texture);
-                }
-                return new Promise(function (resolve) {
-                  texture.onload(resolve);
-                  texture.onerror(resolve);
-                });
-              })
-            )
+            Promise.all(result.textures.map((texture) => texture.checkReady()!.then(() => texture)))
               .then(function () {
                 afterLoad(result);
               })

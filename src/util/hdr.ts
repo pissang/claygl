@@ -167,9 +167,11 @@ export function parseRGBE(
   if (!texture) {
     texture = new Texture2D();
   }
-  texture.width = width;
-  texture.height = height;
-  texture.pixels = pixels;
+  texture.source = {
+    data: pixels,
+    width,
+    height
+  };
   // HALF_FLOAT can't use Float32Array
   texture.type = constants.FLOAT;
   return texture;

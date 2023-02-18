@@ -133,20 +133,24 @@ export function parse(arraybuffer: ArrayBuffer, out?: Texture2D) {
       _height *= 0.5;
       mipmaps[i] = byteArray;
     }
-    textures[f].pixels = mipmaps[0];
+    textures[f].source = {
+      data: mipmaps[0],
+      width,
+      height
+    };
     if (hasMipmap) {
       textures[f].mipmaps = mipmaps.map((mipmap) => ({
-        pixels: mipmap
+        data: mipmap,
+        width: width * 0.5,
+        height: height * 0.5
       }));
     }
   }
   // TODO
   // return isCubeMap ? textures : textures[0];
   if (out) {
-    out.width = textures[0].width;
-    out.height = textures[0].height;
     out.format = textures[0].format;
-    out.pixels = textures[0].pixels;
+    out.source = textures[0].source;
     out.mipmaps = textures[0].mipmaps;
   } else {
     return textures[0];

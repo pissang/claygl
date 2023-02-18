@@ -1,26 +1,8 @@
-import Texture, { TextureImageSource, TextureOpts, TexturePixelSource } from './Texture';
+import Texture, { TextureOpts, TextureSource } from './Texture';
 import vendor from './core/vendor';
 
-export interface Texture2DData {
-  image?: TextureImageSource;
-  /**
-   * Pixels data. Will be ignored if image is set.
-   */
-  pixels?: TexturePixelSource;
-}
-
-export interface Texture2DOpts extends TextureOpts, Texture2DData {
-  /**
-   * @example
-   *     [{
-   *         image: mipmap0,
-   *         pixels: null
-   *     }, {
-   *         image: mipmap1,
-   *         pixels: null
-   *     }, ....]
-   */
-  mipmaps?: Texture2DData[];
+export interface Texture2DOpts extends TextureOpts<TextureSource> {
+  mipmaps?: TextureSource[];
 }
 /**
  * @example
@@ -40,34 +22,24 @@ export interface Texture2DOpts extends TextureOpts, Texture2DData {
  *     });
  */
 
-interface Texture2D extends Omit<Texture2DOpts, 'image'> {}
-class Texture2D extends Texture {
+class Texture2D extends Texture<TextureSource> {
   readonly textureType = 'texture2D';
 
-  private _image?: TextureImageSource;
+  mipmaps?: TextureSource[];
 
   constructor(opts?: Partial<Texture2DOpts>) {
     super(opts);
   }
 
-  get image(): TextureImageSource | undefined {
-    return this._image;
-  }
-  set image(val: TextureImageSource | undefined) {
-    if (this._image !== val) {
-      this._image = val;
-      this.dirty();
-    }
-  }
   get width() {
-    if (this.image) {
-      return this.image.width;
+    if (this.source) {
+      return this.source.width;
     }
     return this._width;
   }
   set width(value: number) {
-    if (this.image) {
-      console.warn("Texture from image can't set width");
+    if (this.source) {
+      console.warn("Texture from source can't set width");
     } else {
       if (this._width !== value) {
         this.dirty();
@@ -76,14 +48,14 @@ class Texture2D extends Texture {
     }
   }
   get height() {
-    if (this.image) {
-      return this.image.height;
+    if (this.source) {
+      return this.source.height;
     }
     return this._height;
   }
   set height(value: number) {
-    if (this.image) {
-      console.warn("Texture from image can't set height");
+    if (this.source) {
+      console.warn("Texture from source can't set height");
     } else {
       if (this._height !== value) {
         this.dirty();
@@ -93,27 +65,27 @@ class Texture2D extends Texture {
   }
 
   isRenderable() {
-    if (this.image) {
-      return this.image.width > 0 && this.image.height > 0;
+    if (this.source) {
+      return this.source.width > 0 && this.source.height > 0;
     } else {
       return !!(this.width && this.height);
     }
   }
 
-  load(src: string, crossOrigin?: string) {
-    this.image = vendor.loadImage(
-      src,
-      crossOrigin,
-      () => {
-        this.dirty();
-        this.trigger('load', this);
-      },
-      () => {
-        this.trigger('error', this);
-      }
-    );
-
-    return this;
+  load(src: string, crossOrigin?: string): Promise<void> {
+    return (this._loadingPromise = new Promise((resolve, reject) => {
+      this.source = vendor.loadImage(
+        src,
+        crossOrigin,
+        () => {
+          this.dirty();
+          resolve();
+        },
+        (e) => {
+          reject(e);
+        }
+      );
+    }));
   }
 }
 

@@ -14,7 +14,7 @@ import StandardMaterial, { StandardMaterialOpts } from '../StandardMaterial';
 import Mesh from '../Mesh';
 import ClayNode from '../Node';
 import { TextureOpts } from '../Texture';
-import Texture2D from '../Texture2D';
+import Texture2D, { Texture2DOpts } from '../Texture2D';
 import Skeleton from '../Skeleton';
 import Joint from '../Joint';
 import PerspectiveCamera from '../camera/Perspective';
@@ -234,11 +234,6 @@ interface GLTFLoadOpts {
    */
   textureFlipY: boolean;
 
-  /**
-   * If convert texture to power-of-two
-   */
-  textureConvertToPOT: boolean;
-
   onload?: (res: GLTFLoadResult) => void;
   onerror?: (err: any) => void;
   onprogress?: (percent: number, loaded: number, total: number) => void;
@@ -278,9 +273,7 @@ function doLoadGLTF(url: string, opts?: Partial<GLTFLoadOpts>) {
       rootPath: url.slice(0, url.lastIndexOf('/')),
 
       crossOrigin: '',
-      textureFlipY: false,
-
-      textureConvertToPOT: false
+      textureFlipY: false
     },
     opts
   );
@@ -608,7 +601,7 @@ function parseTextures(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadO
   (json.textures || []).forEach((textureInfo: GLTFTexture, idx: number) => {
     // samplers is optional
     const samplerInfo = (json.samplers && json.samplers[textureInfo.sampler]) || {};
-    const parameters: Partial<TextureOpts> = {};
+    const parameters: Partial<Texture2DOpts> = {};
     (['wrapS', 'wrapT', 'magFilter', 'minFilter'] as const).forEach(function (name) {
       const value = samplerInfo[name];
       if (value != null) {
@@ -618,8 +611,7 @@ function parseTextures(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadO
     util.defaults(parameters, {
       wrapS: constants.REPEAT,
       wrapT: constants.REPEAT,
-      flipY: opts.textureFlipY,
-      convertToPOT: opts.textureConvertToPOT
+      flipY: opts.textureFlipY
     });
 
     const target = textureInfo.target || constants.TEXTURE_2D;

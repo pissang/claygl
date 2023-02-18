@@ -12,7 +12,7 @@ interface Vendor {
     src: string,
     crossOrigin?: string,
     onload?: () => void,
-    onerror?: () => void
+    onerror?: (e: any) => void
   ) => HTMLImageElement;
   request: {
     get: typeof get;
@@ -82,8 +82,8 @@ vendor.loadImage = function (src, crossOrigin, onload, onerror) {
   image.onload = function () {
     onload && onload();
   };
-  image.onerror = function () {
-    onerror && onerror();
+  image.onerror = function (e) {
+    onerror && onerror(e);
   };
   image.src = src;
   return image;

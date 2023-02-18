@@ -9,7 +9,20 @@ import { GLEnum } from './core/type';
 import { assign } from './core/util';
 
 export type TextureImageSource = HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
-export type TexturePixelSource = Uint8Array | Float32Array;
+export type TexturePixelSource = {
+  data: Uint8Array | Float32Array;
+  width: number;
+  height: number;
+  depth?: number;
+};
+
+export type TextureSource = TextureImageSource | TexturePixelSource;
+
+export function isPixelSource(
+  source: TextureSource | undefined | null
+): source is TexturePixelSource {
+  return !!(source && (source as TexturePixelSource).data);
+}
 
 // Compatible with WebGL1 for float type storage.
 // PENDING
@@ -42,7 +55,11 @@ export function getPossiblelInternalFormat(format: number, type: number) {
   }
   return format;
 }
-export interface TextureOpts {
+export interface TextureOpts<TSource = unknown> {
+  /**
+   * Source
+   */
+  source: TSource;
   /**
    * Texture width, readonly when the texture source is image
    */
@@ -140,8 +157,8 @@ export interface TextureOpts {
    */
   dynamic: boolean;
 }
-interface Texture extends Omit<TextureOpts, 'width' | 'height'> {}
-abstract class Texture extends Notifier {
+interface Texture<TSource> extends Omit<TextureOpts, 'width' | 'height' | 'source'> {}
+abstract class Texture<TSource = unknown> {
   protected _width: number = 512;
   protected _height: number = 512;
 
@@ -149,10 +166,22 @@ abstract class Texture extends Notifier {
 
   textureType: string = '';
 
-  constructor(opts?: Partial<TextureOpts>) {
-    super();
+  private _source?: TSource;
 
+  protected _loadingPromise?: Promise<void>;
+
+  constructor(opts?: Partial<TextureOpts>) {
     assign(this, opts);
+  }
+
+  get source(): TSource | undefined {
+    return this._source;
+  }
+  set source(val: TSource | undefined) {
+    if (this._source !== val) {
+      this._source = val;
+      this.dirty();
+    }
   }
 
   get width() {
@@ -193,6 +222,22 @@ abstract class Texture extends Notifier {
    */
   abstract isRenderable(): boolean;
 
+  /**
+   * Remove a promise that will be resolved if texture is ready.
+   * Will return undefined if there is not any loading actions.
+   * PENDING Should always return a promise?
+   */
+  checkReady() {
+    return this.isRenderable() ? Promise.resolve() : this._loadingPromise;
+  }
+
+  startLoading(doLoading: (onFinished: () => void) => void) {
+    this._loadingPromise = new Promise((resolve) => {
+      doLoading(resolve);
+    });
+  }
+
+  // TODO check ready
   /**
    * Test if texture size is power of two
    * @return {boolean}

@@ -18,6 +18,7 @@ import {
   gBufferDebugFragment,
   gBufferVertex
 } from '../shader/source/deferred/gbuffer.glsl';
+import { isPixelSource, TexturePixelSource } from '../Texture';
 
 const renderableGBufferData = new WeakMap<
   RenderableObject,
@@ -196,16 +197,16 @@ class DeferredGBuffer {
   });
 
   private _defaultNormalMap = new Texture2D({
-    image: createFillCanvas('#000')
+    source: createFillCanvas('#000')
   });
   private _defaultRoughnessMap = new Texture2D({
-    image: createFillCanvas('#fff')
+    source: createFillCanvas('#fff')
   });
   private _defaultMetalnessMap = new Texture2D({
-    image: createFillCanvas('#fff')
+    source: createFillCanvas('#fff')
   });
   private _defaultDiffuseMap = new Texture2D({
-    image: createFillCanvas('#fff')
+    source: createFillCanvas('#fff')
   });
 
   private _frameBuffer = new FrameBuffer();
@@ -468,14 +469,19 @@ class DeferredGBuffer {
                   flipY: false
                 });
               }
+              const source = skinMatricesTexture.source as TexturePixelSource;
               if (
-                !prevSkinMatricesTexture.pixels ||
-                prevSkinMatricesTexture.pixels.length !== skinMatricesTexture.pixels!.length
+                !isPixelSource(prevSkinMatricesTexture.source) ||
+                prevSkinMatricesTexture.source.data.length !== source.data.length
               ) {
-                prevSkinMatricesTexture.pixels = new Float32Array(skinMatricesTexture.pixels!);
+                prevSkinMatricesTexture.source = {
+                  data: new Float32Array(source.data),
+                  width: source.width,
+                  height: source.height
+                };
               } else {
-                for (let i = 0; i < skinMatricesTexture.pixels!.length; i++) {
-                  prevSkinMatricesTexture.pixels[i] = skinMatricesTexture.pixels![i];
+                for (let i = 0; i < source.data.length; i++) {
+                  prevSkinMatricesTexture.source.data[i] = source.data[i];
                 }
               }
               prevSkinMatricesTexture.width = skinMatricesTexture.width;

@@ -1,6 +1,6 @@
 import Joint from './Joint';
 import Texture2D from './Texture2D';
-import Texture from './Texture';
+import Texture, { isPixelSource } from './Texture';
 import BoundingBox from './math/BoundingBox';
 import Matrix4 from './math/Matrix4';
 import * as constants from './core/constants';
@@ -322,13 +322,15 @@ class Skeleton {
         useMipmap: false,
         flipY: false
       }));
-    texture.width = size;
-    texture.height = size;
 
-    if (!texture.pixels || texture.pixels.length !== size * size * 4) {
-      texture.pixels = new Float32Array(size * size * 4);
+    if (!isPixelSource(texture.source) || texture.source.data.length !== size * size * 4) {
+      texture.source = {
+        data: new Float32Array(size * size * 4),
+        width: size,
+        height: size
+      };
     }
-    texture.pixels.set(skinMatrices);
+    texture.source.data.set(skinMatrices);
     texture.dirty();
 
     return texture;
