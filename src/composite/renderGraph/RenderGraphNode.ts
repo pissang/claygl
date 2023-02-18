@@ -187,10 +187,12 @@ class RenderGraphNode {
     const outputLinks = this._outputs || {};
     const hasOutput = !this.isEndNode();
     const outputNames = hasOutput ? keys(outputLinks) : [];
-    const sharedFrameBuffer = hasOutput ? renderGraph.getFrameBuffer() : undefined;
+    const compositeNode = this._compositeNode;
+    const sharedFrameBuffer = hasOutput
+      ? renderGraph.getFrameBuffer(compositeNode.depthBuffer || false)
+      : undefined;
     const texturePool = renderGraph.getTexturePool();
     const outputTextures = this._outputTextures;
-    const compositeNode = this._compositeNode;
 
     const inputTextures: Record<string, Texture> = {};
     inputNames.forEach((inputName) => {

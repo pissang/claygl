@@ -19,6 +19,8 @@ class GBufferCompositeNode extends CompositeNode<never, GBufferOutput> {
   private _camera: Camera;
   private _gbuffer = new DeferredGBuffer();
 
+  depthBuffer = true;
+
   enableTexture1: boolean = true;
   enableTexture2: boolean = true;
   enableTexture3: boolean = true;

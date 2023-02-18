@@ -13,6 +13,7 @@ class RenderGraph {
   private _frameBuffer = new FrameBuffer({
     depthBuffer: false
   });
+  private _frameBufferWithDepth = new FrameBuffer();
 
   addNode(node: RenderGraphNode) {
     const nodes = this._nodes;
@@ -54,8 +55,8 @@ class RenderGraph {
     return this._texturePool;
   }
 
-  getFrameBuffer() {
-    return this._frameBuffer;
+  getFrameBuffer(needsDepthBuffer: boolean) {
+    return needsDepthBuffer ? this._frameBufferWithDepth : this._frameBuffer;
   }
 
   dispose(renderer: Renderer) {

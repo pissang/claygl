@@ -16,6 +16,8 @@ export class CompositeSceneNode<OutputKey extends string = 'color'> extends Comp
   autoUpdateScene = true;
   preZ = false;
 
+  depthBuffer = true;
+
   constructor(scene: Scene, camera: Camera, outputs?: Record<OutputKey, CompositeNodeOutput>) {
     super();
     this.scene = scene;

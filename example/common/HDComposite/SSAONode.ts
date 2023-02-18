@@ -29,9 +29,11 @@ function generateNoiseData(size: number) {
 
 function generateNoiseTexture(size: number) {
   return new Texture2D({
-    pixels: generateNoiseData(size),
-    width: size,
-    height: size
+    source: {
+      data: generateNoiseData(size),
+      width: size,
+      height: size
+    }
   });
 }
 

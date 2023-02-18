@@ -32,8 +32,8 @@ class FrameBuffer {
   > = {};
 
   constructor(opts?: Partial<FrameBufferOpts>) {
-    opts = opts || {};
-    this.depthBuffer = opts.depthBuffer ?? true;
+    const { depthBuffer } = opts || {};
+    this.depthBuffer = depthBuffer == null ? true : depthBuffer;
   }
 
   /**

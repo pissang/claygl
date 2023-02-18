@@ -74,6 +74,11 @@ abstract class CompositeNode<InputKey extends string = string, OutputKey extends
   renderToScreen?: boolean;
 
   /**
+   * If needs depth buffer when render to texture.
+   */
+  depthBuffer?: boolean;
+
+  /**
    * Do preparation logic.
    * For example update inputs and outputs. Update texture size etc
    */
