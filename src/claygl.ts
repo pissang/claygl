@@ -135,3 +135,5 @@ export { default as ForceField } from './particle/ForceField';
 
 // Some useful types
 // export { RenderHooks, RenderableObject, MaterialObject };
+
+export { vec2, vec3, vec4, mat2, mat2d, mat3, mat4, quat } from './glmatrix';
