@@ -337,10 +337,7 @@ class RenderGraphNode {
   // TODO Should avoid accessing the composite node too much
   private _getOutputInfo(outputName: string) {
     const output = this._compositeNode.outputs![outputName];
-    if ((output as GroupOutput).groupOutput) {
-      return (output as GroupOutput).groupOutput;
-    }
-    return output;
+    return (output as GroupOutput).groupOutput || output;
   }
 }
 
