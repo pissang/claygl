@@ -24,6 +24,7 @@ camera.position.set(0, 0, 6);
 
 const scene = new Scene();
 
+function start() {}
 let suzanneGeometry: Geometry;
 loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
@@ -37,7 +38,9 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
       const ambientCubemapLight = new AmbientCubemapLight({
         cubemap
       });
+      console.time('prefilter');
       ambientCubemapLight.prefilter(renderer, 256);
+      console.timeEnd('prefilter');
       scene.add(ambientCubemapLight);
 
       const ambientLight = new AmbientLight({
@@ -81,4 +84,3 @@ window.onresize = function () {
   renderer.resize(window.innerWidth, window.innerHeight);
   camera.aspect = renderer.getViewportAspect();
 };
-78;

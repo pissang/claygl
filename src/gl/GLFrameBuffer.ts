@@ -21,8 +21,8 @@ class GLFrameBuffer {
   // Bound context
   private _bound?: WebGL2RenderingContext | null;
 
-  // Attached textures, [texture, target, width, height]
-  private _textures: Record<string, [GLTexture, GLEnum, number, number]> = {};
+  // Attached textures, [texture, target, width, height, level]
+  private _textures: Record<string, [GLTexture, GLEnum, number, number, number]> = {};
 
   constructor(frambuffer: FrameBuffer) {
     this._fb = frambuffer;
@@ -37,6 +37,7 @@ class GLFrameBuffer {
   ) {
     const frameBuffer = this._fb;
     const webglFb = this._webglFb || (this._webglFb = gl.createFramebuffer()!);
+    const level = this._fb.mipmapLevel;
     let webglRenderBuffer = this._webglRb;
     // PENDING. not bind multiple times? if render twice?
     if (this._bound !== gl) {
@@ -51,7 +52,13 @@ class GLFrameBuffer {
     keys(attachedTextures).forEach((attachment) => {
       if (!texturesToAttach[attachment]) {
         // Detach a texture from framebuffer
-        gl.framebufferTexture2D(FRAMEBUFFER, +attachment, attachedTextures[attachment][1], null, 0);
+        gl.framebufferTexture2D(
+          FRAMEBUFFER,
+          +attachment,
+          attachedTextures[attachment][1],
+          null,
+          attachedTextures[attachment][4]
+        );
         delete attachedTextures[attachment];
       }
     });
@@ -64,11 +71,11 @@ class GLFrameBuffer {
     const bufs: GLEnum[] = [];
     // MRT Support in chrome
     // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
-    const ext = helpers.getGLExtension('EXT_draw_buffers');
     keys(texturesToAttach).forEach((attachmentStr) => {
       const attachment = +attachmentStr;
       const { texture, target } = texturesToAttach[attachment]!;
       const glTexture = helpers.getGLTexture(texture);
+      // TODO mipmap level not support used with render storage.
       width = texture.width;
       height = texture.height;
 
@@ -81,7 +88,7 @@ class GLFrameBuffer {
           renderBufferDetached = true;
         }
       }
-      if (ext && attachment >= COLOR_ATTACHMENT0 && attachment <= COLOR_ATTACHMENT0 + 8) {
+      if (attachment >= COLOR_ATTACHMENT0 && attachment <= COLOR_ATTACHMENT0 + 8) {
         bufs.push(attachment);
       }
 
@@ -91,14 +98,21 @@ class GLFrameBuffer {
         attached[0] === glTexture &&
         attached[1] === target &&
         attached[2] === width &&
-        attached[3] === height
+        attached[3] === height &&
+        attached[4] === level
       ) {
         return;
       }
 
-      gl.framebufferTexture2D(FRAMEBUFFER, attachment, target, glTexture.getWebGLTexture(gl), 0);
+      gl.framebufferTexture2D(
+        FRAMEBUFFER,
+        attachment,
+        target,
+        glTexture.getWebGLTexture(gl),
+        level || 0
+      );
 
-      attachedTextures[attachment] = [glTexture, target, width, height];
+      attachedTextures[attachment] = [glTexture, target, width, height, level];
     });
 
     if (width && height && !depthAttached && frameBuffer.depthBuffer) {
@@ -128,9 +142,7 @@ class GLFrameBuffer {
       this._webglRb = undefined;
     }
 
-    if (ext) {
-      ext.drawBuffersEXT(bufs);
-    }
+    gl.drawBuffers(bufs);
 
     // 0x8CD5, 36053, FRAMEBUFFER_COMPLETE
     // 0x8CD6, 36054, FRAMEBUFFER_INCOMPLETE_ATTACHMENT
@@ -157,7 +169,9 @@ class GLFrameBuffer {
       }
       // Because the data of texture is changed over time,
       // Here update the mipmaps of texture each time after rendered;
-      this.updateMipmap(gl);
+      if (this._fb.autoGenerateMipmap) {
+        this.updateMipmap(gl);
+      }
     }
   }
 

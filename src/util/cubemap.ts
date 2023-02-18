@@ -2,7 +2,7 @@
 // http://www.unrealengine.com/files/downloads/2013SiggraphPresentationsNotes.pdf
 // http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
 import Texture2D from '../Texture2D';
-import TextureCube, { TextureCubeOpts, TextureCubeSource } from '../TextureCube';
+import TextureCube, { cubeTargets, TextureCubeOpts } from '../TextureCube';
 import FrameBuffer from '../FrameBuffer';
 import FullscreenQuadPass from '../composite/Pass';
 import Material from '../Material';
@@ -19,8 +19,6 @@ import { skyboxVertex } from '../shader/source/skybox.glsl';
 import { cubemapPrefilterFragment } from './shader/prefilter.glsl';
 import Mesh from '../Mesh';
 import CubeGeometry from '../geometry/Cube';
-
-const targets = ['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const;
 
 // TODO Downsample
 // TODO ggx
@@ -57,7 +55,6 @@ export function prefilterEnvironmentMap(
     type: textureType,
     flipY: false
   });
-  prefilteredCubeMap.mipmaps = [];
 
   if (!prefilteredCubeMap.isPowerOfTwo()) {
     console.warn('Width and height must be power of two to enable mipmap.');
@@ -108,22 +105,11 @@ export function prefilterEnvironmentMap(
     textureType = prefilteredCubeMap.type = constants.UNSIGNED_BYTE;
   }
 
-  const renderTargetTmp = new Texture2D({
-    width,
-    height,
-    type: textureType
-  });
   const frameBuffer = new FrameBuffer({
     depthBuffer: false
   });
-  const ArrayCtor = textureType === constants.UNSIGNED_BYTE ? Uint8Array : Float32Array;
-
-  // const container = document.createElement('div');
-  // document.body.appendChild(container);
-  // container.style.cssText = 'position: absolute; left: 0; top: 0;';
-
+  frameBuffer.autoGenerateMipmap = false;
   for (let i = 0; i < mipmapNum; i++) {
-    prefilteredCubeMap.mipmaps[i] = {} as TextureCubeSource;
     prefilterMaterial.set('roughness', i / (mipmapNum - 1));
 
     // Tweak fov. TODO It will cause leaking on the edge in the latest chrome
@@ -132,33 +118,23 @@ export function prefilterEnvironmentMap(
     // const fov = ((2 * Math.atan(n / (n - 0.5))) / Math.PI) * 180;
     const fov = 90;
 
-    for (let j = 0; j < targets.length; j++) {
-      const pixels = new ArrayCtor(renderTargetTmp.width * renderTargetTmp.height * 4);
-      frameBuffer.attach(renderTargetTmp);
-
-      const camera = envMapPass.getCamera(targets[j]);
-      camera.fov = fov;
-      renderer.render(dummyScene, camera, frameBuffer);
-      renderer.gl.readPixels(
-        0,
-        0,
-        renderTargetTmp.width,
-        renderTargetTmp.height,
-        constants.RGBA,
-        textureType,
-        pixels
+    for (let j = 0; j < cubeTargets.length; j++) {
+      frameBuffer.clearTextures();
+      frameBuffer.mipmapLevel = i;
+      frameBuffer.attach(
+        prefilteredCubeMap,
+        constants.COLOR_ATTACHMENT0,
+        constants.TEXTURE_CUBE_MAP_POSITIVE_X + j
       );
 
-      prefilteredCubeMap.mipmaps[i].pixels![targets[j]] = pixels;
+      const camera = envMapPass.getCamera(cubeTargets[j]);
+      camera.fov = fov;
+      renderer.render(dummyScene, camera, frameBuffer);
     }
-
-    renderTargetTmp.width /= 2;
-    renderTargetTmp.height /= 2;
-    renderTargetTmp.dirty();
   }
-
   renderer.disposeFrameBuffer(frameBuffer);
-  renderer.disposeTexture(renderTargetTmp);
+
+  // renderer.disposeTexture(renderTargetTmp);
   renderer.disposeGeometry(mesh.geometry);
   if (newCreatedCubemap) {
     // New created temporary cubemap should be disposed
@@ -197,18 +173,6 @@ export function integrateBRDF(renderer: Renderer, normalDistribution: Texture2D)
   quadPass.material.set('viewportSize', [512, 256]);
   quadPass.render(renderer, framebuffer);
 
-  // FIXME Only chrome and firefox can readPixels with float type.
-  // framebuffer.bind(renderer);
-  // const pixels = new Float32Array(512 * 256 * 4);
-  // renderer.gl.readPixels(
-  //     0, 0, texture.width, texture.height,
-  //     Texture.RGBA, Texture.FLOAT, pixels
-  // );
-  // texture.pixels = pixels;
-  // texture.flipY = false;
-  // texture.dirty();
-  // framebuffer.unbind(renderer);
-
   renderer.disposeFrameBuffer(framebuffer);
 
   return texture;
@@ -222,8 +186,6 @@ export function generateNormalDistribution(roughnessLevels?: number, sampleSize?
   sampleSize = sampleSize || 1024;
 
   const normalDistribution = new Texture2D({
-    width: roughnessLevels,
-    height: sampleSize,
     type: constants.FLOAT,
     minFilter: constants.NEAREST,
     magFilter: constants.NEAREST,
@@ -269,7 +231,11 @@ export function generateNormalDistribution(roughnessLevels?: number, sampleSize?
       pixels[offset + 3] = 1.0;
     }
   }
-  normalDistribution.pixels = pixels;
+  normalDistribution.source = {
+    data: pixels,
+    width: roughnessLevels,
+    height: sampleSize
+  };
 
   return normalDistribution;
 }

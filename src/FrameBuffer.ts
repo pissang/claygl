@@ -13,8 +13,15 @@ interface FrameBuffer extends FrameBufferOpts {}
 class FrameBuffer {
   viewport?: RendererViewport;
 
+  // Auto generate mipmap after render
+  // TODO It's some workaround for the case like cubemap prefiltering.
+  // Which don't need to generate mipmap again.
+  autoGenerateMipmap?: boolean = true;
+
   private _width: number = 0;
   private _height: number = 0;
+
+  mipmapLevel: number = 0;
 
   private _textures: Record<
     string,
@@ -25,7 +32,8 @@ class FrameBuffer {
   > = {};
 
   constructor(opts?: Partial<FrameBufferOpts>) {
-    this.depthBuffer = true;
+    opts = opts || {};
+    this.depthBuffer = opts.depthBuffer ?? true;
   }
 
   /**
@@ -51,12 +59,13 @@ class FrameBuffer {
    * Get viewport of bound framebuffer
    */
   getViewport() {
+    const scale = Math.pow(2, this.mipmapLevel);
     return (
       this.viewport || {
         x: 0,
         y: 0,
-        width: this._width,
-        height: this._height,
+        width: this._width / scale,
+        height: this._height / scale,
         devicePixelRatio: 1
       }
     );
