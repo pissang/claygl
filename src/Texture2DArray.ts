@@ -23,14 +23,13 @@ class Texture2DArray extends Texture<TextureSource[]> {
     return this._width;
   }
   set width(value: number) {
+    const oldWidth = this.width;
     if (this._hasSource()) {
-      console.warn("Texture from source can't set width");
+      this.source!.forEach((source) => (source.width = value));
     } else {
-      if (this._width !== value) {
-        this.dirty();
-      }
       this._width = value;
     }
+    oldWidth !== value && this.dirty();
   }
   get height() {
     if (this._hasSource()) {
@@ -39,14 +38,13 @@ class Texture2DArray extends Texture<TextureSource[]> {
     return this._height;
   }
   set height(value: number) {
+    const oldHeight = this.height;
     if (this._hasSource()) {
-      console.warn("Texture from source can't set height");
+      this.source!.forEach((source) => (source.height = value));
     } else {
-      if (this._height !== value) {
-        this.dirty();
-      }
       this._height = value;
     }
+    oldHeight !== value && this.dirty();
   }
 
   isRenderable() {

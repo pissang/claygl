@@ -38,14 +38,13 @@ class Texture2D extends Texture<TextureSource> {
     return this._width;
   }
   set width(value: number) {
+    const oldWidth = this.width;
     if (this.source) {
-      console.warn("Texture from source can't set width");
+      this.source.width = value;
     } else {
-      if (this._width !== value) {
-        this.dirty();
-      }
       this._width = value;
     }
+    oldWidth !== value && this.dirty();
   }
   get height() {
     if (this.source) {
@@ -54,14 +53,13 @@ class Texture2D extends Texture<TextureSource> {
     return this._height;
   }
   set height(value: number) {
+    const oldHeight = this.height;
     if (this.source) {
-      console.warn("Texture from source can't set height");
+      this.source.height = value;
     } else {
-      if (this._height !== value) {
-        this.dirty();
-      }
       this._height = value;
     }
+    oldHeight !== value && this.dirty();
   }
 
   isRenderable() {

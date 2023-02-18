@@ -18,14 +18,13 @@ class Texture3D extends Texture<TexturePixelSource> {
     return this._width;
   }
   set width(value: number) {
+    const oldWidth = this.width;
     if (this.source) {
-      console.warn("Texture from source can't set width");
+      this.source.width = value;
     } else {
-      if (this._width !== value) {
-        this.dirty();
-      }
       this._width = value;
     }
+    oldWidth !== value && this.dirty();
   }
   get height() {
     if (this.source) {
@@ -34,14 +33,13 @@ class Texture3D extends Texture<TexturePixelSource> {
     return this._height;
   }
   set height(value: number) {
+    const oldHeight = this.height;
     if (this.source) {
-      console.warn("Texture from source can't set height");
+      this.source.height = value;
     } else {
-      if (this._height !== value) {
-        this.dirty();
-      }
       this._height = value;
     }
+    oldHeight !== value && this.dirty();
   }
 
   get depth() {
@@ -51,14 +49,13 @@ class Texture3D extends Texture<TexturePixelSource> {
     return this._depth;
   }
   set depth(value: number) {
+    const oldDepth = this.depth;
     if (this.source) {
-      console.warn("Texture from source can't set depth");
+      this.source.depth = value;
     } else {
-      if (this._depth !== value) {
-        this.dirty();
-      }
       this._depth = value;
     }
+    oldDepth !== value && this.dirty();
   }
 
   isRenderable() {
