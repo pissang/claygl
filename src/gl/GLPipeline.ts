@@ -184,7 +184,7 @@ export type SupportedExtension =
 /**
  * Basic webgl renderer without scene management.
  */
-class GLRenderer {
+class GLPipeline {
   readonly gl: WebGL2RenderingContext;
 
   readonly uid = genGUID();
@@ -769,4 +769,4 @@ class GLRenderer {
   }
 }
 
-export default GLRenderer;
+export default GLPipeline;

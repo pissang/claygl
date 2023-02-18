@@ -75,11 +75,17 @@ abstract class CompositeNode<InputKey extends string = string, OutputKey extends
    */
   abstract prepare(renderer: Renderer): void;
 
+  /**
+   * beforeRender hook
+   */
   beforeRender?: (
     renderer: Renderer,
     inputTextures: Record<InputKey, Texture>,
     outputTextures?: Record<OutputKey, Texture>
   ) => void;
+  /**
+   * afterRender hook
+   */
   afterRender?: () => void;
 
   /**

@@ -18,7 +18,7 @@ export { default as FrameBuffer } from './FrameBuffer';
 export { default as Scene } from './Scene';
 export { default as Camera } from './Camera';
 
-export { default as GLRenderer } from './gl/GLRenderer';
+export { default as GLPipeline } from './gl/GLPipeline';
 
 export { default as StandardMaterial } from './StandardMaterial';
 

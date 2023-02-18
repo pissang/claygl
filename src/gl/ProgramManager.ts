@@ -1,8 +1,7 @@
 import { keys } from '../core/util';
-import Material from '../Material';
-import Shader, { ShaderDefineValue, ShaderPrecision } from '../Shader';
+import { ShaderDefineValue, ShaderPrecision } from '../Shader';
 import GLProgram from './GLProgram';
-import GLRenderer, { GLMaterialObject, GLRenderableObject } from './GLRenderer';
+import GLPipeline, { GLMaterialObject, GLRenderableObject } from './GLPipeline';
 
 const loopRegex =
   /for\s*?\(int\s*?_idx_\s*=\s*([\w-]+);\s*_idx_\s*<\s*([\w-]+);\s*_idx_\s*\+\+\s*\)\s*\{\{([\s\S]+?)(?=\}\})\}\}/g;
@@ -120,10 +119,10 @@ export function defaultGetMaterialProgramKey(
 }
 
 class ProgramManager {
-  private _renderer: GLRenderer;
+  private _pipeline: GLPipeline;
   private _cache: Record<string, GLProgram> = {};
-  constructor(renderer: GLRenderer) {
-    this._renderer = renderer;
+  constructor(renderer: GLPipeline) {
+    this._pipeline = renderer;
   }
 
   getProgram(
@@ -133,7 +132,7 @@ class ProgramManager {
     extraDefines?: Record<string, ShaderDefineValue>
   ) {
     const cache = this._cache;
-    const renderer = this._renderer;
+    const renderer = this._pipeline;
 
     const isSkinnedMesh = renderable.isSkinnedMesh && renderable.isSkinnedMesh();
     const isInstancedMesh = renderable.isInstancedMesh && renderable.isInstancedMesh();

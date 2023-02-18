@@ -1,5 +1,3 @@
-import CompositeNode, { CompositeNodeInput } from '../CompositeNode';
-import Texture2D, { Texture2DOpts } from '../../Texture2D';
 import TexturePool from '../TexturePool';
 import FrameBuffer from '../../FrameBuffer';
 import Renderer from '../../Renderer';

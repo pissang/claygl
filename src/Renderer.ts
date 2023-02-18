@@ -26,11 +26,11 @@ import type Camera from './Camera';
 import type ClayNode from './Node';
 import type PerspectiveCamera from './camera/Perspective';
 import { preZFragment, preZVertex } from './shader/source/prez.glsl';
-import GLRenderer, {
+import GLPipeline, {
   ExtendedRenderableObject,
   GLRenderableObject,
   GLRenderHooks
-} from './gl/GLRenderer';
+} from './gl/GLPipeline';
 import Texture from './Texture';
 import InstancedMesh from './InstancedMesh';
 import GeometryBase from './GeometryBase';
@@ -179,7 +179,7 @@ class Renderer extends Notifier {
 
   private _prezMaterial?: Material;
 
-  private _glRenderer: GLRenderer;
+  private _glPipeline: GLPipeline;
 
   constructor(opts?: Partial<RendererOpts>) {
     super();
@@ -209,7 +209,7 @@ class Renderer extends Notifier {
         console.error('Already created a renderer');
       }
       gl.targetRenderer = this;
-      this._glRenderer = new GLRenderer(gl, {
+      this._glPipeline = new GLPipeline(gl, {
         throwError: opts.throwError
       });
 
@@ -328,7 +328,7 @@ class Renderer extends Notifier {
     }
     dpr = dpr || this._devicePixelRatio;
 
-    this._glRenderer.setViewport(x, y!, width!, height!, dpr!);
+    this._glPipeline.setViewport(x, y!, width!, height!, dpr!);
     // Use a fresh new object, not write property.
     this.viewport = {
       x,
@@ -378,7 +378,7 @@ class Renderer extends Notifier {
   }
 
   getWebGLExtension(name: string) {
-    return this._glRenderer.getWebGLExtension(name);
+    return this._glPipeline.getWebGLExtension(name);
   }
 
   /**
@@ -408,7 +408,7 @@ class Renderer extends Notifier {
     opts = opts || {};
     const { notUpdateScene, preZ } = opts;
 
-    const viewport = this._glRenderer.getViewport();
+    const viewport = this._glPipeline.getViewport();
     const viewportDpr = viewport.devicePixelRatio;
 
     if (this.clearBit) {
@@ -537,10 +537,10 @@ class Renderer extends Notifier {
   }
 
   private _bindFrameBuffer(frameBuffer?: FrameBuffer | null) {
-    const glRenderer = this._glRenderer;
-    glRenderer.bindFrameBuffer(frameBuffer);
+    const glPipeline = this._glPipeline;
+    glPipeline.bindFrameBuffer(frameBuffer);
     const viewport = frameBuffer ? frameBuffer.getViewport() : this.viewport;
-    glRenderer.setViewport(
+    glPipeline.setViewport(
       viewport.x,
       viewport.y,
       viewport.width,
@@ -557,7 +557,7 @@ class Renderer extends Notifier {
     scene?: Scene
   ) {
     let worldM: mat4.Mat4Array;
-    const viewport = this._glRenderer.getViewport();
+    const viewport = this._glPipeline.getViewport();
     const vDpr = viewport.devicePixelRatio;
     const viewportUniform = [
       viewport.x * vDpr,
@@ -684,19 +684,19 @@ class Renderer extends Notifier {
     };
 
     // Do frmaebuffer bind in the rnderPass method exposed to outside.
-    this._glRenderer.bindFrameBuffer(frameBuffer);
+    this._glPipeline.bindFrameBuffer(frameBuffer);
 
     renderHooks && renderHooks.prepare && renderHooks.prepare(gl);
-    this._glRenderer.render(list, assign(renderHooksForScene, renderHooks));
+    this._glPipeline.render(list, assign(renderHooksForScene, renderHooks));
     renderHooks && renderHooks.cleanup && renderHooks.cleanup(gl);
   }
 
   getMaxJointNumber() {
-    return this._glRenderer.maxJointNumber;
+    return this._glPipeline.maxJointNumber;
   }
 
   setMaxJointNumber(val: number) {
-    this._glRenderer.maxJointNumber = val;
+    this._glPipeline.maxJointNumber = val;
   }
 
   renderPreZ(list: GLRenderableObject<Material>[], scene: Scene, camera: Camera) {
@@ -776,11 +776,11 @@ class Renderer extends Notifier {
       parent.remove(root);
     }
     const disposedMap: Record<string, boolean> = {};
-    const glRenderer = this._glRenderer;
+    const glPipeline = this._glPipeline;
     root.traverse((node) => {
       const material = (node as Renderable).material;
       if ((node as Renderable).geometry && disposeGeometry) {
-        this._glRenderer.disposeGeometry((node as Renderable).geometry);
+        this._glPipeline.disposeGeometry((node as Renderable).geometry);
       }
       // Pending more check?
       if ((node as InstancedMesh).instancedAttributes) {
@@ -800,11 +800,11 @@ class Renderer extends Notifier {
             if (uniformObj.array) {
               for (let k = 0; k < val.length; k++) {
                 if (val[k]) {
-                  glRenderer.disposeTexture(val[k]);
+                  glPipeline.disposeTexture(val[k]);
                 }
               }
             } else {
-              glRenderer.disposeTexture(val);
+              glPipeline.disposeTexture(val);
             }
           }
         }
@@ -816,16 +816,16 @@ class Renderer extends Notifier {
   }
 
   disposeTexture(texture: Texture) {
-    this._glRenderer.disposeTexture(texture);
+    this._glPipeline.disposeTexture(texture);
   }
   disposeGeometry(geometry: GeometryBase) {
-    this._glRenderer.disposeGeometry(geometry);
+    this._glPipeline.disposeGeometry(geometry);
   }
   disposeFrameBuffer(frameBuffer: FrameBuffer) {
-    this._glRenderer.disposeFrameBuffer(frameBuffer);
+    this._glPipeline.disposeFrameBuffer(frameBuffer);
   }
   disposeInstancedMesh(mesh: InstancedMesh) {
-    this._glRenderer.disposeInstancedMesh(mesh);
+    this._glPipeline.disposeInstancedMesh(mesh);
   }
   /**
    * Dispose renderer

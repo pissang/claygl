@@ -1,4 +1,4 @@
-import { GLRenderer, GeometryBase, Shader, glsl, setCanvasSize, Texture2DArray } from 'claygl';
+import { GLPipeline, GeometryBase, Shader, glsl, setCanvasSize, Texture2DArray } from 'claygl';
 
 const { uniform, attribute, varying } = Shader;
 
@@ -6,7 +6,7 @@ const canvas = document.getElementById('main') as HTMLCanvasElement;
 setCanvasSize(canvas, 400, 400);
 const gl = canvas.getContext('webgl2')!;
 gl.viewport(0, 0, 400, 400);
-const renderer = new GLRenderer(gl);
+const pipeline = new GLPipeline(gl);
 
 const geometry = new GeometryBase();
 geometry.createAttribute('position', 'float', 3, 'POSITION');
@@ -66,7 +66,7 @@ uniforms.colorTex.value = new Texture2DArray({
 });
 
 function render() {
-  renderer.render([
+  pipeline.render([
     {
       geometry,
       material: { shader, uniforms }
