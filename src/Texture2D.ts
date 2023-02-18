@@ -32,8 +32,12 @@ class Texture2D extends Texture<TextureSource> {
   }
 
   get width() {
-    if (this.source) {
-      return this.source.width;
+    const source = this.source;
+    const mipmaps = this.mipmaps;
+    if (source) {
+      return source.width;
+    } else if (mipmaps && mipmaps[0]) {
+      return mipmaps[0].width;
     }
     return this._width;
   }
@@ -47,8 +51,12 @@ class Texture2D extends Texture<TextureSource> {
     oldWidth !== value && this.dirty();
   }
   get height() {
-    if (this.source) {
-      return this.source.height;
+    const source = this.source;
+    const mipmaps = this.mipmaps;
+    if (source) {
+      return source.height;
+    } else if (mipmaps && mipmaps[0]) {
+      return mipmaps[0].height;
     }
     return this._height;
   }

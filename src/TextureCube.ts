@@ -15,7 +15,7 @@ export type CubeTarget = 'px' | 'nx' | 'py' | 'ny' | 'pz' | 'nz';
 
 export type TextureCubeSource = Record<CubeTarget, TextureSource | undefined>;
 export interface TextureCubeOpts extends TextureOpts<TextureCubeSource> {
-  mipmaps?: Record<CubeTarget, TextureSource>[];
+  mipmaps?: TextureCubeSource[];
 }
 
 /**
@@ -48,7 +48,7 @@ export interface TextureCubeOpts extends TextureOpts<TextureCubeSource> {
 class TextureCube extends Texture<TextureCubeSource> {
   readonly textureType = 'textureCube';
 
-  mipmaps?: Record<CubeTarget, TextureSource>[];
+  mipmaps?: TextureCubeSource[];
 
   constructor(opts?: Partial<TextureCubeOpts>) {
     super(opts);
@@ -56,39 +56,47 @@ class TextureCube extends Texture<TextureCubeSource> {
 
   get width() {
     const source = this.source;
+    const mipmaps = this.mipmaps;
     if (source && source.px) {
       return source.px.width;
+    } else if (mipmaps && mipmaps[0] && mipmaps[0].px) {
+      return mipmaps[0].px.width;
     }
     return this._width;
   }
   set width(value: number) {
+    const oldWidth = this.width;
     const source = this.source;
     if (source && source.px) {
-      console.warn("Texture from source can't set width");
+      (keys(source) as CubeTarget[]).forEach((target) => {
+        source[target] && (source[target]!.width = value);
+      });
     } else {
-      if (this._width !== value) {
-        this.dirty();
-      }
       this._width = value;
     }
+    oldWidth !== value && this.dirty();
   }
   get height() {
     const source = this.source;
+    const mipmaps = this.mipmaps;
     if (source && source.px) {
       return source.px.height;
+    } else if (mipmaps && mipmaps[0] && mipmaps[0].px) {
+      return mipmaps[0].px.height;
     }
     return this._height;
   }
   set height(value: number) {
+    const oldHeight = this.height;
     const source = this.source;
     if (source && source.px) {
-      console.warn("Texture from image can't set height");
+      (keys(source) as CubeTarget[]).forEach((target) => {
+        source[target] && (source[target]!.height = value);
+      });
     } else {
-      if (this._height !== value) {
-        this.dirty();
-      }
       this._height = value;
     }
+    oldHeight !== value && this.dirty();
   }
 
   // Overwrite the isPowerOfTwo method

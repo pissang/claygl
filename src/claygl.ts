@@ -31,6 +31,7 @@ export { default as Texture2D } from './Texture2D';
 export { default as Texture2DArray } from './Texture2DArray';
 export { default as Texture3D } from './Texture3D';
 export { default as TextureCube } from './TextureCube';
+export type { TextureCubeSource } from './TextureCube';
 
 export function startTimeline(onframe?: (deltaTime: number) => void) {
   const timeline = new Timeline();

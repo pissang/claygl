@@ -14,7 +14,8 @@ import {
   PlaneGeometry,
   Mesh,
   Vector3,
-  Node as ClayNode
+  Node as ClayNode,
+  TextureCubeSource
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -33,8 +34,6 @@ const material = new Material(createUnlitShader());
 const texture = new Texture2D({
   wrapS: constants.REPEAT,
   wrapT: constants.REPEAT,
-  width: 32,
-  height: 32,
   mipmaps: [
     createMipMap(32, '#000'),
     createMipMap(16, '#222'),
@@ -47,8 +46,6 @@ const texture = new Texture2D({
 const textureCube = new TextureCube({
   wrapS: constants.REPEAT,
   wrapT: constants.REPEAT,
-  width: 128,
-  height: 128,
   mipmaps: [
     createMipMapCube(128, '#02a'),
     createMipMapCube(64, '#000'),
@@ -73,7 +70,9 @@ function createMipMap(size: number, color: string) {
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
   return {
-    pixels: new Uint8Array(imgData)
+    data: new Uint8Array(imgData),
+    width: size,
+    height: size
   };
 }
 
@@ -85,12 +84,14 @@ function createMipMapCube(size: number, color: string) {
   ctx.fillRect(0, 0, size, size);
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
 
-  return {
-    pixels: (['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const).reduce((obj, target) => {
-      obj[target] = new Uint8Array(imgData);
-      return obj;
-    }, {} as Record<'px' | 'nx' | 'py' | 'ny' | 'pz' | 'nz', Uint8Array>)
-  };
+  return (['px', 'nx', 'py', 'ny', 'pz', 'nz'] as const).reduce((obj, target) => {
+    obj[target] = {
+      data: new Uint8Array(imgData),
+      width: size,
+      height: size
+    };
+    return obj;
+  }, {} as TextureCubeSource);
 }
 
 const root = new ClayNode();

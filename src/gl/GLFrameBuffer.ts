@@ -37,7 +37,7 @@ class GLFrameBuffer {
   ) {
     const frameBuffer = this._fb;
     const webglFb = this._webglFb || (this._webglFb = gl.createFramebuffer()!);
-    const level = this._fb.mipmapLevel;
+    const level = frameBuffer.mipmapLevel;
     let webglRenderBuffer = this._webglRb;
     // PENDING. not bind multiple times? if render twice?
     if (this._bound !== gl) {

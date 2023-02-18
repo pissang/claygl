@@ -34,7 +34,7 @@ particleRenderable.material.set('color', [1, 1, 1]);
 particleRenderable.material.set(
   'sprite',
   new Texture2D({
-    image: generateSprite()
+    source: generateSprite()
   })
 );
 

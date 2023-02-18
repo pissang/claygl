@@ -49,7 +49,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
       wrapS: constants.REPEAT,
       wrapT: constants.REPEAT
     });
-    tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png').onload(() => {
+    tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png').then(() => {
       update();
     });
     material[mapInfo[0]] = tex;
