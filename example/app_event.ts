@@ -1,4 +1,4 @@
-import { App3D } from 'claygl';
+import { App3D, vec3 } from 'claygl';
 const app = new App3D('#main', {
   event: true
 });
@@ -17,7 +17,7 @@ const cube = app.createCube();
 }, this);
 
 function makeRandomColor() {
-  return [Math.random(), Math.random(), Math.random()];
+  return vec3.fromValues(Math.random(), Math.random(), Math.random());
 }
 
 var randomColor = makeRandomColor();

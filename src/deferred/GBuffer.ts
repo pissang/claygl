@@ -280,7 +280,7 @@ class DeferredGBuffer {
         y: y,
         width: width,
         height: height,
-        devicePixelRatio: dpr || 1
+        pixelRatio: dpr || 1
       };
     }
     this._frameBuffer.viewport = viewport as RendererViewport;
@@ -295,7 +295,7 @@ class DeferredGBuffer {
         y: 0,
         width: this._gBufferTex1.width,
         height: this._gBufferTex1.height,
-        devicePixelRatio: 1
+        pixelRatio: 1
       };
     }
   }
@@ -369,7 +369,7 @@ class DeferredGBuffer {
 
     function clearViewport() {
       if (viewport) {
-        const dpr = viewport.devicePixelRatio;
+        const dpr = viewport.pixelRatio;
         // use scissor to make sure only clear the viewport
         gl.enable(gl.SCISSOR_TEST);
         gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);

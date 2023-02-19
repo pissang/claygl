@@ -13,7 +13,7 @@ import Stats from 'stats.js';
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
-  devicePixelRatio: 1
+  pixelRatio: 1
 });
 const width = window.innerWidth;
 const height = window.innerHeight;
@@ -42,7 +42,7 @@ const shader = createUnlitShader();
 for (let i = 0; i < cnt; ++i) {
   for (let j = 0; j < cnt; ++j) {
     const material = new Material(shader);
-    material.set('color', 'red');
+    material.set('color', [1, 0, 0]);
     const cube = new Mesh(cubeGeo, material);
     cube.position.set((i - cnt / 2) * distance, (j - cnt / 2) * distance, 0);
     cube.scale.set(size, size, size);

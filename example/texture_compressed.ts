@@ -21,7 +21,7 @@ const shader = new Shader(fullscreenQuadPassVertex, outputTextureFragment);
 const planeGeo = new PlaneGeometry();
 function createRect(texture: Texture2D, x: number, y: number, width: number, height: number) {
   const mat = new Material(shader);
-  mat.set('texture', texture);
+  mat.set('colorTex', texture);
   const mesh = new Mesh(planeGeo, mat, {
     culling: false
   });
@@ -72,7 +72,7 @@ let marginY = 50;
 
     const textMesh = createRect(
       new Texture2D({
-        image: textCanvas,
+        source: textCanvas,
         flipY: false
       }),
       localX,
@@ -92,7 +92,7 @@ let marginY = 50;
       useMipmap: false,
       flipY: false
     });
-    tex.load(url).onload(() => {
+    tex.load(url).then(() => {
       create(tex);
     });
   } else {
@@ -102,9 +102,7 @@ let marginY = 50;
         const res = parseKTX(ab)!;
         create(
           new Texture2D({
-            pixels: res.pixels,
-            width: res.width,
-            height: res.height,
+            source: res.source,
             format: res.format,
             minFilter: constants.LINEAR,
             magFilter: constants.LINEAR,

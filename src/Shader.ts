@@ -673,7 +673,11 @@ export class Shader<
 
           // Is matrix semantic
           // TODO more generic way?
-          if (isTranpose || isInverse || BASIC_MATRIX_SEMANTICS.includes(uniformSemantic as any)) {
+          if (
+            isTranpose ||
+            isInverse ||
+            BASIC_MATRIX_SEMANTICS.indexOf(uniformSemantic as any) >= 0
+          ) {
             matrixSemantics.push(uniformSemantic as MatrixSemantic);
           }
         } else {

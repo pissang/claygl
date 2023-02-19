@@ -19,7 +19,7 @@ const compositor = new Compositor();
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
-  devicePixelRatio: 1.0
+  pixelRatio: 1.0
 });
 //Create scene
 const scene = new Scene();

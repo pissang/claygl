@@ -67,7 +67,7 @@ interface App3DGraphicOpts {
   tonemapping?: boolean;
 }
 interface App3DOpts {
-  devicePixelRatio?: number;
+  pixelRatio?: number;
   width?: number;
   height?: number;
 
@@ -201,7 +201,7 @@ class App3D extends Notifier {
 
     const rendererOpts: Partial<RendererOpts> = {};
     isDomCanvas && (rendererOpts.canvas = container as HTMLCanvasElement);
-    opts.devicePixelRatio && (rendererOpts.devicePixelRatio = opts.devicePixelRatio);
+    opts.pixelRatio && (rendererOpts.pixelRatio = opts.pixelRatio);
 
     (
       [

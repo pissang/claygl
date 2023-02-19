@@ -22,7 +22,7 @@ import Stats from 'stats.js';
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
-  devicePixelRatio: 1.0
+  pixelRatio: 1.0
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 const deferredRenderer = new DeferredRenderer();
@@ -126,7 +126,7 @@ startTimeline((deltaTime) => {
   deferredRenderer.render(renderer, scene, camera);
 
   // TODO
-  debugPass.material.set('texture', (deferredRenderer as any)._lightAccumTex);
+  debugPass.material.set('colorTex', (deferredRenderer as any)._lightAccumTex);
 
   stats.update();
 });

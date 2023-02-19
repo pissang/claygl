@@ -17,7 +17,7 @@ import { projectEnvironmentMap } from '../src/util/sh';
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
-  devicePixelRatio: 1.0
+  pixelRatio: 1.0
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 const camera = new PerspectiveCamera({

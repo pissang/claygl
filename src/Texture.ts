@@ -3,7 +3,6 @@
  * TODO mapping
  */
 import * as constants from './core/constants';
-import Notifier from './core/Notifier';
 import { isPowerOfTwo } from './math/util';
 import { GLEnum } from './core/type';
 import { assign } from './core/util';

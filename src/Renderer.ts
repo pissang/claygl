@@ -58,7 +58,7 @@ export interface RendererViewport {
   y: number;
   width: number;
   height: number;
-  devicePixelRatio: number;
+  pixelRatio: number;
 }
 export interface RendererOpts {
   canvas: HTMLCanvasElement | null;
@@ -73,13 +73,13 @@ export interface RendererOpts {
   height: number;
 
   /**
-   * Device pixel ratio, set by setDevicePixelRatio method
+   * Device pixel ratio, set by setPixelRatio method
    * Specially for high defination display
    * @see http://www.khronos.org/webgl/wiki/HandlingHighDPI
    * @type {number}
    * @private
    */
-  devicePixelRatio: number;
+  pixelRatio: number;
 
   /**
    * Clear color
@@ -150,13 +150,13 @@ class Renderer extends Notifier {
   private _height: number;
 
   /**
-   * Device pixel ratio, set by setDevicePixelRatio method
+   * Device pixel ratio, set by setPixelRatio method
    * Specially for high defination display
    * @see http://www.khronos.org/webgl/wiki/HandlingHighDPI
    * @type {number}
    * @private
    */
-  private _devicePixelRatio: number;
+  private _pixelRatio: number;
 
   // Settings when getting context
   // http://www.khronos.org/registry/webgl/specs/latest/#2.4
@@ -215,8 +215,8 @@ class Renderer extends Notifier {
 
       this._width = opts.width || canvas.width || 100;
       this._height = opts.height || canvas.height || 100;
-      this._devicePixelRatio =
-        opts.devicePixelRatio || (typeof window !== 'undefined' ? window.devicePixelRatio : 1.0);
+      this._pixelRatio =
+        opts.pixelRatio || (typeof window !== 'undefined' ? window.devicePixelRatio : 1.0);
       this.resize(this._width, this._height);
     } catch (e) {
       throw 'Error creating WebGL Context ' + e;
@@ -234,7 +234,7 @@ class Renderer extends Notifier {
    */
   resize(width?: number, height?: number) {
     const canvas = this.canvas;
-    const dpr = this._devicePixelRatio;
+    const dpr = this._pixelRatio;
     if (width != null) {
       setCanvasSize(canvas, width, height!, dpr);
       this._width = width;
@@ -272,20 +272,20 @@ class Renderer extends Notifier {
   }
 
   /**
-   * Set devicePixelRatio
-   * @param {number} devicePixelRatio
+   * Set pixelRatio
+   * @param {number} pixelRatio
    */
-  setDevicePixelRatio(devicePixelRatio: number) {
-    this._devicePixelRatio = devicePixelRatio;
+  setPixelRatio(pixelRatio: number) {
+    this._pixelRatio = pixelRatio;
     this.resize(this._width, this._height);
   }
 
   /**
-   * Get devicePixelRatio
-   * @param {number} devicePixelRatio
+   * Get pixelRatio
+   * @param {number} pixelRatio
    */
   getDevicePixelRatio() {
-    return this._devicePixelRatio;
+    return this._pixelRatio;
   }
 
   /**
@@ -294,8 +294,8 @@ class Renderer extends Notifier {
    * @param {number} [y]
    * @param {number} [width]
    * @param {number} [height]
-   * @param {number} [devicePixelRatio]
-   *        Defaultly use the renderere devicePixelRatio
+   * @param {number} [pixelRatio]
+   *        Defaultly use the renderere pixelRatio
    *        It needs to be 1 when setViewport is called by frameBuffer
    *
    * @example
@@ -305,7 +305,7 @@ class Renderer extends Notifier {
    *      y: 0,
    *      width: width,
    *      height: height,
-   *      devicePixelRatio: 1
+   *      pixelRatio: 1
    *  })
    */
   setViewport(x: RendererViewport): void;
@@ -324,9 +324,9 @@ class Renderer extends Notifier {
       y = obj.y;
       width = obj.width;
       height = obj.height;
-      dpr = obj.devicePixelRatio;
+      dpr = obj.pixelRatio;
     }
-    dpr = dpr || this._devicePixelRatio;
+    dpr = dpr || this._pixelRatio;
 
     this._glPipeline.setViewport(x, y!, width!, height!, dpr!);
     // Use a fresh new object, not write property.
@@ -335,7 +335,7 @@ class Renderer extends Notifier {
       y: y!,
       width: width!,
       height: height!,
-      devicePixelRatio: dpr
+      pixelRatio: dpr
     };
   }
 
@@ -409,7 +409,7 @@ class Renderer extends Notifier {
     const { notUpdateScene, preZ } = opts;
 
     const viewport = this._glPipeline.getViewport();
-    const viewportDpr = viewport.devicePixelRatio;
+    const viewportDpr = viewport.pixelRatio;
 
     if (this.clearBit) {
       // Must set depth and color mask true before clear
@@ -419,7 +419,7 @@ class Renderer extends Notifier {
       if (
         viewport.width !== this._width ||
         viewport.height !== this._height ||
-        (viewportDpr && viewportDpr !== this._devicePixelRatio) ||
+        (viewportDpr && viewportDpr !== this._pixelRatio) ||
         viewport.x ||
         viewport.y
       ) {
@@ -545,7 +545,7 @@ class Renderer extends Notifier {
       viewport.y,
       viewport.width,
       viewport.height,
-      viewport.devicePixelRatio
+      viewport.pixelRatio
     );
   }
 
@@ -558,14 +558,14 @@ class Renderer extends Notifier {
   ) {
     let worldM: mat4.Mat4Array;
     const viewport = this._glPipeline.getViewport();
-    const vDpr = viewport.devicePixelRatio;
+    const vDpr = viewport.pixelRatio;
     const viewportUniform = [
       viewport.x * vDpr,
       viewport.y * vDpr,
       viewport.width * vDpr,
       viewport.height * vDpr
     ];
-    const windowDpr = this._devicePixelRatio;
+    const windowDpr = this._pixelRatio;
     const windowSizeUniform = frameBuffer
       ? [frameBuffer.getWidth(), frameBuffer.getHeight()]
       : [this._width * windowDpr, this._height * windowDpr];

@@ -1829,9 +1829,9 @@
               // Assumes your canvas width and height is scaled proportionately.
               // TODO(smus): The following causes buttons to become huge on iOS, but seems
               // like the right thing to do. For now, added a hack. But really, investigate why.
-              var dps = gl.drawingBufferWidth / (screen.width * window.devicePixelRatio);
+              var dps = gl.drawingBufferWidth / (screen.width * window.pixelRatio);
               if (!Util.isIOS()) {
-                dps *= window.devicePixelRatio;
+                dps *= window.pixelRatio;
               }
 
               var lineWidth = (kCenterLineThicknessDp * dps) / 2;
@@ -5523,11 +5523,11 @@
           };
 
           Util.getScreenWidth = function () {
-            return Math.max(window.screen.width, window.screen.height) * window.devicePixelRatio;
+            return Math.max(window.screen.width, window.screen.height) * window.pixelRatio;
           };
 
           Util.getScreenHeight = function () {
-            return Math.min(window.screen.width, window.screen.height) * window.devicePixelRatio;
+            return Math.min(window.screen.width, window.screen.height) * window.pixelRatio;
           };
 
           Util.requestFullscreen = function (element) {

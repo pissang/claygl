@@ -157,9 +157,11 @@ class AlchemyAOCompositeNode extends GroupCompositeNode<
       texture = generateNoiseTexture(size);
       this._estimateNode.material.set('noiseTex', generateNoiseTexture(size));
     } else {
-      texture.pixels = generateNoiseData(size);
-      texture.width = texture.height = size;
-      texture.dirty();
+      texture.source = {
+        data: generateNoiseData(size),
+        width: size,
+        height: size
+      };
     }
 
     this._estimateNode.material.set('noiseTexSize', [size, size]);

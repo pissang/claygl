@@ -27,7 +27,7 @@ import Stats from 'stats.js';
 const compositor = new Compositor();
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
-  devicePixelRatio: 1
+  pixelRatio: 1
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 

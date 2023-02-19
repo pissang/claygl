@@ -396,7 +396,7 @@ class DeferredRenderer {
     renderer.renderPass([], camera, lightAccumFrameBuffer, {
       prepare() {
         if (viewport) {
-          const dpr = viewport.devicePixelRatio;
+          const dpr = viewport.pixelRatio;
           // use scissor to make sure only clear the viewport
           gl.enable(gl.SCISSOR_TEST);
           gl.scissor(

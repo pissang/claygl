@@ -25,7 +25,8 @@
     "lint": "npx eslint --quiet src/**/*.ts",
     "watch": "rollup --sourcemap inline -c -w",
     "watch:lib": "npx tsc --watch",
-    "dev": "vite ./ --config example/vite.config.js"
+    "dev": "vite ./ --config example/vite.config.js",
+    "check:example": "npx tsc --noEmit -p example/tsconfig.json"
   },
   "repository": {
     "type": "git",

@@ -160,9 +160,11 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
       texture = generateNoiseTexture(size);
       estimateMaterial.set('noiseTex', generateNoiseTexture(size));
     } else {
-      texture.pixels = generateNoiseData(size);
-      texture.width = texture.height = size;
-      texture.dirty();
+      texture.source = {
+        data: generateNoiseData(size),
+        width: size,
+        height: size
+      };
     }
 
     estimateMaterial.set('noiseTexSize', [size, size]);

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES2015",
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -10,5 +10,6 @@
       "claygl": ["../src/claygl.ts"],
       "claygl/shaders": ["../src/shader/exports.ts"]
     }
-  }
+  },
+  "include": ["**/*.ts"]
 }

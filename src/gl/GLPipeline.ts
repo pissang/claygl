@@ -208,7 +208,7 @@ class GLPipeline {
     y: number;
     width: number;
     height: number;
-    devicePixelRatio: number;
+    pixelRatio: number;
   };
 
   throwError: boolean;
@@ -235,13 +235,13 @@ class GLPipeline {
       y,
       width,
       height,
-      devicePixelRatio: dpr
+      pixelRatio: dpr
     };
     this.gl.viewport(x * dpr, y * dpr, width * dpr, height * dpr);
   }
 
   getViewport() {
-    return this._viewport || { x: 0, y: 0, width: 0, height: 0, devicePixelRatio: 1 };
+    return this._viewport || { x: 0, y: 0, width: 0, height: 0, pixelRatio: 1 };
   }
 
   /**

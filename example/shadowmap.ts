@@ -15,7 +15,7 @@ import {
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
-  devicePixelRatio: 1.0
+  pixelRatio: 1.0
 });
 
 const shadowMapPass = new ShadowMapPass();

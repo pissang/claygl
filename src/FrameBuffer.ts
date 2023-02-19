@@ -67,7 +67,7 @@ class FrameBuffer {
         y: 0,
         width: this._width / scale,
         height: this._height / scale,
-        devicePixelRatio: 1
+        pixelRatio: 1
       }
     );
   }

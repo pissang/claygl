@@ -37,7 +37,7 @@ const config = {
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
-  devicePixelRatio: 1.0
+  pixelRatio: 1.0
 });
 const camera = new PerspectiveCamera({
   aspect: renderer.getViewportAspect()
