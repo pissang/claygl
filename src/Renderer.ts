@@ -569,7 +569,6 @@ class Renderer extends Notifier {
     const windowSizeUniform = frameBuffer
       ? [frameBuffer.getWidth(), frameBuffer.getHeight()]
       : [this._width * windowDpr, this._height * windowDpr];
-    // DEPRECATED
     const viewportSizeUniform = [viewportUniform[2], viewportUniform[3]];
     const time = Date.now();
     const gl = this.gl;
@@ -592,7 +591,7 @@ class Renderer extends Notifier {
     const renderHooksForScene: GLRenderHooks = {
       getProgramKey: (renderable) => {
         let key = (scene && scene.getProgramKey(renderable.lightGroup || 0)) || '';
-        if (this.logDepthBuffer) {
+        if (logDepthBuffer) {
           key += ',ld';
         }
         return key;
@@ -607,6 +606,9 @@ class Renderer extends Notifier {
               extraDefines[lightType.toUpperCase() + '_COUNT'] = count;
             }
           }
+        }
+        if (logDepthBuffer) {
+          extraDefines.LOG_DEPTH = true;
         }
         return extraDefines;
       },
