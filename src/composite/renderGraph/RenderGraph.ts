@@ -15,6 +15,10 @@ class RenderGraph {
   });
   private _frameBufferWithDepth = new FrameBuffer();
 
+  private _width: number = 0;
+  private _height: number = 0;
+  private _dpr: number = 0;
+
   addNode(node: RenderGraphNode) {
     const nodes = this._nodes;
     if (nodes.indexOf(node) < 0) {
@@ -35,6 +39,18 @@ class RenderGraph {
   }
 
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {
+    const width = renderer.getWidth();
+    const height = renderer.getHeight();
+    const dpr = renderer.getDevicePixelRatio();
+
+    if (this._width !== width || this._height !== height || this._dpr !== dpr) {
+      this._width = width;
+      this._height = height;
+      this._dpr = dpr;
+      // Clear all the previous allocated textures when size changed.
+      this._texturePool.clear(renderer);
+    }
+
     const nodes = this._nodes;
     const outputs = nodes.filter((node) => node.isEndNode());
 
