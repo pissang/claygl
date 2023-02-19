@@ -1,4 +1,9 @@
-import Texture, { getDefaultTextureFormat, TextureOpts, TextureSource } from './Texture';
+import Texture, {
+  getDefaultTextureFormatBySource,
+  getDefaultTypeBySource,
+  TextureOpts,
+  TextureSource
+} from './Texture';
 import vendor from './core/vendor';
 
 export interface Texture2DOpts extends TextureOpts<TextureSource> {
@@ -70,8 +75,12 @@ class Texture2D extends Texture<TextureSource> {
     oldHeight !== value && this.dirty();
   }
 
-  _defaultFormat() {
-    return getDefaultTextureFormat(this.source);
+  protected override _defaultFormat() {
+    return getDefaultTextureFormatBySource(this.source);
+  }
+
+  protected override _defaultType() {
+    return getDefaultTypeBySource(this.source);
   }
 
   isRenderable() {

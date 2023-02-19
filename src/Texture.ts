@@ -62,12 +62,23 @@ const formatMap = {
   4: constants.RGBA
 };
 
-export function getDefaultTextureFormat(source?: TextureSource) {
+export function getDefaultTextureFormatBySource(source?: TextureSource) {
   if (isPixelSource(source)) {
     const channels = source.data.length / source.width / source.height / (source.depth || 1);
     return formatMap[channels as 1] || constants.RGBA;
   }
   return constants.RGBA;
+}
+
+export function getDefaultTypeBySource(source?: TextureSource) {
+  if (isPixelSource(source)) {
+    return source.data instanceof Float32Array
+      ? constants.FLOAT
+      : source.data instanceof Uint16Array
+      ? constants.HALF_FLOAT
+      : constants.UNSIGNED_BYTE;
+  }
+  return constants.UNSIGNED_BYTE;
 }
 export interface TextureOpts<TSource = unknown> {
   /**
@@ -185,7 +196,7 @@ abstract class Texture<TSource = unknown> {
   private _loadingPromise?: Promise<void>;
 
   private _format?: GLEnum;
-
+  private _type?: GLEnum;
   private _internalFormat?: GLEnum;
 
   constructor(opts?: Partial<TextureOpts>) {
@@ -215,6 +226,14 @@ abstract class Texture<TSource = unknown> {
     this._height = value;
   }
 
+  get type() {
+    return this._type || this._defaultType();
+  }
+
+  set type(type: GLEnum) {
+    this._type = type;
+  }
+
   get format() {
     return this._format || this._defaultFormat();
   }
@@ -233,6 +252,10 @@ abstract class Texture<TSource = unknown> {
 
   protected _defaultFormat() {
     return constants.RGBA;
+  }
+
+  protected _defaultType() {
+    return constants.UNSIGNED_BYTE;
   }
 
   /**
@@ -287,7 +310,6 @@ abstract class Texture<TSource = unknown> {
 
 // Default values.
 const proto = Texture.prototype;
-proto.type = constants.UNSIGNED_BYTE;
 proto.wrapS = constants.REPEAT;
 proto.wrapT = constants.REPEAT;
 proto.minFilter = constants.LINEAR_MIPMAP_LINEAR;

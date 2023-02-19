@@ -1,4 +1,9 @@
-import Texture, { getDefaultTextureFormat, TextureOpts, TextureSource } from './Texture';
+import Texture, {
+  getDefaultTextureFormatBySource,
+  getDefaultTypeBySource,
+  TextureOpts,
+  TextureSource
+} from './Texture';
 import vendor from './core/vendor';
 
 export interface Texture2DArrayOpts extends TextureOpts<TextureSource[]> {}
@@ -47,8 +52,12 @@ class Texture2DArray extends Texture<TextureSource[]> {
     oldHeight !== value && this.dirty();
   }
 
-  _defaultFormat() {
-    return getDefaultTextureFormat(this.source && this.source[0]);
+  protected override _defaultFormat() {
+    return getDefaultTextureFormatBySource(this.source && this.source[0]);
+  }
+
+  protected override _defaultType() {
+    return getDefaultTypeBySource(this.source && this.source[0]);
   }
 
   isRenderable() {

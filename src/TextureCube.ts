@@ -1,5 +1,6 @@
 import Texture, {
-  getDefaultTextureFormat,
+  getDefaultTextureFormatBySource,
+  getDefaultTypeBySource,
   TextureImageSource,
   TextureOpts,
   TexturePixelSource,
@@ -100,8 +101,11 @@ class TextureCube extends Texture<TextureCubeSource> {
     oldHeight !== value && this.dirty();
   }
 
-  _defaultFormat() {
-    return getDefaultTextureFormat(this.source && this.source.px);
+  protected override _defaultFormat() {
+    return getDefaultTextureFormatBySource(this.source && this.source.px);
+  }
+  protected override _defaultType() {
+    return getDefaultTypeBySource(this.source && this.source.px);
   }
 
   // Overwrite the isPowerOfTwo method
