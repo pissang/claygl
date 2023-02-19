@@ -219,7 +219,7 @@ class DeferredRenderer {
     camera.update();
 
     const lightAccumTex = opts.targetTexture || this._lightAccumTex;
-    const dpr = renderer.getDevicePixelRatio();
+    const dpr = renderer.getPixelRatio();
     const isInputGBuffer = opts.gBufferTexture1 && opts.gBufferTexture2 && opts.gBufferTexture3;
 
     if (

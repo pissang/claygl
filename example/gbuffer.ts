@@ -79,8 +79,8 @@ function update() {
 function resize() {
   renderer.resize(window.innerWidth, window.innerHeight);
   gbuffer.resize(
-    renderer.getWidth() * renderer.getDevicePixelRatio(),
-    renderer.getHeight() * renderer.getDevicePixelRatio()
+    renderer.getWidth() * renderer.getPixelRatio(),
+    renderer.getHeight() * renderer.getPixelRatio()
   );
   camera.aspect = renderer.getViewportAspect();
 }

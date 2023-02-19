@@ -284,7 +284,7 @@ class Renderer extends Notifier {
    * Get pixelRatio
    * @param {number} pixelRatio
    */
-  getDevicePixelRatio() {
+  getPixelRatio() {
     return this._pixelRatio;
   }
 

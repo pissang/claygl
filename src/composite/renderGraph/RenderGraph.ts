@@ -41,7 +41,7 @@ class RenderGraph {
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {
     const width = renderer.getWidth();
     const height = renderer.getHeight();
-    const dpr = renderer.getDevicePixelRatio();
+    const dpr = renderer.getPixelRatio();
 
     if (this._width !== width || this._height !== height || this._dpr !== dpr) {
       this._width = width;

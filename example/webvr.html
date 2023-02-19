@@ -179,8 +179,8 @@
 
         function resize() {
           renderer.resize(viewport.offsetWidth, viewport.offsetHeight);
-          sourceTexture.width = renderer.getWidth() * renderer.getDevicePixelRatio();
-          sourceTexture.height = renderer.getHeight() * renderer.getDevicePixelRatio();
+          sourceTexture.width = renderer.getWidth() * renderer.getPixelRatio();
+          sourceTexture.height = renderer.getHeight() * renderer.getPixelRatio();
           sourceTexture.dirty();
         }
 
