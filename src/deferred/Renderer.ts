@@ -82,9 +82,7 @@ class DeferredRenderer {
   });
 
   // TODO Support dynamic material?
-  private _fullQuadPass = new FullscreenQuadPass(outputFragment, {
-    blendWithPrevious: true
-  });
+  private _fullQuadPass = new FullscreenQuadPass(outputFragment);
 
   private _depthWriteMat = new Material(new Shader(fullscreenQuadPassVertex, depthWriteFragment));
 

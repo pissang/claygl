@@ -18,7 +18,6 @@ const camera = new OrthoCamera();
 interface FullscreenQuadPassOpts {
   clearColor?: Color;
   clearDepth?: boolean;
-  blendWithPrevious?: boolean;
 }
 
 class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Notifier {
@@ -26,7 +25,8 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
 
   clearColor?: Color | boolean;
   clearDepth?: boolean;
-  blendWithPrevious?: boolean;
+
+  viewport?: { x: number; y: number; width: number; height: number };
 
   constructor(frag: T, opts?: Partial<FullscreenQuadPassOpts>) {
     super();
@@ -38,17 +38,13 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
 
     opts = opts || {};
     this.clearColor = opts.clearColor || false;
-    this.blendWithPrevious = opts.blendWithPrevious || false;
     this.clearDepth = optional(opts.clearDepth, true);
   }
 
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {
-    this.trigger('beforerender', this, renderer);
-
     // FIXME Don't clear in each pass in default, let the color overwrite the buffer
     // FIXME pixels may be discard
     let clearBit = this.clearDepth ? constants.DEPTH_BUFFER_BIT : 0;
-    const blendWithPrevious = this.blendWithPrevious;
 
     // Blend with previous rendered scene in the final output
     // FIXME Configure blend.
@@ -56,8 +52,13 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
 
     this.renderQuad(renderer, frameBuffer, (gl) => {
       gl.depthMask(true);
-      gl[blendWithPrevious ? 'enable' : 'disable'](constants.BLEND);
-      this.material && (this.material.transparent = blendWithPrevious!);
+
+      const viewport = this.viewport;
+      if (viewport) {
+        gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
+        gl.enable(constants.SCISSOR_TEST);
+        gl.scissor(viewport.x, viewport.y, viewport.width, viewport.height);
+      }
 
       if (this.clearColor) {
         clearBit = clearBit | constants.COLOR_BUFFER_BIT;
@@ -68,9 +69,11 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
         }
       }
       gl.clear(clearBit);
-    });
 
-    this.trigger('afterrender', this, renderer);
+      if (viewport) {
+        gl.disable(constants.SCISSOR_TEST);
+      }
+    });
   }
 
   /**
