@@ -45,6 +45,9 @@ class RenderGraphNode {
   private _prevOutputTextures: Record<string, Texture2D> = {};
   private _outputTextures: Record<string, Texture2D> = {};
 
+  // Textures will be persisted
+  private _persistedTextures: Record<string, Texture2D> = {};
+
   private _needsKeepPrevFrame: Record<string, boolean> = {};
   private _outputRefCount: Record<string, number> = {};
   private _prevOutputRefCount: Record<string, number> = {};
@@ -211,11 +214,13 @@ class RenderGraphNode {
     outputNames.forEach((outputName, idx) => {
       const outputInfo = compositeNode.outputs![outputName];
       const parameters = this.getTextureParams(outputName, renderer);
+      const persistedTextures = this._persistedTextures;
       let texture: Texture2D;
       if (!outputInfo.persist) {
         texture = texturePool.allocate(parameters);
       } else {
-        texture = outputTextures[outputName] || new Texture2D();
+        texture =
+          persistedTextures[outputName] || (persistedTextures[outputName] = new Texture2D());
         // PENDING
         assign(texture, parameters);
       }

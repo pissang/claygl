@@ -182,10 +182,6 @@ class GLTexture {
         glType,
         (source && source.data) || null
       );
-
-      // if (gl.getError()) {
-      //   debugger;
-      // }
     } else {
       // Try as image source.
       // TODO check?
@@ -310,6 +306,10 @@ class GLTexture {
       // TODO Not all texture use mipmap.
       gl.generateMipmap(bindTarget);
       gl.bindTexture(bindTarget, null);
+
+      if (gl.getError()) {
+        debugger;
+      }
     }
   }
 
