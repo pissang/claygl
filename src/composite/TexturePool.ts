@@ -4,7 +4,6 @@ import Texture2D, { Texture2DOpts } from '../Texture2D';
 import * as constants from '../core/constants';
 import * as util from '../core/util';
 import Renderer from '../Renderer';
-import { getPossiblelInternalFormat } from '../Texture';
 
 export type TexturePoolParameters = Pick<
   Texture2DOpts,

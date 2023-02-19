@@ -1,11 +1,6 @@
 import * as constants from '../core/constants';
 import { GLEnum } from '../core/type';
-import {
-  getPossiblelInternalFormat,
-  isPixelSource,
-  TexturePixelSource,
-  TextureSource
-} from '../Texture';
+import { isPixelSource, TexturePixelSource, TextureSource } from '../Texture';
 import Texture2D from '../Texture2D';
 import Texture2DArray from '../Texture2DArray';
 import Texture3D from '../Texture3D';
@@ -33,6 +28,7 @@ function getAvailableMinFilter(texture: AllTextureType) {
     return minFilter;
   }
 }
+
 class GLTexture {
   /**
    * Slot been taken
@@ -76,8 +72,7 @@ class GLTexture {
 
     const glFormat = texture.format;
 
-    const glInternalFormat =
-      texture.internalFormat || getPossiblelInternalFormat(texture.format, texture.type);
+    const glInternalFormat = texture.internalFormat;
     const mipmaps = (texture as Texture2D).mipmaps || [];
     const mipmapsLen = mipmaps.length;
     let glType = texture.type;

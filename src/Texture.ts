@@ -54,6 +54,21 @@ export function getPossiblelInternalFormat(format: number, type: number) {
   }
   return format;
 }
+
+const formatMap = {
+  1: constants.RED,
+  2: constants.RG,
+  3: constants.RGB,
+  4: constants.RGBA
+};
+
+export function getDefaultTextureFormat(source?: TextureSource) {
+  if (isPixelSource(source)) {
+    const channels = source.data.length / source.width / source.height / (source.depth || 1);
+    return formatMap[channels as 1] || constants.RGBA;
+  }
+  return constants.RGBA;
+}
 export interface TextureOpts<TSource = unknown> {
   /**
    * Source
@@ -169,6 +184,10 @@ abstract class Texture<TSource = unknown> {
 
   private _loadingPromise?: Promise<void>;
 
+  private _format?: GLEnum;
+
+  private _internalFormat?: GLEnum;
+
   constructor(opts?: Partial<TextureOpts>) {
     assign(this, opts);
   }
@@ -194,6 +213,26 @@ abstract class Texture<TSource = unknown> {
   }
   set height(value: number) {
     this._height = value;
+  }
+
+  get format() {
+    return this._format || this._defaultFormat();
+  }
+
+  set format(format: GLEnum) {
+    this._format = format;
+  }
+
+  get internalFormat() {
+    return this._internalFormat || getPossiblelInternalFormat(this.format, this.type);
+  }
+
+  set internalFormat(internalFormat: GLEnum) {
+    this._internalFormat = internalFormat;
+  }
+
+  protected _defaultFormat() {
+    return constants.RGBA;
   }
 
   /**
@@ -249,7 +288,6 @@ abstract class Texture<TSource = unknown> {
 // Default values.
 const proto = Texture.prototype;
 proto.type = constants.UNSIGNED_BYTE;
-proto.format = constants.RGBA;
 proto.wrapS = constants.REPEAT;
 proto.wrapT = constants.REPEAT;
 proto.minFilter = constants.LINEAR_MIPMAP_LINEAR;

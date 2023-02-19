@@ -1,4 +1,4 @@
-import Texture, { TextureOpts, TexturePixelSource } from './Texture';
+import Texture, { getDefaultTextureFormat, TextureOpts, TexturePixelSource } from './Texture';
 
 export interface Texture3DOpts extends TextureOpts<TexturePixelSource> {}
 
@@ -56,6 +56,10 @@ class Texture3D extends Texture<TexturePixelSource> {
       this._depth = value;
     }
     oldDepth !== value && this.dirty();
+  }
+
+  _defaultFormat() {
+    return getDefaultTextureFormat(this.source);
   }
 
   isRenderable() {
