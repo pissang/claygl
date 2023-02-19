@@ -172,3 +172,9 @@ export function setCanvasSize(
 }
 
 export const isArray = Array.isArray;
+
+export function assert(cond: boolean, msg?: string) {
+  if (!cond) {
+    throw new Error(msg);
+  }
+}

@@ -2,6 +2,7 @@ import Texture from './Texture';
 import * as constants from './core/constants';
 import { RendererViewport } from './Renderer';
 import { GLEnum } from './core/type';
+import { assert } from './core/util';
 
 interface FrameBufferOpts {
   /**
@@ -84,9 +85,7 @@ class FrameBuffer {
    * @param  {number} [target=gl.TEXTURE_2D]
    */
   attach(texture: Texture, attachment?: GLEnum, target?: GLEnum) {
-    if (!texture.width) {
-      throw new Error('The texture attached to color buffer is not a valid.');
-    }
+    assert(texture.width > 0, 'Invalid texture');
 
     // If the depth_texture extension is enabled, developers
     // Can attach a depth texture to the depth buffer

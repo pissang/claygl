@@ -182,6 +182,10 @@ class GLTexture {
         glType,
         (source && source.data) || null
       );
+
+      // if (gl.getError()) {
+      //   debugger;
+      // }
     } else {
       // Try as image source.
       // TODO check?

@@ -9,7 +9,7 @@ import Mesh from '../Mesh';
 import Skeleton from '../Skeleton';
 import GLProgram from './GLProgram';
 import ProgramManager from './ProgramManager';
-import { genGUID, isArray, keys, optional } from '../core/util';
+import { assert, genGUID, isArray, keys, optional } from '../core/util';
 import type Texture from '../Texture';
 import FrameBuffer from '../FrameBuffer';
 import Texture2D from '../Texture2D';
@@ -255,6 +255,8 @@ class GLPipeline {
     const gl = this.gl;
     let glFrameBuffer;
     if (frameBuffer) {
+      assert(frameBuffer.getWidth() > 0, 'No textures attached');
+
       glFrameBuffer = glFrameBufferMap.get(frameBuffer);
       if (!glFrameBuffer) {
         glFrameBuffer = new GLFrameBuffer(frameBuffer);
