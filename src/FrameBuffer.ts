@@ -61,6 +61,7 @@ class FrameBuffer {
   getViewport() {
     const scale = Math.pow(2, this.mipmapLevel);
     return (
+      // PENDING this.viewport scale mipmapLevel?
       this.viewport || {
         x: 0,
         y: 0,

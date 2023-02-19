@@ -95,7 +95,7 @@ export function copy(out: Mat4Array, a: Mat4Array) {
  * @param out the receiving matrix
  * @returns out
  */
-export function identity(out: number[]) {
+export function identity(out: Mat4Array): Mat4Array {
   out[0] = 1;
   out[1] = 0;
   out[2] = 0;
@@ -1009,7 +1009,12 @@ export function ortho(
  * @param up vec3 pointing up
  * @returns out
  */
-export function lookAt(out: Mat4Array, eye: Vec3Array, center: Vec3Array, up: Vec3Array) {
+export function lookAt(
+  out: Mat4Array,
+  eye: Vec3Array,
+  center: Vec3Array,
+  up: Vec3Array
+): Mat4Array {
   let x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
   const eyex = eye[0],
     eyey = eye[1],
