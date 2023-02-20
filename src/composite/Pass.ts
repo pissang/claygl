@@ -26,7 +26,8 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
   clearColor?: Color | boolean;
   clearDepth?: boolean;
 
-  viewport?: { x: number; y: number; width: number; height: number };
+  beforeRender?: (gl: WebGL2RenderingContext) => void;
+  afterRender?: (gl: WebGL2RenderingContext) => void;
 
   constructor(frag: T, opts?: Partial<FullscreenQuadPassOpts>) {
     super();
@@ -50,30 +51,28 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
     // FIXME Configure blend.
     // FIXME It will cause screen blink？
 
-    this.renderQuad(renderer, frameBuffer, (gl) => {
-      gl.depthMask(true);
+    this.renderQuad(
+      renderer,
+      frameBuffer,
+      (gl) => {
+        gl.depthMask(true);
 
-      const viewport = this.viewport;
-      if (viewport) {
-        gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
-        gl.enable(constants.SCISSOR_TEST);
-        gl.scissor(viewport.x, viewport.y, viewport.width, viewport.height);
-      }
+        this.beforeRender?.(gl);
 
-      if (this.clearColor) {
-        clearBit = clearBit | constants.COLOR_BUFFER_BIT;
-        gl.colorMask(true, true, true, true);
-        const cc = this.clearColor;
-        if (isArray(cc)) {
-          gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
+        if (this.clearColor) {
+          clearBit = clearBit | constants.COLOR_BUFFER_BIT;
+          gl.colorMask(true, true, true, true);
+          const cc = this.clearColor;
+          if (isArray(cc)) {
+            gl.clearColor(cc[0], cc[1], cc[2], cc[3]);
+          }
         }
+        gl.clear(clearBit);
+      },
+      (gl) => {
+        this.afterRender?.(gl);
       }
-      gl.clear(clearBit);
-
-      if (viewport) {
-        gl.disable(constants.SCISSOR_TEST);
-      }
-    });
+    );
   }
 
   /**
