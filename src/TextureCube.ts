@@ -64,7 +64,7 @@ class TextureCube extends Texture<TextureCubeSource> {
     } else if (mipmaps && mipmaps[0] && mipmaps[0].px) {
       return mipmaps[0].px.width;
     }
-    return this._width;
+    return this._width || 0;
   }
   set width(value: number) {
     const oldWidth = this.width;
@@ -86,7 +86,7 @@ class TextureCube extends Texture<TextureCubeSource> {
     } else if (mipmaps && mipmaps[0] && mipmaps[0].px) {
       return mipmaps[0].px.height;
     }
-    return this._height;
+    return this._height || 0;
   }
   set height(value: number) {
     const oldHeight = this.height;

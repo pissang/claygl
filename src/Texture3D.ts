@@ -10,7 +10,7 @@ export interface Texture3DOpts extends TextureOpts<TexturePixelSource> {}
 class Texture3D extends Texture<TexturePixelSource> {
   readonly textureType = 'texture3D';
 
-  private _depth: number = 512;
+  private _depth?: number;
 
   constructor(opts?: Partial<Texture3DOpts>) {
     super(opts);
@@ -20,7 +20,7 @@ class Texture3D extends Texture<TexturePixelSource> {
     if (this.source) {
       return this.source.width;
     }
-    return this._width;
+    return this._width || 0;
   }
   set width(value: number) {
     const oldWidth = this.width;
@@ -35,7 +35,7 @@ class Texture3D extends Texture<TexturePixelSource> {
     if (this.source) {
       return this.source.height;
     }
-    return this._height;
+    return this._height || 0;
   }
   set height(value: number) {
     const oldHeight = this.height;
@@ -51,7 +51,7 @@ class Texture3D extends Texture<TexturePixelSource> {
     if (this.source) {
       return this.source.depth!;
     }
-    return this._depth;
+    return this._depth || 0;
   }
   set depth(value: number) {
     const oldDepth = this.depth;
