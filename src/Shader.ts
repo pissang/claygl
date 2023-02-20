@@ -94,7 +94,7 @@ export type AttributeSemantic =
   | 'NORMAL'
   | 'BINORMAL'
   | 'TANGENT'
-  | 'TEXCOORD'
+  // | 'TEXCOORD'
   | 'TEXCOORD_0'
   | 'TEXCOORD_1'
   | 'COLOR'

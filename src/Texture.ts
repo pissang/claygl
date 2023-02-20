@@ -184,8 +184,8 @@ export interface TextureOpts<TSource = unknown> {
 }
 interface Texture<TSource> extends Omit<TextureOpts, 'width' | 'height' | 'source'> {}
 abstract class Texture<TSource = unknown> {
-  protected _width: number = 512;
-  protected _height: number = 512;
+  protected _width?: number;
+  protected _height?: number;
 
   __dirty = true;
 
@@ -214,13 +214,13 @@ abstract class Texture<TSource = unknown> {
   }
 
   get width() {
-    return this._width;
+    return this._width || 0;
   }
   set width(value: number) {
     this._width = value;
   }
   get height() {
-    return this._height;
+    return this._height || 0;
   }
   set height(value: number) {
     this._height = value;
