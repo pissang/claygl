@@ -171,6 +171,7 @@ class GLTexture {
         }
       }
 
+      // TODO use texStorage2D if source is undefined.
       gl.texImage2D(
         constants.TEXTURE_2D,
         level,
