@@ -51,16 +51,14 @@ vendor.supportWebGL = function () {
 };
 
 let g: any;
-if (typeof window !== 'undefined') {
-  g = window;
+if (typeof globalThis !== 'undefined') {
+  g = globalThis;
   // @ts-ignore
 } else if (typeof global !== 'undefined') {
-  /* global global */
   // @ts-ignore
   g = global;
-} else if (typeof globalThis !== 'undefined') {
-  g = globalThis;
 }
+
 vendor.requestAnimationFrame =
   g.requestAnimationFrame ||
   function (func: () => void) {
