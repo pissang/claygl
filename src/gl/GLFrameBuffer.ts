@@ -4,6 +4,7 @@ import {
   DEPTH_STENCIL_ATTACHMENT,
   FRAMEBUFFER,
   FRAMEBUFFER_COMPLETE,
+  DEPTH_COMPONENT24,
   RENDERBUFFER
 } from '../core/constants';
 import { GLEnum } from '../core/type';
@@ -123,7 +124,7 @@ class GLFrameBuffer {
       }
       if (width !== this._webglRbW || height !== this._webglRbH) {
         gl.bindRenderbuffer(RENDERBUFFER, webglRenderBuffer);
-        gl.renderbufferStorage(RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
+        gl.renderbufferStorage(RENDERBUFFER, DEPTH_COMPONENT24, width, height);
         this._webglRbW = width;
         this._webglRbH = height;
         gl.bindRenderbuffer(RENDERBUFFER, null);
