@@ -1,7 +1,6 @@
 // TODO dispose unused textures.
 
 import Texture2D, { Texture2DOpts } from '../Texture2D';
-import * as constants from '../core/constants';
 import * as util from '../core/util';
 import Renderer from '../Renderer';
 
