@@ -20,7 +20,7 @@ export type TexturePoolParameters = Pick<
   | 'anisotropic'
 >;
 
-const textureAllocatedMap = new WeakMap<Texture2D, boolean>();
+const textureKeyMap = new WeakMap<Texture2D, string>();
 
 const MAX_ALLOCATE_TEXTURE = 1e3;
 
@@ -40,26 +40,25 @@ class TexturePool {
     if (!list.length) {
       const texture = new Texture2D(parameters);
       this._allocated.push(texture);
-      textureAllocatedMap.set(texture, true);
+      textureKeyMap.set(texture, key);
       return texture;
     }
     const texture = list.pop() as Texture2D;
-    util.assign(texture, parameters);
-    textureAllocatedMap.set(texture, true);
+    textureKeyMap.set(texture, key);
     return texture;
   }
 
   release(texture: Texture2D) {
+    const key = textureKeyMap.get(texture);
     // Already been released.
-    if (!textureAllocatedMap.get(texture)) {
+    if (!key) {
       return;
     }
 
-    const key = generateKey(texture);
     if (!util.hasOwn(this._pool, key)) {
       this._pool[key] = [];
     }
-    textureAllocatedMap.set(texture, false);
+    textureKeyMap.set(texture, '');
     const list = this._pool[key];
     list.push(texture);
   }
@@ -70,28 +69,25 @@ class TexturePool {
     this._allocated = [];
   }
 }
-const defaultParams: Partial<TexturePoolParameters> = {
-  type: constants.UNSIGNED_BYTE,
-  format: constants.RGBA,
-  wrapS: constants.CLAMP_TO_EDGE,
-  wrapT: constants.CLAMP_TO_EDGE,
-  minFilter: constants.LINEAR_MIPMAP_LINEAR,
-  magFilter: constants.LINEAR,
-  useMipmap: true,
-  anisotropic: 1
-} as const;
 
-const defaultParamPropList = util.keys(defaultParams);
+const texturePropList = [
+  'width',
+  'height',
+  'format',
+  'internalFormat',
+  'type',
+  'wrapS',
+  'wrapT',
+  'minFilter',
+  'magFilter',
+  'useMipmap',
+  'anisotropic'
+];
 
 function generateKey(parameters: Partial<TexturePoolParameters>) {
-  util.defaults(parameters, defaultParams);
-  // CAUTION: DO NOT MODIFY THE PARAM
-  // parameters.internalFormat =
-  //   parameters.internalFormat || getPossiblelInternalFormat(parameters.format!, parameters.type!);
-
   let key = '';
-  for (let i = 0; i < defaultParamPropList.length; i++) {
-    key += (parameters as any)[defaultParamPropList[i]].toString();
+  for (let i = 0; i < texturePropList.length; i++) {
+    key += (parameters as any)[texturePropList[i]] ?? 'df';
   }
   return key;
 }
