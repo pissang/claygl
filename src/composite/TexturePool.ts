@@ -44,6 +44,7 @@ class TexturePool {
       return texture;
     }
     const texture = list.pop() as Texture2D;
+    util.assign(texture, parameters);
     textureAllocatedMap.set(texture, true);
     return texture;
   }
