@@ -5,8 +5,7 @@ import {
   Scene,
   Mesh,
   CubeGeometry,
-  StandardMaterial,
-  startTimeline
+  StandardMaterial
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -20,6 +19,7 @@ const camera = new PerspectiveCamera({
 });
 camera.position.set(0, 0, 6);
 renderer.resize(window.innerWidth, window.innerHeight);
+gbuffer.resize(window.innerWidth, window.innerHeight);
 
 const scene = new Scene();
 

@@ -10,7 +10,7 @@ import * as constants from '../core/constants';
 import Renderer, { RenderHooks, RendererViewport, RenderableObject } from '../Renderer';
 import Camera from '../Camera';
 import Scene from '../Scene';
-import { optional } from '../core/util';
+import { assert, optional } from '../core/util';
 import {
   gBuffer1Fragment,
   gBuffer2Fragment,
@@ -252,10 +252,11 @@ class DeferredGBuffer {
    * @param {number} height
    */
   resize(width: number, height: number) {
-    if (this._gBufferTex1.width === width && this._gBufferTex1.height === height) {
+    const gBufferTex1 = this._gBufferTex1;
+    if (gBufferTex1.width === width && gBufferTex1.height === height) {
       return;
     }
-    this._gBufferTex1.resize(width, height);
+    gBufferTex1.resize(width, height);
     this._gBufferTex2.resize(width, height);
     this._gBufferTex3.resize(width, height);
     this._gBufferTex4.resize(width, height);
@@ -318,6 +319,9 @@ class DeferredGBuffer {
       targetTexture4?: Texture2D;
     }
   ) {
+    const gBufferTex1 = this._gBufferTex1;
+    assert(gBufferTex1.width > 0 && gBufferTex1.height > 0, 'Invalid size');
+
     opts = opts || {};
 
     const gl = renderer.gl;
@@ -387,7 +391,7 @@ class DeferredGBuffer {
     // PENDING, scene.boundingBoxLastFrame needs be updated if have shadow
     if (enableTargetTexture1) {
       // Pass 1
-      frameBuffer.attach(opts.targetTexture1 || this._gBufferTex1);
+      frameBuffer.attach(opts.targetTexture1 || gBufferTex1);
 
       const gBufferMaterial1 = this._gBufferMaterial1;
       const renderHooks: RenderHooks = {
