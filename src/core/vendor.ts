@@ -50,7 +50,7 @@ vendor.supportWebGL = function () {
   return supportWebGL;
 };
 
-let g;
+let g: any;
 if (typeof window !== 'undefined') {
   g = window;
   // @ts-ignore
