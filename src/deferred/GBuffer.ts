@@ -319,9 +319,6 @@ class DeferredGBuffer {
       targetTexture4?: Texture2D;
     }
   ) {
-    const gBufferTex1 = this._gBufferTex1;
-    assert(gBufferTex1.width > 0 && gBufferTex1.height > 0, 'Invalid size');
-
     opts = opts || {};
 
     const gl = renderer.gl;
