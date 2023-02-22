@@ -307,10 +307,6 @@ class GLTexture {
       // TODO Not all texture use mipmap.
       gl.generateMipmap(bindTarget);
       gl.bindTexture(bindTarget, null);
-
-      if (gl.getError()) {
-        debugger;
-      }
     }
   }
 
