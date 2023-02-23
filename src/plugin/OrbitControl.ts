@@ -548,9 +548,17 @@ class OrbitControl extends Notifier {
     }
 
     // Override the aspect.
-    if (camera instanceof PerspectiveCamera && this.aspect) {
-      this._needsUpdate ||= camera.aspect !== this.aspect;
-      camera.aspect = this.aspect;
+    const aspect = this.aspect;
+    if (aspect) {
+      if (camera instanceof PerspectiveCamera) {
+        this._needsUpdate ||= camera.aspect !== aspect;
+        camera.aspect = aspect;
+      } else if (camera instanceof OrthographicCamera) {
+        const oldAspect = (camera.right - camera.left) / (camera.top - camera.bottom);
+        if (Math.abs(aspect - oldAspect) > 1e-4) {
+          this._needsUpdate = true;
+        }
+      }
     }
 
     if (!this._needsUpdate) {
