@@ -82,7 +82,7 @@ interface OrbitControlOpts {
    * Aspect of orthographic camera
    * Only available when camera is orthographic
    */
-  orthographicAspect: number;
+  aspect: number;
 
   /**
    * Minimum alpha rotation
@@ -204,7 +204,7 @@ class OrbitControl extends Notifier {
           maxDistance: 1000,
           maxOrthographicSize: 300,
           minOrthographicSize: 30,
-          orthographicAspect: 1,
+          // aspect: 1,
           minAlpha: -90,
           maxAlpha: 90,
           minBeta: -Infinity,
@@ -407,7 +407,7 @@ class OrbitControl extends Notifier {
         'maxDistance',
         'minOrthographicSize',
         'maxOrthographicSize',
-        'orthographicAspect',
+        'aspect',
         'minAlpha',
         'maxAlpha',
         'minBeta',
@@ -532,6 +532,7 @@ class OrbitControl extends Notifier {
    */
   update(deltaTime?: number) {
     deltaTime = deltaTime || 16;
+    const camera = this.target;
 
     if (this._rotating) {
       const radian =
@@ -546,6 +547,12 @@ class OrbitControl extends Notifier {
       this._needsUpdate = true;
     }
 
+    // Override the aspect.
+    if (camera instanceof PerspectiveCamera && this.aspect) {
+      this._needsUpdate ||= camera.aspect !== this.aspect;
+      camera.aspect = this.aspect;
+    }
+
     if (!this._needsUpdate) {
       return;
     }
@@ -558,8 +565,8 @@ class OrbitControl extends Notifier {
 
     this._updateTransform();
 
-    if (this.target) {
-      this.target.update();
+    if (camera) {
+      camera.update();
     }
 
     this.trigger('update');
@@ -579,9 +586,10 @@ class OrbitControl extends Notifier {
   }
 
   _updateDistanceOrSize(deltaTime: number) {
-    this._setDistance(this._distance + (this._zoomSpeed * deltaTime) / 20);
     if (!(this.target instanceof PerspectiveCamera)) {
       this._setOrthoSize((this._orthoSize as number) + (this._zoomSpeed * deltaTime) / 20);
+    } else {
+      this._setDistance(this._distance + (this._zoomSpeed * deltaTime) / 20);
     }
 
     this._zoomSpeed *= Math.pow(this.damping, deltaTime / 16);
@@ -596,7 +604,7 @@ class OrbitControl extends Notifier {
     const camera = this.target as OrthographicCamera;
     const cameraHeight = this._orthoSize;
     // TODO
-    const cameraWidth = cameraHeight * this.orthographicAspect;
+    const cameraWidth = cameraHeight * (this.aspect || 1);
     camera.left = -cameraWidth / 2;
     camera.right = cameraWidth / 2;
     camera.top = cameraHeight / 2;
