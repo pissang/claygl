@@ -1,6 +1,5 @@
 // Cubemap prefilter utility
-// http://www.unrealengine.com/files/downloads/2013SiggraphPresentationsNotes.pdf
-// http://http.developer.nvidia.com/GPUGems3/gpugems3_ch20.html
+// https://blog.selfshadow.com/publications/s2013-shading-course/#course_content
 import Texture2D from '../Texture2D';
 import TextureCube, { cubeTargets, TextureCubeOpts } from '../TextureCube';
 import FrameBuffer from '../FrameBuffer';
@@ -196,18 +195,13 @@ export function generateNormalDistribution(roughnessLevels?: number, sampleSize?
   const pixels = new Float32Array(sampleSize * roughnessLevels * 4);
   const tmp = [];
 
-  // function sortFunc(a, b) {
-  //     return Math.abs(b) - Math.abs(a);
-  // }
   for (let j = 0; j < roughnessLevels; j++) {
     const roughness = j / roughnessLevels;
     const a = roughness * roughness;
 
     for (let i = 0; i < sampleSize; i++) {
       // http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
-      // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Bitwise_Operators
       // http://stackoverflow.com/questions/1908492/unsigned-integer-in-javascript
-      // http://stackoverflow.com/questions/1822350/what-is-the-javascript-operator-and-how-do-you-use-it
       let y = ((i << 16) | (i >>> 16)) >>> 0;
       y = (((y & 1431655765) << 1) | ((y & 2863311530) >>> 1)) >>> 0;
       y = (((y & 858993459) << 2) | ((y & 3435973836) >>> 2)) >>> 0;

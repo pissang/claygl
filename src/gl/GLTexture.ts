@@ -214,15 +214,15 @@ class GLTexture {
         source.length
       );
       source.forEach((sourceSlice, idx) =>
-        // TODO check image size are equal
         _gl.texSubImage3D(
           constants.TEXTURE_2D_ARRAY,
           0,
           0,
           0,
           idx,
-          width,
-          height,
+          // Layer width and layer height.
+          sourceSlice.width,
+          sourceSlice.height,
           1,
           glFormat,
           glType,
