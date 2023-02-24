@@ -1,6 +1,7 @@
 import Texture, {
   getDefaultTextureFormatBySource,
   getDefaultTypeBySource,
+  isPixelSource,
   TextureOpts,
   TextureSource
 } from './Texture';
@@ -48,9 +49,11 @@ class Texture2D extends Texture<TextureSource> {
   }
   set width(value: number) {
     const oldWidth = this.width;
-    if (this.source) {
-      this.source.width = value;
-    } else {
+    const source = this.source;
+    if (isPixelSource(source)) {
+      // PENDING should not change the size of source?
+      source.width = value;
+    } else if (!source) {
       this._width = value;
     }
     oldWidth !== value && this.dirty();
@@ -67,9 +70,10 @@ class Texture2D extends Texture<TextureSource> {
   }
   set height(value: number) {
     const oldHeight = this.height;
-    if (this.source) {
-      this.source.height = value;
-    } else {
+    const source = this.source;
+    if (isPixelSource(source)) {
+      source.height = value;
+    } else if (!source) {
       this._height = value;
     }
     oldHeight !== value && this.dirty();

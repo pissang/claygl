@@ -1,6 +1,7 @@
 import Texture, {
   getDefaultTextureFormatBySource,
   getDefaultTypeBySource,
+  isPixelSource,
   TextureOpts,
   TextureSource
 } from './Texture';
@@ -23,31 +24,41 @@ class Texture2DArray extends Texture<TextureSource[]> {
 
   get width() {
     if (this._hasSource()) {
-      return this.source![0].width;
+      let maxWidth = 0;
+      const source = this.source;
+      for (let i = 0; i < source!.length; i++) {
+        maxWidth = Math.max(maxWidth, source![i].width);
+      }
+      return maxWidth;
     }
     return this._width || 0;
   }
   set width(value: number) {
     const oldWidth = this.width;
-    if (this._hasSource()) {
-      this.source!.forEach((source) => (source.width = value));
-    } else {
+    if (!this._hasSource()) {
       this._width = value;
+    } else {
+      // PENDING Should not change the source size.
+      // this.source!.forEach((source) => isPixelSource(source) && (source.width = value));
     }
     oldWidth !== value && this.dirty();
   }
   get height() {
     if (this._hasSource()) {
-      return this.source![0].height;
+      let maxHeight = 0;
+      const source = this.source;
+      for (let i = 0; i < source!.length; i++) {
+        maxHeight = Math.max(maxHeight, source![i].height);
+      }
     }
     return this._height || 0;
   }
   set height(value: number) {
     const oldHeight = this.height;
-    if (this._hasSource()) {
-      this.source!.forEach((source) => (source.height = value));
-    } else {
+    if (!this._hasSource()) {
       this._height = value;
+    } else {
+      // this.source!.forEach((source) => (source.height = value));
     }
     oldHeight !== value && this.dirty();
   }

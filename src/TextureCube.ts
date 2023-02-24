@@ -1,6 +1,7 @@
 import Texture, {
   getDefaultTextureFormatBySource,
   getDefaultTypeBySource,
+  isPixelSource,
   TextureImageSource,
   TextureOpts,
   TexturePixelSource,
@@ -71,7 +72,7 @@ class TextureCube extends Texture<TextureCubeSource> {
     const source = this.source;
     if (source && source.px) {
       (keys(source) as CubeTarget[]).forEach((target) => {
-        source[target] && (source[target]!.width = value);
+        isPixelSource(source[target]) && (source[target]!.width = value);
       });
     } else {
       this._width = value;
@@ -93,7 +94,7 @@ class TextureCube extends Texture<TextureCubeSource> {
     const source = this.source;
     if (source && source.px) {
       (keys(source) as CubeTarget[]).forEach((target) => {
-        source[target] && (source[target]!.height = value);
+        isPixelSource(source[target]) && (source[target]!.height = value);
       });
     } else {
       this._height = value;
