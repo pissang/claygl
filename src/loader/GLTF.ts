@@ -840,8 +840,6 @@ function pbrMetallicRoughnessToStandard(
       name: materialInfo.name
     });
 
-    material.define('fragment', 'USE_ROUGHNESS');
-    material.define('fragment', 'USE_METALNESS');
     material.define('fragment', 'ROUGHNESS_CHANNEL', 1);
     material.define('fragment', 'METALNESS_CHANNEL', 2);
 
@@ -905,12 +903,12 @@ function pbrSpecularGlossinessToStandard(
   const diffuseColor = specularGlossinessMatInfo.diffuseFactor || [1, 1, 1, 1];
 
   const commonProperties = {
-    diffuseMap: diffuseMap,
-    glossinessMap: glossinessMap,
-    specularMap: specularMap,
-    normalMap: normalMap,
-    emissiveMap: emissiveMap,
-    occlusionMap: occlusionMap,
+    diffuseMap,
+    glossinessMap,
+    specularMap,
+    normalMap,
+    emissiveMap,
+    occlusionMap,
     color: diffuseColor.slice(0, 3),
     alpha: diffuseColor[3],
     specularColor: specularGlossinessMatInfo.specularFactor || [1, 1, 1],

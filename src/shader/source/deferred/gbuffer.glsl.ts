@@ -66,7 +66,7 @@ void main() {
   vec3 skinnedPosition = position;
   vec3 prevSkinnedPosition = position;
 
-#ifdef FIRST_PASS
+#ifdef USE_TARGET_TEXTURE1
   vec3 skinnedNormal = normal;
   vec3 skinnedTangent = tangent.xyz;
   bool hasTangent = dot(tangent, tangent) > 0.0;
@@ -78,7 +78,7 @@ void main() {
 
   skinnedPosition = (skinMatrixWS * vec4(position, 1.0)).xyz;
 
-  #ifdef FIRST_PASS
+  #ifdef USE_TARGET_TEXTURE1
   // Upper skinMatrix
   skinnedNormal = (skinMatrixWS * vec4(normal, 0.0)).xyz;
   if (hasTangent) {
@@ -86,7 +86,7 @@ void main() {
   }
   #endif
 
-  #ifdef THIRD_PASS
+  #ifdef USE_TARGET_TEXTURE4
   // Weighted Sum Skinning Matrix
   // PENDING Must be assigned.
   {
@@ -101,11 +101,11 @@ void main() {
 
 #endif
 
-#if defined(SECOND_PASS) || defined(FIRST_PASS)
+#if defined(USE_TARGET_TEXTURE3) || defined(USE_TARGET_TEXTURE1)
   v_Texcoord = texcoord * uvRepeat + uvOffset;
 #endif
 
-#ifdef FIRST_PASS
+#ifdef USE_TARGET_TEXTURE1
   v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
 
   if (hasTangent) {
@@ -115,7 +115,7 @@ void main() {
   v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
 #endif
 
-#ifdef THIRD_PASS
+#ifdef USE_TARGET_TEXTURE4
   v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
   v_PrevViewPosition = prevWorldViewProjection * vec4(prevSkinnedPosition, 1.0);
 #endif
@@ -126,28 +126,51 @@ void main() {
 });
 
 /**
- * First pass
+ * First texture
  * - R: normal.x
  * - G: normal.y
  * - B: normal.z
  * - A: metalness
+ *
+ * Second texture
+ * - R: albedo.r
+ * - G: albedo.g
+ * - B: albedo.b
+ * - A: metalness
+ *
+ * Third texture
+ * - Velocity
  */
-export const gBuffer1Fragment = new FragmentShader({
-  name: 'gBuffer1Frag',
-  uniforms: {
-    viewInverse: VIEWINVERSE(),
-    glossiness: uniform('float'),
-    normalMap: uniform('sampler2D'),
-    diffuseMap: uniform('sampler2D'),
-    roughGlossMap: uniform('sampler2D'),
-    useRoughGlossMap: uniform('bool'),
-    useRoughness: uniform('bool'),
-    doubleSided: uniform('bool'),
-    alphaCutoff: uniform('float', 0.0),
-    alpha: uniform('float', 1.0),
-    roughGlossChannel: uniform('int', 0)
-  },
-  main: glsl`
+export const createGBufferFrag = (outputs: string[]) =>
+  new FragmentShader({
+    name: 'gBufferFrag',
+    outputs: outputs,
+    uniforms: {
+      viewInverse: VIEWINVERSE(),
+      glossiness: uniform('float'),
+
+      diffuseMap: uniform('sampler2D'),
+      metalnessMap: uniform('sampler2D'),
+      color: uniform('vec3'),
+      metalness: uniform('float'),
+      useMetalnessMap: uniform('bool'),
+      linear: uniform('bool'),
+
+      normalMap: uniform('sampler2D'),
+      roughGlossMap: uniform('sampler2D'),
+      useRoughGlossMap: uniform('bool'),
+      useRoughness: uniform('bool'),
+
+      doubleSided: uniform('bool'),
+      alphaCutoff: uniform('float', 0.0),
+      alpha: uniform('float', 1.0),
+
+      roughGlossChannel: uniform('int', 0),
+
+      firstRender: uniform('bool')
+    },
+    includes: [sRGBMixin],
+    main: glsl`
 float indexingTexel(in vec4 texel, in int idx) {
   if (idx == 3) return texel.a;
   else if (idx == 1) return texel.g;
@@ -157,6 +180,13 @@ float indexingTexel(in vec4 texel, in int idx) {
 
 void main() {
 
+  if (alphaCutoff > 0.0) {
+    float a = texture(diffuseMap, v_Texcoord).a * alpha;
+    if (a < alphaCutoff) {
+      discard;
+    }
+  }
+#ifdef USE_TARGET_TEXTURE1
   vec3 N = v_Normal;
 
   if (doubleSided) {
@@ -166,13 +196,6 @@ void main() {
       N = -N;
     }
   }
-  if (alphaCutoff > 0.0) {
-    float a = texture(diffuseMap, v_Texcoord).a * alpha;
-    if (a < alphaCutoff) {
-      discard;
-    }
-  }
-
   if (dot(v_Tangent, v_Tangent) > 0.0) {
     vec3 normalTexel = texture(normalMap, v_Texcoord).xyz;
     if (dot(normalTexel, normalTexel) > 0.0) { // Valid normal map
@@ -183,11 +206,6 @@ void main() {
     }
   }
 
-  out_color.rgb = (N + 1.0) * 0.5;
-
-  // FIXME Have precision problem http://aras-p.info/texts/CompactNormalStorage.html
-  // N.z can be recovered from sqrt(1 - dot(N.xy, N.xy));
-  // out_color.rg = (N.xy + 1.0) * 0.5;
 
   float g = glossiness;
 
@@ -199,38 +217,16 @@ void main() {
     g = clamp(g2 + (g - 0.5) * 2.0, 0.0, 1.0);
   }
 
+  // FIXME Have precision problem http://aras-p.info/texts/CompactNormalStorage.html
+  // N.z can be recovered from sqrt(1 - dot(N.xy, N.xy));
+  // out_color.rg = (N.xy + 1.0) * 0.5;
+
   // PENDING Alpha can't be zero.
-  out_color.a = g + 0.005;
+  out_color0 = vec4((N + 1.0) * 0.5, g + 0.005);
+#endif
 
-  // Pack sign of normal to metalness
-  // Add 0.001 to avoid m is 0
-  // out_color.a = sign(N.z) * (m + 0.001) * 0.5 + 0.5;
-}`
-});
-
-/**
- * Second pass
- * - R: albedo.r
- * - G: albedo.g
- * - B: albedo.b
- * - A: metalness
- */
-export const gBuffer2Fragment = new FragmentShader({
-  name: 'gBuffer2Frag',
-  uniforms: {
-    diffuseMap: uniform('sampler2D'),
-    metalnessMap: uniform('sampler2D'),
-    color: uniform('vec3'),
-    metalness: uniform('float'),
-    useMetalnessMap: uniform('bool'),
-    linear: uniform('bool'),
-    alphaCutoff: uniform('float', 0.0),
-    alpha: uniform('float', 1.0)
-  },
-  includes: [sRGBMixin],
-  main: glsl`
-void main()
-{
+  // Texture 2
+#ifdef USE_TARGET_TEXTURE3
   float m = metalness;
 
   if (useMetalnessMap) {
@@ -241,41 +237,24 @@ void main()
   if (linear) {
     texel = sRGBToLinear(texel);
   }
-  if (alphaCutoff > 0.0) {
-    float a = texel.a * alpha;
-    if (a < alphaCutoff) {
-      discard;
-    }
-  }
 
-  out_color.rgb = texel.rgb * color;
+  out_color1 = vec4(texel.rgb * color, m + 0.005);
+#endif
 
-  // PENDING Alpha can't be zero.
-  out_color.a = m + 0.005;
-}`
-});
-
-/**
- * Velocity
- */
-export const gBuffer3Fragment = new FragmentShader({
-  name: 'gBuffer3Frag',
-  uniforms: {
-    firstRender: uniform('bool')
-  },
-  main: glsl`
-void main() {
+#ifdef USE_TARGET_TEXTURE4
+  // Velocity
   vec2 a = v_ViewPosition.xy / v_ViewPosition.w;
   vec2 b = v_PrevViewPosition.xy / v_PrevViewPosition.w;
 
   if (firstRender) {
-    out_color = vec4(0.0);
+    out_color2 = vec4(0.0);
   }
   else {
-    out_color = vec4((a - b) * 0.5 + 0.5, 0.0, 1.0);
+    out_color2 = vec4((a - b) * 0.5 + 0.5, 0.0, 1.0);
   }
+#endif
 }`
-});
+  });
 
 export const gBufferDebugFragment = new FragmentShader({
   name: 'gBufferDebugFrag',

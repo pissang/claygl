@@ -10,11 +10,9 @@ import * as constants from '../core/constants';
 import Renderer, { RenderHooks, RendererViewport, RenderableObject } from '../Renderer';
 import Camera from '../Camera';
 import Scene from '../Scene';
-import { assert, optional } from '../core/util';
+import { optional } from '../core/util';
 import {
-  gBuffer1Fragment,
-  gBuffer2Fragment,
-  gBuffer3Fragment,
+  createGBufferFrag,
   gBufferDebugFragment,
   gBufferVertex
 } from '../shader/source/deferred/gbuffer.glsl';
@@ -41,62 +39,26 @@ function createFillCanvas(color: string) {
 
 // TODO specularColor
 // TODO Performance improvement
-function getGetUniformHook1(
+function getGetUniformHook(
+  defaultDiffuseMap: Texture2D,
   defaultNormalMap: Texture2D,
   defaultRoughnessMap: Texture2D,
-  defaultDiffuseMap: Texture2D
+  defaultMetalnessMap: Texture2D
 ) {
   return function (renderable: RenderableObject, gBufferMat: Material, symbol: string) {
     const standardMaterial = renderable.material;
-    if (symbol === 'doubleSided') {
-      return standardMaterial.isDefined('fragment', 'DOUBLE_SIDED');
-    } else if (symbol === 'uvRepeat' || symbol === 'uvOffset' || symbol === 'alpha') {
-      return standardMaterial.get(symbol);
-    } else if (symbol === 'normalMap') {
-      return standardMaterial.get(symbol) || defaultNormalMap;
-    } else if (symbol === 'diffuseMap') {
-      return standardMaterial.get(symbol) || defaultDiffuseMap;
-    } else if (symbol === 'alphaCutoff') {
-      // TODO DIFFUSEMAP_ALPHA_ALPHA
-      if (standardMaterial.isDefined('fragment', 'ALPHA_TEST')) {
-        const alphaCutoff = standardMaterial.get('alphaCutoff');
-        return alphaCutoff || 0;
-      }
-      return 0;
-    } else {
-      const useRoughnessWorkflow = standardMaterial.isDefined('fragment', 'USE_ROUGHNESS');
-      const roughGlossMap = useRoughnessWorkflow
-        ? standardMaterial.get('roughnessMap')
-        : standardMaterial.get('glossinessMap');
-      switch (symbol) {
-        case 'glossiness':
-          return useRoughnessWorkflow
-            ? 1.0 - standardMaterial.get('roughness')
-            : standardMaterial.get('glossiness');
-        case 'roughGlossMap':
-          return roughGlossMap;
-        case 'useRoughGlossMap':
-          return !!roughGlossMap;
-        case 'useRoughness':
-          return useRoughnessWorkflow;
-        case 'roughGlossChannel':
-          return useRoughnessWorkflow
-            ? standardMaterial.getDefine('fragment', 'ROUGHNESS_CHANNEL')
-            : standardMaterial.getDefine('fragment', 'GLOSSINESS_CHANNEL');
-      }
-    }
-  };
-}
-
-function getGetUniformHook2(defaultDiffuseMap: Texture2D, defaultMetalnessMap: Texture2D) {
-  return function (renderable: RenderableObject, gBufferMat: Material, symbol: string) {
-    const standardMaterial = renderable.material;
     switch (symbol) {
-      case 'color':
+      case 'doubleSided':
+        return standardMaterial.isDefined('fragment', 'DOUBLE_SIDED');
       case 'uvRepeat':
       case 'uvOffset':
       case 'alpha':
+      case 'color':
         return standardMaterial.get(symbol);
+      case 'normalMap':
+        return standardMaterial.get(symbol) || defaultNormalMap;
+      case 'diffuseMap':
+        return standardMaterial.get(symbol) || defaultDiffuseMap;
       case 'metalness':
         return standardMaterial.get('metalness') || 0;
       case 'diffuseMap':
@@ -111,9 +73,43 @@ function getGetUniformHook2(defaultDiffuseMap: Texture2D, defaultMetalnessMap: T
         // TODO DIFFUSEMAP_ALPHA_ALPHA
         if (standardMaterial.isDefined('fragment', 'ALPHA_TEST')) {
           const alphaCutoff = standardMaterial.get('alphaCutoff');
-          return alphaCutoff || 0.0;
+          return alphaCutoff || 0;
         }
-        return 0.0;
+        return 0;
+      case 'prevWorldViewProjection':
+        return renderableGBufferData.get(renderable)?.prevWorldViewProjection;
+      case 'prevSkinMatrix':
+        return renderableGBufferData.get(renderable)?.prevSkinMatricesArray;
+      case 'prevSkinMatricesTexture':
+        return renderableGBufferData.get(renderable)?.prevSkinMatricesTexture;
+      case 'firstRender':
+        return !renderableGBufferData.get(renderable)?.prevWorldViewProjection;
+      default:
+        const useRoughnessWorkflow = !standardMaterial.isDefined('fragment', 'SPECULAR_WORKFLOW');
+        const roughGlossMap = useRoughnessWorkflow
+          ? standardMaterial.get('roughnessMap')
+          : standardMaterial.get('glossinessMap');
+        switch (symbol) {
+          case 'glossiness':
+            return useRoughnessWorkflow
+              ? 1.0 - standardMaterial.get('roughness')
+              : standardMaterial.get('glossiness');
+          case 'roughGlossMap':
+            // PENDING defaultGlossinessMap?
+            return roughGlossMap || defaultRoughnessMap;
+          case 'useRoughGlossMap':
+            return !!roughGlossMap;
+          case 'useRoughness':
+            return useRoughnessWorkflow;
+          case 'roughGlossChannel':
+            return standardMaterial.getDefine(
+              'fragment',
+              useRoughnessWorkflow ? 'ROUGHNESS_CHANNEL' : 'GLOSSINESS_CHANNEL'
+            );
+          default:
+            // Return directly
+            return standardMaterial.get(symbol);
+        }
     }
   };
 }
@@ -211,30 +207,8 @@ class DeferredGBuffer {
 
   private _frameBuffer = new FrameBuffer();
 
-  private _gBufferMaterial1 = new Material(new Shader(gBufferVertex, gBuffer1Fragment), {
-    vertexDefines: {
-      FIRST_PASS: null
-    },
-    fragmentDefines: {
-      FIRST_PASS: null
-    }
-  });
-  private _gBufferMaterial2 = new Material(new Shader(gBufferVertex, gBuffer2Fragment), {
-    vertexDefines: {
-      SECOND_PASS: null
-    },
-    fragmentDefines: {
-      SECOND_PASS: null
-    }
-  });
-  private _gBufferMaterial3 = new Material(new Shader(gBufferVertex, gBuffer3Fragment), {
-    vertexDefines: {
-      THIRD_PASS: null
-    },
-    fragmentDefines: {
-      THIRD_PASS: null
-    }
-  });
+  private _outputs = [];
+  private _gBufferMaterial?: Material;
 
   private _debugPass = new FullscreenQuadPass(gBufferDebugFragment);
 
@@ -385,67 +359,57 @@ class DeferredGBuffer {
       return renderable.material !== prevRenderable.material;
     }
 
+    const outputs = [];
     // PENDING, scene.boundingBoxLastFrame needs be updated if have shadow
     if (enableTargetTexture1) {
-      // Pass 1
-      frameBuffer.attach(opts.targetTexture1 || this._gBufferTex1);
-
-      const gBufferMaterial1 = this._gBufferMaterial1;
-      const renderHooks: RenderHooks = {
-        prepare(gl) {
-          clearViewport();
-        },
-        getMaterial() {
-          return gBufferMaterial1;
-        },
-        getMaterialUniform: getGetUniformHook1(
-          this._defaultNormalMap,
-          this._defaultRoughnessMap,
-          this._defaultDiffuseMap
-        ),
-        isMaterialChanged,
-        sortCompare: Renderer.opaqueSortCompare
-      };
-      // FIXME Use MRT if possible
-      renderer.renderPass(gBufferRenderList, camera, frameBuffer, renderHooks, scene);
+      frameBuffer.attach(opts.targetTexture1 || this._gBufferTex1, gl.COLOR_ATTACHMENT0);
+      outputs.push('color0');
     }
     if (enableTargetTexture3) {
-      // Pass 2
-      frameBuffer.attach(opts.targetTexture3 || this._gBufferTex3);
-
-      const gBufferMaterial2 = this._gBufferMaterial2;
-      const renderHooks: RenderHooks = {
-        prepare(gl) {
-          clearViewport();
-        },
-        getMaterial() {
-          return gBufferMaterial2;
-        },
-        getMaterialUniform: getGetUniformHook2(this._defaultDiffuseMap, this._defaultMetalnessMap),
-        isMaterialChanged: isMaterialChanged,
-        sortCompare: Renderer.opaqueSortCompare
-      };
-      renderer.renderPass(gBufferRenderList, camera, frameBuffer, renderHooks, scene);
+      frameBuffer.attach(opts.targetTexture3 || this._gBufferTex3, gl.COLOR_ATTACHMENT1);
+      outputs.push('color1');
+    }
+    if (enableTargetTexture4) {
+      frameBuffer.attach(opts.targetTexture4 || this._gBufferTex4, gl.COLOR_ATTACHMENT2);
+      outputs.push('color2');
     }
 
-    if (enableTargetTexture4) {
-      frameBuffer.attach(opts.targetTexture4 || this._gBufferTex4);
+    const cameraViewProj = mat4.create();
+    mat4.multiply(cameraViewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
 
-      // Remove jittering in temporal aa.
-      // PENDING. Better solution?
-      camera.update();
+    let gBufferMaterial = this._gBufferMaterial;
+    if (!gBufferMaterial || this._outputs.join('') !== outputs.join('')) {
+      gBufferMaterial = this._gBufferMaterial = new Material(
+        new Shader(gBufferVertex, createGBufferFrag(outputs))
+      );
+      if (enableTargetTexture1) {
+        gBufferMaterial.define('USE_TARGET_TEXTURE1');
+      }
+      if (enableTargetTexture3) {
+        gBufferMaterial.define('USE_TARGET_TEXTURE3');
+      }
+      if (enableTargetTexture4) {
+        gBufferMaterial.define('USE_TARGET_TEXTURE4');
+      }
+    }
 
-      const gBufferMaterial3 = this._gBufferMaterial3;
-      const cameraViewProj = mat4.create();
-      mat4.multiply(cameraViewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
-      const renderHooks: RenderHooks = {
-        prepare(gl) {
-          clearViewport();
-        },
-        getMaterial() {
-          return gBufferMaterial3;
-        },
-        afterRender(renderable: RenderableObject) {
+    const renderHooks: RenderHooks = {
+      prepare(gl) {
+        clearViewport();
+      },
+      getMaterial() {
+        return gBufferMaterial!;
+      },
+      getMaterialUniform: getGetUniformHook(
+        this._defaultDiffuseMap,
+        this._defaultNormalMap,
+        this._defaultRoughnessMap,
+        this._defaultMetalnessMap
+      ),
+      isMaterialChanged,
+      sortCompare: Renderer.opaqueSortCompare,
+      afterRender(renderable: RenderableObject) {
+        if (enableTargetTexture4) {
           let gbufferData = renderableGBufferData.get(renderable);
           if (!gbufferData) {
             gbufferData = {};
@@ -512,30 +476,10 @@ class DeferredGBuffer {
               );
             }
           }
-        },
-        getMaterialUniform(renderable: RenderableObject, gBufferMat: Material, symbol: string) {
-          const gbufferData = renderableGBufferData.get(renderable);
-          if (symbol === 'prevWorldViewProjection') {
-            return gbufferData && gbufferData.prevWorldViewProjection;
-          } else if (symbol === 'prevSkinMatrix') {
-            return gbufferData && gbufferData.prevSkinMatricesArray;
-          } else if (symbol === 'prevSkinMatricesTexture') {
-            return gbufferData && gbufferData.prevSkinMatricesTexture;
-          } else if (symbol === 'firstRender') {
-            return !(gbufferData && gbufferData.prevWorldViewProjection);
-          } else {
-            return gBufferMat.get(symbol);
-          }
-        },
-        isMaterialChanged() {
-          // Always update prevWorldViewProjection
-          return true;
-        },
-        sortCompare: Renderer.opaqueSortCompare
-      };
-
-      renderer.renderPass(gBufferRenderList, camera, frameBuffer, renderHooks, scene);
-    }
+        }
+      }
+    };
+    renderer.renderPass(gBufferRenderList, camera, frameBuffer, renderHooks, scene);
   }
 
   /**
