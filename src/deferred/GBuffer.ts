@@ -61,8 +61,6 @@ function getGetUniformHook(
         return standardMaterial.get(symbol) || defaultDiffuseMap;
       case 'metalness':
         return standardMaterial.get('metalness') || 0;
-      case 'diffuseMap':
-        return standardMaterial.get(symbol) || defaultDiffuseMap;
       case 'metalnessMap':
         return standardMaterial.get(symbol) || defaultMetalnessMap;
       case 'useMetalnessMap':
