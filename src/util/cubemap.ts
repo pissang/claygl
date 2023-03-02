@@ -33,9 +33,11 @@ export function prefilterEnvironmentMap(
 ) {
   // Not create other renderer, it is easy having issue of cross reference of resources like framebuffer
   // PENDING preserveDrawingBuffer?
+  let newCreatedNormalDistribution = false;
   if (!brdfLookup || !normalDistribution) {
     normalDistribution = generateNormalDistribution();
     brdfLookup = integrateBRDF(renderer, normalDistribution);
+    newCreatedNormalDistribution = true;
   }
   textureOpts = textureOpts || {};
 
@@ -139,8 +141,9 @@ export function prefilterEnvironmentMap(
     // New created temporary cubemap should be disposed
     renderer.disposeTexture(envMap);
   }
-  // Remove gpu resource allucated in renderer
-  renderer.disposeTexture(normalDistribution);
+  if (newCreatedNormalDistribution) {
+    renderer.disposeTexture(normalDistribution);
+  }
 
   return {
     environmentMap: prefilteredCubeMap,
