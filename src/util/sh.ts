@@ -138,13 +138,15 @@ function projectEnvironmentMapCPU(
   return coeff;
 }
 
+export interface ProjectEnvironmentMapOpts {
+  decodeRGBM?: boolean;
+  lod?: number;
+}
+
 export function projectEnvironmentMap(
   renderer: Renderer,
   envMap: Texture2D | TextureCube,
-  opts?: {
-    decodeRGBM?: boolean;
-    lod?: number;
-  }
+  opts?: ProjectEnvironmentMapOpts
 ) {
   // TODO sRGB
 

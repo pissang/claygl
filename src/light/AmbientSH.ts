@@ -1,4 +1,7 @@
 import Light, { LightOpts } from '../Light';
+import Renderer from '../Renderer';
+import TextureCube from '../TextureCube';
+import { projectEnvironmentMap, ProjectEnvironmentMapOpts } from '../util/sh';
 
 export interface AmbientSHLightOpts extends LightOpts {
   coefficients: ArrayLike<number>;
@@ -12,6 +15,14 @@ class AmbientSHLight extends Light {
   constructor(opts?: Partial<AmbientSHLightOpts>) {
     super(opts);
     this.coefficients = (opts && opts.coefficients) || [];
+  }
+
+  calculateFromEnvironmentMap(
+    renderer: Renderer,
+    cubemap: TextureCube,
+    opts?: ProjectEnvironmentMapOpts
+  ) {
+    this.coefficients = projectEnvironmentMap(renderer, cubemap!, opts);
   }
 
   clone() {
