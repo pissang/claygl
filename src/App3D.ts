@@ -77,6 +77,12 @@ interface App3DOpts {
   autoRender?: boolean;
 
   /**
+   * If do auto gc on the gpu resources.
+   * Otherwise needs to call gc() manually
+   */
+  autoGC?: boolean;
+
+  /**
    * If not init immediately. Should call init method manually.
    *
    * App will start the loop after promise returned from init resolved.
@@ -131,21 +137,18 @@ type CreateMaterialConfig<T extends Material['shader'] = StandardShader> = Parti
  * Here is a basic example to create a rotating cube.
  *
 ```js
-const app = clay.application.create('#viewport', {
-    init: function (app) {
-        // Create a perspective camera.
-        // First parameter is the camera position. Which is in front of the cube.
-        // Second parameter is the camera lookAt target. Which is the origin of the world, and where the cube puts.
-        this._camera = app.createCamera([0, 2, 5], [0, 0, 0]);
-        // Create a sample cube
-        this._cube = app.createCube();
-        // Create a directional light. The direction is from top right to left bottom, away from camera.
-        this._mainLight = app.createDirectionalLight([-1, -1, -1]);
-    },
-    loop: function (app) {
-        // Simply rotating the cube every frame.
-        this._cube.rotation.rotateY(app.frameTime / 1000);
-    }
+const app = new App3D('#viewport');
+// Create a perspective camera.
+// First parameter is the camera position. Which is in front of the cube.
+// Second parameter is the camera lookAt target. Which is the origin of the world, and where the cube puts.
+const camera = app.createCamera([0, 2, 5], [0, 0, 0]);
+// Create a sample cube
+const cube = app.createCube();
+// Create a directional light. The direction is from top right to left bottom, away from camera.
+const mainLight = app.createDirectionalLight([-1, -1, -1]);
+app.loop((app) => {
+  // Simply rotating the cube every frame.
+  this._cube.rotation.rotateY(app.frameTime / 1000);
 });
 ```
  * @param dom Container dom element or a selector string that can be used in `querySelector`
@@ -170,6 +173,7 @@ class App3D extends Notifier {
   private _inRender = false;
   private _disposed = false;
   private _autoRender;
+  private _autoGC;
   private _inited = false;
 
   private _frameTime: number = 0;
@@ -182,6 +186,7 @@ class App3D extends Notifier {
     opts = util.assign({}, opts);
 
     this._autoRender = util.optional(opts.autoRender, true);
+    this._autoGC = util.optional(opts.autoGC, true);
     const graphicOpts = (this._graphicOpts = opts.graphic || {});
     const glAttributes = opts.glAttributes || {};
 
@@ -349,7 +354,9 @@ class App3D extends Notifier {
         this.render();
       }
 
-      this._gpuResourceManager.collect(this._scene);
+      if (this._autoGC) {
+        this._gpuResourceManager.collect(this._scene);
+      }
     });
   }
 
@@ -416,6 +423,13 @@ class App3D extends Notifier {
 
     this.trigger('afterrender');
     this._inRender = false;
+  }
+
+  /**
+   * Collect resources.
+   */
+  gc() {
+    this._gpuResourceManager.collect(this._scene);
   }
 
   /**
