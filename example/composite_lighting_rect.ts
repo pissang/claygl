@@ -40,8 +40,7 @@ const material = new StandardMaterial({
   metalness: 0,
   uvRepeat: [3, 3],
   roughness: 0,
-  linear: true,
-  color: [1, 0, 0]
+  linear: true
 });
 
 const texture = new Texture2D({
@@ -65,24 +64,24 @@ scene.add(rectLight);
 loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   const suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
 
-  const mesh = new Mesh(new SphereGeometry(), material);
+  const mesh = new Mesh(suzanneGeometry, material);
   mesh.geometry.generateTangents();
 
-  // (
-  //   [
-  //     ['diffuseMap', 'basecolor'],
-  //     ['normalMap', 'normal'],
-  //     ['metalnessMap', 'metalness'],
-  //     ['roughnessMap', 'roughness']
-  //   ] as const
-  // ).forEach(function (mapInfo) {
-  //   const tex = new Texture2D({
-  //     wrapS: constants.REPEAT,
-  //     wrapT: constants.REPEAT
-  //   });
-  //   tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png');
-  //   material[mapInfo[0]] = tex;
-  // });
+  (
+    [
+      ['diffuseMap', 'basecolor'],
+      ['normalMap', 'normal'],
+      ['metalnessMap', 'metalness'],
+      ['roughnessMap', 'roughness']
+    ] as const
+  ).forEach(function (mapInfo) {
+    const tex = new Texture2D({
+      wrapS: constants.REPEAT,
+      wrapT: constants.REPEAT
+    });
+    tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png');
+    material[mapInfo[0]] = tex;
+  });
 
   mesh.scale.set(1.4, 1.4, 1.4);
   scene.add(mesh);
