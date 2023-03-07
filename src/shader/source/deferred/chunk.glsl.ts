@@ -45,7 +45,7 @@ float metalness = texel3.a;
 // N.xy = texel1.rg * 2.0 - 1.0;
 // N.z = sign(metalness) * sqrt(clamp(1.0 - dot(N.xy, N.xy), 0.0, 1.0));
 // N = normalize(N);
-vec3 N = texel1.rgb * 2.0 - 1.0;
+vec3 N = normalize(texel1.rgb * 2.0 - 1.0);
 
 // Depth buffer range is 0.0 - 1.0
 float z = texture(gBufferTexture2, uv).r * 2.0 - 1.0;

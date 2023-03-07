@@ -73,7 +73,7 @@ vec3 LTC_Evaluate(const in vec3 N, const in vec3 V, const in vec3 P, const in ma
 	// construct orthonormal basis around N
 	vec3 T1, T2;
 	T1 = normalize(V - N * dot(V, N));
-	T2 = - cross(N, T1); // negated from paper; possibly due to a different handedness of world coordinate system
+	T2 = -cross(N, T1); // negated from paper; possibly due to a different handedness of world coordinate system
 
 	// compute transform
 	mat3 mat = mInv * transpose(mat3(T1, T2, N));

@@ -40,7 +40,8 @@ const material = new StandardMaterial({
   metalness: 0,
   uvRepeat: [3, 3],
   roughness: 0,
-  linear: true
+  linear: true,
+  color: [1, 0, 0]
 });
 
 const texture = new Texture2D({
@@ -55,7 +56,8 @@ scene.skybox = skybox;
 skybox.setEnvironmentMap(texture);
 
 const rectLight = new RectAreaLight();
-rectLight.position.z = 3;
+rectLight.intensity = 2;
+rectLight.position.z = 2;
 rectLight.width = 2;
 rectLight.height = 2;
 scene.add(rectLight);
