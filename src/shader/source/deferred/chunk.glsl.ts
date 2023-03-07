@@ -89,6 +89,6 @@ vec3 lightEquation(
   in float ndl, in float ndh, in float ndv, in float g
 ) {
   return ndl * lightColor
-    * (diffuseColor + D_Phong(g, ndh) * F_Schlick(ndv, specularColor));
+    * (diffuseColor + D_GGX(g, ndh) * F_Schlick(ndv, specularColor));
 }
 `);

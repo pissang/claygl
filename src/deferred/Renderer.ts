@@ -113,6 +113,14 @@ class DeferredRenderer {
   private _volumeMeshMap = new WeakMap<Light, Mesh>();
   private _lightShadowInfosMap = new WeakMap<Light, LightShadowInfo>();
 
+  private _extraLightTypes: Record<
+    string,
+    {
+      fullQuad: boolean;
+      getLightMaterial?: (light: Light) => Material;
+    }
+  > = {};
+
   constructor() {
     const directionalLightShader = new Shader(
       fullscreenQuadPassVertex,
@@ -171,6 +179,22 @@ class DeferredRenderer {
 
     this._lightConeGeo = coneGeo;
     this._lightCylinderGeo = cylinderGeo;
+  }
+
+  extendLightType<T extends Light>(
+    lightType: T['type'],
+    opts?: {
+      fullQuad?: boolean;
+      // Available when fullQuad is true
+      getLightMaterial?: (light: T) => Material;
+    }
+  ) {
+    opts = opts || {};
+    // TODO light using full quad not supported yet.
+    this._extraLightTypes[lightType] = {
+      fullQuad: opts.fullQuad || false,
+      getLightMaterial: opts.getLightMaterial as (light: Light) => Material
+    };
   }
 
   /**
@@ -311,7 +335,7 @@ class DeferredRenderer {
     this._gBuffer.resize(width, height);
   }
   // Render transparent object, skybox
-  _renderOthers(
+  private _renderOthers(
     renderer: Renderer,
     scene: Scene,
     camera: Camera,
@@ -341,7 +365,7 @@ class DeferredRenderer {
     }
   }
 
-  _accumulateLightBuffer(
+  private _accumulateLightBuffer(
     renderer: Renderer,
     scene: Scene,
     camera: Camera,
@@ -424,6 +448,7 @@ class DeferredRenderer {
       const uTpl = light.uniformTemplates!;
 
       const volumeMesh = light.volumeMesh || this._volumeMeshMap.get(light);
+      const extraLightTypes = this._extraLightTypes;
 
       if (volumeMesh) {
         const material = volumeMesh.material;
@@ -460,7 +485,9 @@ class DeferredRenderer {
             material.set('lightPosition', uTpl.tubeLightPosition.value(light));
             break;
           default:
-            unknownLightType = true;
+            if (!(!extraLightTypes[light.type].fullQuad && light.volumeMesh)) {
+              unknownLightType = true;
+            }
         }
 
         if (unknownLightType) {
@@ -510,8 +537,17 @@ class DeferredRenderer {
             passMaterial.set('lightDirection', uTpl.directionalLightDirection.value(light));
             break;
           default:
-            // Unkonw light type
-            unknownLightType = true;
+            const extraLightConfig = extraLightTypes[light.type];
+            if (
+              extraLightConfig &&
+              extraLightConfig.fullQuad &&
+              extraLightConfig.getLightMaterial
+            ) {
+              passMaterial = extraLightConfig.getLightMaterial(light);
+            } else {
+              // Unkonw light type
+              unknownLightType = true;
+            }
         }
         if (unknownLightType) {
           continue;
@@ -543,7 +579,7 @@ class DeferredRenderer {
     this._renderVolumeMeshList(renderer, scene, camera, lightAccumFrameBuffer, volumeMeshList);
   }
 
-  _prepareLightShadow(
+  private _prepareLightShadow(
     renderer: Renderer,
     scene: Scene,
     camera: PerspectiveCamera | OrthographicCamera
@@ -572,7 +608,7 @@ class DeferredRenderer {
     }
   }
 
-  _prepareSingleLightShadow(
+  private _prepareSingleLightShadow(
     renderer: Renderer,
     scene: Scene,
     camera: PerspectiveCamera | OrthographicCamera,
@@ -631,7 +667,7 @@ class DeferredRenderer {
   // And we can use custom volume mesh to shape the light.
   //
   // See "Deferred Shading Optimizations" in GDC2011
-  _updateLightProxy(light: DeferredLight) {
+  private _updateLightProxy(light: DeferredLight) {
     let volumeMesh;
     let shader;
     let r;
@@ -701,7 +737,7 @@ class DeferredRenderer {
     }
   }
 
-  _renderVolumeMeshList(
+  private _renderVolumeMeshList(
     renderer: Renderer,
     scene: Scene,
     camera: Camera,
