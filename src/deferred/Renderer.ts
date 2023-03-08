@@ -48,7 +48,7 @@ const preZMaterial = new Material(new Shader(preZVertex, preZFragment));
 
 function lightAccumulateBlendFunc(gl: WebGL2RenderingContext) {
   gl.blendEquation(gl.FUNC_ADD);
-  gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
+  gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ZERO);
 }
 
 type DeferredLight = PointLight | SphereLight | SpotLight | TubeLight | DirectionalLight;
