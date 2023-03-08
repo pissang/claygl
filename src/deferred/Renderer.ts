@@ -46,6 +46,11 @@ import { depthWriteFragment } from '../shader/source/deferred/depthwrite.glsl';
 const worldView = new Matrix4();
 const preZMaterial = new Material(new Shader(preZVertex, preZFragment));
 
+function lightAccumulateBlendFunc(gl: WebGL2RenderingContext) {
+  gl.blendEquation(gl.FUNC_ADD);
+  gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
+}
+
 type DeferredLight = PointLight | SphereLight | SpotLight | TubeLight | DirectionalLight;
 
 interface LightShadowInfo {
@@ -127,17 +132,8 @@ class DeferredRenderer {
       deferredDirectionalLightFragment
     );
 
-    const lightAccumulateBlendFunc = function (gl: WebGL2RenderingContext) {
-      gl.blendEquation(gl.FUNC_ADD);
-      gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
-    };
-
     const createLightPassMat = function <T extends Shader>(shader: T) {
-      return new Material(shader, {
-        blend: lightAccumulateBlendFunc,
-        transparent: true,
-        depthMask: false
-      });
+      return new Material(shader);
     };
     this._createLightPassMat = createLightPassMat;
 
@@ -571,7 +567,9 @@ class DeferredRenderer {
         }
         const pass = this._fullQuadPass;
         pass.material = passMaterial;
-
+        passMaterial.transparent = true;
+        passMaterial.depthMask = false;
+        passMaterial.blend = lightAccumulateBlendFunc;
         pass.renderQuad(renderer, lightAccumFrameBuffer);
       }
     }

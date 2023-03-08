@@ -14,7 +14,8 @@ import {
   SphereGeometry,
   PointLight,
   FilterCompositeNode,
-  Skybox
+  Skybox,
+  Vector3
 } from 'claygl';
 import LightingCompositeNode from './common/HDComposite/LightingNode';
 import { composeCompositeFragment } from 'claygl/shaders';
@@ -54,34 +55,31 @@ skybox.material.define('SRGB_DECODE');
 scene.skybox = skybox;
 skybox.setEnvironmentMap(texture);
 
-const rectLight = new RectAreaLight();
-rectLight.intensity = 2;
-rectLight.position.z = 2;
-rectLight.width = 2;
-rectLight.height = 2;
-scene.add(rectLight);
+const rectLightNode1 = new ClayNode();
+const rectLight1 = new RectAreaLight();
+rectLightNode1.add(rectLight1);
+rectLight1.intensity = 2;
+rectLight1.color = [0, 0, 1];
+rectLight1.position.z = 3;
+rectLight1.width = 2;
+rectLight1.height = 2;
+const rectLightNode2 = new ClayNode();
+const rectLight2 = new RectAreaLight();
+rectLightNode2.add(rectLight2);
+rectLight2.color = [1, 0, 0];
+rectLight2.intensity = 2;
+rectLight2.position.z = 3;
+rectLight2.width = 2;
+rectLight2.height = 2;
+
+scene.add(rectLightNode1);
+scene.add(rectLightNode2);
 
 loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
   const suzanneGeometry = (res.scene!.getDescendantByName('Suzanne') as Mesh).geometry;
 
   const mesh = new Mesh(suzanneGeometry, material);
   mesh.geometry.generateTangents();
-
-  (
-    [
-      ['diffuseMap', 'basecolor'],
-      ['normalMap', 'normal'],
-      ['metalnessMap', 'metalness'],
-      ['roughnessMap', 'roughness']
-    ] as const
-  ).forEach(function (mapInfo) {
-    const tex = new Texture2D({
-      wrapS: constants.REPEAT,
-      wrapT: constants.REPEAT
-    });
-    tex.load('assets/textures/iron-rusted4/iron-rusted4-' + mapInfo[1] + '.png');
-    material[mapInfo[0]] = tex;
-  });
 
   mesh.scale.set(1.4, 1.4, 1.4);
   scene.add(mesh);
@@ -111,6 +109,9 @@ startTimeline(() => {
   scene.update();
   material.metalness = config.metalness;
   material.roughness = config.roughness;
+
+  rectLightNode1.rotation.rotateX(0.01);
+  rectLightNode2.rotation.rotateY(0.02);
   compositor.render(renderer);
   stats.update();
 });

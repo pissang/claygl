@@ -42,8 +42,8 @@ class LightingCompositeNode extends CompositeNode<
 
     const commonOpts = {
       // TODO: Texture should be default
-      minFilter: constants.LINEAR,
-      magFilter: constants.NEAREST,
+      minFilter: constants.NEAREST,
+      magFilter: constants.LINEAR,
       wrapS: constants.CLAMP_TO_EDGE,
       wrapT: constants.CLAMP_TO_EDGE,
       flipY: false,
