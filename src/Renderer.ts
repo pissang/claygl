@@ -453,8 +453,8 @@ class Renderer extends Notifier {
       console.error("Can't find camera in the scene.");
       return;
     }
-    camera.update();
     camera.updateOffset && camera.updateOffset(viewport.width, viewport.height, viewportDpr);
+    camera.update();
     const renderList = scene.updateRenderList(camera, true);
 
     const opaqueList = renderList.opaque;

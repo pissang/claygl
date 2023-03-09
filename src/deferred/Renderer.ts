@@ -235,10 +235,13 @@ class DeferredRenderer {
       scene.update();
     }
     scene.updateLights();
-    // Render list will be updated in gbuffer.
-    camera.update();
 
     const lightAccumTex = opts.targetTexture || this._lightAccumTex;
+
+    // Render list will be updated in gbuffer.
+    camera.updateOffset && camera.updateOffset(lightAccumTex.width, lightAccumTex.height, 1);
+    camera.update();
+
     const dpr = renderer.getPixelRatio();
     const isInputGBuffer = opts.gBufferTexture1 && opts.gBufferTexture2 && opts.gBufferTexture3;
 
