@@ -591,7 +591,8 @@ class DeferredRenderer {
   private _updatePCFKernel(material: Material) {
     const shadowMapPass = this.shadowMapPass!;
     material.define('fragment', 'PCF_KERNEL_SIZE', shadowMapPass.kernelPCF.length / 2);
-    material.define('fragment', 'PCSS_LIGHT_SIZE', shadowMapPass.PCSSLightSize.toFixed(2));
+    const pcssLightSize = +shadowMapPass.PCSSLightSize.toFixed(2);
+    material[pcssLightSize > 0 ? 'define' : 'undefine']('fragment', 'PCSS_LIGHT_SIZE');
     material.set('pcfKernel', shadowMapPass.kernelPCF);
   }
 
