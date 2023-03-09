@@ -354,6 +354,8 @@ class DeferredRenderer {
         gl.colorMask(false, false, false, false);
       },
       (gl) => {
+        // Clear after render.
+        gl.clear(gl.DEPTH_BUFFER_BIT);
         gl.colorMask(true, true, true, true);
       }
     );
