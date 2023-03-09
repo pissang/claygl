@@ -47,8 +47,8 @@ const worldView = new Matrix4();
 const preZMaterial = new Material(new Shader(preZVertex, preZFragment));
 
 function lightAccumulateBlendFunc(gl: WebGL2RenderingContext) {
-  gl.blendEquation(gl.FUNC_ADD);
-  gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ZERO);
+  gl.blendEquation(constants.FUNC_ADD);
+  gl.blendFuncSeparate(constants.ONE, constants.ONE, constants.ONE, constants.ZERO);
 }
 
 type DeferredLight = PointLight | SphereLight | SpotLight | TubeLight | DirectionalLight;
@@ -569,6 +569,8 @@ class DeferredRenderer {
             passMaterial.set('shadowCascadeClipsFar', lightShadowInfo.cascadeClipsFar);
 
             passMaterial.set('lightShadowMapSize', light.shadowResolution);
+
+            this._updatePCFKernel(passMaterial);
           }
         }
         const pass = this._fullQuadPass;
@@ -581,6 +583,13 @@ class DeferredRenderer {
     }
 
     this._renderVolumeMeshList(renderer, scene, camera, lightAccumFrameBuffer, volumeMeshList);
+  }
+
+  private _updatePCFKernel(material: Material) {
+    const shadowMapPass = this.shadowMapPass!;
+    material.define('fragment', 'PCF_KERNEL_SIZE', shadowMapPass.kernelPCF.length / 2);
+    material.define('fragment', 'PCSS_LIGHT_SIZE', shadowMapPass.PCSSLightSize.toFixed(2));
+    material.set('pcfKernel', shadowMapPass.kernelPCF);
   }
 
   private _prepareLightShadow(
@@ -620,6 +629,9 @@ class DeferredRenderer {
     material?: Material
   ) {
     const shadowMapPass = this.shadowMapPass!;
+    if (material) {
+      this._updatePCFKernel(material);
+    }
     if (light.type === 'POINT_LIGHT') {
       const shadowMaps: TextureCube[] = [];
       shadowMapPass.renderPointLightShadow(renderer, scene, light, shadowMaps);
