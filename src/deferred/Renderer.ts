@@ -503,6 +503,8 @@ class DeferredRenderer {
         material.depthMask = false;
         material.blend = lightAccumulateBlendFunc;
 
+        this._updatePCFKernel(material);
+
         volumeMeshList.push(volumeMesh);
       } else {
         let unknownLightType = false;
@@ -572,9 +574,9 @@ class DeferredRenderer {
             passMaterial.set('shadowCascadeClipsFar', lightShadowInfo.cascadeClipsFar);
 
             passMaterial.set('lightShadowMapSize', light.shadowResolution);
-
-            this._updatePCFKernel(passMaterial);
           }
+
+          this._updatePCFKernel(passMaterial);
         }
         const pass = this._fullQuadPass;
         pass.material = passMaterial;
@@ -589,11 +591,16 @@ class DeferredRenderer {
   }
 
   private _updatePCFKernel(material: Material) {
-    const shadowMapPass = this.shadowMapPass!;
-    material.define('fragment', 'PCF_KERNEL_SIZE', shadowMapPass.kernelPCF.length / 2);
-    const pcssLightSize = +shadowMapPass.PCSSLightSize.toFixed(2);
-    material[pcssLightSize > 0 ? 'define' : 'undefine']('fragment', 'PCSS_LIGHT_SIZE');
-    material.set('pcfKernel', shadowMapPass.kernelPCF);
+    const shadowMapPass = this.shadowMapPass;
+    if (shadowMapPass) {
+      material.define('fragment', 'PCF_KERNEL_SIZE', shadowMapPass.kernelPCF.length / 2);
+      material[shadowMapPass.PCSSLightSize > 0 ? 'define' : 'undefine'](
+        'fragment',
+        'PCSS_LIGHT_SIZE',
+        shadowMapPass.PCSSLightSize.toFixed(2)
+      );
+      material.set('pcfKernel', shadowMapPass.kernelPCF);
+    }
   }
 
   private _prepareLightShadow(
