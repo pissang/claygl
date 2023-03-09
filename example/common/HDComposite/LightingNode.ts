@@ -41,7 +41,6 @@ class LightingCompositeNode extends CompositeNode<
     this._deferredRenderer.autoResize = false;
 
     const commonOpts = {
-      // TODO: Texture should be default
       minFilter: constants.NEAREST,
       magFilter: constants.LINEAR,
       wrapS: constants.CLAMP_TO_EDGE,

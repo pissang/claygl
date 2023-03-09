@@ -69,7 +69,7 @@ bloomNode.inputs = {
 };
 bloomNode.setBrightThreshold(0.6);
 taaNode.inputs = {
-  colorTexture: sceneNode
+  colorTex: sceneNode
 };
 taaNode.setDynamic(false);
 tonemappingNode.inputs = {

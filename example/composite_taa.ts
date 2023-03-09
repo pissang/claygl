@@ -133,12 +133,12 @@ blendNode.material.define('BLEND_METHOD', 1);
 blendNode.material.set('weight1', 1);
 blendNode.material.set('weight2', 1);
 taaNode.inputs = {
-  colorTexture: blendNode,
+  colorTex: blendNode,
   gBufferTexture2: {
     node: gbufferNode,
     output: 'texture2'
   },
-  gBufferTexture3: {
+  gBufferTexture4: {
     node: gbufferNode,
     output: 'texture4'
   }
