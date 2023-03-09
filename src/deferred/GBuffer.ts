@@ -334,9 +334,13 @@ class DeferredGBuffer {
     }
 
     if (enableTargetTexture2) {
+      const targetTexture2 = opts.targetTexture2 || this._gBufferTex2;
       frameBuffer.attach(
-        opts.targetTexture2 || this._gBufferTex2,
-        renderer.gl.DEPTH_STENCIL_ATTACHMENT
+        targetTexture2,
+        // TODO can specify attachment
+        targetTexture2.format === constants.DEPTH_STENCIL
+          ? renderer.gl.DEPTH_STENCIL_ATTACHMENT
+          : renderer.gl.DEPTH_ATTACHMENT
       );
     }
 
