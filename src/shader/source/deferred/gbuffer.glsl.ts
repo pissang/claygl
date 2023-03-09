@@ -238,7 +238,7 @@ void main() {
     texel = sRGBToLinear(texel);
   }
 
-  out_color1 = vec4(texel.rgb * color, m + 0.005);
+  out_color1 = vec4(texel.rgb * sRGBToLinear(vec4(color, 1.0)).rgb, m + 0.005);
 #endif
 
 #ifdef USE_TARGET_TEXTURE4
