@@ -499,6 +499,9 @@ class DeferredRenderer {
         material.set('gBufferTexture1', gBufferTexture1);
         material.set('gBufferTexture2', gBufferTexture2);
         material.set('gBufferTexture3', gBufferTexture3);
+        material.transparent = true;
+        material.depthMask = false;
+        material.blend = lightAccumulateBlendFunc;
 
         volumeMeshList.push(volumeMesh);
       } else {
