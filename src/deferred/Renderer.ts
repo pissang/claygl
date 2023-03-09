@@ -389,7 +389,6 @@ class DeferredRenderer {
 
     const shadowMapPass = this.shadowMapPass;
     if (shadowMapPass && updateShadow) {
-      gl.clearColor(1, 1, 1, 1);
       this._prepareLightShadow(renderer, scene, camera as PerspectiveCamera | OrthographicCamera);
     }
 
@@ -560,13 +559,15 @@ class DeferredRenderer {
 
         // TODO
         if (shadowMapPass && light.castShadow) {
-          const lightShadowInfo = this._lightShadowInfosMap.get(light)!;
-          passMaterial.set('lightShadowMap', lightShadowInfo.shadowMap);
-          passMaterial.set('lightMatrices', lightShadowInfo.lightMatrices);
-          passMaterial.set('shadowCascadeClipsNear', lightShadowInfo.cascadeClipsNear);
-          passMaterial.set('shadowCascadeClipsFar', lightShadowInfo.cascadeClipsFar);
+          const lightShadowInfo = this._lightShadowInfosMap.get(light);
+          if (lightShadowInfo) {
+            passMaterial.set('lightShadowMap', lightShadowInfo.shadowMap);
+            passMaterial.set('lightMatrices', lightShadowInfo.lightMatrices);
+            passMaterial.set('shadowCascadeClipsNear', lightShadowInfo.cascadeClipsNear);
+            passMaterial.set('shadowCascadeClipsFar', lightShadowInfo.cascadeClipsFar);
 
-          passMaterial.set('lightShadowMapSize', light.shadowResolution);
+            passMaterial.set('lightShadowMapSize', light.shadowResolution);
+          }
         }
         const pass = this._fullQuadPass;
         pass.material = passMaterial;

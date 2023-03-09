@@ -386,6 +386,8 @@ class ShadowMapPass extends Notifier {
     const defaultShadowMaterial = this._getDepthMaterial(light);
     const passConfig: RenderHooks = {
       prepare(gl) {
+        // Needs white background.
+        gl.clearColor(1, 1, 1, 1);
         gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
       },
       getMaterial(renderable) {
@@ -483,8 +485,12 @@ class ShadowMapPass extends Notifier {
           prepare(gl) {
             // Reversed, left to right => far to near
             gl.viewport((light.shadowCascade - i - 1) * shadowSize, 0, shadowSize, shadowSize);
+
             // Only clear on the first pass.
-            i === 0 && gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
+            if (i === 0) {
+              gl.clearColor(1, 1, 1, 1);
+              gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
+            }
           }
         } as RenderHooks)
       );
@@ -551,6 +557,7 @@ class ShadowMapPass extends Notifier {
     const defaultShadowMaterial = this._getDepthMaterial(light);
     const passConfig: RenderHooks = {
       prepare(gl) {
+        gl.clearColor(1, 1, 1, 1);
         gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
       },
       getMaterial(renderable) {
