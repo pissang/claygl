@@ -379,6 +379,7 @@ class DeferredRenderer {
   ) {
     const gl = renderer.gl;
     const lightAccumFrameBuffer = this._lightAccumFrameBuffer;
+    const fullQuadPass = this._fullQuadPass;
 
     const eyePosition = camera.getWorldPosition().array;
 
@@ -439,12 +440,13 @@ class DeferredRenderer {
       }
     });
 
+    let hasLight = false;
     for (let i = 0; i < scene.lights.length; i++) {
       const light = scene.lights[i];
       if (light.invisible) {
         continue;
       }
-
+      hasLight = true;
       const uTpl = light.uniformTemplates!;
 
       const volumeMesh = light.volumeMesh || this._volumeMeshMap.get(light);
@@ -578,16 +580,27 @@ class DeferredRenderer {
 
           this._updatePCFKernel(passMaterial);
         }
-        const pass = this._fullQuadPass;
-        pass.material = passMaterial;
+        fullQuadPass.material = passMaterial;
         passMaterial.transparent = true;
         passMaterial.depthMask = false;
         passMaterial.blend = lightAccumulateBlendFunc;
-        pass.renderQuad(renderer, lightAccumFrameBuffer);
+        fullQuadPass.renderQuad(renderer, lightAccumFrameBuffer);
       }
     }
 
     this._renderVolumeMeshList(renderer, scene, camera, lightAccumFrameBuffer, volumeMeshList);
+
+    if (!hasLight) {
+      // Show pure black with ambient light.
+      const passMaterial = this._ambientMat;
+      // No need to set transparent and blend
+      passMaterial.set('lightColor', [0, 0, 0]);
+      passMaterial.set('gBufferTexture1', gBufferTexture1);
+      passMaterial.set('gBufferTexture3', gBufferTexture3);
+      passMaterial.depthMask = false;
+      fullQuadPass.material = passMaterial;
+      fullQuadPass.renderQuad(renderer, lightAccumFrameBuffer);
+    }
   }
 
   private _updatePCFKernel(material: Material) {
