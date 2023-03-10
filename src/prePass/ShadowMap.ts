@@ -71,8 +71,6 @@ const cropMatrix = new Matrix4();
 const lightViewProjMatrix = new Matrix4();
 const lightProjMatrix = new Matrix4();
 
-interface ShadowMapPassOpts {}
-
 /**
  * Pass rendering shadow map.
  *
@@ -97,6 +95,9 @@ class ShadowMapPass extends Notifier {
   kernelPCF = new Float32Array([1, 0, 1, 1, -1, 1, 0, 1, -1, 0, -1, -1, 1, -1, 0, -1]);
 
   precision: ShaderPrecision = 'highp';
+
+  // If intersect with view bounding box to keep the frustum in directional light.
+  intersectCameraBoundingBox = true;
 
   private _frameBuffer = new FrameBuffer();
 
@@ -760,7 +761,9 @@ class ShadowMapPass extends Notifier {
     const camera = this._lightCameras.directional;
 
     sceneViewBoundingBox.copy(scene.viewBoundingBoxLastFrame);
-    sceneViewBoundingBox.intersection(sceneCamera.frustum.boundingBox);
+    if (this.intersectCameraBoundingBox) {
+      sceneViewBoundingBox.intersection(sceneCamera.frustum.boundingBox);
+    }
     // Move to the center of frustum(in world space)
     camera.position
       .copy(sceneViewBoundingBox.min)
