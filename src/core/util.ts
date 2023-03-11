@@ -160,8 +160,6 @@ export function setCanvasSize(
   pixelRatio?: number
 ) {
   const style = canvas.style;
-  // http://www.khronos.org/webgl/wiki/HandlingHighDPI
-  // set the display size of the canvas.
   if (style) {
     style.width = width + 'px';
     style.height = height + 'px';
