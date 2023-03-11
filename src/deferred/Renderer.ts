@@ -46,6 +46,11 @@ import { depthWriteFragment } from '../shader/source/deferred/depthwrite.glsl';
 const worldView = new Matrix4();
 const preZMaterial = new Material(new Shader(preZVertex, preZFragment));
 
+function lightAccumulateBlendFunc(gl: WebGL2RenderingContext) {
+  gl.blendEquation(constants.FUNC_ADD);
+  gl.blendFuncSeparate(constants.ONE, constants.ONE, constants.ONE, constants.ZERO);
+}
+
 type DeferredLight = PointLight | SphereLight | SpotLight | TubeLight | DirectionalLight;
 
 interface LightShadowInfo {
@@ -113,23 +118,22 @@ class DeferredRenderer {
   private _volumeMeshMap = new WeakMap<Light, Mesh>();
   private _lightShadowInfosMap = new WeakMap<Light, LightShadowInfo>();
 
+  private _extraLightTypes: Record<
+    string,
+    {
+      fullQuad: boolean;
+      getLightMaterial?: (light: Light) => Material;
+    }
+  > = {};
+
   constructor() {
     const directionalLightShader = new Shader(
       fullscreenQuadPassVertex,
       deferredDirectionalLightFragment
     );
 
-    const lightAccumulateBlendFunc = function (gl: WebGL2RenderingContext) {
-      gl.blendEquation(gl.FUNC_ADD);
-      gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
-    };
-
     const createLightPassMat = function <T extends Shader>(shader: T) {
-      return new Material(shader, {
-        blend: lightAccumulateBlendFunc,
-        transparent: true,
-        depthMask: false
-      });
+      return new Material(shader);
     };
     this._createLightPassMat = createLightPassMat;
 
@@ -171,6 +175,22 @@ class DeferredRenderer {
 
     this._lightConeGeo = coneGeo;
     this._lightCylinderGeo = cylinderGeo;
+  }
+
+  extendLightType<T extends Light>(
+    lightType: T['type'],
+    opts?: {
+      fullQuad?: boolean;
+      // Available when fullQuad is true
+      getLightMaterial?: (light: T) => Material;
+    }
+  ) {
+    opts = opts || {};
+    // TODO light using full quad not supported yet.
+    this._extraLightTypes[lightType] = {
+      fullQuad: opts.fullQuad || false,
+      getLightMaterial: opts.getLightMaterial as (light: Light) => Material
+    };
   }
 
   /**
@@ -215,10 +235,13 @@ class DeferredRenderer {
       scene.update();
     }
     scene.updateLights();
-    // Render list will be updated in gbuffer.
-    camera.update();
 
     const lightAccumTex = opts.targetTexture || this._lightAccumTex;
+
+    // Render list will be updated in gbuffer.
+    camera.updateOffset && camera.updateOffset(lightAccumTex.width, lightAccumTex.height, 1);
+    camera.update();
+
     const dpr = renderer.getPixelRatio();
     const isInputGBuffer = opts.gBufferTexture1 && opts.gBufferTexture2 && opts.gBufferTexture3;
 
@@ -311,7 +334,7 @@ class DeferredRenderer {
     this._gBuffer.resize(width, height);
   }
   // Render transparent object, skybox
-  _renderOthers(
+  private _renderOthers(
     renderer: Renderer,
     scene: Scene,
     camera: Camera,
@@ -331,6 +354,8 @@ class DeferredRenderer {
         gl.colorMask(false, false, false, false);
       },
       (gl) => {
+        // Clear after render.
+        gl.clear(gl.DEPTH_BUFFER_BIT);
         gl.colorMask(true, true, true, true);
       }
     );
@@ -341,7 +366,7 @@ class DeferredRenderer {
     }
   }
 
-  _accumulateLightBuffer(
+  private _accumulateLightBuffer(
     renderer: Renderer,
     scene: Scene,
     camera: Camera,
@@ -354,6 +379,7 @@ class DeferredRenderer {
   ) {
     const gl = renderer.gl;
     const lightAccumFrameBuffer = this._lightAccumFrameBuffer;
+    const fullQuadPass = this._fullQuadPass;
 
     const eyePosition = camera.getWorldPosition().array;
 
@@ -366,7 +392,6 @@ class DeferredRenderer {
 
     const shadowMapPass = this.shadowMapPass;
     if (shadowMapPass && updateShadow) {
-      gl.clearColor(1, 1, 1, 1);
       this._prepareLightShadow(renderer, scene, camera as PerspectiveCamera | OrthographicCamera);
     }
 
@@ -415,15 +440,17 @@ class DeferredRenderer {
       }
     });
 
+    let hasLight = false;
     for (let i = 0; i < scene.lights.length; i++) {
       const light = scene.lights[i];
       if (light.invisible) {
         continue;
       }
-
+      hasLight = true;
       const uTpl = light.uniformTemplates!;
 
       const volumeMesh = light.volumeMesh || this._volumeMeshMap.get(light);
+      const extraLightTypes = this._extraLightTypes;
 
       if (volumeMesh) {
         const material = volumeMesh.material;
@@ -460,7 +487,9 @@ class DeferredRenderer {
             material.set('lightPosition', uTpl.tubeLightPosition.value(light));
             break;
           default:
-            unknownLightType = true;
+            if (!(!extraLightTypes[light.type].fullQuad && light.volumeMesh)) {
+              unknownLightType = true;
+            }
         }
 
         if (unknownLightType) {
@@ -472,6 +501,11 @@ class DeferredRenderer {
         material.set('gBufferTexture1', gBufferTexture1);
         material.set('gBufferTexture2', gBufferTexture2);
         material.set('gBufferTexture3', gBufferTexture3);
+        material.transparent = true;
+        material.depthMask = false;
+        material.blend = lightAccumulateBlendFunc;
+
+        this._updatePCFKernel(material);
 
         volumeMeshList.push(volumeMesh);
       } else {
@@ -510,8 +544,17 @@ class DeferredRenderer {
             passMaterial.set('lightDirection', uTpl.directionalLightDirection.value(light));
             break;
           default:
-            // Unkonw light type
-            unknownLightType = true;
+            const extraLightConfig = extraLightTypes[light.type];
+            if (
+              extraLightConfig &&
+              extraLightConfig.fullQuad &&
+              extraLightConfig.getLightMaterial
+            ) {
+              passMaterial = extraLightConfig.getLightMaterial(light);
+            } else {
+              // Unkonw light type
+              unknownLightType = true;
+            }
         }
         if (unknownLightType) {
           continue;
@@ -525,25 +568,55 @@ class DeferredRenderer {
 
         // TODO
         if (shadowMapPass && light.castShadow) {
-          const lightShadowInfo = this._lightShadowInfosMap.get(light)!;
-          passMaterial.set('lightShadowMap', lightShadowInfo.shadowMap);
-          passMaterial.set('lightMatrices', lightShadowInfo.lightMatrices);
-          passMaterial.set('shadowCascadeClipsNear', lightShadowInfo.cascadeClipsNear);
-          passMaterial.set('shadowCascadeClipsFar', lightShadowInfo.cascadeClipsFar);
+          const lightShadowInfo = this._lightShadowInfosMap.get(light);
+          if (lightShadowInfo) {
+            passMaterial.set('lightShadowMap', lightShadowInfo.shadowMap);
+            passMaterial.set('lightMatrices', lightShadowInfo.lightMatrices);
+            passMaterial.set('shadowCascadeClipsNear', lightShadowInfo.cascadeClipsNear);
+            passMaterial.set('shadowCascadeClipsFar', lightShadowInfo.cascadeClipsFar);
 
-          passMaterial.set('lightShadowMapSize', light.shadowResolution);
+            passMaterial.set('lightShadowMapSize', light.shadowResolution);
+          }
+
+          this._updatePCFKernel(passMaterial);
         }
-        const pass = this._fullQuadPass;
-        pass.material = passMaterial;
-
-        pass.renderQuad(renderer, lightAccumFrameBuffer);
+        fullQuadPass.material = passMaterial;
+        passMaterial.transparent = true;
+        passMaterial.depthMask = false;
+        passMaterial.blend = lightAccumulateBlendFunc;
+        fullQuadPass.renderQuad(renderer, lightAccumFrameBuffer);
       }
     }
 
     this._renderVolumeMeshList(renderer, scene, camera, lightAccumFrameBuffer, volumeMeshList);
+
+    if (!hasLight) {
+      // Show pure black with ambient light.
+      const passMaterial = this._ambientMat;
+      // No need to set transparent and blend
+      passMaterial.set('lightColor', [0, 0, 0]);
+      passMaterial.set('gBufferTexture1', gBufferTexture1);
+      passMaterial.set('gBufferTexture3', gBufferTexture3);
+      passMaterial.depthMask = false;
+      fullQuadPass.material = passMaterial;
+      fullQuadPass.renderQuad(renderer, lightAccumFrameBuffer);
+    }
   }
 
-  _prepareLightShadow(
+  private _updatePCFKernel(material: Material) {
+    const shadowMapPass = this.shadowMapPass;
+    if (shadowMapPass) {
+      material.define('fragment', 'PCF_KERNEL_SIZE', shadowMapPass.kernelPCF.length / 2);
+      material[shadowMapPass.PCSSLightSize > 0 ? 'define' : 'undefine'](
+        'fragment',
+        'PCSS_LIGHT_SIZE',
+        shadowMapPass.PCSSLightSize.toFixed(2)
+      );
+      material.set('pcfKernel', shadowMapPass.kernelPCF);
+    }
+  }
+
+  private _prepareLightShadow(
     renderer: Renderer,
     scene: Scene,
     camera: PerspectiveCamera | OrthographicCamera
@@ -572,7 +645,7 @@ class DeferredRenderer {
     }
   }
 
-  _prepareSingleLightShadow(
+  private _prepareSingleLightShadow(
     renderer: Renderer,
     scene: Scene,
     camera: PerspectiveCamera | OrthographicCamera,
@@ -580,6 +653,9 @@ class DeferredRenderer {
     material?: Material
   ) {
     const shadowMapPass = this.shadowMapPass!;
+    if (material) {
+      this._updatePCFKernel(material);
+    }
     if (light.type === 'POINT_LIGHT') {
       const shadowMaps: TextureCube[] = [];
       shadowMapPass.renderPointLightShadow(renderer, scene, light, shadowMaps);
@@ -631,7 +707,7 @@ class DeferredRenderer {
   // And we can use custom volume mesh to shape the light.
   //
   // See "Deferred Shading Optimizations" in GDC2011
-  _updateLightProxy(light: DeferredLight) {
+  private _updateLightProxy(light: DeferredLight) {
     let volumeMesh;
     let shader;
     let r;
@@ -701,7 +777,7 @@ class DeferredRenderer {
     }
   }
 
-  _renderVolumeMeshList(
+  private _renderVolumeMeshList(
     renderer: Renderer,
     scene: Scene,
     camera: Camera,

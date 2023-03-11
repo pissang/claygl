@@ -9,8 +9,7 @@ import {
   ShadowMapPass,
   SpotLight,
   startTimeline,
-  TextureCube,
-  Timeline
+  TextureCube
 } from 'claygl';
 
 loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {

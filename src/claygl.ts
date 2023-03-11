@@ -64,6 +64,8 @@ export {
   Tube as TubeLight
 } from './light/index';
 
+export { default as Light } from './Light';
+
 // Procedural Geometry
 export {
   Cone as ConeGeometry,

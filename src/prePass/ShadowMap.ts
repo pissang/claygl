@@ -71,8 +71,6 @@ const cropMatrix = new Matrix4();
 const lightViewProjMatrix = new Matrix4();
 const lightProjMatrix = new Matrix4();
 
-interface ShadowMapPassOpts {}
-
 /**
  * Pass rendering shadow map.
  *
@@ -97,6 +95,9 @@ class ShadowMapPass extends Notifier {
   kernelPCF = new Float32Array([1, 0, 1, 1, -1, 1, 0, 1, -1, 0, -1, -1, 1, -1, 0, -1]);
 
   precision: ShaderPrecision = 'highp';
+
+  // If intersect with view bounding box to keep the frustum in directional light.
+  intersectCameraBoundingBox = true;
 
   private _frameBuffer = new FrameBuffer();
 
@@ -386,6 +387,8 @@ class ShadowMapPass extends Notifier {
     const defaultShadowMaterial = this._getDepthMaterial(light);
     const passConfig: RenderHooks = {
       prepare(gl) {
+        // Needs white background.
+        gl.clearColor(1, 1, 1, 1);
         gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
       },
       getMaterial(renderable) {
@@ -483,8 +486,12 @@ class ShadowMapPass extends Notifier {
           prepare(gl) {
             // Reversed, left to right => far to near
             gl.viewport((light.shadowCascade - i - 1) * shadowSize, 0, shadowSize, shadowSize);
+
             // Only clear on the first pass.
-            i === 0 && gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
+            if (i === 0) {
+              gl.clearColor(1, 1, 1, 1);
+              gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
+            }
           }
         } as RenderHooks)
       );
@@ -551,6 +558,7 @@ class ShadowMapPass extends Notifier {
     const defaultShadowMaterial = this._getDepthMaterial(light);
     const passConfig: RenderHooks = {
       prepare(gl) {
+        gl.clearColor(1, 1, 1, 1);
         gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
       },
       getMaterial(renderable) {
@@ -753,7 +761,9 @@ class ShadowMapPass extends Notifier {
     const camera = this._lightCameras.directional;
 
     sceneViewBoundingBox.copy(scene.viewBoundingBoxLastFrame);
-    sceneViewBoundingBox.intersection(sceneCamera.frustum.boundingBox);
+    if (this.intersectCameraBoundingBox) {
+      sceneViewBoundingBox.intersection(sceneCamera.frustum.boundingBox);
+    }
     // Move to the center of frustum(in world space)
     camera.position
       .copy(sceneViewBoundingBox.min)

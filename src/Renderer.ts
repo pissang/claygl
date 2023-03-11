@@ -232,9 +232,10 @@ class Renderer extends Notifier {
    * @param {number} width
    * @param {number} height
    */
-  resize(width?: number, height?: number) {
+  resize(width?: number, height?: number, pixelRatio?: number) {
     const canvas = this.canvas;
-    const dpr = this._pixelRatio;
+    const dpr = pixelRatio || this._pixelRatio;
+    this._pixelRatio = dpr;
     if (width != null) {
       setCanvasSize(canvas, width, height!, dpr);
       this._width = width;
@@ -453,8 +454,8 @@ class Renderer extends Notifier {
       console.error("Can't find camera in the scene.");
       return;
     }
-    camera.update();
     camera.updateOffset && camera.updateOffset(viewport.width, viewport.height, viewportDpr);
+    camera.update();
     const renderList = scene.updateRenderList(camera, true);
 
     const opaqueList = renderList.opaque;

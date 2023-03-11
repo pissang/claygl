@@ -4,7 +4,7 @@ import TAAFragment from './TAA.glsl';
 import TAACameraJitter from './TAACameraJitter';
 
 class TAACompositeNode extends GroupCompositeNode<
-  'gBufferTexture2' | 'gBufferTexture3' | 'colorTexture',
+  'gBufferTexture2' | 'gBufferTexture4' | 'colorTex',
   'color'
 > {
   readonly name = 'TAA';
@@ -23,9 +23,9 @@ class TAACompositeNode extends GroupCompositeNode<
         prevFrame: true,
         output: 'color'
       },
-      currTex: this.getGroupInput('colorTexture'),
+      currTex: this.getGroupInput('colorTex'),
       depthTex: this.getGroupInput('gBufferTexture2'),
-      velocityTex: this.getGroupInput('gBufferTexture3')
+      velocityTex: this.getGroupInput('gBufferTexture4')
     };
 
     this._outputNode.inputs = {

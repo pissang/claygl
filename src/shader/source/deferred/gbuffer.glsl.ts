@@ -234,11 +234,13 @@ void main() {
     m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);
   }
   vec4 texel = texture(diffuseMap, v_Texcoord);
+  vec3 albedo = color;
   if (linear) {
     texel = sRGBToLinear(texel);
+    albedo = sRGBToLinear(vec4(albedo, 1.0)).rgb;
   }
 
-  out_color1 = vec4(texel.rgb * color, m + 0.005);
+  out_color1 = vec4(texel.rgb * albedo, m + 0.005);
 #endif
 
 #ifdef USE_TARGET_TEXTURE4

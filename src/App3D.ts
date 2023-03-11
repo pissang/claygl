@@ -1207,9 +1207,13 @@ class App3D extends Notifier {
   /**
    * Resize the application. Will use the container clientWidth/clientHeight if width/height in parameters are not given.
    */
-  resize(width?: number, height?: number) {
+  resize(width?: number, height?: number, pixelRatio?: number) {
     const container = this._container;
-    this._renderer.resize(width || container.clientWidth, height || container.clientHeight);
+    this._renderer.resize(
+      width || container.clientWidth,
+      height || container.clientHeight,
+      pixelRatio
+    );
   }
 
   /**
