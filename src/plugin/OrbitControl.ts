@@ -551,7 +551,8 @@ class OrbitControl extends Notifier {
     const aspect = this.aspect;
     if (aspect) {
       if (camera instanceof PerspectiveCamera) {
-        this._needsUpdate ||= camera.aspect !== aspect;
+        // TODO may conflict with aspect updating in the App3D
+        this._needsUpdate ||= Math.abs(aspect - camera.aspect) > 1e-4;
         camera.aspect = aspect;
       } else if (camera instanceof OrthographicCamera) {
         const oldAspect = (camera.right - camera.left) / (camera.top - camera.bottom);

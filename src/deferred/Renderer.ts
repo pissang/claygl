@@ -238,19 +238,15 @@ class DeferredRenderer {
 
     const lightAccumTex = opts.targetTexture || this._lightAccumTex;
 
-    // Render list will be updated in gbuffer.
-    camera.updateOffset && camera.updateOffset(lightAccumTex.width, lightAccumTex.height, 1);
-    camera.update();
-
-    const dpr = renderer.getPixelRatio();
+    const pixelRatio = renderer.getPixelRatio();
     const isInputGBuffer = opts.gBufferTexture1 && opts.gBufferTexture2 && opts.gBufferTexture3;
 
     if (
       this.autoResize &&
-      (renderer.getWidth() * dpr !== lightAccumTex.width ||
-        renderer.getHeight() * dpr !== lightAccumTex.height)
+      (renderer.getWidth() * pixelRatio !== lightAccumTex.width ||
+        renderer.getHeight() * pixelRatio !== lightAccumTex.height)
     ) {
-      this.resize(renderer.getWidth() * dpr, renderer.getHeight() * dpr);
+      this.resize(renderer.getWidth() * pixelRatio, renderer.getHeight() * pixelRatio);
     }
 
     if (!isInputGBuffer) {

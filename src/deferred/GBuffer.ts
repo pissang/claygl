@@ -376,6 +376,10 @@ class DeferredGBuffer {
       outputs.push('color2');
     }
 
+    // Render list will be updated in gbuffer.
+    camera.updateOffset && camera.updateOffset(frameBuffer.getWidth(), frameBuffer.getHeight(), 1);
+    camera.update();
+
     const cameraViewProj = mat4.create();
     mat4.multiply(cameraViewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
 
