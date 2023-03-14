@@ -69,7 +69,7 @@ class TexturePool {
   }
 }
 
-const texturePropList = [
+export const texturePropList = [
   'width',
   'height',
   'format',

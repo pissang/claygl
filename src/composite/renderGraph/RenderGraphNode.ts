@@ -1,3 +1,4 @@
+import { constants } from '../../claygl';
 import { COLOR_ATTACHMENT0 } from '../../core/constants';
 import { assign, isFunction, keys, optional } from '../../core/util';
 import type FrameBuffer from '../../FrameBuffer';
@@ -6,7 +7,7 @@ import type Texture from '../../Texture';
 import Texture2D from '../../Texture2D';
 import CompositeNode from '../CompositeNode';
 import { GroupOutput } from '../GroupNode';
-import { TexturePoolParameters } from '../TexturePool';
+import { TexturePoolParameters, texturePropList } from '../TexturePool';
 import type RenderGraph from './RenderGraph';
 
 interface RenderGraphNodeLink {
@@ -73,14 +74,20 @@ class RenderGraphNode {
   ) {
     const textureParams = this._textureParams;
     if (!textureParams[outputName]) {
-      const derivedParams = this._deriveTextureParams(renderer);
-      const outputInfo = this._compositeNode.outputs![outputName];
+      const derivedParams = this._deriveTextureParams(renderer) || {};
+      const outputInfo = this._compositeNode.outputs![outputName] || {};
       const width = isFunction(outputInfo.width) ? outputInfo.width(renderer) : outputInfo.width;
       const height = isFunction(outputInfo.height)
         ? outputInfo.height(renderer)
         : outputInfo.height;
-      // TODO Omit other params??
-      const params = assign({} as TexturePoolParameters, derivedParams, outputInfo);
+      const params = {} as TexturePoolParameters;
+      for (let i = 0; i < texturePropList.length; i++) {
+        const propName = texturePropList[i];
+        const val = optional((outputInfo as any)[propName], (derivedParams as any)[propName]);
+        if (val != null) {
+          (params as any)[propName] = val;
+        }
+      }
       const scale = optional(outputInfo.scale, 1);
       width != null && (params.width = width);
       height != null && (params.height = height);
@@ -114,7 +121,7 @@ class RenderGraphNode {
       return;
     }
     this._inLoop = true;
-    let mostProbablyParams: TexturePoolParameters | undefined;
+    let mostProbablyParams: Partial<TexturePoolParameters> | undefined;
     let largestSize = 0;
     keys(this._inputs).forEach((inputName) => {
       const { node, pin } = this._inputs[inputName];
@@ -126,7 +133,28 @@ class RenderGraphNode {
       }
     });
     this._inLoop = false;
-    return mostProbablyParams;
+    const result = mostProbablyParams && assign({}, mostProbablyParams);
+    if (result) {
+      // TODO
+      if (result.internalFormat) {
+        // Ignore internalFormat and format
+        delete result.internalFormat;
+      }
+      if (result.format) {
+        delete result.format;
+      }
+      if (
+        // Not derive type like UNSIGNED_INT_24_8 that will be used in the depth texture.
+        // TODO may be confusing?
+        result.type &&
+        result.type !== constants.UNSIGNED_BYTE &&
+        result.type !== constants.HALF_FLOAT &&
+        result.type !== constants.UNSIGNED_INT_24_8
+      ) {
+        delete result.type;
+      }
+    }
+    return result;
   }
 
   getOutputTexture(
