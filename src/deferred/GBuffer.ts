@@ -581,6 +581,8 @@ class DeferredGBuffer {
    * + G: normal.y * 0.5 + 0.5
    * + B: normal.z * 0.5 + 0.5
    * + A: glossiness
+   *
+   * Normal is in the world space.
    * @return {clay.Texture2D}
    */
   getTargetTexture1() {

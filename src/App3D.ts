@@ -83,6 +83,11 @@ interface App3DOpts {
   autoGC?: boolean;
 
   /**
+   * If update camera aspect automatically.
+   */
+  autoUpdateCameraAspect?: boolean;
+
+  /**
    * If not init immediately. Should call init method manually.
    *
    * App will start the loop after promise returned from init resolved.
@@ -174,6 +179,7 @@ class App3D extends Notifier {
   private _disposed = false;
   private _autoRender;
   private _autoGC;
+  private _autoUpdateCameraAspect;
   private _inited = false;
 
   private _frameTime: number = 0;
@@ -187,6 +193,8 @@ class App3D extends Notifier {
 
     this._autoRender = util.optional(opts.autoRender, true);
     this._autoGC = util.optional(opts.autoGC, true);
+    this._autoUpdateCameraAspect = util.optional(opts.autoUpdateCameraAspect, true);
+
     const graphicOpts = (this._graphicOpts = opts.graphic || {});
     const glAttributes = opts.glAttributes || {};
 
@@ -343,9 +351,11 @@ class App3D extends Notifier {
       this._frameTime = frameTime;
       this._elapsedTime += frameTime;
 
-      const camera = this._scene.getMainCamera();
-      if (camera instanceof PerspectiveCamera) {
-        camera.aspect = this._renderer.getViewportAspect();
+      if (this._autoUpdateCameraAspect) {
+        const camera = this._scene.getMainCamera();
+        if (camera instanceof PerspectiveCamera) {
+          camera.aspect = this._renderer.getViewportAspect();
+        }
       }
 
       this.trigger('loop', frameTime);
