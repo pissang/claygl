@@ -17,6 +17,7 @@ import {
   gBufferVertex
 } from '../shader/source/deferred/gbuffer.glsl';
 import { isPixelSource, TexturePixelSource } from '../Texture';
+import { GLRenderHooks } from '../gl/GLPipeline';
 
 const renderableGBufferData = new WeakMap<
   RenderableObject,
@@ -140,6 +141,13 @@ export interface DeferredGBufferOpts {
    */
   enableTargetTexture4: boolean;
 
+  /**
+   * If render opaque list. Default to be true
+   */
+  renderOpaque: boolean;
+  /**
+   * If render transparent list. Default to be false
+   */
   renderTransparent: boolean;
 }
 
@@ -216,6 +224,7 @@ class DeferredGBuffer {
     this.enableTargetTexture2 = optional(opts.enableTargetTexture2, true);
     this.enableTargetTexture3 = optional(opts.enableTargetTexture3, true);
     this.enableTargetTexture4 = optional(opts.enableTargetTexture4, false);
+    this.renderOpaque = optional(opts.renderOpaque, true);
     this.renderTransparent = optional(opts.renderTransparent, false);
   }
   /**
@@ -285,6 +294,7 @@ class DeferredGBuffer {
     scene: Scene,
     camera: Camera,
     opts?: {
+      filter?: GLRenderHooks['filter'];
       targetTexture1?: Texture2D;
       targetTexture2?: Texture2D;
       targetTexture3?: Texture2D;
@@ -305,16 +315,14 @@ class DeferredGBuffer {
 
     let offset = 0;
     const gBufferRenderList = this._gBufferRenderList;
-    for (let i = 0; i < opaqueList.length; i++) {
-      if (!opaqueList[i].ignoreGBuffer) {
+    if (this.renderOpaque) {
+      for (let i = 0; i < opaqueList.length; i++) {
         gBufferRenderList[offset++] = opaqueList[i];
       }
     }
     if (this.renderTransparent) {
       for (let i = 0; i < transparentList.length; i++) {
-        if (!transparentList[i].ignoreGBuffer) {
-          gBufferRenderList[offset++] = transparentList[i];
-        }
+        gBufferRenderList[offset++] = transparentList[i];
       }
     }
     gBufferRenderList.length = offset;
@@ -400,6 +408,7 @@ class DeferredGBuffer {
     }
 
     const renderHooks: RenderHooks = {
+      filter: opts.filter,
       prepare(gl) {
         clearViewport();
       },

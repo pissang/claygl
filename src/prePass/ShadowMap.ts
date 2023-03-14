@@ -396,7 +396,7 @@ class ShadowMapPass extends Notifier {
       },
       isMaterialChanged: isDepthMaterialChanged,
       getMaterialUniform: getDepthMaterialUniform,
-      ifRender(renderable) {
+      filter(renderable) {
         return (renderable as Renderable).castShadow;
       },
       sortCompare: Renderer.opaqueSortCompare
@@ -530,7 +530,7 @@ class ShadowMapPass extends Notifier {
       },
       isMaterialChanged: isDepthMaterialChanged,
       getMaterialUniform: getDepthMaterialUniform,
-      ifRender(renderable) {
+      filter(renderable) {
         return (renderable as Renderable).castShadow;
       },
       sortCompare: Renderer.opaqueSortCompare

@@ -70,11 +70,6 @@ export interface RenderableOpts extends ClayNodeOpts {
    * If Ignore prez
    */
   ignorePreZ: boolean;
-
-  /**
-   * If ignore gbuffer
-   */
-  ignoreGBuffer: boolean;
 }
 
 const properties = [
@@ -89,8 +84,7 @@ const properties = [
   'castShadow',
   'receiveShadow',
   'ignorePicking',
-  'ignorePreZ',
-  'ignoreGBuffer'
+  'ignorePreZ'
 ] as const;
 
 interface Renderable<T extends Material = Material> extends RenderableOpts {}
@@ -196,6 +190,5 @@ proto.receiveShadow = true;
 proto.castShadow = true;
 proto.ignorePicking = false;
 proto.ignorePreZ = false;
-proto.ignoreGBuffer = false;
 
 export default Renderable;

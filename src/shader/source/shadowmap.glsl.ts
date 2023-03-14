@@ -243,7 +243,6 @@ float computeShadowContribOmni(samplerCube map, vec3 direction, float range) {
 }
 
 #if defined(SPOT_LIGHT_SHADOWMAP_COUNT) || defined(DIRECTIONAL_LIGHT_SHADOWMAP_COUNT) || defined(POINT_LIGHT_SHADOWMAP_COUNT)
-
 #ifdef SPOT_LIGHT_SHADOWMAP_COUNT
 uniform sampler2D spotLightShadowMaps[SPOT_LIGHT_SHADOWMAP_COUNT];
 uniform mat4 spotLightMatrices[SPOT_LIGHT_SHADOWMAP_COUNT];

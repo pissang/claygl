@@ -398,6 +398,10 @@ class Renderer extends Notifier {
        * If use preZ optimization
        */
       preZ?: boolean;
+      /**
+       * Filter the renderable
+       */
+      filter?: (renderable: Renderable) => boolean;
     }
   ) {
     const gl = this.gl;
@@ -494,7 +498,8 @@ class Renderer extends Notifier {
       frameBuffer,
       {
         getMaterial,
-        sortCompare: Renderer.opaqueSortCompare
+        sortCompare: Renderer.opaqueSortCompare,
+        filter: opts.filter
       },
       scene
     );
@@ -505,7 +510,8 @@ class Renderer extends Notifier {
       frameBuffer,
       {
         getMaterial,
-        sortCompare: Renderer.transparentSortCompare
+        sortCompare: Renderer.transparentSortCompare,
+        filter: opts.filter
       },
       scene
     );
@@ -719,7 +725,7 @@ class Renderer extends Notifier {
 
     // Status
     this._renderPass(list, camera, undefined, {
-      ifRender(renderable) {
+      filter(renderable) {
         return !renderable.ignorePreZ;
       },
       isMaterialChanged(renderable, prevRenderable) {

@@ -139,7 +139,9 @@ void main() {
  * - A: metalness
  *
  * Third texture
- * - Velocity
+ * - R: velocity.x
+ * - G: velocity.y
+ * - A: alpha
  */
 export const createGBufferFrag = (outputs: string[]) =>
   new FragmentShader({
@@ -180,11 +182,9 @@ float indexingTexel(in vec4 texel, in int idx) {
 
 void main() {
 
-  if (alphaCutoff > 0.0) {
-    float a = texture(diffuseMap, v_Texcoord).a * alpha;
-    if (a < alphaCutoff) {
-      discard;
-    }
+  float a = alpha * texture(diffuseMap, v_Texcoord).a;
+  if (a < alphaCutoff) {
+    discard;
   }
 #ifdef USE_TARGET_TEXTURE1
   vec3 N = v_Normal;
@@ -245,14 +245,14 @@ void main() {
 
 #ifdef USE_TARGET_TEXTURE4
   // Velocity
-  vec2 a = v_ViewPosition.xy / v_ViewPosition.w;
-  vec2 b = v_PrevViewPosition.xy / v_PrevViewPosition.w;
+  vec2 cur = v_ViewPosition.xy / v_ViewPosition.w;
+  vec2 prev = v_PrevViewPosition.xy / v_PrevViewPosition.w;
 
   if (firstRender) {
-    out_color2 = vec4(0.0);
+    out_color2 = vec4(0.0, 0.0, 0.0, a);
   }
   else {
-    out_color2 = vec4((a - b) * 0.5 + 0.5, 0.0, 1.0);
+    out_color2 = vec4((cur - prev) * 0.5 + 0.5, 0.0, a);
   }
 #endif
 }`

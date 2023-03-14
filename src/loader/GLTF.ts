@@ -1095,8 +1095,7 @@ function parseMeshes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpt
             constants.TRIANGLES,
             constants.TRIANGLE_STRIP,
             constants.TRIANGLE_FAN
-          ][primitiveInfo.mode] || constants.TRIANGLES,
-        ignoreGBuffer: material.transparent
+          ][primitiveInfo.mode] || constants.TRIANGLES
       });
       if (materialInfo != null) {
         mesh.culling = !materialInfo.doubleSided;

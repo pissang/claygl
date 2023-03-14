@@ -105,7 +105,10 @@ export interface ExtendedRenderableObject<T extends GLMaterialObject = GLMateria
 }
 
 export interface GLRenderHooks<T extends GLRenderableObject = GLRenderableObject> {
-  ifRender?(renderable: T): boolean;
+  /**
+   * Filter the renderable
+   */
+  filter?(renderable: T): boolean;
   /**
    * Get material of renderable
    */
@@ -289,7 +292,7 @@ class GLPipeline {
     renderHooks.beforeRender = renderHooks.beforeRender || noop;
     renderHooks.afterRender = renderHooks.afterRender || noop;
 
-    const ifRenderObject = renderHooks.ifRender || defaultIfRender;
+    const ifRenderObject = renderHooks.filter || defaultIfRender;
 
     this._updatePrograms(list, renderHooks);
     if (renderHooks.sortCompare) {
