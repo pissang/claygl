@@ -339,7 +339,7 @@ class DeferredRenderer {
   ) {
     // Render depth
     const pass = this._fullQuadPass;
-    this._depthWriteMat.set('gBufferTexture2', gBufferTexture2);
+    this._depthWriteMat.set('depthTex', gBufferTexture2);
     pass.material = this._depthWriteMat as Material;
     pass.renderQuad(
       renderer,

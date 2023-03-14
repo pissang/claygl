@@ -227,6 +227,10 @@ class Renderer extends Notifier {
     // gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT
     this.clearBit = opts.clearBit || 17664;
   }
+
+  getGLPipeline() {
+    return this._glPipeline;
+  }
   /**
    * Resize the canvas
    * @param {number} width

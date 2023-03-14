@@ -1,6 +1,5 @@
-import OrthoCamera from '../camera/Orthographic';
 import Plane from '../geometry/Plane';
-import Shader, { FragmentShader, VertexShader } from '../Shader';
+import Shader, { FragmentShader } from '../Shader';
 import Material from '../Material';
 import Mesh from '../Mesh';
 import * as constants from '../core/constants';
@@ -13,7 +12,6 @@ import { Color } from '../core/type';
 
 const planeGeo = new Plane();
 let mesh: Mesh;
-const camera = new OrthoCamera();
 
 interface FullscreenQuadPassOpts {
   clearColor?: Color;
@@ -91,7 +89,7 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
         frustumCulling: false
       });
     mesh.material = material;
-    renderer.renderPass([mesh], camera, frameBuffer, {
+    renderer.renderPass([mesh], undefined, frameBuffer, {
       prepare,
       cleanup
     });

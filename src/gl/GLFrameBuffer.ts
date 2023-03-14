@@ -69,7 +69,6 @@ class GLFrameBuffer {
 
     let width: number | undefined;
     let height: number | undefined;
-    const bufs: GLEnum[] = [];
     // MRT Support in chrome
     // https://www.khronos.org/registry/webgl/sdk/tests/conformance/extensions/ext-draw-buffers.html
     keys(texturesToAttach).forEach((attachmentStr) => {
@@ -88,9 +87,6 @@ class GLFrameBuffer {
           gl.framebufferRenderbuffer(FRAMEBUFFER, DEPTH_ATTACHMENT, RENDERBUFFER, null);
           renderBufferDetached = true;
         }
-      }
-      if (attachment >= COLOR_ATTACHMENT0 && attachment <= COLOR_ATTACHMENT0 + 8) {
-        bufs.push(attachment);
       }
 
       const attached = attachedTextures[attachment];
@@ -142,8 +138,6 @@ class GLFrameBuffer {
       gl.deleteRenderbuffer(webglRenderBuffer!);
       this._webglRb = undefined;
     }
-
-    gl.drawBuffers(bufs);
 
     // 0x8CD5, 36053, FRAMEBUFFER_COMPLETE
     // 0x8CD6, 36054, FRAMEBUFFER_INCOMPLETE_ATTACHMENT

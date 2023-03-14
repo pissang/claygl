@@ -6,6 +6,7 @@ import FullscreenQuadPass from '../composite/Pass';
 import Matrix4 from '../math/Matrix4';
 import * as mat4 from '../glmatrix/mat4';
 import * as constants from '../core/constants';
+import { depthWriteFragment } from '../shader/source/deferred/depthwrite.glsl';
 
 import Renderer, { RenderHooks, RendererViewport, RenderableObject } from '../Renderer';
 import Camera from '../Camera';
@@ -214,9 +215,10 @@ class DeferredGBuffer {
   private _frameBuffer = new FrameBuffer();
 
   private _outputs = [];
-  private _gBufferMaterial?: Material;
+  private _gBufferMat?: Material;
 
   private _debugPass = new FullscreenQuadPass(gBufferDebugFragment);
+  private _depthWritePass = new FullscreenQuadPass(depthWriteFragment);
 
   constructor(opts?: Partial<DeferredGBufferOpts>) {
     opts = opts || {};
@@ -295,6 +297,11 @@ class DeferredGBuffer {
     camera: Camera,
     opts?: {
       filter?: GLRenderHooks['filter'];
+      /**
+       * Depth texture as mask
+       */
+      depthMaskTexture?: Texture2D;
+
       targetTexture1?: Texture2D;
       targetTexture2?: Texture2D;
       targetTexture3?: Texture2D;
@@ -391,9 +398,9 @@ class DeferredGBuffer {
     const cameraViewProj = mat4.create();
     mat4.multiply(cameraViewProj, camera.projectionMatrix.array, camera.viewMatrix.array);
 
-    let gBufferMaterial = this._gBufferMaterial;
+    let gBufferMaterial = this._gBufferMat;
     if (!gBufferMaterial || this._outputs.join('') !== outputs.join('')) {
-      gBufferMaterial = this._gBufferMaterial = new Material(
+      gBufferMaterial = this._gBufferMat = new Material(
         new Shader(gBufferVertex, createGBufferFrag(outputs))
       );
       if (enableTargetTexture1) {
@@ -407,11 +414,21 @@ class DeferredGBuffer {
       }
     }
 
+    // Render nothing and do the clear.
+    renderer.renderPass([], camera, frameBuffer, {
+      prepare() {
+        clearViewport();
+      }
+    });
+
+    if (opts.depthMaskTexture) {
+      const depthWritePass = this._depthWritePass;
+      depthWritePass.material.set('depthTex', opts.depthMaskTexture);
+      depthWritePass.render(renderer, frameBuffer);
+    }
+
     const renderHooks: RenderHooks = {
       filter: opts.filter,
-      prepare(gl) {
-        clearViewport();
-      },
       getMaterial() {
         return gBufferMaterial!;
       },

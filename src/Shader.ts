@@ -605,6 +605,8 @@ export class Shader<
   readonly vertex: string;
   readonly fragment: string;
 
+  readonly outputs: string[];
+
   private readonly _shaderID: string;
 
   version: 3 = 3;
@@ -722,6 +724,7 @@ export class Shader<
       }),
       false
     ));
+    this.outputs = frag.outputs;
 
     this._shaderID = getShaderID(vertex, fragment);
   }

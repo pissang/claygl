@@ -293,6 +293,7 @@ class GLPipeline {
     renderHooks.afterRender = renderHooks.afterRender || noop;
 
     const ifRenderObject = renderHooks.filter || defaultIfRender;
+    const isBoundToFramebuffer = this._framebuffer;
 
     this._updatePrograms(list, renderHooks);
     if (renderHooks.sortCompare) {
@@ -313,6 +314,7 @@ class GLPipeline {
     let drawID: string | undefined;
     let materialTakesTextureSlot: number | undefined;
     let currentBuffers: GLBuffers | undefined;
+    let drawBuffersCount = 0;
 
     for (let i = 0; i < list.length; i++) {
       const renderable = list[i];
@@ -323,6 +325,7 @@ class GLPipeline {
 
       const geometry = renderable.geometry;
       const material = renderHooks.getMaterial.call(this, renderable);
+      const outputsNum = material.shader.outputs.length;
 
       let program = (renderable as ExtendedRenderableObject).__program;
 
@@ -390,6 +393,16 @@ class GLPipeline {
           }
         }
 
+        if (outputsNum !== drawBuffersCount && isBoundToFramebuffer) {
+          // TODO what if framebuffer has more attached textures?
+          const attachements = [];
+          for (let i = 0; i < outputsNum; i++) {
+            attachements.push(constants.COLOR_ATTACHMENT0 + i);
+          }
+          gl.drawBuffers(attachements);
+          drawBuffersCount = outputsNum;
+        }
+
         materialTakesTextureSlot = this._bindMaterial(
           renderable,
           material,
@@ -428,6 +441,7 @@ class GLPipeline {
         buffers.bindToProgram(gl, program);
         currentBuffers = buffers;
       }
+
       this._renderObject(renderable, currentBuffers!, program);
 
       // After render hook
