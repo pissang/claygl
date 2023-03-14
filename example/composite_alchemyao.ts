@@ -13,7 +13,8 @@ import {
   AmbientCubemapLight,
   Skybox,
   SceneCompositeNode,
-  FilterCompositeNode
+  FilterCompositeNode,
+  createCompositeNodeInput
 } from 'claygl';
 import { blendCompositeFragment, composeCompositeFragment } from 'claygl/shaders';
 import AlchemyAOCompositeNode from './common/HDComposite/AlchemyAONode';
@@ -103,14 +104,8 @@ const sceneNode = new SceneCompositeNode(scene, camera);
 const blendNode = new FilterCompositeNode(blendCompositeFragment);
 const tonemappingNode = new FilterCompositeNode(composeCompositeFragment);
 alchemyAONode.inputs = {
-  gBufferTexture1: {
-    node: gBufferNode,
-    output: 'texture1'
-  },
-  gBufferTexture2: {
-    node: gBufferNode,
-    output: 'texture2'
-  }
+  gBufferTexture1: createCompositeNodeInput(gBufferNode, 'texture1'),
+  gBufferTexture2: createCompositeNodeInput(gBufferNode, 'texture2')
 };
 sceneNode.outputs = {
   color: {}

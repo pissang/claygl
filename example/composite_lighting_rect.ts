@@ -8,14 +8,10 @@ import {
   startTimeline,
   StandardMaterial,
   loadGLTF,
-  constants,
   OrbitControl,
   Node as ClayNode,
-  SphereGeometry,
-  PointLight,
   FilterCompositeNode,
-  Skybox,
-  Vector3
+  Skybox
 } from 'claygl';
 import LightingCompositeNode from './common/HDComposite/LightingNode';
 import { composeCompositeFragment } from 'claygl/shaders';

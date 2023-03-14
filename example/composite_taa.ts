@@ -15,7 +15,8 @@ import {
   AmbientCubemapLight,
   Skybox,
   Node as ClayNode,
-  color
+  color,
+  createCompositeNodeInput
 } from 'claygl';
 import { blendCompositeFragment, composeCompositeFragment } from 'claygl/shaders';
 import { projectEnvironmentMap } from '../src/util/sh';
@@ -116,14 +117,8 @@ const blendNode = new FilterCompositeNode(blendCompositeFragment);
 const tonemappingNode = new FilterCompositeNode(composeCompositeFragment);
 const taaNode = new TAACompositeNode(camera, taaCameraJitter);
 ssaoNode.inputs = {
-  gBufferTex: {
-    node: gbufferNode,
-    output: 'texture1'
-  },
-  depthTex: {
-    node: gbufferNode,
-    output: 'texture2'
-  }
+  gBufferTex: createCompositeNodeInput(gbufferNode, 'texture1'),
+  depthTex: createCompositeNodeInput(gbufferNode, 'texture2')
 };
 blendNode.inputs = {
   colorTex1: sceneNode,

@@ -16,7 +16,8 @@ import {
   SceneCompositeNode,
   FilterCompositeNode,
   Skybox,
-  textureUtil
+  textureUtil,
+  createCompositeNodeInput
 } from 'claygl';
 import { blendCompositeFragment, composeCompositeFragment } from 'claygl/shaders';
 import GBufferNode from './common/HDComposite/GBufferNode';
@@ -137,14 +138,8 @@ const ssrNode = new SSRCompositeNode(camera);
 const blendNode = new FilterCompositeNode(blendCompositeFragment);
 const tonemappingNode = new FilterCompositeNode(composeCompositeFragment);
 ssrNode.inputs = {
-  gBufferTexture1: {
-    node: gBufferNode,
-    output: 'texture1'
-  },
-  gBufferTexture2: {
-    node: gBufferNode,
-    output: 'texture2'
-  },
+  gBufferTexture1: createCompositeNodeInput(gBufferNode, 'texture1'),
+  gBufferTexture2: createCompositeNodeInput(gBufferNode, 'texture2'),
   colorTexture: sceneNode
 };
 blendNode.inputs = {

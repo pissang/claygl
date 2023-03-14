@@ -14,7 +14,8 @@ import {
   Compositor,
   SceneCompositeNode,
   FilterCompositeNode,
-  SphereGeometry
+  SphereGeometry,
+  createCompositeNodeInput
 } from 'claygl';
 import { blendCompositeFragment } from 'claygl/shaders';
 import GBufferNode from './common/HDComposite/GBufferNode';
@@ -116,14 +117,8 @@ const gBufferNode = new GBufferNode(scene, camera);
 const ssrNode = new SSRCompositeNode(camera);
 const blendNode = new FilterCompositeNode(blendCompositeFragment);
 ssrNode.inputs = {
-  gBufferTexture1: {
-    node: gBufferNode,
-    output: 'texture1'
-  },
-  gBufferTexture2: {
-    node: gBufferNode,
-    output: 'texture2'
-  },
+  gBufferTexture1: createCompositeNodeInput(gBufferNode, 'texture1'),
+  gBufferTexture2: createCompositeNodeInput(gBufferNode, 'texture2'),
   colorTexture: sceneNode
 };
 blendNode.inputs = {

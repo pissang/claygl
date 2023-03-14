@@ -10,7 +10,8 @@ import {
   FilterCompositeNode,
   loadGLTF,
   SpotLight,
-  AmbientLight
+  AmbientLight,
+  createCompositeNodeInput
 } from 'claygl';
 import { blendCompositeFragment } from 'claygl/shaders';
 import GBufferNode from './common/HDComposite/GBufferNode';
@@ -86,14 +87,8 @@ loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
   const ssrNode = new SSRCompositeNode(camera);
   const blendNode = new FilterCompositeNode(blendCompositeFragment);
   ssrNode.inputs = {
-    gBufferTexture1: {
-      node: gBufferNode,
-      output: 'texture1'
-    },
-    gBufferTexture2: {
-      node: gBufferNode,
-      output: 'texture2'
-    },
+    gBufferTexture1: createCompositeNodeInput(gBufferNode, 'texture1'),
+    gBufferTexture2: createCompositeNodeInput(gBufferNode, 'texture2'),
     colorTexture: sceneNode
   };
   blendNode.inputs = {

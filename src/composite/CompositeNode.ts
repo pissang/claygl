@@ -122,4 +122,18 @@ abstract class CompositeNode<InputKey extends string = string, OutputKey extends
   }
 }
 
+export function createCompositeNodeInput<T extends CompositeNode>(
+  node: T,
+  output?: keyof NonNullable<T['outputs']>,
+  opts?: Partial<CompositeNodeInput>
+): CompositeNodeInput {
+  return Object.assign(
+    {
+      node,
+      output
+    },
+    opts
+  );
+}
+
 export default CompositeNode;
