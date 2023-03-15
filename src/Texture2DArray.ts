@@ -50,6 +50,7 @@ class Texture2DArray extends Texture<TextureSource[]> {
       for (let i = 0; i < source!.length; i++) {
         maxHeight = Math.max(maxHeight, source![i].height);
       }
+      return maxHeight;
     }
     return this._height || 0;
   }
