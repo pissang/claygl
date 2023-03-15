@@ -169,20 +169,20 @@ class GLTexture {
         } else {
           console.error(`Format ${glFormat} should have pixels data.`);
         }
+      } else {
+        // TODO use texStorage2D if source is undefined.
+        gl.texImage2D(
+          constants.TEXTURE_2D,
+          level,
+          glInternalFormat,
+          width,
+          height,
+          0,
+          glFormat,
+          glType,
+          (source && source.data) || null
+        );
       }
-
-      // TODO use texStorage2D if source is undefined.
-      gl.texImage2D(
-        constants.TEXTURE_2D,
-        level,
-        glInternalFormat,
-        width,
-        height,
-        0,
-        glFormat,
-        glType,
-        (source && source.data) || null
-      );
     } else {
       // Try as image source.
       // TODO check?
