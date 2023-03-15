@@ -7,17 +7,39 @@ import {
   Scene,
   OrthographicCamera,
   Texture2D,
-  constants
+  constants,
+  VertexShader,
+  glsl
 } from 'claygl';
-import { fullscreenQuadPassVertex, outputTextureFragment } from 'claygl/shaders';
+import { outputTextureFragment } from 'claygl/shaders';
 
 import { parse as parseKTX } from '../src/util/ktx';
+
+const vertexShader = new VertexShader({
+  name: 'vertex',
+  uniforms: {
+    MVP: Shader.semanticUniform('mat4', 'WORLDVIEWPROJECTION')
+  },
+  attributes: {
+    pos: Shader.attribute('vec3', 'POSITION'),
+    uv: Shader.attribute('vec2', 'TEXCOORD_0')
+  },
+  varyings: {
+    v_Texcoord: Shader.varying('vec2')
+  },
+  main: glsl`
+void main() {
+  v_Texcoord = uv;
+  gl_Position = MVP * vec4(pos, 1.0);
+}
+`
+});
 
 const canvas = document.querySelector('canvas')!;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const shader = new Shader(fullscreenQuadPassVertex, outputTextureFragment);
+const shader = new Shader(vertexShader, outputTextureFragment);
 const planeGeo = new PlaneGeometry();
 function createRect(texture: Texture2D, x: number, y: number, width: number, height: number) {
   const mat = new Material(shader);
