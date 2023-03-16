@@ -417,7 +417,7 @@ class DeferredRenderer {
         if (viewport) {
           const dpr = viewport.pixelRatio;
           // use scissor to make sure only clear the viewport
-          gl.enable(gl.SCISSOR_TEST);
+          gl.enable(constants.SCISSOR_TEST);
           gl.scissor(
             viewport.x * dpr,
             viewport.y * dpr,
@@ -426,10 +426,10 @@ class DeferredRenderer {
           );
         }
         gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.enable(gl.BLEND);
+        gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
+        gl.enable(constants.BLEND);
         if (viewport) {
-          gl.disable(gl.SCISSOR_TEST);
+          gl.disable(constants.SCISSOR_TEST);
         }
       }
     });
