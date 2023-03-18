@@ -36,6 +36,9 @@ export interface ClayMouseEvent extends Partial<rayPicking.Intersection> {
   offsetY: number;
   wheelDelta?: number;
   cancelBubble?: boolean;
+  shiftKey: boolean;
+  ctrlKey: boolean;
+  metaKey: boolean;
 }
 
 function packageEvent(
@@ -43,6 +46,7 @@ function packageEvent(
   pickResult: Partial<rayPicking.Intersection>,
   offsetX: number,
   offsetY: number,
+  rawEvent: MouseEvent | TouchEvent,
   wheelDelta?: number
 ) {
   return assign(
@@ -50,7 +54,10 @@ function packageEvent(
       type: eventType,
       offsetX: offsetX,
       offsetY: offsetY,
-      wheelDelta: wheelDelta
+      wheelDelta: wheelDelta,
+      shiftKey: rawEvent.shiftKey,
+      ctrlKey: rawEvent.ctrlKey,
+      metaKey: rawEvent.metaKey
     },
     pickResult
   ) as ClayMouseEvent;
@@ -170,18 +177,19 @@ export class EventManager {
                         target: oldTarget
                       },
                       offsetX,
-                      offsetY
+                      offsetY,
+                      e
                     )
                   );
               }
               bubblingEvent(
                 pickResult.target,
-                packageEvent('pointermove', pickResult, offsetX, offsetY)
+                packageEvent('pointermove', pickResult, offsetX, offsetY, e)
               );
               if (targetChanged) {
                 bubblingEvent(
                   pickResult.target,
-                  packageEvent('pointerover', pickResult, offsetX, offsetY)
+                  packageEvent('pointerover', pickResult, offsetX, offsetY, e)
                 );
               }
             } else {
@@ -189,7 +197,7 @@ export class EventManager {
               eveType = domEveType;
               bubblingEvent(
                 pickResult.target,
-                packageEvent(eveType, pickResult, offsetX, offsetY, delta)
+                packageEvent(eveType, pickResult, offsetX, offsetY, e, delta)
               );
             }
             oldTarget = pickResult.target;
@@ -202,7 +210,8 @@ export class EventManager {
                   target: oldTarget
                 },
                 offsetX,
-                offsetY
+                offsetY,
+                e
               )
             );
             oldTarget = undefined;
