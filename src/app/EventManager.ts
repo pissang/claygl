@@ -39,6 +39,7 @@ export interface ClayMouseEvent extends Partial<rayPicking.Intersection> {
   shiftKey: boolean;
   ctrlKey: boolean;
   metaKey: boolean;
+  altKey: boolean;
 }
 
 function packageEvent(
@@ -57,7 +58,8 @@ function packageEvent(
       wheelDelta: wheelDelta,
       shiftKey: rawEvent.shiftKey,
       ctrlKey: rawEvent.ctrlKey,
-      metaKey: rawEvent.metaKey
+      metaKey: rawEvent.metaKey,
+      altKey: rawEvent.altKey
     },
     pickResult
   ) as ClayMouseEvent;
