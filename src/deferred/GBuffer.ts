@@ -424,7 +424,18 @@ class DeferredGBuffer {
     if (opts.depthMaskTexture) {
       const depthWritePass = this._depthWritePass;
       depthWritePass.material.set('depthTex', opts.depthMaskTexture);
-      depthWritePass.render(renderer, frameBuffer);
+      depthWritePass.renderQuad(
+        renderer,
+        frameBuffer,
+        (gl) => {
+          gl.depthMask(true);
+          gl.clear(gl.DEPTH_BUFFER_BIT);
+          gl.colorMask(false, false, false, false);
+        },
+        (gl) => {
+          gl.colorMask(true, true, true, true);
+        }
+      );
     }
 
     const renderHooks: RenderHooks = {
