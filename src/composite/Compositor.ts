@@ -72,6 +72,11 @@ class Compositor {
    * Render
    */
   render(renderer: Renderer, frameBuffer?: FrameBuffer) {
+    if (!renderer.getWidth() || !renderer.getHeight()) {
+      // Not ready yet.
+      return;
+    }
+
     this._nodes.forEach((node) => {
       if (node instanceof GroupCompositeNode) {
         node.updateInnerLinks();
