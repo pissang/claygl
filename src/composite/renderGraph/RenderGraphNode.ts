@@ -1,5 +1,9 @@
-import { constants } from '../../claygl';
-import { COLOR_ATTACHMENT0 } from '../../core/constants';
+import {
+  COLOR_ATTACHMENT0,
+  HALF_FLOAT,
+  UNSIGNED_BYTE,
+  UNSIGNED_INT_24_8
+} from '../../core/constants';
 import { assign, isFunction, keys, optional } from '../../core/util';
 import type FrameBuffer from '../../FrameBuffer';
 import type Renderer from '../../Renderer';
@@ -147,9 +151,9 @@ class RenderGraphNode {
         // Not derive type like UNSIGNED_INT_24_8 that will be used in the depth texture.
         // TODO may be confusing?
         result.type &&
-        result.type !== constants.UNSIGNED_BYTE &&
-        result.type !== constants.HALF_FLOAT &&
-        result.type !== constants.UNSIGNED_INT_24_8
+        result.type !== UNSIGNED_BYTE &&
+        result.type !== HALF_FLOAT &&
+        result.type !== UNSIGNED_INT_24_8
       ) {
         delete result.type;
       }
