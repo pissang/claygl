@@ -84,6 +84,8 @@ function getGetUniformHook(
         return renderableGBufferData.get(renderable)?.prevSkinMatricesTexture;
       case 'firstRender':
         return !renderableGBufferData.get(renderable)?.prevWorldViewProjection;
+      case 'useVertexColor':
+        return standardMaterial.isDefined('vertex', 'VERTEX_COLOR');
       default:
         const useRoughnessWorkflow = !standardMaterial.isDefined('fragment', 'SPECULAR_WORKFLOW');
         const roughGlossMap = useRoughnessWorkflow

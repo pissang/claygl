@@ -27,6 +27,7 @@ export const gBufferVertex = new VertexShader({
     position: POSITION(),
     texcoord: TEXCOORD_0(),
     normal: NORMAL(),
+    color: attribute('vec4', 'COLOR'),
     tangent: TANGENT()
   },
   uniforms: {
@@ -37,11 +38,13 @@ export const gBufferVertex = new VertexShader({
     prevSkinMatricesTexture: uniform('sampler2D'),
     prevSkinMatrix: createArrayUniform('mat4', 'JOINT_COUNT'),
     uvRepeat: uniform('vec2'),
-    uvOffset: uniform('vec2')
+    uvOffset: uniform('vec2'),
+    useVertexColor: uniform('bool')
   },
   varyings: {
     v_Texcoord: varying('vec2'),
     v_Normal: varying('vec3'),
+    v_Color: varying('vec4'),
     v_Tangent: varying('vec3'),
     v_Bitangent: varying('vec3'),
     v_WorldPosition: varying('vec3'),
@@ -103,6 +106,15 @@ void main() {
 
 #if defined(USE_TARGET_TEXTURE3) || defined(USE_TARGET_TEXTURE1)
   v_Texcoord = texcoord * uvRepeat + uvOffset;
+#endif
+
+#ifdef USE_TARGET_TEXTURE3
+  if (useVertexColor) {
+    v_Color = color;
+  }
+  else {
+    v_Color = vec4(1.0);
+  }
 #endif
 
 #ifdef USE_TARGET_TEXTURE1
@@ -235,12 +247,14 @@ void main() {
   }
   vec4 texel = texture(diffuseMap, v_Texcoord);
   vec3 albedo = color;
+  vec4 vtxColor = v_Color;
   if (linear) {
     texel = sRGBToLinear(texel);
     albedo = sRGBToLinear(vec4(albedo, 1.0)).rgb;
+    vtxColor = sRGBToLinear(vtxColor);
   }
 
-  out_color1 = vec4(texel.rgb * albedo, m + 0.005);
+  out_color1 = vec4(texel.rgb * albedo * vtxColor.rgb, m + 0.005);
 #endif
 
 #ifdef USE_TARGET_TEXTURE4
