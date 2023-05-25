@@ -1,17 +1,18 @@
-import Plane from '../geometry/Plane';
-import Shader, { FragmentShader } from '../Shader';
-import Material from '../Material';
-import Mesh from '../Mesh';
-import * as constants from '../core/constants';
-import { fullscreenQuadPassVertex } from '../shader/source/compositor/vertex.glsl';
-import { isArray, optional } from '../core/util';
-import Renderer, { RenderHooks } from '../Renderer';
-import type FrameBuffer from '../FrameBuffer';
-import Notifier from '../core/Notifier';
-import { Color } from '../core/type';
+import Shader, { FragmentShader } from './Shader';
+import Material from './Material';
+import * as constants from './core/constants';
+import { fullscreenQuadPassVertex } from './shader/source/compositor/vertex.glsl';
+import { isArray, optional } from './core/util';
+import Notifier from './core/Notifier';
+import type { Color } from './core/type';
+import type Renderer from './Renderer';
+import type { RenderHooks } from './Renderer';
+import type FrameBuffer from './FrameBuffer';
+import GeometryBase from './GeometryBase';
 
-const planeGeo = new Plane();
-let mesh: Mesh;
+const planeGeo = new GeometryBase();
+planeGeo.createAttribute('position', 'float', 3, 'POSITION');
+planeGeo.attributes.position.fromArray([-1, -1, 0, 1, -1, 0, 1, 1, 0, -1, 1, 0]);
 
 interface FullscreenQuadPassOpts {
   clearColor?: Color;
@@ -83,16 +84,21 @@ class FullscreenQuadPass<T extends FragmentShader = FragmentShader> extends Noti
     cleanup?: RenderHooks['cleanup']
   ) {
     const material = this.material;
-    mesh =
-      mesh ||
-      new Mesh(planeGeo, material, {
-        frustumCulling: false
-      });
-    mesh.material = material;
-    renderer.renderPass([mesh], undefined, frameBuffer, {
-      prepare,
-      cleanup
-    });
+    renderer.renderPass(
+      [
+        {
+          geometry: planeGeo,
+          material,
+          mode: constants.TRIANGLE_FAN
+        }
+      ],
+      undefined,
+      frameBuffer,
+      {
+        prepare,
+        cleanup
+      }
+    );
   }
 
   /**

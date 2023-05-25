@@ -2,7 +2,7 @@ import Texture2D from '../Texture2D';
 import Material from '../Material';
 import FrameBuffer from '../FrameBuffer';
 import Shader from '../Shader';
-import FullscreenQuadPass from '../composite/Pass';
+import FullscreenQuadPass from '../FullscreenQuadPass';
 import Matrix4 from '../math/Matrix4';
 import * as mat4 from '../glmatrix/mat4';
 import * as constants from '../core/constants';

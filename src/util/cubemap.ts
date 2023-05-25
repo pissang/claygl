@@ -3,7 +3,7 @@
 import Texture2D from '../Texture2D';
 import TextureCube, { cubeTargets, TextureCubeOpts } from '../TextureCube';
 import FrameBuffer from '../FrameBuffer';
-import FullscreenQuadPass from '../composite/Pass';
+import FullscreenQuadPass from '../FullscreenQuadPass';
 import Material from '../Material';
 import Shader from '../Shader';
 import Scene from '../Scene';

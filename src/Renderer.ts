@@ -34,6 +34,7 @@ import GLPipeline, {
 import Texture from './Texture';
 import InstancedMesh from './InstancedMesh';
 import GeometryBase from './GeometryBase';
+import Texture2D from './Texture2D';
 
 const mat4Create = mat4.create;
 
@@ -399,6 +400,10 @@ class Renderer extends Notifier {
        */
       notUpdateScene?: boolean;
       /**
+       * Global material that override the scene material and renderable material.
+       */
+      globalMaterial?: Material;
+      /**
        * If use preZ optimization
        */
       preZ?: boolean;
@@ -468,7 +473,7 @@ class Renderer extends Notifier {
 
     const opaqueList = renderList.opaque;
     const transparentList = renderList.transparent;
-    const sceneMaterial = scene.material;
+    const globalMaterial = opts.globalMaterial || scene.material;
 
     // Render pre z
     preZ && this.renderPreZ(opaqueList, scene, camera);
@@ -485,7 +490,7 @@ class Renderer extends Notifier {
     }
 
     function getMaterial(renderable: Renderable) {
-      return sceneMaterial || renderable.material;
+      return globalMaterial || renderable.material;
     }
 
     // Render skybox before anyother objects
@@ -546,6 +551,11 @@ class Renderer extends Notifier {
   bindFrameBuffer(frameBuffer?: FrameBuffer | null) {
     this._bindFrameBuffer(frameBuffer);
   }
+
+  /**
+   * Write texture to depth buffer
+   */
+  writeDepthBuffer(depthTex: Texture2D) {}
 
   private _bindFrameBuffer(frameBuffer?: FrameBuffer | null) {
     const glPipeline = this._glPipeline;

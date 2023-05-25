@@ -1,6 +1,6 @@
 // TODO Shader library
 import CompositeNode, { CompositeNodeInput, CompositeNodeOutput } from './CompositeNode';
-import FullscreenQuadPass from './Pass';
+import FullscreenQuadPass from '../FullscreenQuadPass';
 import Renderer from '../Renderer';
 import FrameBuffer from '../FrameBuffer';
 import Texture from '../Texture';

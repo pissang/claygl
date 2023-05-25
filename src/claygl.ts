@@ -118,7 +118,7 @@ export * as textureUtil from './util/texture';
 export { default as App3D } from './App3D';
 
 // Composite
-export { default as FullscreenQuadPass } from './composite/Pass';
+export { default as FullscreenQuadPass } from './FullscreenQuadPass';
 export { default as Compositor } from './composite/Compositor';
 export { default as CompositeNode, createCompositeNodeInput } from './composite/CompositeNode';
 export type { CompositeNodeOutput, CompositeNodeInput } from './composite/CompositeNode';

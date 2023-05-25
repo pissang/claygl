@@ -18,7 +18,7 @@ import type Renderable from '../Renderable';
 import { Notifier } from '../core';
 import Scene from '../Scene';
 import Camera from '../Camera';
-import FullscreenQuadPass from '../composite/Pass';
+import FullscreenQuadPass from '../FullscreenQuadPass';
 import Light from '../Light';
 import DirectionalLight from '../light/Directional';
 import SpotLight from '../light/Spot';
