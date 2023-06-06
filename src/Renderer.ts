@@ -476,7 +476,7 @@ class Renderer extends Notifier {
     const globalMaterial = opts.globalMaterial || scene.material;
 
     // Render pre z
-    preZ && this.renderPreZ(opaqueList, scene, camera);
+    preZ && this.renderPreZ(opaqueList, camera, frameBuffer);
     gl.depthFunc(preZ ? constants.LEQUAL : constants.LESS);
 
     // Update the depth of transparent list.
@@ -551,11 +551,6 @@ class Renderer extends Notifier {
   bindFrameBuffer(frameBuffer?: FrameBuffer | null) {
     this._bindFrameBuffer(frameBuffer);
   }
-
-  /**
-   * Write texture to depth buffer
-   */
-  writeDepthBuffer(depthTex: Texture2D) {}
 
   private _bindFrameBuffer(frameBuffer?: FrameBuffer | null) {
     const glPipeline = this._glPipeline;
@@ -722,7 +717,7 @@ class Renderer extends Notifier {
     this._glPipeline.maxJointNumber = val;
   }
 
-  renderPreZ(list: GLRenderableObject<Material>[], scene: Scene, camera: Camera) {
+  renderPreZ(list: GLRenderableObject<Material>[], camera: Camera, frameBuffer?: FrameBuffer) {
     const _gl = this.gl;
     const preZPassMaterial =
       this._prezMaterial || new Material(new Shader(preZVertex, preZFragment));
@@ -738,7 +733,7 @@ class Renderer extends Notifier {
     _gl.depthMask(true);
 
     // Status
-    this._renderPass(list, camera, undefined, {
+    this._renderPass(list, camera, frameBuffer, {
       filter(renderable) {
         return !renderable.ignorePreZ;
       },

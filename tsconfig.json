@@ -5,6 +5,7 @@
 
     "strict": true,
     "removeComments": false,
+    "noEmit": false,
     "sourceMap": true,
     "keyofStringsOnly": true,
 

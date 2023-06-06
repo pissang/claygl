@@ -365,12 +365,12 @@ class DeferredGBuffer {
       if (viewport) {
         const dpr = viewport.pixelRatio;
         // use scissor to make sure only clear the viewport
-        gl.enable(gl.SCISSOR_TEST);
+        gl.enable(constants.SCISSOR_TEST);
         gl.scissor(viewport.x * dpr, viewport.y * dpr, viewport.width * dpr, viewport.height * dpr);
       }
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.clear(constants.COLOR_BUFFER_BIT | constants.DEPTH_BUFFER_BIT);
       if (viewport) {
-        gl.disable(gl.SCISSOR_TEST);
+        gl.disable(constants.SCISSOR_TEST);
       }
     }
 

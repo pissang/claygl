@@ -46,7 +46,7 @@ export const wireframeFragment = new FragmentShader({
   uniforms: {
     color: uniform('vec3', [0, 0, 0]),
     alpha: uniform('float', 1),
-    lineWidth: uniform('float', 0)
+    lineWidth: uniform('float', 1)
   },
   includes: [floatEncoderMixin, wireframeMixin],
   main: glsl`

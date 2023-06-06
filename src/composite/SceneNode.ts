@@ -5,7 +5,7 @@ import type Camera from '../Camera';
 import type Renderer from '../Renderer';
 import Texture from '../Texture';
 
-export class CompositeSceneNode<OutputKey extends string = 'color'> extends CompositeNode<
+class SceneCompositeNode<OutputKey extends string = 'color'> extends CompositeNode<
   never,
   OutputKey
 > {
@@ -45,4 +45,4 @@ export class CompositeSceneNode<OutputKey extends string = 'color'> extends Comp
   }
 }
 
-export default CompositeSceneNode;
+export default SceneCompositeNode;
