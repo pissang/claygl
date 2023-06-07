@@ -318,6 +318,10 @@ class App3D extends Notifier {
     return this._shadowPass;
   }
 
+  getEventManager() {
+    return this._eventManager;
+  }
+
   /**
    * Init app3D. Only available when lazyInit is set true.
    *
