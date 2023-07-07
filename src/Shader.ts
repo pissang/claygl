@@ -419,6 +419,7 @@ export class FragmentShader<
   TMixins extends ShaderMixinLoose[] = never
   // TVaryings extends Dict<ShaderVaringLoose> = Dict<ShaderVaringLoose>
 > extends StageShader<TDefines, TUniforms, never, never, TMixins> {
+  // TODO
   outputs: string[];
   constructor(options: {
     name?: string;

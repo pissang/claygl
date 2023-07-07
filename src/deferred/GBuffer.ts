@@ -378,7 +378,7 @@ class DeferredGBuffer {
       return renderable.material !== prevRenderable.material;
     }
 
-    const outputs = [];
+    const outputs: string[] = [];
     // PENDING, scene.boundingBoxLastFrame needs be updated if have shadow
     if (enableTargetTexture1) {
       frameBuffer.attach(opts.targetTexture1 || this._gBufferTex1, gl.COLOR_ATTACHMENT0);

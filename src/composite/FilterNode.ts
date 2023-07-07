@@ -42,6 +42,7 @@ import { FragmentShaderLoose, PickFragmentTextureUniforms } from '../Shader';
 
 class FilterCompositeNode<
   T extends FragmentShaderLoose = FragmentShaderLoose,
+  // TODO inference from shader
   O extends string = 'color',
   S = PickFragmentTextureUniforms<T['uniforms']>
 > extends CompositeNode<keyof S, O> {

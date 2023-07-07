@@ -12,9 +12,9 @@ const CLICK_EVENTS = ['click', 'dblclick', 'pointerdown', 'pointerup'] as const;
 const WHEEL_EVENTS = ['wheel'] as const;
 
 type ListenedEvents =
-  | typeof HOVER_EVENTS[number]
-  | typeof CLICK_EVENTS[number]
-  | typeof WHEEL_EVENTS[number];
+  | (typeof HOVER_EVENTS)[number]
+  | (typeof CLICK_EVENTS)[number]
+  | (typeof WHEEL_EVENTS)[number];
 
 type ClayEventType =
   | 'click'
@@ -79,12 +79,12 @@ function makeHandlerName(eveType: string) {
 export class EventManager {
   private _renderer: Renderer;
   private _container: HTMLElement;
-  private _scene: Scene;
+  private _scene: Scene | undefined;
   private _camera: Camera | undefined;
 
   private _listenedEvents: ListenedEvents[] = [];
 
-  constructor(container: HTMLElement, renderer: Renderer, scene: Scene, camera?: Camera) {
+  constructor(container: HTMLElement, renderer: Renderer, scene?: Scene, camera?: Camera) {
     this._container = container;
     this._renderer = renderer;
     this._scene = scene;
@@ -95,12 +95,15 @@ export class EventManager {
     this._camera = camera;
   }
 
+  setScene(scene?: Scene) {
+    this._scene = scene;
+  }
+
   enable(enabledTriggers?: EventTriggers[]) {
     // Disable before enable.
     this.disable();
 
     const dom = this._container;
-    const scene = this._scene;
     const renderer = this._renderer;
 
     enabledTriggers = enabledTriggers || ['click', 'hover', 'wheel'];
@@ -121,8 +124,9 @@ export class EventManager {
         dom,
         domEveType,
         ((this as any)[makeHandlerName(domEveType)] = (e: MouseEvent | TouchEvent) => {
-          const mainCamera = this._camera || scene.getMainCamera();
-          if (!mainCamera) {
+          const scene = this._scene;
+          const mainCamera = this._camera || (scene && scene.getMainCamera());
+          if (!mainCamera || !scene) {
             // Not have camera yet.
             return;
           }

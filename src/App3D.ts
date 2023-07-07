@@ -232,7 +232,7 @@ class App3D extends Notifier {
     });
 
     const renderer = (this._renderer = new Renderer(rendererOpts));
-    const scene = (this._scene = new Scene());
+    const scene = new Scene();
 
     const width = opts.width || container.clientWidth;
     const height = opts.height || container.clientHeight;
@@ -252,14 +252,14 @@ class App3D extends Notifier {
     }
 
     if (eventOpts && eventOpts.enabled) {
-      this._eventManager = new EventManager(
-        eventOpts.container || container,
-        renderer,
-        this._scene
-      );
+      this._eventManager = new EventManager(eventOpts.container || container, renderer, scene);
       this._eventManager.enable(eventOpts.trigger);
     }
     !isDomCanvas && container.appendChild(renderer.canvas);
+
+    // Set scene to initialize.
+    this._onBeforeRenderScene = this._onBeforeRenderScene.bind(this);
+    this.scene = scene;
 
     renderer.resize(width, height);
 
@@ -268,22 +268,24 @@ class App3D extends Notifier {
     if (!opts.lazyInit) {
       this._doInit();
     }
-
-    scene.on(
-      'beforerender',
-      (renderer: Renderer, scene: Scene, camera: Camera, renderList: RenderList) => {
-        if (this._inRender) {
-          // Only update graphic options when using #render function.
-          (['opaque', 'transparent'] as const).forEach((type) => {
-            this._updateGraphicOptions(graphicOpts, renderList[type], false);
-          });
-        }
-      }
-    );
   }
 
   get scene() {
     return this._scene;
+  }
+
+  set scene(scene: Scene) {
+    if (scene === this._scene || this._disposed) {
+      return;
+    }
+    if (this._eventManager) {
+      this._eventManager.setScene(scene);
+    }
+
+    this._scene && this._scene.off('beforerender', this._onBeforeRenderScene);
+    scene.on('beforerender', this._onBeforeRenderScene);
+
+    this._scene = scene;
   }
 
   get renderer() {
@@ -344,6 +346,20 @@ class App3D extends Notifier {
    */
   loop(cb: (frameTime: number) => void) {
     this.on('loop', cb);
+  }
+
+  private _onBeforeRenderScene(
+    renderer: Renderer,
+    scene: Scene,
+    camera: Camera,
+    renderList: RenderList
+  ) {
+    if (this._inRender) {
+      // Only update graphic options when using #render function.
+      (['opaque', 'transparent'] as const).forEach((type) => {
+        this._updateGraphicOptions(this._graphicOpts, renderList[type], false);
+      });
+    }
   }
 
   private _doInit() {

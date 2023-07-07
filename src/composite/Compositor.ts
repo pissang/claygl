@@ -97,7 +97,7 @@ class Compositor {
   private _buildRenderGraphLinks(renderer: Renderer) {
     function logMissingLink(input: CompositeNodeInput) {
       console.warn(
-        'Pin of ' +
+        'Output of ' +
           (input.node.name || 'Anoymous') +
           (input.output ? '.' + input.output : '') +
           ' not exist'

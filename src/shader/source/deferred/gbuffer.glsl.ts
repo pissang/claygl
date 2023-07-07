@@ -158,7 +158,7 @@ void main() {
 export const createGBufferFrag = (outputs: string[]) =>
   new FragmentShader({
     name: 'gBufferFrag',
-    outputs: outputs,
+    outputs,
     uniforms: {
       viewInverse: VIEWINVERSE(),
       glossiness: uniform('float'),

@@ -18,6 +18,7 @@ export interface CompositeNodeInput {
 
   /**
    * If using the previous frame result of output.
+   * Can't be used with output.persist.
    */
   prevFrame?: boolean;
 }
