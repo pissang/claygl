@@ -163,7 +163,7 @@ class App3D extends Notifier {
   private _container: HTMLElement;
 
   private _renderer: Renderer;
-  private _scene: Scene;
+  private _scene!: Scene;
   private _timeline: Timeline;
   private _shadowPass?: ShadowMapPass;
 
