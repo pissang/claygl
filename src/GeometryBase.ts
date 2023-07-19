@@ -2,7 +2,6 @@ import Ray from './math/Ray';
 import { genGUID, keys } from './core/util';
 import { Vec3Array } from './glmatrix/common';
 
-import type Renderer from './Renderer';
 import type Camera from './Camera';
 import type Renderable from './Renderable';
 import type BoundingBox from './math/BoundingBox';
@@ -233,7 +232,6 @@ class GeometryBase {
   pick?: (
     x: number,
     y: number,
-    renderer: Renderer,
     camera: Camera,
     renderable: Renderable,
     out: Intersection[]

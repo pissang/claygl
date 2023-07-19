@@ -77,14 +77,14 @@ function makeHandlerName(eveType: string) {
 }
 
 export class EventManager {
-  private _renderer: Renderer;
+  private _renderer?: Renderer;
   private _container: HTMLElement;
   private _scene: Scene | undefined;
   private _camera: Camera | undefined;
 
   private _listenedEvents: ListenedEvents[] = [];
 
-  constructor(container: HTMLElement, renderer: Renderer, scene?: Scene, camera?: Camera) {
+  constructor(container: HTMLElement, renderer?: Renderer, scene?: Scene, camera?: Camera) {
     this._container = container;
     this._renderer = renderer;
     this._scene = scene;
@@ -148,7 +148,19 @@ export class EventManager {
             offsetY = (e as MouseEvent).clientY - box.top;
           }
 
-          const pickResultAll = rayPicking.pickAll(renderer, scene, mainCamera, offsetX, offsetY);
+          const pickResultAll = rayPicking.pickAll(
+            // Make sure the EventManager can be used without renderer.
+            renderer || {
+              x: 0,
+              y: 0,
+              width: dom.clientWidth,
+              height: dom.clientHeight
+            },
+            scene,
+            mainCamera,
+            offsetX,
+            offsetY
+          );
           // Just ignore silent element.
           const pickResult = pickResultAll.find((result) => !result.target.silent);
 

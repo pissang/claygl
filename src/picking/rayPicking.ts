@@ -11,6 +11,26 @@ import type Camera from '../Camera';
 import type ClayNode from '../Node';
 import type { GeometryAttribute } from '../GeometryBase';
 
+interface Viewport {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+function screenToNDC(x: number, y: number, viewport: Viewport, out: Vector2) {
+  // Invert y;
+  y = viewport.height - y;
+
+  const arr = out.array;
+  arr[0] = (x - viewport.x) / viewport.width;
+  arr[0] = arr[0] * 2 - 1;
+  arr[1] = (y - viewport.y) / viewport.height;
+  arr[1] = arr[1] * 2 - 1;
+
+  return out;
+}
+
 /**
  * Pick all intersection objects, wich will be sorted from near to far
  * @param  x Mouse position x
@@ -19,7 +39,7 @@ import type { GeometryAttribute } from '../GeometryBase';
  * @param  forcePickAll ignore ignorePicking
  */
 export function pickAll(
-  renderer: Renderer,
+  renderer: Renderer | Viewport,
   scene: Scene,
   camera: Camera,
   x: number,
@@ -29,12 +49,15 @@ export function pickAll(
 ): Intersection[] {
   const ray = new Ray();
   const ndc = new Vector2();
-  renderer.screenToNDC(x, y, ndc);
+
+  (renderer as Renderer).screenToNDC
+    ? (renderer as Renderer).screenToNDC(x, y, ndc)
+    : screenToNDC(x, y, renderer as Viewport, ndc);
   camera.castRay(ndc, ray);
 
   output = output || [];
 
-  intersectNode(renderer, camera, ray, ndc, scene, output, forcePickAll || false);
+  intersectNode(camera, ray, ndc, scene, output, forcePickAll || false);
 
   output.sort(intersectionCompareFunc);
 
@@ -59,7 +82,6 @@ export function pick(
 }
 
 function intersectNode(
-  renderer: Renderer,
   camera: Camera,
   ray: Ray,
   ndc: Vector2,
@@ -81,12 +103,12 @@ function intersectNode(
         renderable.geometry.pickByRay ||
         renderable.geometry.pick)
     ) {
-      intersectRenderable(renderer, camera, ray, ndc, renderable, out);
+      intersectRenderable(camera, ray, ndc, renderable, out);
     }
   }
   const childrenRef = node.childrenRef();
   for (let i = 0; i < childrenRef.length; i++) {
-    intersectNode(renderer, camera, ray, ndc, childrenRef[i], out, forcePickAll);
+    intersectNode(camera, ray, ndc, childrenRef[i], out, forcePickAll);
   }
 }
 
@@ -97,7 +119,6 @@ const ray = new Ray();
 const worldInverse = new Matrix4();
 
 function intersectRenderable(
-  renderer: Renderer,
   camera: Camera,
   rawRay: Ray,
   ndc: Vector2,
@@ -122,7 +143,7 @@ function intersectRenderable(
   }
   // Use user defined picking algorithm
   if (geometry.pick) {
-    geometry.pick(ndc.x, ndc.y, renderer, camera, renderable, out);
+    geometry.pick(ndc.x, ndc.y, camera, renderable, out);
     return;
   }
   // Use user defined ray picking algorithm
