@@ -162,6 +162,7 @@ class ProgramManager {
       return program;
     }
 
+    material.beforeCompileShader && material.beforeCompileShader();
     const _gl = renderer.gl;
     let commonDefineCode = '';
     if (isSkinnedMesh) {
@@ -188,18 +189,6 @@ class ProgramManager {
     let fragmentDefineStr = commonDefineCode + getDefineCode(fragmentDefines, enabledTextures);
     const versionStr = shader.version === 3 ? `#version 300 es\n` : '';
 
-    // const extensions = [
-    //   ['OES_standard_derivatives', 'STANDARD_DERIVATIVES'],
-    // ].filter(function (ext) {
-    //   return renderer.getWebGLExtension(ext[0]) != null;
-    // });
-
-    // for (let i = 0; i < extensions.length; i++) {
-    //   const extDefineCode = '\n#define SUPPORT_' + extensions[i][1];
-    //   fragmentDefineStr += extDefineCode;
-    //   vertexDefineStr += extDefineCode;
-    // }
-
     const vertexCode = versionStr + vertexDefineStr + '\n' + shader.vertex;
 
     const fragmentCode =
@@ -220,6 +209,8 @@ class ProgramManager {
     program.__error = errorMsg;
 
     cache[key] = program;
+
+    material.afterCompileShader && material.afterCompileShader();
 
     return program;
   }

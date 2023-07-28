@@ -72,6 +72,10 @@ export interface GLMaterialObject {
 
   getEnabledTextures?(): string[];
   getProgramKey?(): string;
+
+  // Hooks
+  beforeCompileShader?(): void;
+  afterCompileShader?(): void;
 }
 /**
  * A very basic renderable that is used in renderPass
