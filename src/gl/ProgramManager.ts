@@ -121,8 +121,10 @@ export function defaultGetMaterialProgramKey(
 class ProgramManager {
   private _pipeline: GLPipeline;
   private _cache: Record<string, GLProgram> = {};
-  constructor(renderer: GLPipeline) {
+  private _parallelExt: any;
+  constructor(renderer: GLPipeline, parallelExt: any) {
     this._pipeline = renderer;
+    this._parallelExt = parallelExt;
   }
 
   getProgram(
@@ -133,6 +135,8 @@ class ProgramManager {
   ) {
     const cache = this._cache;
     const renderer = this._pipeline;
+    const parallelExt = this._parallelExt;
+    const _gl = renderer.gl;
 
     const isSkinnedMesh = renderable.isSkinnedMesh && renderable.isSkinnedMesh();
     const isInstancedMesh = renderable.isInstancedMesh && renderable.isInstancedMesh();
@@ -159,11 +163,15 @@ class ProgramManager {
     let program = cache[key];
 
     if (program) {
+      if (program.__compiling) {
+        // Check compiling status
+        if (program.checkParallelCompiled(_gl, parallelExt)) {
+          program.updateLinkStatus(_gl);
+        }
+      }
       return program;
     }
 
-    material.beforeCompileShader && material.beforeCompileShader();
-    const _gl = renderer.gl;
     let commonDefineCode = '';
     if (isSkinnedMesh) {
       const skinDefines: Record<string, ShaderDefineValue> = {
@@ -205,14 +213,36 @@ class ProgramManager {
 
     program = new GLProgram();
     program.attributes = shader.attributes;
-    const errorMsg = program.buildProgram(_gl, shader, finalVertexCode, finalFragmentCode);
-    program.__error = errorMsg;
+    program.buildProgram(_gl, shader, finalVertexCode, finalFragmentCode);
+
+    if (parallelExt) {
+      program.__compiling = true;
+    } else {
+      program.updateLinkStatus(_gl);
+    }
 
     cache[key] = program;
 
-    material.afterCompileShader && material.afterCompileShader();
-
     return program;
+  }
+
+  isAllProgramCompiled() {
+    if (!this._parallelExt) {
+      return true;
+    }
+    const cache = this._cache;
+    const gl = this._pipeline.gl;
+    for (const key in cache) {
+      const program = cache[key];
+      if (program.__compiling) {
+        if (program.checkParallelCompiled(gl, this._parallelExt)) {
+          program.updateLinkStatus(gl);
+        } else {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 }
 

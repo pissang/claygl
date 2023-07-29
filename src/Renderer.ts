@@ -34,7 +34,6 @@ import GLPipeline, {
 import Texture from './Texture';
 import InstancedMesh from './InstancedMesh';
 import GeometryBase from './GeometryBase';
-import Texture2D from './Texture2D';
 
 const mat4Create = mat4.create;
 
@@ -128,6 +127,10 @@ export interface RendererOpts {
    * If throw context error, usually turned on in debug mode
    */
   throwError: boolean;
+  /**
+   * If use parallel shader compile.
+   */
+  parallelShaderCompile: boolean;
 }
 
 interface Renderer
@@ -211,7 +214,8 @@ class Renderer extends Notifier {
       }
       gl.targetRenderer = this;
       this._glPipeline = new GLPipeline(gl, {
-        throwError: opts.throwError
+        throwError: opts.throwError,
+        parallelShaderCompile: opts.parallelShaderCompile
       });
 
       this._width = opts.width || canvas.width || 100;
@@ -387,6 +391,10 @@ class Renderer extends Notifier {
     return this._glPipeline.getWebGLExtension(name);
   }
 
+  isAllProgramCompiled() {
+    return this._glPipeline.isAllProgramCompiled();
+  }
+
   /**
    * Render the scene in camera to the screen or binded offline framebuffer
    */
@@ -493,37 +501,44 @@ class Renderer extends Notifier {
       return globalMaterial || renderable.material;
     }
 
+    let unfinished = false;
     // Render skybox before anyother objects
     const skybox = scene.skybox;
     if (skybox) {
       skybox.update();
-      this._renderPass([skybox], camera, frameBuffer);
+      unfinished = unfinished || this._renderPass([skybox], camera, frameBuffer);
     }
 
     // Render opaque list
-    this._renderPass(
-      opaqueList,
-      camera,
-      frameBuffer,
-      {
-        getMaterial,
-        sortCompare: Renderer.opaqueSortCompare,
-        filter: opts.filter
-      },
-      scene
-    );
+    unfinished =
+      unfinished ||
+      this._renderPass(
+        opaqueList,
+        camera,
+        frameBuffer,
+        {
+          getMaterial,
+          sortCompare: Renderer.opaqueSortCompare,
+          filter: opts.filter
+        },
+        scene
+      );
 
-    this._renderPass(
-      transparentList,
-      camera,
-      frameBuffer,
-      {
-        getMaterial,
-        sortCompare: Renderer.transparentSortCompare,
-        filter: opts.filter
-      },
-      scene
-    );
+    unfinished =
+      unfinished ||
+      this._renderPass(
+        transparentList,
+        camera,
+        frameBuffer,
+        {
+          getMaterial,
+          sortCompare: Renderer.transparentSortCompare,
+          filter: opts.filter
+        },
+        scene
+      );
+
+    return unfinished;
   }
 
   /**
@@ -541,7 +556,7 @@ class Renderer extends Notifier {
     scene?: Scene
   ) {
     this._bindFrameBuffer(frameBuffer);
-    this._renderPass(list, camera, frameBuffer, renderHooks, scene);
+    return this._renderPass(list, camera, frameBuffer, renderHooks, scene);
   }
 
   /**
@@ -705,8 +720,10 @@ class Renderer extends Notifier {
     this._glPipeline.bindFrameBuffer(frameBuffer);
 
     renderHooks && renderHooks.prepare && renderHooks.prepare(gl);
-    this._glPipeline.render(list, assign(renderHooksForScene, renderHooks));
+    const unfinished = this._glPipeline.render(list, assign(renderHooksForScene, renderHooks));
     renderHooks && renderHooks.cleanup && renderHooks.cleanup(gl);
+
+    return unfinished;
   }
 
   getMaxJointNumber() {

@@ -45,8 +45,14 @@ class GLProgram {
 
   private _valueCache: Record<string, any> = {};
 
+  private _vertexShader?: WebGLShader;
+  private _fragmentShader?: WebGLShader;
+
   // Error message
   __error?: string;
+
+  // Used when using parallel compile
+  __compiling?: boolean;
 
   constructor() {}
 
@@ -60,7 +66,18 @@ class GLProgram {
   }
 
   isValid() {
-    return !!this._program;
+    return !!this._program && !this.__compiling;
+  }
+
+  isCompiling() {
+    return this.__compiling;
+  }
+
+  checkParallelCompiled(gl: WebGL2RenderingContext, parallelExt: any) {
+    return (
+      this._program &&
+      gl.getProgramParameter(this._program, parallelExt.COMPLETION_STATUS_KHR) == true
+    );
   }
 
   hasUniform(symbol: string) {
@@ -253,28 +270,46 @@ class GLProgram {
     }
     gl.linkProgram(program);
 
-    gl.deleteShader(vertexShader);
-    gl.deleteShader(fragmentShader);
-
     // Save code.
     this.vertexCode = vertexShaderCode;
     this.fragmentCode = fragmentShaderCode;
 
+    this._vertexShader = vertexShader;
+    this._fragmentShader = fragmentShader;
+    this._program = program;
+  }
+
+  updateLinkStatus(gl: WebGL2RenderingContext) {
+    const program = this._program;
+    const vertexShader = this._vertexShader;
+    const fragmentShader = this._fragmentShader;
+    const vertexShaderCode = this.vertexCode;
+    const fragmentShaderCode = this.fragmentCode;
+
+    if (!program) {
+      return;
+    }
+
+    let errMsg = '';
     if (!gl.getProgramParameter(program, constants.LINK_STATUS)) {
       // Only check after linked
       // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices#dont_check_shader_compile_status_unless_linking_fails
-      let msg = checkShaderErrorMsg(gl, vertexShader, vertexShaderCode);
+      let msg = checkShaderErrorMsg(gl, vertexShader!, vertexShaderCode);
       if (msg) {
-        return msg;
+        errMsg = msg;
       }
-      msg = checkShaderErrorMsg(gl, fragmentShader, fragmentShaderCode);
+      msg = checkShaderErrorMsg(gl, fragmentShader!, fragmentShaderCode);
       if (msg) {
-        return msg;
+        errMsg = msg;
       }
-
-      return 'Could not link program\n' + gl.getProgramInfoLog(program);
+      errMsg = 'Could not link program\n' + gl.getProgramInfoLog(program);
     }
-    this._program = program;
+
+    this.__error = errMsg;
+
+    gl.deleteShader(vertexShader!);
+    gl.deleteShader(fragmentShader!);
+    this._vertexShader = this._fragmentShader = undefined;
 
     // Cache uniform locations
     const numUniforms = gl.getProgramParameter(program, constants.ACTIVE_UNIFORMS);
@@ -287,6 +322,8 @@ class GLProgram {
         this._uniformLocations[symbol.replace('[0]', '')] = gl.getUniformLocation(program, symbol)!;
       }
     }
+
+    this.__compiling = false;
   }
 }
 

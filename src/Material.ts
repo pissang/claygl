@@ -105,11 +105,7 @@ type PickTextureUniforms<T extends Shader['uniformTpls']> = Pick<
   }[keyof T]
 >;
 
-interface Material extends Omit<MaterialOpts, 'shader'> {
-  // Hooks
-  beforeCompileShader?(): void;
-  afterCompileShader?(): void;
-}
+interface Material extends Omit<MaterialOpts, 'shader'> {}
 /**
  * Material defines the appearance of mesh surface, like `color`, `roughness`, `metalness`, etc.
  * It contains a {@link clay.Shader} and corresponding uniforms.

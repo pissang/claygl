@@ -72,10 +72,6 @@ export interface GLMaterialObject {
 
   getEnabledTextures?(): string[];
   getProgramKey?(): string;
-
-  // Hooks
-  beforeCompileShader?(): void;
-  afterCompileShader?(): void;
 }
 /**
  * A very basic renderable that is used in renderPass
@@ -218,6 +214,8 @@ class GLPipeline {
     pixelRatio: number;
   };
 
+  private _parallelShaderCompile?: any;
+
   throwError: boolean;
 
   maxJointNumber = 20;
@@ -226,14 +224,20 @@ class GLPipeline {
     gl: WebGL2RenderingContext,
     opts?: {
       throwError?: boolean;
+      parallelShaderCompile?: boolean;
     }
   ) {
     opts = opts || {};
     this.gl = gl;
     // Init managers
-    this._programMgr = new ProgramManager(this);
     this._glext = new GLExtension(gl, gl.getSupportedExtensions() || []);
     this.throwError = optional(opts.throwError, true);
+
+    if (opts.parallelShaderCompile) {
+      this._parallelShaderCompile = this._glext.getExtension('KHR_parallel_shader_compile');
+    }
+
+    this._programMgr = new ProgramManager(this, this._parallelShaderCompile || false);
   }
 
   setViewport(x: number, y: number, width: number, height: number, dpr: number) {
@@ -320,6 +324,8 @@ class GLPipeline {
     let currentBuffers: GLBuffers | undefined;
     let drawBuffersCount = 0;
 
+    let unfinished = false;
+
     for (let i = 0; i < list.length; i++) {
       const renderable = list[i];
 
@@ -332,6 +338,11 @@ class GLPipeline {
       const outputsNum = material.shader.outputs.length;
 
       let program = (renderable as ExtendedRenderableObject).__program;
+
+      if (program.isCompiling()) {
+        unfinished = true;
+        continue;
+      }
 
       // If has error in shader and program is invalid
       if (!program.isValid()) {
@@ -455,6 +466,8 @@ class GLPipeline {
       prevProgram = program;
       prevRenderable = renderable;
     }
+
+    return unfinished;
   }
 
   private _updatePrograms(list: GLRenderableObject[], renderHooks: GLRenderHooks) {
@@ -492,6 +505,10 @@ class GLPipeline {
 
       (renderable as ExtendedRenderableObject).__program = program;
     }
+  }
+
+  isAllProgramCompiled() {
+    return this._programMgr.isAllProgramCompiled();
   }
 
   getWebGLExtension(extName: string) {
