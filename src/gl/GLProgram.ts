@@ -21,7 +21,7 @@ function checkShaderErrorMsg(
   shaderString: string
 ) {
   if (!_gl.getShaderParameter(shader, constants.COMPILE_STATUS)) {
-    return [_gl.getShaderInfoLog(shader), addLineNumbers(shaderString)].join('\n');
+    return [addLineNumbers(shaderString), _gl.getShaderInfoLog(shader)].join('\n');
   }
 }
 
