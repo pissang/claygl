@@ -298,11 +298,15 @@ class GLProgram {
       if (msg) {
         errMsg = msg;
       }
-      msg = checkShaderErrorMsg(gl, fragmentShader!, fragmentShaderCode);
-      if (msg) {
-        errMsg = msg;
+      if (!errMsg) {
+        msg = checkShaderErrorMsg(gl, fragmentShader!, fragmentShaderCode);
+        if (msg) {
+          errMsg = msg;
+        }
       }
-      errMsg = 'Could not link program\n' + gl.getProgramInfoLog(program);
+      if (!errMsg) {
+        errMsg = 'Could not link program\n' + gl.getProgramInfoLog(program);
+      }
     }
 
     this.__error = errMsg;
