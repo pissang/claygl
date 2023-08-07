@@ -1,7 +1,6 @@
 import Texture, {
   getDefaultTextureFormatBySource,
   getDefaultTypeBySource,
-  isPixelSource,
   TextureOpts,
   TextureSource
 } from './Texture';
