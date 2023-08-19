@@ -1,5 +1,4 @@
-import { Plugin } from 'rollup';
-import { parse, ParserOptions } from '@babel/parser';
+import { parse } from '@babel/parser';
 import traverse from '@babel/traverse';
 import generate from '@babel/generator';
 function minify(code) {
@@ -19,13 +18,10 @@ function minify(code) {
  * so the tagged template expression won't be transpiled to function call.
  */
 export default function glslMinifyPlugin() {
-  /**
-   * @type {Plugin}
-   */
   return {
     name: 'glsl-minify',
     transform(code) {
-      if (!code.match(`glsl`)) return code;
+      if (!code.match(`glsl`)) return;
       try {
         const ast = parse(code, {
           sourceType: 'module'
@@ -41,10 +37,12 @@ export default function glslMinifyPlugin() {
             }
           }
         });
-        return generate(ast);
+        return generate(ast, {
+          sourceMaps: true
+        });
       } catch (e) {
         console.error(e);
-        return code;
+        return;
       }
     }
   };
