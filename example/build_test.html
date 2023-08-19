@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Build Test</title>
+  </head>
+  <body>
+    <style>
+      html,
+      body,
+      #main {
+        height: 100%;
+        margin: 0;
+      }
+    </style>
+    <div id="main"></div>
+    <script type="module">
+      import { App3D } from '../dist/claygl.es';
+      const app = new App3D('#main');
+
+      // Create camera
+      const camera = app.createCamera([0, 2, 5], [0, 0, 0]);
+
+      // Create cube
+      const cube = app.createCube({
+        color: '#f00'
+      });
+      // Create light
+      const mainLight = app.createDirectionalLight([-1, -1, -1]);
+
+      app.loop(() => {
+        cube.rotation.rotateY(app.frameTime / 1000);
+      });
+
+      window.onresize = function () {
+        app.resize();
+      };
+    </script>
+  </body>
+</html>

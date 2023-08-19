@@ -1,14 +1,8 @@
-import typescript from '@rollup/plugin-typescript';
-import glslMinifyPlugin from './build/glslMinifyPlugin';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 export default {
-  input: 'src/claygl.ts',
-  plugins: [
-    typescript({
-      target: 'ES6'
-    }),
-    glslMinifyPlugin()
-  ],
+  input: 'lib/claygl.js',
+  plugins: [nodeResolve()],
   output: [
     {
       format: 'umd',

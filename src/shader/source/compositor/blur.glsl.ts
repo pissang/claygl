@@ -4,32 +4,12 @@ import { clampSampleFunction, HDREncoderMixin } from '../util.glsl';
 const defaultGaussianKernelName = `gaussianKernel`;
 
 export const gaussianKernel9 = (kernelName: string = defaultGaussianKernelName) => glsl`
-float ${kernelName}[9];
-${kernelName}[0] = 0.07;
-${kernelName}[1] = 0.09;
-${kernelName}[2] = 0.12;
-${kernelName}[3] = 0.14;
-${kernelName}[4] = 0.16;
-${kernelName}[5] = 0.14;
-${kernelName}[6] = 0.12;
-${kernelName}[7] = 0.09;
-${kernelName}[8] = 0.07;`;
+float ${kernelName}[9] = float[9](0.07, 0.09, 0.12, 0.14, 0.16, 0.14, 0.12, 0.09, 0.07);
+`;
 
 export const gaussianKernel13 = (kernelName: string = defaultGaussianKernelName) => glsl`
-float ${kernelName}[13];
-${kernelName}[0] = 0.02;
-${kernelName}[1] = 0.03;
-${kernelName}[2] = 0.06;
-${kernelName}[3] = 0.08;
-${kernelName}[4] = 0.11;
-${kernelName}[5] = 0.13;
-${kernelName}[6] = 0.14;
-${kernelName}[7] = 0.13;
-${kernelName}[8] = 0.11;
-${kernelName}[9] = 0.08;
-${kernelName}[10] = 0.06;
-${kernelName}[11] = 0.03;
-${kernelName}[12] = 0.02;`;
+float ${kernelName}[13] = float[13](0.02, 0.03, 0.06, 0.08, 0.11, 0.13, 0.14, 0.13, 0.11, 0.08, 0.06, 0.03, 0.02);
+`;
 
 export const gaussianBlurCompositeFragment = new FragmentShader({
   name: 'gaussianBlurFrag',

@@ -33,8 +33,8 @@ vec2 uv2 = (gl_FragCoord.xy - viewport.xy) / viewport.zw;
 
 vec4 texel1 = texture(gBufferTexture1, uv);
 vec4 texel3 = texture(gBufferTexture3, uv);
-// Is empty
 if (dot(texel1.rgb, vec3(1.0)) == 0.0) {
+  // Is empty
     discard;
 }
 
