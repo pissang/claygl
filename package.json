@@ -18,8 +18,8 @@
   "sideEffects": false,
   "scripts": {
     "build": "npm run build:lib && npm run build:bundle",
-    "build:lib": "rm -rf lib  && npx tsc && node build/minifyGlsl.js",
-    "build:bundle": "rm -rf dist  && npx rollup -c && npx terser dist/claygl.js -c -m > dist/claygl.min.js",
+    "build:lib": "rm -rf lib  && tsc && node build/minifyGlsl.js",
+    "build:bundle": "rm -rf dist && rollup -c && terser dist/claygl.js -c -m > dist/claygl.min.js",
     "prepare": "npm run build",
     "prepare:nightly": "node build/prepareNightly.js",
     "prepare:nightly-next": "node build/prepareNightly.js --next",

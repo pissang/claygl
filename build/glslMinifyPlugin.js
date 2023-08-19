@@ -3,7 +3,8 @@ import traverse from '@babel/traverse';
 import generate from '@babel/generator';
 import { minify } from 'shader-minifier';
 
-const placeholder = '\n#pragma __placeholder__\n';
+const pragmaPlaceholder = '#pragma __placeholder__';
+const placeholder = `\n${pragmaPlaceholder}\n`;
 const placeholderInline = '__inline_placeholder__';
 // function minify(code) {
 //   return (
@@ -51,7 +52,16 @@ export default function glslMinifyPlugin() {
               }
             }
 
-            const transformedCode = minify(fullCode);
+            let transformedCode = minify(fullCode);
+            if (transformedCode.startsWith(pragmaPlaceholder)) {
+              // Add '\n' prefix
+              transformedCode = '\n' + transformedCode;
+            }
+            if (transformedCode.endsWith(pragmaPlaceholder)) {
+              // Add '\n' suffix
+              transformedCode += '\n';
+            }
+
             const transformedData = transformedCode.split(
               new RegExp([placeholder, placeholderInline].join('|'), 'g')
             );
@@ -69,7 +79,7 @@ export default function glslMinifyPlugin() {
           sourceMaps: true
         });
       } catch (e) {
-        // console.error(e);
+        console.error(e);
         return;
       }
     }
