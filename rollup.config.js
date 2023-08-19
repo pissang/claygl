@@ -1,11 +1,13 @@
 import typescript from '@rollup/plugin-typescript';
+import glslMinifyPlugin from './build/glslMinifyPlugin';
 
 export default {
   input: 'src/claygl.ts',
   plugins: [
     typescript({
-      target: 'ES5'
-    })
+      target: 'ES6'
+    }),
+    glslMinifyPlugin()
   ],
   output: [
     {

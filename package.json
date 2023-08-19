@@ -33,6 +33,10 @@
     "url": "https://github.com/pissang/claygl.git"
   },
   "devDependencies": {
+    "@babel/generator": "^7.22.10",
+    "@babel/parser": "^7.22.10",
+    "@babel/traverse": "^7.22.10",
+    "@rollup/plugin-typescript": "^8.3.2",
     "@types/dat.gui": "^0.7.7",
     "@types/stats.js": "^0.17.0",
     "@typescript-eslint/eslint-plugin": "^5.20.0",
@@ -46,7 +50,6 @@
     "stats.js": "^0.17.0",
     "terser": "^5.12.1",
     "typescript": "^4.9.5",
-    "@rollup/plugin-typescript": "^8.3.2",
     "vite": "^2.9.6"
   },
   "dependencies": {
