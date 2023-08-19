@@ -55,6 +55,7 @@
     "vite": "^2.9.6"
   },
   "dependencies": {
+    "shader-minifier": "^0.0.1",
     "tslib": "^2.5.0"
   }
 }
