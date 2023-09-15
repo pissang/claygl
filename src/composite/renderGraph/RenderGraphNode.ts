@@ -10,6 +10,7 @@ import type Renderer from '../../Renderer';
 import type Texture from '../../Texture';
 import Texture2D from '../../Texture2D';
 import CompositeNode from '../CompositeNode';
+import FilterCompositeNode from '../FilterNode';
 import { GroupOutput } from '../GroupNode';
 import { TexturePoolParameters, texturePropList } from '../TexturePool';
 import type RenderGraph from './RenderGraph';
@@ -256,11 +257,24 @@ class RenderGraphNode {
         // PENDING
         assign(texture, parameters);
       }
-      const attachment = outputInfo.attachment || COLOR_ATTACHMENT0 + idx;
 
       outputTextures[outputName] = texture;
       MRTOutputTextures![outputName] = texture;
+    });
 
+    // The MRTOutputTextures follows the order of assigning node.outputs. It's easily to get wrong with the order of frag.outputs.
+    // Align them
+    (compositeNode instanceof FilterCompositeNode && outputNames.length > 0
+      ? compositeNode.pass.material.shader.outputs
+      : outputNames
+    ).forEach((outputName, idx) => {
+      const outputInfo = compositeNode.outputs![outputName];
+      if (!outputInfo) {
+        // When outputName is from compositeNode.pass.material.shader.outputs
+        return;
+      }
+      const texture = MRTOutputTextures![outputName];
+      const attachment = outputInfo.attachment || COLOR_ATTACHMENT0 + idx;
       // FIXME attachment changes in different nodes
       sharedFrameBuffer!.attach(texture, +attachment);
     });
