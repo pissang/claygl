@@ -48,5 +48,8 @@
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-watch": "^4.3.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "esprima": "^4.0.1",
+    "math-expression-evaluator": "^2.0.3"
+  }
 }

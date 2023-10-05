@@ -7,6 +7,10 @@ import Shader from './Shader';
 import Texture from './Texture';
 import Texture2D from './Texture2D';
 import TextureCube from './TextureCube';
+import * as esprimaLoad from 'esprima'
+const esprima = esprimaLoad.default?esprimaLoad.default:esprimaLoad;
+import * as mexpLoad from 'math-expression-evaluator';
+const Mexp = mexpLoad.default?mexpLoad.default:mexpLoad;
 
 import registerBuiltinCompositor from './shader/registerBuiltinCompositor';
 
@@ -144,7 +148,7 @@ function createNode(nodeInfo, lib, opts) {
                     else {
                         node.on(
                             'beforerender', createSizeSetHandler(
-                                name, tryConvertExpr(val)
+                                name, getSafeExpressionEvaluator(val)
                             )
                         );
                     }
@@ -197,7 +201,7 @@ function convertParameter(paramInfo) {
                 if (typeof val === 'string') {
                     val = val.trim();
                     param[name] = createSizeParser(
-                        name, tryConvertExpr(val), sizeScale
+                        name, getSafeExpressionEvaluator(val), sizeScale
                     );
                 }
                 else {
@@ -289,21 +293,57 @@ function createSizeParser(name, exprFunc, scale) {
     };
 }
 
-function tryConvertExpr(string) {
-    // PENDING
-    var exprRes = /^expr\((.*)\)$/.exec(string);
-    if (exprRes) {
-        try {
-            var func = new Function('width', 'height', 'dpr', 'return ' + exprRes[1]);
-            // Try run t
-            func(1, 1);
-
-            return func;
-        }
-        catch (e) {
-            throw new Error('Invalid expression.');
-        }
+function astToMathExpression(node, context) {
+    switch (node.type) {
+        case 'BinaryExpression':
+            let left = astToMathExpression(node.left, context);
+            let right = astToMathExpression(node.right, context);
+            return `(${left} ${node.operator} ${right})`;
+        case 'Literal':
+            return node.value;
+        case 'Identifier':
+            if (['width', 'height', 'dpr'].includes(node.name)) {
+                return context[node.name];
+            }
+            throw new Error(`Unknown identifier: ${node.name}`);
+        default:
+            throw new Error(`Unsupported node type: ${node.type}`);
     }
 }
+
+function getSafeExpressionEvaluator(expression) {
+    if (!expression) return;
+    var exprRes = /^expr\((.*)\)$/.exec(expression);
+    if (!exprRes) return;
+
+    const ast = esprima.parseScript(exprRes[1]);
+
+    const func = function(width, height, dpr) {
+        const context = { width, height, dpr };
+        const mexp = new Mexp()
+        // Handle array of expressions
+        if (ast.body[0].type === 'ExpressionStatement' && ast.body[0].expression.type === 'ArrayExpression') {
+            return ast.body[0].expression.elements.map(element => {
+                const mathExpression = astToMathExpression(element, context);
+                return mexp.eval(mathExpression);
+            });
+        }
+
+        // Handle single expression
+        const mathExpression = astToMathExpression(ast.body[0].expression, context);
+        return mexp.eval(mathExpression);
+    };
+
+    // Try run t
+    try {
+        func(1, 1);
+        return func;
+    }
+    catch (e) {
+        throw new Error('Invalid expression.');
+    }
+
+}
+
 
 export default createCompositor;
