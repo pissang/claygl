@@ -233,11 +233,12 @@ class GLPipeline {
     this._glext = new GLExtension(gl, gl.getSupportedExtensions() || []);
     this.throwError = optional(opts.throwError, true);
 
-    if (opts.parallelShaderCompile) {
-      this._parallelShaderCompile = this._glext.getExtension('KHR_parallel_shader_compile');
-    }
-
-    this._programMgr = new ProgramManager(this, this._parallelShaderCompile || false);
+    this._programMgr = new ProgramManager(
+      this,
+      opts.parallelShaderCompile
+        ? this._glext.getExtension('KHR_parallel_shader_compile')
+        : undefined
+    );
   }
 
   setViewport(x: number, y: number, width: number, height: number, dpr: number) {

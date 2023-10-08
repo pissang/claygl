@@ -129,6 +129,8 @@ export interface RendererOpts {
   throwError: boolean;
   /**
    * If use parallel shader compile.
+   * We still need to set shader.parallelCompile to true
+   * to enable the specified shader manually
    */
   parallelShaderCompile: boolean;
 }

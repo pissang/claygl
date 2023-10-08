@@ -215,7 +215,7 @@ class ProgramManager {
     program.attributes = shader.attributes;
     program.buildProgram(_gl, shader, finalVertexCode, finalFragmentCode);
 
-    if (parallelExt) {
+    if (parallelExt && shader.parallelCompile) {
       program.__compiling = true;
     } else {
       program.updateLinkStatus(_gl);

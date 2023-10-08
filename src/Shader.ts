@@ -610,6 +610,12 @@ export class Shader<
 
   private readonly _shaderID: string;
 
+  /**
+   * If enable parallel compile.
+   * Only available when renderer#parallelShaderCompile is true.
+   */
+  parallelCompile?: boolean;
+
   version: 3 = 3;
 
   get shaderID() {
