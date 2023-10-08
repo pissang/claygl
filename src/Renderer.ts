@@ -419,6 +419,11 @@ class Renderer extends Notifier {
        * Filter the renderable
        */
       filter?: (renderable: Renderable) => boolean;
+      /**
+       * If waiting for all shaders compiled. Available when parallelShaderCompile is true.
+       * Default to be false, it will render the meshes that has finishing compiling shader eargerly.
+       */
+      waitForAllShadersCompiled?: boolean;
     }
   ) {
     const gl = this.gl;
@@ -483,8 +488,11 @@ class Renderer extends Notifier {
     const transparentList = renderList.transparent;
     const globalMaterial = opts.globalMaterial || scene.material;
 
+    const passOpts = {
+      waitForAllShadersCompiled: opts.waitForAllShadersCompiled
+    };
     // Render pre z
-    preZ && this.renderPreZ(opaqueList, camera, frameBuffer);
+    preZ && this.renderPreZ(opaqueList, camera, frameBuffer, passOpts);
     gl.depthFunc(preZ ? constants.LEQUAL : constants.LESS);
 
     // Update the depth of transparent list.
@@ -521,7 +529,8 @@ class Renderer extends Notifier {
           sortCompare: Renderer.opaqueSortCompare,
           filter: opts.filter
         },
-        scene
+        scene,
+        passOpts
       );
 
     unfinished =
@@ -535,7 +544,8 @@ class Renderer extends Notifier {
           sortCompare: Renderer.transparentSortCompare,
           filter: opts.filter
         },
-        scene
+        scene,
+        passOpts
       );
 
     return unfinished;
@@ -553,10 +563,13 @@ class Renderer extends Notifier {
     camera?: Camera,
     frameBuffer?: FrameBuffer,
     renderHooks?: RenderHooks,
-    scene?: Scene
+    scene?: Scene,
+    opts?: {
+      waitForAllShadersCompiled?: boolean;
+    }
   ) {
     this._bindFrameBuffer(frameBuffer);
-    return this._renderPass(list, camera, frameBuffer, renderHooks, scene);
+    return this._renderPass(list, camera, frameBuffer, renderHooks, scene, opts);
   }
 
   /**
@@ -585,7 +598,10 @@ class Renderer extends Notifier {
     camera?: Camera,
     frameBuffer?: FrameBuffer,
     renderHooks?: RenderHooks,
-    scene?: Scene
+    scene?: Scene,
+    opts?: {
+      waitForAllShadersCompiled?: boolean;
+    }
   ) {
     let worldM: mat4.Mat4Array;
     const viewport = this._glPipeline.getViewport();
@@ -720,7 +736,11 @@ class Renderer extends Notifier {
     this._glPipeline.bindFrameBuffer(frameBuffer);
 
     renderHooks && renderHooks.prepare && renderHooks.prepare(gl);
-    const unfinished = this._glPipeline.render(list, assign(renderHooksForScene, renderHooks));
+    const unfinished = this._glPipeline.render(
+      list,
+      assign(renderHooksForScene, renderHooks),
+      opts
+    );
     renderHooks && renderHooks.cleanup && renderHooks.cleanup(gl);
 
     return unfinished;
@@ -734,7 +754,14 @@ class Renderer extends Notifier {
     this._glPipeline.maxJointNumber = val;
   }
 
-  renderPreZ(list: GLRenderableObject<Material>[], camera: Camera, frameBuffer?: FrameBuffer) {
+  renderPreZ(
+    list: GLRenderableObject<Material>[],
+    camera: Camera,
+    frameBuffer?: FrameBuffer,
+    opts?: {
+      waitForAllShadersCompiled?: boolean;
+    }
+  ) {
     const _gl = this.gl;
     const preZPassMaterial =
       this._prezMaterial || new Material(new Shader(preZVertex, preZFragment));
@@ -750,39 +777,46 @@ class Renderer extends Notifier {
     _gl.depthMask(true);
 
     // Status
-    this._renderPass(list, camera, frameBuffer, {
-      filter(renderable) {
-        return !renderable.ignorePreZ;
-      },
-      isMaterialChanged(renderable, prevRenderable) {
-        const matA = renderable.material;
-        const matB = prevRenderable.material;
-        return (
-          matA.get('diffuseMap') !== matB.get('diffuseMap') ||
-          (matA.get('alphaCutoff') || 0) !== (matB.get('alphaCutoff') || 0)
-        );
-      },
-      getMaterialUniform(renderable, depthMaterial, symbol) {
-        const material = renderable.material;
-        if (symbol === 'alphaMap') {
-          return material.get('diffuseMap');
-        } else if (symbol === 'alphaCutoff') {
-          if (material.isDefined('fragment', 'ALPHA_TEST') && material.get('diffuseMap')) {
-            const alphaCutoff = material.get('alphaCutoff');
-            return alphaCutoff || 0;
+    this._renderPass(
+      list,
+      camera,
+      frameBuffer,
+      {
+        filter(renderable) {
+          return !renderable.ignorePreZ;
+        },
+        isMaterialChanged(renderable, prevRenderable) {
+          const matA = renderable.material;
+          const matB = prevRenderable.material;
+          return (
+            matA.get('diffuseMap') !== matB.get('diffuseMap') ||
+            (matA.get('alphaCutoff') || 0) !== (matB.get('alphaCutoff') || 0)
+          );
+        },
+        getMaterialUniform(renderable, depthMaterial, symbol) {
+          const material = renderable.material;
+          if (symbol === 'alphaMap') {
+            return material.get('diffuseMap');
+          } else if (symbol === 'alphaCutoff') {
+            if (material.isDefined('fragment', 'ALPHA_TEST') && material.get('diffuseMap')) {
+              const alphaCutoff = material.get('alphaCutoff');
+              return alphaCutoff || 0;
+            }
+            return 0;
+          } else if (symbol === 'uvRepeat' || symbol === 'uvOffset') {
+            return material.get(symbol);
+          } else {
+            return depthMaterial.get(symbol);
           }
-          return 0;
-        } else if (symbol === 'uvRepeat' || symbol === 'uvOffset') {
-          return material.get(symbol);
-        } else {
-          return depthMaterial.get(symbol);
-        }
+        },
+        getMaterial() {
+          return preZPassMaterial;
+        },
+        sortCompare: Renderer.opaqueSortCompare
       },
-      getMaterial() {
-        return preZPassMaterial;
-      },
-      sortCompare: Renderer.opaqueSortCompare
-    });
+      undefined,
+      opts
+    );
 
     _gl.colorMask(true, true, true, true);
     _gl.depthMask(true);

@@ -291,8 +291,15 @@ class GLPipeline {
    * @param list List of all renderables.
    * @param renderHooks
    */
-  render(list: GLRenderableObject[], renderHooks?: GLRenderHooks) {
+  render(
+    list: GLRenderableObject[],
+    renderHooks?: GLRenderHooks,
+    opts?: {
+      waitForAllShadersCompiled?: boolean;
+    }
+  ) {
     renderHooks = renderHooks || {};
+    opts = opts || {};
     renderHooks.getMaterial = renderHooks.getMaterial || defaultGetMaterial;
     renderHooks.getMaterialUniform = renderHooks.getMaterialUniform || defaultGetUniform;
     // PENDING Better solution?
@@ -303,7 +310,12 @@ class GLPipeline {
     const ifRenderObject = renderHooks.filter || defaultIfRender;
     const isBoundToFramebuffer = this._framebuffer;
 
-    this._updatePrograms(list, renderHooks);
+    const hasProgramCompiling = this._updatePrograms(list, renderHooks);
+
+    if (hasProgramCompiling && opts.waitForAllShadersCompiled) {
+      return true;
+    }
+
     if (renderHooks.sortCompare) {
       (list as ExtendedRenderableObject[]).sort(renderHooks.sortCompare);
     }
@@ -324,8 +336,6 @@ class GLPipeline {
     let currentBuffers: GLBuffers | undefined;
     let drawBuffersCount = 0;
 
-    let unfinished = false;
-
     for (let i = 0; i < list.length; i++) {
       const renderable = list[i];
 
@@ -338,11 +348,6 @@ class GLPipeline {
       const outputsNum = material.shader.outputs.length;
 
       let program = (renderable as ExtendedRenderableObject).__program;
-
-      if (program.isCompiling()) {
-        unfinished = true;
-        continue;
-      }
 
       // If has error in shader and program is invalid
       if (!program.isValid()) {
@@ -467,11 +472,12 @@ class GLPipeline {
       prevRenderable = renderable;
     }
 
-    return unfinished;
+    return hasProgramCompiling;
   }
 
   private _updatePrograms(list: GLRenderableObject[], renderHooks: GLRenderHooks) {
     const getMaterial = renderHooks.getMaterial || defaultGetMaterial;
+    let hasProgramCompiling = false;
     for (let i = 0; i < list.length; i++) {
       const renderable = list[i];
       const renderMaterial = getMaterial.call(this, renderable);
@@ -504,7 +510,12 @@ class GLPipeline {
       this._validateProgram(program);
 
       (renderable as ExtendedRenderableObject).__program = program;
+      if (program.isCompiling()) {
+        hasProgramCompiling = true;
+      }
     }
+
+    return hasProgramCompiling;
   }
 
   isAllProgramCompiled() {
