@@ -156,7 +156,7 @@ function intersectRenderable(
     (renderable.cullFace === constants.BACK && renderable.frontFace === constants.CCW) ||
     (renderable.cullFace === constants.FRONT && renderable.frontFace === constants.CW);
 
-  let point;
+  let hit;
   const indices = geometry.indices;
   const positionAttr = geometry.attributes.position;
   const weightAttr = geometry.attributes.weight;
@@ -202,6 +202,8 @@ function intersectRenderable(
     }
   }
 
+  const hitPoint = new Vector3();
+  const barycenteric = new Vector3();
   for (let i = 0; i < indices.length; i += 3) {
     const i1 = indices[i];
     const i2 = indices[i + 1];
@@ -211,23 +213,25 @@ function intersectRenderable(
     finalPosAttr.get(i2, v2.array);
     finalPosAttr.get(i3, v3.array);
 
+    let isHit = false;
     if (cullBack) {
-      point = ray.intersectTriangle(v1, v2, v3, renderable.culling);
+      isHit = ray.intersectTriangle(v1, v2, v3, renderable.culling, hitPoint, barycenteric);
     } else {
-      point = ray.intersectTriangle(v1, v3, v2, renderable.culling);
+      isHit = ray.intersectTriangle(v1, v3, v2, renderable.culling, hitPoint, barycenteric);
     }
-    if (point) {
+    if (isHit) {
       const pointW = new Vector3();
       if (!isSkinnedMesh) {
-        Vector3.transformMat4(pointW, point, renderable.worldTransform);
+        Vector3.transformMat4(pointW, hitPoint, renderable.worldTransform);
       } else {
         // TODO point maybe not right.
-        Vector3.copy(pointW, point);
+        Vector3.copy(pointW, hitPoint);
       }
       out.push(
         new Intersection(
-          point,
+          hitPoint.clone(),
           pointW,
+          barycenteric.clone(),
           renderable,
           [i1, i2, i3],
           i / 3,
@@ -252,6 +256,10 @@ export class Intersection {
    */
   pointWorld: Vector3;
   /**
+   * Barycentric coord
+   */
+  barycentric: Vector3;
+  /**
    * Intersection scene node
    */
   target: ClayNode;
@@ -271,6 +279,7 @@ export class Intersection {
   constructor(
     point: Vector3,
     pointWorld: Vector3,
+    barycentric: Vector3,
     target: ClayNode,
     triangle: number[],
     triangleIndex: number,
@@ -282,5 +291,6 @@ export class Intersection {
     this.triangle = triangle;
     this.triangleIndex = triangleIndex;
     this.distance = distance;
+    this.barycentric = barycentric;
   }
 }

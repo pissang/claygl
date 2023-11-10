@@ -204,7 +204,7 @@ class Ray {
     bIn: Vector3,
     cIn: Vector3,
     singleSided: boolean,
-    out?: Vector3,
+    out: Vector3,
     barycenteric?: Vector3
   ) {
     const dir = this.direction.array;
@@ -222,43 +222,40 @@ class Ray {
 
     if (singleSided) {
       if (det > -EPSILON) {
-        return null;
+        return false;
       }
     } else {
       if (det > -EPSILON && det < EPSILON) {
-        return null;
+        return false;
       }
     }
 
     vec3.sub(AO, origin, a);
     const u = vec3.dot(vCross, AO) / det;
     if (u < 0 || u > 1) {
-      return null;
+      return false;
     }
 
     vec3.cross(vCross, eBA, AO);
     const v = vec3.dot(dir, vCross) / det;
 
     if (v < 0 || v > 1 || u + v > 1) {
-      return null;
+      return false;
     }
 
     vec3.cross(vCross, eBA, eCA);
     const t = -vec3.dot(AO, vCross) / det;
 
     if (t < 0) {
-      return null;
+      return false;
     }
 
-    if (!out) {
-      out = new Vector3();
-    }
     if (barycenteric) {
       Vector3.set(barycenteric, 1 - u - v, u, v);
     }
     vec3.scaleAndAdd(out.array, origin, dir, t);
 
-    return out;
+    return true;
   }
 
   /**
