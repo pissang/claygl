@@ -124,6 +124,10 @@ export interface RendererOpts {
    */
   preserveDrawingBuffer: boolean;
   /**
+   * Power preference
+   */
+  powerPreference: 'high-performance' | 'low-power' | 'default';
+  /**
    * If throw context error, usually turned on in debug mode
    */
   throwError: boolean;
@@ -199,7 +203,8 @@ class Renderer extends Notifier {
         stencil: opts.stencil || false,
         antialias: optional(opts.antialias, true),
         premultipliedAlpha: optional(opts.premultipliedAlpha, true),
-        preserveDrawingBuffer: optional(opts.preserveDrawingBuffer, false)
+        preserveDrawingBuffer: optional(opts.preserveDrawingBuffer, false),
+        powerPreference: opts.powerPreference || 'default'
       };
 
       const gl = (this.gl = canvas.getContext(
