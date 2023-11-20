@@ -129,7 +129,7 @@ export function prefilterEnvironmentMap(
       );
 
       const camera = envMapPass.getCamera(cubeTargets[j]);
-      camera.fov = fov;
+      camera.projection.fov = fov;
       renderer.render(dummyScene, camera, frameBuffer);
     }
   }

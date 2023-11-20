@@ -1,4 +1,4 @@
-import PerspectiveCamera from '../camera/Perspective';
+import Camera from '../Camera';
 import Matrix4 from '../math/Matrix4';
 import type ClayNode from '../Node';
 
@@ -7,23 +7,24 @@ const tmpProjectionMatrix = new Matrix4();
 class StereoCamera {
   aspect = 0.5;
 
-  _leftCamera = new PerspectiveCamera();
+  _leftCamera = new Camera('perspective');
 
-  _rightCamera = new PerspectiveCamera();
+  _rightCamera = new Camera('perspective');
 
   _eyeLeft = new Matrix4();
   _eyeRight = new Matrix4();
 
   _frameData: any;
 
-  updateFromCamera(camera: PerspectiveCamera, focus: number, zoom: number, eyeSep: number) {
+  updateFromCamera(camera: Camera<'perspective'>, focus: number, zoom: number, eyeSep: number) {
     focus = focus == null ? 10 : focus;
     zoom = zoom == null ? 1 : zoom;
     eyeSep = eyeSep == null ? 0.064 : eyeSep;
 
-    const fov = camera.fov;
-    const aspect = camera.aspect * this.aspect;
-    const near = camera.near;
+    const proj = camera.projection;
+    const fov = proj.fov;
+    const aspect = proj.aspect * this.aspect;
+    const near = proj.near;
 
     // Off-axis stereoscopic effect based on
     // http://paulbourke.net/stereographics/stereorender/

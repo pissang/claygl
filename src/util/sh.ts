@@ -185,7 +185,7 @@ export function projectEnvironmentMap(
   for (let i = 0; i < cubeTargets.length; i++) {
     cubePixels[cubeTargets[i]] = new Uint8Array(width * height * 4);
     const camera = envMapPass.getCamera(cubeTargets[i]);
-    camera.fov = 90;
+    camera.projection.fov = 90;
     framebuffer.attach(rgbmTexture);
     renderer.render(dummyScene, camera, framebuffer);
     renderer.gl.readPixels(
