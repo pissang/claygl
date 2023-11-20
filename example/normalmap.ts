@@ -1,21 +1,21 @@
 import {
   Renderer,
   Scene,
-  PerspectiveCamera,
   CubeGeometry,
   createStandardShader,
   Material,
   Texture2D,
   Mesh,
   DirectionalLight,
-  Vector3
+  Vector3,
+  Camera
 } from 'claygl';
 
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement
 });
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect(),
   far: 500
 });

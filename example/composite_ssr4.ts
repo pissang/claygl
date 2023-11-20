@@ -1,6 +1,5 @@
 import {
   Renderer,
-  PerspectiveCamera,
   Vector3,
   Mesh,
   OrbitControl,
@@ -11,7 +10,8 @@ import {
   loadGLTF,
   SpotLight,
   AmbientLight,
-  createCompositeNodeInput
+  createCompositeNodeInput,
+  Camera
 } from 'claygl';
 import { blendCompositeFragment } from 'claygl/shaders';
 import GBufferNode from './common/HDComposite/GBufferNode';
@@ -38,7 +38,7 @@ const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
   pixelRatio: 1.0
 });
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect(),
   far: 100
 });

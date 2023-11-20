@@ -1,6 +1,5 @@
 import {
   Renderer,
-  PerspectiveCamera,
   Scene,
   CubeGeometry,
   Material,
@@ -11,7 +10,8 @@ import {
   startTimeline,
   Vector3,
   Plane,
-  pickByRay
+  pickByRay,
+  Camera
 } from 'claygl';
 import ClayNode from '../src/Node';
 const renderer = new Renderer({
@@ -20,8 +20,8 @@ const renderer = new Renderer({
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 
-const camera = new PerspectiveCamera();
-camera.aspect = renderer.getViewportAspect();
+const camera = new Camera('perspective');
+camera.projection.aspect = renderer.getViewportAspect();
 camera.position.z = 10;
 
 const scene = new Scene();

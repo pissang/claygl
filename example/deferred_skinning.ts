@@ -9,7 +9,6 @@ import {
   createUnlitShader,
   Mesh,
   loadGLTF,
-  PerspectiveCamera,
   Vector3,
   OrbitControl,
   DirectionalLight,
@@ -17,7 +16,8 @@ import {
   PlaneGeometry,
   StandardMaterial,
   startTimeline,
-  constants
+  constants,
+  Camera
 } from 'claygl';
 
 function createSkeletonDebugScene(skeleton: Skeleton) {
@@ -75,14 +75,14 @@ loadGLTF('assets/models/whale/whale-anim.gltf').then((res) => {
   const scene = res.scene!;
   const skeleton = res.skeletons[0];
   const animator = res.animators[0];
-  const camera = new PerspectiveCamera({
+  const camera = new Camera('perspective', {
     aspect: renderer.getViewportAspect()
   });
 
   camera.position.set(0, 10, 30);
   camera.lookAt(new Vector3(0, 2, 0));
 
-  camera.aspect = renderer.canvas.width / renderer.canvas.height;
+  camera.projection.aspect = renderer.canvas.width / renderer.canvas.height;
 
   const control = new OrbitControl({
     target: camera,

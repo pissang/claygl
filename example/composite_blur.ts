@@ -1,7 +1,6 @@
 import {
   Renderer,
   Scene,
-  PerspectiveCamera,
   Material,
   createLambertShader,
   SceneCompositeNode,
@@ -11,7 +10,8 @@ import {
   Mesh,
   Vector3,
   DirectionalLight,
-  startTimeline
+  startTimeline,
+  Camera
 } from 'claygl';
 import GaussianBlurCompositeNode from './common/HDComposite/GaussianBlurNode';
 
@@ -23,7 +23,7 @@ const renderer = new Renderer({
 });
 //Create scene
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.canvas.width / renderer.canvas.height,
   far: 500
 });

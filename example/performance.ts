@@ -6,8 +6,8 @@ import {
   Scene,
   Mesh,
   Material,
-  OrthographicCamera,
-  CubeGeometry
+  CubeGeometry,
+  Camera
 } from 'claygl';
 import Stats from 'stats.js';
 
@@ -25,7 +25,7 @@ document.body.appendChild(stats.dom);
 const cubeGeo = new CubeGeometry();
 
 const scene = new Scene();
-const camera = new OrthographicCamera({
+const camera = new Camera('orthographic', {
   left: -width / 2,
   right: width / 2,
   top: height / 2,

@@ -75,14 +75,24 @@ class Camera<T extends CameraProjectionTypes = CameraProjectionTypes> extends Cl
    */
   offset = new Vector2();
 
-  constructor(type: CameraProjectionTypes = 'perspective') {
+  /**
+   * @param type Default to be perspective
+   */
+  constructor(type?: T, opts?: Omit<Partial<Projections[T]>, 'type'>) {
     super();
     // TODO
     this.projection = (
-      type === 'perspective'
-        ? new CameraPerspectiveProjection()
-        : new CameraOrthographicProjection()
+      type === 'orthographic'
+        ? new CameraOrthographicProjection()
+        : new CameraPerspectiveProjection()
     ) as Projections[T];
+
+    Object.keys(opts || {}).forEach((key) => {
+      const val = (opts as any)[key];
+      if (!isNaN(val)) {
+        (this.projection as any)[key] = val;
+      }
+    });
   }
 
   update() {

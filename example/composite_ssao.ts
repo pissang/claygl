@@ -1,7 +1,6 @@
 import {
   Renderer,
   Scene,
-  PerspectiveCamera,
   Compositor,
   Mesh,
   startTimeline,
@@ -13,7 +12,8 @@ import {
   AmbientSHLight,
   textureUtil,
   AmbientCubemapLight,
-  Skybox
+  Skybox,
+  Camera
 } from 'claygl';
 import { blendCompositeFragment, composeCompositeFragment } from 'claygl/shaders';
 import { projectEnvironmentMap } from '../src/util/sh';
@@ -26,7 +26,7 @@ const renderer = new Renderer({
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 
-const camera = new PerspectiveCamera({
+const camera = new Camera(('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 0, 6);

@@ -1,6 +1,5 @@
 import {
   Renderer,
-  PerspectiveCamera,
   DeferredRenderer,
   Scene,
   loadGLTF,
@@ -13,13 +12,14 @@ import {
   Mesh,
   OrbitControl,
   startTimeline,
-  constants
+  constants,
+  Camera
 } from 'claygl';
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement
 });
 renderer.resize(window.innerWidth, window.innerHeight);
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 0, 6);
@@ -96,5 +96,5 @@ startTimeline((deltaTime) => {
 
 window.onresize = function () {
   renderer.resize(window.innerWidth, window.innerHeight);
-  camera.aspect = renderer.getViewportAspect();
+  camera.projection.aspect = renderer.getViewportAspect();
 };

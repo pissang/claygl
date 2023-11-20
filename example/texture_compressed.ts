@@ -5,11 +5,11 @@ import {
   Material,
   PlaneGeometry,
   Scene,
-  OrthographicCamera,
   Texture2D,
   constants,
   VertexShader,
-  glsl
+  glsl,
+  Camera
 } from 'claygl';
 import { outputTextureFragment } from 'claygl/shaders';
 
@@ -57,7 +57,7 @@ function createRect(texture: Texture2D, x: number, y: number, width: number, hei
 
 const renderer = new Renderer({ canvas });
 const scene = new Scene();
-const camera = new OrthographicCamera();
+const camera = new Camera('orthographic');
 
 let x = 0;
 let y = 10;

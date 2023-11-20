@@ -1,7 +1,6 @@
 import {
   Renderer,
   Scene,
-  PerspectiveCamera,
   Compositor,
   Texture2D,
   Mesh,
@@ -14,7 +13,8 @@ import {
   SphereGeometry,
   PointLight,
   FilterCompositeNode,
-  Skybox
+  Skybox,
+  Camera
 } from 'claygl';
 import LightingCompositeNode from './common/HDComposite/LightingNode';
 import { composeCompositeFragment } from 'claygl/shaders';
@@ -29,7 +29,7 @@ const renderer = new Renderer({
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 0, 6);

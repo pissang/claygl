@@ -1,7 +1,6 @@
 import {
   Renderer,
   DeferredRenderer,
-  PerspectiveCamera,
   Scene,
   loadGLTF,
   Mesh,
@@ -12,7 +11,8 @@ import {
   SphereGeometry,
   OrbitControl,
   startTimeline,
-  constants
+  constants,
+  Camera
 } from 'claygl';
 
 import Stats from 'stats.js';
@@ -25,7 +25,7 @@ const renderer = new Renderer({
 renderer.resize(window.innerWidth, window.innerHeight);
 const deferredRenderer = new DeferredRenderer();
 
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   far: 10000,
   aspect: renderer.getViewportAspect()
 });

@@ -1,7 +1,6 @@
 import {
   Renderer,
   ShadowMapPass,
-  PerspectiveCamera,
   CubeGeometry,
   Scene,
   Mesh,
@@ -10,7 +9,8 @@ import {
   SpotLight,
   Vector3,
   PlaneGeometry,
-  startTimeline
+  startTimeline,
+  Camera
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -21,7 +21,7 @@ const renderer = new Renderer({
 const shadowMapPass = new ShadowMapPass();
 
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect(),
   far: 100
 });

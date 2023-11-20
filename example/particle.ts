@@ -1,7 +1,6 @@
 import {
   Renderer,
   Scene,
-  PerspectiveCamera,
   PlaneGeometry,
   Material,
   Texture2D,
@@ -11,7 +10,8 @@ import {
   ParticleRenderable,
   ParticleEmitter,
   startTimeline,
-  PointLight
+  PointLight,
+  Camera
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -39,7 +39,7 @@ particleRenderable.material.set(
 );
 
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect(),
   far: 1000,
   near: 1

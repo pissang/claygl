@@ -1,11 +1,11 @@
 import {
   Renderer,
   DeferredGBuffer,
-  PerspectiveCamera,
   Scene,
   Mesh,
   CubeGeometry,
-  StandardMaterial
+  StandardMaterial,
+  Camera
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -14,7 +14,7 @@ const renderer = new Renderer({
 const gbuffer = new DeferredGBuffer({
   enableTargetTexture4: true
 });
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 0, 6);

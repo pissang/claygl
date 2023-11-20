@@ -1,12 +1,4 @@
-import {
-  createUnlitShader,
-  Material,
-  Mesh,
-  OrthographicCamera,
-  Renderer,
-  Scene,
-  Geometry
-} from 'claygl';
+import { createUnlitShader, Material, Mesh, Renderer, Scene, Geometry, Camera } from 'claygl';
 
 const TRIANGLE_POSITIONS = [
   [-0.5, -0.5, 0],
@@ -24,7 +16,7 @@ const renderer = new Renderer({
 });
 renderer.resize(400, 400);
 const scene = new Scene();
-const camera = new OrthographicCamera();
+const camera = new Camera('orthographic');
 const geometry = new Geometry();
 
 // Add triangle vertices to position attribute.

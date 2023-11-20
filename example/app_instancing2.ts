@@ -7,7 +7,7 @@ const app = new App3D('#main', {
 });
 // Create camera
 const camera = app.createCamera([100, 300, 800], [0, 100, 0]);
-camera.far = 10000;
+camera.projection.far = 10000;
 
 // Load boombox model.
 app.loadModel('./assets/models/SambaDancing/SambaDancing.gltf').then(function (result) {

@@ -1,10 +1,10 @@
 import {
   AmbientLight,
+  Camera,
   EnvironmentMapPass,
   loadGLTF,
   Mesh,
   OrbitControl,
-  PerspectiveCamera,
   Renderer,
   ShadowMapPass,
   SpotLight,
@@ -28,14 +28,14 @@ loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
 
   const scene = res.scene!;
   scene.rotation.rotateX(-Math.PI / 2);
-  const camera = new PerspectiveCamera({
+  const camera = new Camera('perspective', {
     aspect: renderer.getViewportAspect(),
     far: 100
   });
 
   camera.position.set(2, 2, 2);
   camera.lookAt(scene.position);
-  camera.aspect = renderer.canvas.width / renderer.canvas.height;
+  camera.projection.aspect = renderer.canvas.width / renderer.canvas.height;
 
   const control = new OrbitControl({
     target: camera,

@@ -1,6 +1,5 @@
 import {
   Renderer,
-  PerspectiveCamera,
   SphereGeometry,
   Scene,
   loadGLTF,
@@ -11,7 +10,8 @@ import {
   createStandardShader,
   AmbientSHLight,
   OrbitControl,
-  startTimeline
+  startTimeline,
+  Camera
 } from 'claygl';
 import { projectEnvironmentMap } from '../src/util/sh';
 
@@ -20,7 +20,7 @@ const renderer = new Renderer({
   pixelRatio: 1.0
 });
 renderer.resize(window.innerWidth, window.innerHeight);
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 0, 5);
