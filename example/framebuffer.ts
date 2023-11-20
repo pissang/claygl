@@ -1,7 +1,5 @@
 import {
   Renderer,
-  PerspectiveCamera,
-  OrthographicCamera,
   Material,
   CubeGeometry,
   PlaneGeometry,
@@ -13,7 +11,8 @@ import {
   Scene,
   createStandardShader,
   createUnlitShader,
-  startTimeline
+  startTimeline,
+  Camera
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -22,7 +21,7 @@ const renderer = new Renderer({
 });
 //Create scene
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect(),
   far: 500
 });
@@ -56,7 +55,7 @@ rttMesh.material.set('diffuseMap', rtt);
 const rttScene = new Scene();
 rttScene.add(rttMesh);
 
-const orthCamera = new OrthographicCamera();
+const orthCamera = new Camera('orthographic');
 
 startTimeline(() => {
   renderer.render(scene, camera, frameBuffer);

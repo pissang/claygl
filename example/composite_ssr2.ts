@@ -1,6 +1,5 @@
 import {
   Renderer,
-  PerspectiveCamera,
   Vector3,
   Scene,
   PlaneGeometry,
@@ -17,7 +16,8 @@ import {
   FilterCompositeNode,
   Skybox,
   textureUtil,
-  createCompositeNodeInput
+  createCompositeNodeInput,
+  Camera
 } from 'claygl';
 import { blendCompositeFragment, composeCompositeFragment } from 'claygl/shaders';
 import GBufferNode from './common/HDComposite/GBufferNode';
@@ -42,7 +42,7 @@ const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement,
   pixelRatio: 1.0
 });
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 4, 4);
@@ -160,7 +160,7 @@ startTimeline((deltaTime) => {
 
 function resize() {
   renderer.resize(window.innerWidth, window.innerHeight);
-  camera.aspect = renderer.getViewportAspect();
+  camera.projection.aspect = renderer.getViewportAspect();
 }
 window.onresize = resize;
 resize();

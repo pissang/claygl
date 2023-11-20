@@ -2,7 +2,6 @@ import {
   Renderer,
   DeferredRenderer,
   Scene,
-  PerspectiveCamera,
   Texture2D,
   Mesh,
   StandardMaterial,
@@ -14,7 +13,8 @@ import {
   startTimeline,
   FullscreenQuadPass,
   Shader,
-  constants
+  constants,
+  Camera
 } from 'claygl';
 import Stats from 'stats.js';
 import { outputTextureFragment } from 'claygl/shaders';
@@ -26,7 +26,7 @@ const renderer = new Renderer({
 renderer.resize(window.innerWidth, window.innerHeight);
 const deferredRenderer = new DeferredRenderer();
 
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   far: 5000,
   aspect: renderer.getViewportAspect()
 });

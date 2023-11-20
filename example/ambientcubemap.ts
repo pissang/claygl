@@ -1,6 +1,5 @@
 import {
   Renderer,
-  PerspectiveCamera,
   Scene,
   loadGLTF,
   OrbitControl,
@@ -11,13 +10,14 @@ import {
   AmbientLight,
   StandardMaterial,
   Skybox,
-  startTimeline
+  startTimeline,
+  Camera
 } from 'claygl';
 const renderer = new Renderer({
   canvas: document.getElementById('main') as HTMLCanvasElement
 });
 renderer.resize(window.innerWidth, window.innerHeight);
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 0, 6);

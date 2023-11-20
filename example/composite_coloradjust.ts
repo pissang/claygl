@@ -1,7 +1,6 @@
 import {
   Renderer,
   Scene,
-  PerspectiveCamera,
   Material,
   createLambertShader,
   Shader,
@@ -13,7 +12,8 @@ import {
   Mesh,
   Vector3,
   DirectionalLight,
-  startTimeline
+  startTimeline,
+  Camera
 } from 'claygl';
 import { colorAdjustCompositeFragment } from '../src/shader/source/compositor/coloradjust.glsl';
 
@@ -25,7 +25,7 @@ const renderer = new Renderer({
 });
 //Create scene
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.canvas.width / renderer.canvas.height,
   far: 500
 });

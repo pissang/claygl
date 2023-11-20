@@ -2,7 +2,6 @@ import {
   Shader,
   Renderer,
   Scene,
-  PerspectiveCamera,
   CubeGeometry,
   Material,
   Mesh,
@@ -11,7 +10,8 @@ import {
   startTimeline,
   Compositor,
   SceneCompositeNode,
-  FilterCompositeNode
+  FilterCompositeNode,
+  Camera
 } from 'claygl';
 import { unlitVertex, composeCompositeFragment } from 'claygl/shaders';
 import { tronFragment } from './shader/tron.glsl';
@@ -25,7 +25,7 @@ const renderer = new Renderer({
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect(),
   far: 500
 });

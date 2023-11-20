@@ -2,15 +2,14 @@ import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
 import GestureMgr, { PinchEvent } from './GestureMgr';
 import vendor from '../core/vendor';
-import PerspectiveCamera from '../camera/Perspective';
 import Notifier from '../core/Notifier';
 import Timeline from '../Timeline';
 import ClayNode from '../Node';
 import type { vec3 } from '../glmatrix';
 import type { AnimationEasing } from '../animation/easing';
 import type ProceduralKeyframeAnimator from '../animation/ProceduralKeyframeAnimator';
-import OrthographicCamera from '../camera/Orthographic';
 import { assign, isArray } from '../core/util';
+import Camera, { CameraOrthographicProjection } from '../Camera';
 
 const addEvent = vendor.addEventListener;
 const removeEvent = vendor.removeEventListener;
@@ -41,7 +40,7 @@ type MouseButtonsWithSpecialKey =
   `${ShiftKey}+${MouseButtons}` | MouseButtons;
 
 interface OrbitControlOpts {
-  target: ClayNode;
+  target: Camera;
   timeline?: Timeline;
   domElement: HTMLElement;
 
@@ -149,7 +148,7 @@ class OrbitControl extends Notifier {
   disabled = false;
 
   private _autoRotate: boolean = false;
-  private _target?: ClayNode;
+  private _target?: Camera;
   private _center = new Vector3();
 
   private _orthoSize?: number;
@@ -244,11 +243,11 @@ class OrbitControl extends Notifier {
     this._rotating = val;
   }
 
-  get target(): ClayNode | undefined {
+  get target(): Camera | undefined {
     return this._target;
   }
 
-  set target(val: ClayNode | undefined) {
+  set target(val: Camera | undefined) {
     if (val && val.target) {
       this.setCenter(val.target.toArray());
     }
@@ -549,13 +548,14 @@ class OrbitControl extends Notifier {
 
     // Override the aspect.
     const aspect = this.aspect;
-    if (aspect) {
-      if (camera instanceof PerspectiveCamera) {
+    if (aspect && camera) {
+      const proj = camera.projection;
+      if (proj.type === 'perspective') {
         // TODO may conflict with aspect updating in the App3D
-        this._needsUpdate ||= Math.abs(aspect - camera.aspect) > 1e-4;
-        camera.aspect = aspect;
-      } else if (camera instanceof OrthographicCamera) {
-        const oldAspect = (camera.right - camera.left) / (camera.top - camera.bottom);
+        this._needsUpdate ||= Math.abs(aspect - proj.aspect) > 1e-4;
+        proj.aspect = aspect;
+      } else {
+        const oldAspect = (proj.right - proj.left) / (proj.top - proj.bottom);
         if (Math.abs(aspect - oldAspect) > 1e-4) {
           this._needsUpdate = true;
         }
@@ -595,7 +595,7 @@ class OrbitControl extends Notifier {
   }
 
   _updateDistanceOrSize(deltaTime: number) {
-    if (!(this.target instanceof PerspectiveCamera)) {
+    if (this.target?.projection.type === 'orthographic') {
       this._setOrthoSize((this._orthoSize as number) + (this._zoomSpeed * deltaTime) / 20);
     } else {
       this._setDistance(this._distance + (this._zoomSpeed * deltaTime) / 20);
@@ -610,14 +610,14 @@ class OrbitControl extends Notifier {
 
   _setOrthoSize(size: number) {
     this._orthoSize = Math.max(Math.min(size, this.maxOrthographicSize), this.minOrthographicSize);
-    const camera = this.target as OrthographicCamera;
+    const proj = this.target!.projection as CameraOrthographicProjection;
     const cameraHeight = this._orthoSize;
     // TODO
     const cameraWidth = cameraHeight * (this.aspect || 1);
-    camera.left = -cameraWidth / 2;
-    camera.right = cameraWidth / 2;
-    camera.top = cameraHeight / 2;
-    camera.bottom = -cameraHeight / 2;
+    proj.left = -cameraWidth / 2;
+    proj.right = cameraWidth / 2;
+    proj.top = cameraHeight / 2;
+    proj.bottom = -cameraHeight / 2;
   }
 
   _updatePan(deltaTime: number) {
@@ -703,8 +703,9 @@ class OrbitControl extends Notifier {
     this.setAlpha(this.getAlpha());
 
     this._setDistance(this.target.position.dist(this._center));
-    if (this.target instanceof OrthographicCamera) {
-      this._setOrthoSize(this.target.top - this.target.bottom);
+    const proj = this.target?.projection;
+    if (proj.type === 'orthographic') {
+      this._setOrthoSize(proj.top - proj.bottom);
     }
   }
 
@@ -844,7 +845,8 @@ class OrbitControl extends Notifier {
 
   _zoomHandler(e: WheelEvent, delta: number) {
     let speed;
-    if (this.target instanceof PerspectiveCamera) {
+    const proj = this.target?.projection;
+    if (proj && proj.type === 'perspective') {
       speed = Math.max(
         Math.max(Math.min(this._distance - this.minDistance, this.maxDistance - this._distance)) /
           20,

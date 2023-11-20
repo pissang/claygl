@@ -10,8 +10,6 @@ import FrameBuffer from '../FrameBuffer';
 import Texture from '../Texture';
 import Texture2D from '../Texture2D';
 import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
-import PerspectiveCamera from '../camera/Perspective';
-import OrthoCamera from '../camera/Orthographic';
 import TexturePool from '../composite/TexturePool';
 import * as mat4 from '../glmatrix/mat4';
 import type Renderable from '../Renderable';
@@ -112,9 +110,9 @@ class ShadowMapPass extends Notifier {
   private _lightsCastShadow: Light[] = [];
 
   private _lightCameras: {
-    point?: Record<CubeTarget, PerspectiveCamera>;
-    directional?: OrthoCamera;
-    spot?: PerspectiveCamera;
+    point?: Record<CubeTarget, Camera<'perspective'>>;
+    directional?: Camera<'orthographic'>;
+    spot?: Camera<'perspective'>;
   } = {};
   private _lightMaterials: Record<string, Material> = {};
 
@@ -264,7 +262,7 @@ class ShadowMapPass extends Notifier {
         this.renderDirectionalLightShadow(
           renderer,
           scene,
-          sceneCamera as PerspectiveCamera | OrthoCamera,
+          sceneCamera,
           light,
           shadowCascadeClips,
           directionalLightMatrices,
@@ -378,7 +376,7 @@ class ShadowMapPass extends Notifier {
   renderDirectionalLightShadow(
     renderer: Renderer,
     scene: Scene,
-    sceneCamera: PerspectiveCamera | OrthoCamera,
+    sceneCamera: Camera,
     light: DirectionalLight,
     shadowCascadeClips: number[],
     directionalLightMatrices: mat4.Mat4Array[],
@@ -407,10 +405,11 @@ class ShadowMapPass extends Notifier {
       const boundingBox = scene.getBoundingBox();
       scene.viewBoundingBoxLastFrame.copy(boundingBox).applyTransform(sceneCamera.viewMatrix);
     }
+    const proj = sceneCamera.projection;
     // Considering moving speed since the bounding box is from last frame
     // TODO: add a bias
-    const clippedFar = Math.min(-scene.viewBoundingBoxLastFrame.min.z, sceneCamera.far);
-    const clippedNear = Math.max(-scene.viewBoundingBoxLastFrame.max.z, sceneCamera.near);
+    const clippedFar = Math.min(-scene.viewBoundingBoxLastFrame.min.z, proj.far);
+    const clippedNear = Math.max(-scene.viewBoundingBoxLastFrame.max.z, proj.near);
 
     const lightCamera = this._getDirectionalLightCamera(light, scene, sceneCamera);
 
@@ -421,10 +420,10 @@ class ShadowMapPass extends Notifier {
     mat4.multiply(lvpMat4Arr, lightProjMatrix.array, lightViewMatrix.array);
 
     const clipPlanes = [];
-    const isPerspective = sceneCamera instanceof PerspectiveCamera;
+    const isPerspective = proj.type === 'perspective';
 
-    const scaleZ = (sceneCamera.near + sceneCamera.far) / (sceneCamera.near - sceneCamera.far);
-    const offsetZ = (2 * sceneCamera.near * sceneCamera.far) / (sceneCamera.near - sceneCamera.far);
+    const scaleZ = (proj.near + proj.far) / (proj.near - proj.far);
+    const offsetZ = (2 * proj.near * proj.far) / (proj.near - proj.far);
     for (let i = 0; i <= light.shadowCascade; i++) {
       const clog = clippedNear * Math.pow(clippedFar / clippedNear, i / light.shadowCascade);
       const cuni = clippedNear + ((clippedFar - clippedNear) * i) / light.shadowCascade;
@@ -447,18 +446,18 @@ class ShadowMapPass extends Notifier {
       if (isPerspective) {
         mat4.perspective(
           splitProjMatrix.array,
-          (sceneCamera.fov / 180) * Math.PI,
-          sceneCamera.aspect,
+          (proj.fov / 180) * Math.PI,
+          proj.aspect,
           nearPlane,
           farPlane
         );
       } else {
         mat4.ortho(
           splitProjMatrix.array,
-          sceneCamera.left,
-          sceneCamera.right,
-          sceneCamera.bottom,
-          sceneCamera.top,
+          proj.left,
+          proj.right,
+          proj.bottom,
+          proj.top,
           nearPlane,
           farPlane
         );
@@ -713,14 +712,15 @@ class ShadowMapPass extends Notifier {
     const lightCameras = this._lightCameras;
     if (!lightCameras.point) {
       lightCameras.point = cubeTargets.reduce((obj, target) => {
-        obj[target] = new PerspectiveCamera();
+        obj[target] = new Camera('perspective');
         return obj;
-      }, {} as Record<CubeTarget, PerspectiveCamera>);
+      }, {} as Record<CubeTarget, Camera<'perspective'>>);
     }
     const camera = lightCameras.point[target];
+    const proj = camera.projection;
 
-    camera.far = light.range;
-    camera.fov = 90;
+    proj.far = light.range;
+    proj.fov = 90;
     camera.position.set(0, 0, 0);
     switch (target) {
       case 'px':
@@ -750,13 +750,9 @@ class ShadowMapPass extends Notifier {
 
   // Camera of directional light will be adjusted
   // to contain the view frustum and scene bounding box as tightly as possible
-  _getDirectionalLightCamera(
-    light: DirectionalLight,
-    scene: Scene,
-    sceneCamera: PerspectiveCamera | OrthoCamera
-  ) {
+  _getDirectionalLightCamera(light: DirectionalLight, scene: Scene, sceneCamera: Camera) {
     if (!this._lightCameras.directional) {
-      this._lightCameras.directional = new OrthoCamera();
+      this._lightCameras.directional = new Camera('orthographic');
     }
     const camera = this._lightCameras.directional;
 
@@ -793,19 +789,20 @@ class ShadowMapPass extends Notifier {
     camera.position
       .set((min.x + max.x) / 2, (min.y + max.y) / 2, max.z + nearDistance)
       .transformMat4(camera.worldTransform);
-    camera.near = 0;
-    camera.far = max.z - min.z + nearDistance;
+    const proj = camera.projection;
+    proj.near = 0;
+    proj.far = max.z - min.z + nearDistance;
     // Make sure receivers not in the frustum will stil receive the shadow.
     if (isNaN(+this.lightFrustumBias)) {
-      camera.far *= 4;
+      proj.far *= 4;
     } else {
-      camera.far += +this.lightFrustumBias;
+      proj.far += +this.lightFrustumBias;
     }
     // PENDING
-    camera.left = min.x - PCSSLightSize;
-    camera.right = max.x + PCSSLightSize;
-    camera.top = max.y + PCSSLightSize;
-    camera.bottom = min.y - PCSSLightSize;
+    proj.left = min.x - PCSSLightSize;
+    proj.right = max.x + PCSSLightSize;
+    proj.top = max.y + PCSSLightSize;
+    proj.bottom = min.y - PCSSLightSize;
     camera.update();
 
     return camera;
@@ -813,12 +810,13 @@ class ShadowMapPass extends Notifier {
 
   _getSpotLightCamera(light: SpotLight) {
     if (!this._lightCameras.spot) {
-      this._lightCameras.spot = new PerspectiveCamera();
+      this._lightCameras.spot = new Camera('perspective');
     }
     const camera = this._lightCameras.spot;
+    const proj = camera.projection;
     // Update properties
-    camera.fov = light.penumbraAngle * 2;
-    camera.far = light.range;
+    proj.fov = light.penumbraAngle * 2;
+    proj.far = light.range;
     camera.worldTransform.copy(light.worldTransform);
     camera.updateProjectionMatrix();
     mat4.invert(camera.viewMatrix.array, camera.worldTransform.array);

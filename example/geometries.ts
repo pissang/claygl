@@ -1,6 +1,5 @@
 import {
   Renderer,
-  PerspectiveCamera,
   Scene,
   Mesh,
   Material,
@@ -12,7 +11,8 @@ import {
   CylinderGeometry,
   ParametricSurfaceGeometry,
   OrbitControl,
-  startTimeline
+  startTimeline,
+  Camera
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -20,7 +20,7 @@ const renderer = new Renderer({
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect(),
   far: 500
 });

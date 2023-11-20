@@ -3,7 +3,6 @@ import {
   Renderer,
   DeferredRenderer,
   Scene,
-  PerspectiveCamera,
   Mesh,
   StandardMaterial,
   SphereGeometry,
@@ -13,7 +12,8 @@ import {
   AmbientLight,
   OrbitControl,
   DirectionalLight,
-  startTimeline
+  startTimeline,
+  Camera
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -22,7 +22,7 @@ const renderer = new Renderer({
 renderer.resize(window.innerWidth, window.innerHeight);
 const deferredRenderer = new DeferredRenderer();
 
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   far: 10000,
   aspect: renderer.getViewportAspect()
 });

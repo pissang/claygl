@@ -1,7 +1,6 @@
 import {
   Renderer,
   ShadowMapPass,
-  PerspectiveCamera,
   DeferredRenderer,
   Scene,
   CubeGeometry,
@@ -11,7 +10,8 @@ import {
   DirectionalLight,
   startTimeline,
   Vector3,
-  OrbitControl
+  OrbitControl,
+  Camera
 } from 'claygl';
 import Stats from 'stats.js';
 
@@ -24,7 +24,7 @@ const shadowMapPass = new ShadowMapPass();
 const deferredRenderer = new DeferredRenderer();
 deferredRenderer.shadowMapPass = shadowMapPass;
 
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   far: 1000,
   aspect: renderer.getViewportAspect()
 });

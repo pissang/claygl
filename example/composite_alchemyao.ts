@@ -1,6 +1,5 @@
 import {
   Renderer,
-  PerspectiveCamera,
   Scene,
   Mesh,
   Compositor,
@@ -14,7 +13,8 @@ import {
   Skybox,
   SceneCompositeNode,
   FilterCompositeNode,
-  createCompositeNodeInput
+  createCompositeNodeInput,
+  Camera
 } from 'claygl';
 import { blendCompositeFragment, composeCompositeFragment } from 'claygl/shaders';
 import AlchemyAOCompositeNode from './common/HDComposite/AlchemyAONode';
@@ -36,7 +36,7 @@ const renderer = new Renderer({
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 0, 6);

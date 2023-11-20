@@ -1,6 +1,5 @@
 import {
   Renderer,
-  PerspectiveCamera,
   Scene,
   Material,
   SphereGeometry,
@@ -13,7 +12,8 @@ import {
   Vector3,
   OrbitControl,
   loadGLTF,
-  pickByRay
+  pickByRay,
+  Camera
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -21,8 +21,8 @@ const renderer = new Renderer({
   pixelRatio: 1.0
 });
 renderer.resize(window.innerWidth, window.innerHeight);
-const camera = new PerspectiveCamera();
-camera.aspect = renderer.getViewportAspect();
+const camera = new Camera('perspective');
+camera.projection.aspect = renderer.getViewportAspect();
 camera.position.z = 3;
 
 const control = new OrbitControl({

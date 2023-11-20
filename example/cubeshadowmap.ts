@@ -6,12 +6,12 @@ import {
   Mesh,
   Scene,
   CubeGeometry,
-  PerspectiveCamera,
   ShadowMapPass,
   createLambertShader,
   Node as ClayNode,
   Vector3,
-  PointLight
+  PointLight,
+  Camera
 } from 'claygl';
 
 const renderer = new Renderer({
@@ -22,7 +22,7 @@ renderer.resize(window.innerWidth, window.innerHeight);
 const shadowMapPass = new ShadowMapPass();
 
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect(),
   far: 500
 });

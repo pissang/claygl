@@ -3,14 +3,14 @@ import {
   startTimeline,
   ShadowMapPass,
   DeferredRenderer,
-  PerspectiveCamera,
   Scene,
   Mesh,
   StandardMaterial,
   CubeGeometry,
   SphereGeometry,
   OrbitControl,
-  PointLight
+  PointLight,
+  Camera
 } from 'claygl';
 
 import Stats from 'stats.js';
@@ -25,7 +25,7 @@ renderer.resize(window.innerWidth, window.innerHeight);
 const deferredRenderer = new DeferredRenderer();
 deferredRenderer.shadowMapPass = shadowMapPass;
 
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 

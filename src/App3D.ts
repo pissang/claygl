@@ -15,8 +15,6 @@ import TextureCube, { CubeTarget, TextureCubeOpts } from './TextureCube';
 import Texture, { TextureImageSource } from './Texture';
 import Mesh from './Mesh';
 import Material, { GeneralMaterialUniformObject, MaterialOpts } from './Material';
-import PerspectiveCamera from './camera/Perspective';
-import OrthographicCamera from './camera/Orthographic';
 import Vector3 from './math/Vector3';
 import { GLTFLoadResult, load as loadGLTF } from './loader/GLTF';
 import ClayNode from './Node';
@@ -373,8 +371,8 @@ class App3D extends Notifier {
 
       if (this._autoUpdateCameraAspect) {
         const camera = this._scene.getMainCamera();
-        if (camera instanceof PerspectiveCamera) {
-          camera.aspect = this._renderer.getViewportAspect();
+        if (camera.projection.type === 'perspective') {
+          camera.projection.aspect = this._renderer.getViewportAspect();
         }
       }
 
@@ -887,31 +885,25 @@ class App3D extends Notifier {
     target: Vector3 | Vector3['array'],
     type: 'ortho' | 'orthographic',
     extent?: Vector3 | Vector3['array']
-  ): OrthographicCamera;
+  ): Camera<'orthographic'>;
   createCamera(
     position: Vector3 | Vector3['array'],
     target?: Vector3 | Vector3['array'],
     type?: 'perspective'
-  ): PerspectiveCamera;
+  ): Camera<'perspective'>;
   createCamera(
     position: Vector3 | Vector3['array'],
     target?: Vector3 | Vector3['array'],
     type?: 'ortho' | 'orthographic' | 'perspective',
     extent?: Vector3 | Vector3['array']
-  ): PerspectiveCamera | OrthographicCamera {
-    let CameraCtor;
-    let isOrtho = false;
-    if (type === 'ortho' || type === 'orthographic') {
-      isOrtho = true;
-      CameraCtor = OrthographicCamera;
-    } else {
-      if (type && type !== 'perspective') {
-        console.error('Unkown camera type ' + type + '. Use default perspective camera');
-      }
-      CameraCtor = PerspectiveCamera;
+  ): Camera {
+    // let CameraCtor;
+    // let isOrtho = false;
+    if (type === 'ortho') {
+      type = 'orthographic';
     }
 
-    const camera = new CameraCtor();
+    const camera = new Camera(type);
     if (position instanceof Vector3) {
       camera.position.copy(position);
     } else if (util.isArray(position)) {
@@ -925,16 +917,17 @@ class App3D extends Notifier {
       camera.lookAt(target);
     }
 
-    if (extent && isOrtho) {
+    const projParams = camera.projection;
+    if (extent && projParams.type === 'orthographic') {
       extent = (extent as Vector3).array || extent;
-      (camera as OrthographicCamera).left = -extent[0] / 2;
-      (camera as OrthographicCamera).right = extent[0] / 2;
-      (camera as OrthographicCamera).top = extent[1] / 2;
-      (camera as OrthographicCamera).bottom = -extent[1] / 2;
-      (camera as OrthographicCamera).near = 0;
-      (camera as OrthographicCamera).far = extent[2];
-    } else {
-      (camera as PerspectiveCamera).aspect = this._renderer.getViewportAspect();
+      projParams.left = -extent[0] / 2;
+      projParams.right = extent[0] / 2;
+      projParams.top = extent[1] / 2;
+      projParams.bottom = -extent[1] / 2;
+      projParams.near = 0;
+      projParams.far = extent[2];
+    } else if (projParams.type === 'perspective') {
+      projParams.aspect = this._renderer.getViewportAspect();
     }
 
     this._scene.add(camera);

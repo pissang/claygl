@@ -1,7 +1,7 @@
 import {
   Renderer,
   Scene,
-  PerspectiveCamera,
+  Camera,
   Compositor,
   Texture2D,
   Mesh,
@@ -27,7 +27,7 @@ const renderer = new Renderer({
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 0, 6);

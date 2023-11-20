@@ -9,12 +9,12 @@ import Mesh from '../Mesh';
 import Material from '../Material';
 import Geometry from '../Geometry';
 import Shader from '../Shader';
-import PerspectiveCamera from '../camera/Perspective';
 
 import { Color } from '../core/type';
 import type Renderer from '../Renderer';
 import type Texture2D from '../Texture2D';
 import { VRDistorterFragment, VRDistorterVertex } from './distorter';
+import Camera from '../Camera';
 
 function lerp(a: number, b: number, t: number) {
   return a * (1 - t) + b * t;
@@ -24,7 +24,7 @@ class CardboardDistorter {
   clearColor: Color = [0, 0, 0, 1];
 
   private _mesh: Mesh;
-  private _fakeCamera = new PerspectiveCamera();
+  private _fakeCamera = new Camera('perspective');
   constructor() {
     this._mesh = new Mesh(
       new Geometry({

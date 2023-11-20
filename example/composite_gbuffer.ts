@@ -1,7 +1,6 @@
 import {
   Renderer,
   Scene,
-  PerspectiveCamera,
   Compositor,
   Texture2D,
   Mesh,
@@ -10,7 +9,8 @@ import {
   loadGLTF,
   constants,
   OrbitControl,
-  FilterCompositeNode
+  FilterCompositeNode,
+  Camera
 } from 'claygl';
 import GBufferCompositeNode from './common/HDComposite/GBufferNode';
 import { outputTextureFragment } from 'claygl/shaders';
@@ -22,7 +22,7 @@ const renderer = new Renderer({
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 0, 6);
@@ -68,7 +68,7 @@ const control = new OrbitControl({
 
 const availableDebugTypes = ['texture1', 'texture2', 'texture3', 'texture4'] as const;
 const config: {
-  debugType: typeof availableDebugTypes[number];
+  debugType: (typeof availableDebugTypes)[number];
 } = {
   debugType: 'texture1'
 };

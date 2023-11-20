@@ -2,7 +2,6 @@ import {
   Renderer,
   Shader,
   Scene,
-  PerspectiveCamera,
   Material,
   Mesh,
   CubeGeometry,
@@ -11,7 +10,8 @@ import {
   PointLight,
   startTimeline,
   AmbientLight,
-  createStandardShader
+  createStandardShader,
+  Camera
 } from 'claygl';
 import Stats from 'stats.js';
 
@@ -21,7 +21,7 @@ const renderer = new Renderer({
 });
 renderer.resize(window.innerWidth, window.innerHeight);
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect(),
   far: 500
 });

@@ -1,19 +1,19 @@
 import {
   Renderer,
-  PerspectiveCamera,
   Scene,
   startTimeline,
   TextureCube,
   Skybox,
   OrbitControl,
-  Vector3
+  Vector3,
+  Camera
 } from 'claygl';
 
 const renderer = new Renderer({
   canvas: document.getElementById('Main') as HTMLCanvasElement
 });
 const scene = new Scene();
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect(),
   far: 500
 });

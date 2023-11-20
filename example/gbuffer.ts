@@ -1,7 +1,6 @@
 import {
   Renderer,
   DeferredGBuffer,
-  PerspectiveCamera,
   loadGLTF,
   startTimeline,
   Scene,
@@ -9,7 +8,8 @@ import {
   Mesh,
   StandardMaterial,
   Texture2D,
-  constants
+  constants,
+  Camera
 } from 'claygl';
 import * as dat from 'dat.gui';
 
@@ -19,7 +19,7 @@ const renderer = new Renderer({
 const gbuffer = new DeferredGBuffer({
   enableTargetTexture4: true
 });
-const camera = new PerspectiveCamera({
+const camera = new Camera('perspective', {
   aspect: renderer.getViewportAspect()
 });
 camera.position.set(0, 0, 6);
@@ -82,7 +82,7 @@ function resize() {
     renderer.getWidth() * renderer.getPixelRatio(),
     renderer.getHeight() * renderer.getPixelRatio()
   );
-  camera.aspect = renderer.getViewportAspect();
+  camera.projection.aspect = renderer.getViewportAspect();
 }
 
 window.onresize = resize;
@@ -98,7 +98,7 @@ const availableDebugTypes = [
   'velocity'
 ] as const;
 const config: {
-  debugType: typeof availableDebugTypes[number];
+  debugType: (typeof availableDebugTypes)[number];
 } = {
   debugType: 'normal'
 };

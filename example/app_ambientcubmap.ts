@@ -1,4 +1,4 @@
-import { App3D, OrbitControl, PerspectiveCamera } from 'claygl';
+import { App3D, Camera, OrbitControl } from 'claygl';
 
 const app = new App3D('#main', {
   lazyInit: true,
@@ -8,7 +8,7 @@ const app = new App3D('#main', {
   }
 });
 
-let camera: PerspectiveCamera;
+let camera: Camera;
 let control: OrbitControl;
 app.init(() => {
   // Create camera

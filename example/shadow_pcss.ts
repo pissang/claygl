@@ -4,14 +4,14 @@ import {
   loadGLTF,
   Mesh,
   OrbitControl,
-  PerspectiveCamera,
   Renderer,
   ShadowMapPass,
   DirectionalLight,
   Node as ClayNode,
   Timeline,
   Scene,
-  startTimeline
+  startTimeline,
+  Camera
 } from 'claygl';
 import dat from 'dat.gui';
 import halton from './common/halton';
@@ -37,7 +37,7 @@ loadGLTF('assets/models/basic_scene/scene.gltf', {
   const shadowMapPass = new ShadowMapPass();
   shadowMapPass.kernelPCF = new Float32Array(pcfKernel);
 
-  const camera = new PerspectiveCamera({
+  const camera = new Camera('perspective', {
     aspect: renderer.getViewportAspect(),
     far: 100
   });

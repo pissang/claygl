@@ -11,8 +11,47 @@ export interface CameraOpts extends ClayNodeOpts {}
 
 const v4Arr = vec4.create();
 
-interface Camera extends ClayNodeOpts {}
-class Camera extends ClayNode {
+type CameraProjectionTypes = 'perspective' | 'orthographic';
+export class CameraPerspectiveProjection {
+  type: 'perspective' = 'perspective';
+  /**
+   * Vertical field of view in degrees
+   */
+  fov = 50;
+  /**
+   * Aspect ratio, typically viewport width / height
+   */
+  aspect = 1;
+  /**
+   * Near bound of the frustum
+   */
+  near = 0.1;
+  /**
+   * Far bound of the frustum
+   */
+  far = 2000;
+}
+
+export class CameraOrthographicProjection {
+  type: 'orthographic' = 'orthographic';
+  left = -1;
+  right = 1;
+  near = -1;
+  far = 1;
+  top = 1;
+  bottom = -1;
+}
+
+type Projections = {
+  orthographic: CameraOrthographicProjection;
+  perspective: CameraPerspectiveProjection;
+};
+
+class Camera<T extends CameraProjectionTypes = CameraProjectionTypes> extends ClayNode {
+  /**
+   * Camera projection
+   */
+  projection: Projections[T];
   /**
    * Camera projection matrix
    */
@@ -35,6 +74,26 @@ class Camera extends ClayNode {
    * Jitter offset. In pixels.
    */
   offset = new Vector2();
+
+  /**
+   * @param type Default to be perspective
+   */
+  constructor(type?: T, opts?: Omit<Partial<Projections[T]>, 'type'>) {
+    super();
+    // TODO
+    this.projection = (
+      type === 'orthographic'
+        ? new CameraOrthographicProjection()
+        : new CameraPerspectiveProjection()
+    ) as Projections[T];
+
+    Object.keys(opts || {}).forEach((key) => {
+      const val = (opts as any)[key];
+      if (!isNaN(val)) {
+        (this.projection as any)[key] = val;
+      }
+    });
+  }
 
   update() {
     super.update.call(this);
@@ -64,11 +123,6 @@ class Camera extends ClayNode {
   }
 
   /**
-   * Decompose camera projection matrix
-   */
-  decomposeProjectionMatrix() {}
-
-  /**
    * Set camera projection matrix
    * @param {clay.Matrix4} projectionMatrix
    */
@@ -80,8 +134,44 @@ class Camera extends ClayNode {
   /**
    * Update projection matrix, called after update
    */
-  updateProjectionMatrix() {}
+  updateProjectionMatrix() {
+    const proj = this.projection;
+    if (proj.type === 'orthographic') {
+      this.projectionMatrix.ortho(
+        proj.left,
+        proj.right,
+        proj.bottom,
+        proj.top,
+        proj.near,
+        proj.far
+      );
+    } else {
+      const rad = (proj.fov / 180) * Math.PI;
+      this.projectionMatrix.perspective(rad, proj.aspect, proj.near, proj.far);
+    }
+  }
 
+  /**
+   * Decompose camera projection matrix
+   */
+  decomposeProjectionMatrix() {
+    const proj = this.projection;
+    const m = this.projectionMatrix.array;
+    if (proj.type === 'orthographic') {
+      proj.left = (-1 - m[12]) / m[0];
+      proj.right = (1 - m[12]) / m[0];
+      proj.top = (1 - m[13]) / m[5];
+      proj.bottom = (-1 - m[13]) / m[5];
+      proj.near = -(-1 - m[14]) / m[10];
+      proj.far = -(1 - m[14]) / m[10];
+    } else {
+      const rad = Math.atan(1 / m[5]) * 2;
+      proj.fov = (rad / Math.PI) * 180;
+      proj.aspect = m[5] / m[0];
+      proj.near = m[14] / (m[10] - 1);
+      proj.far = m[14] / (m[10] + 1);
+    }
+  }
   /**
    * Cast a picking ray from camera near plane to far plane
    * @function
@@ -111,6 +201,15 @@ class Camera extends ClayNode {
     vec3.normalize(ray.direction.array, ray.direction.array);
 
     return ray;
+  }
+
+  clone() {
+    const camera = super.clone.call(this);
+    camera.projection = {
+      ...this.projection
+    };
+
+    return camera;
   }
 }
 

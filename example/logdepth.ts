@@ -5,7 +5,7 @@ const app = new App3D('#main');
 app.renderer.logDepthBuffer = true;
 // Create camera
 const camera = app.createCamera([0, 3, 8], [0, 1, 0]);
-camera.far = 10;
+camera.projection.far = 10;
 
 // Create lights
 app.createDirectionalLight([-2, -1, -1], '#fff', 0.7);
