@@ -46,12 +46,6 @@ export { setCanvasSize };
 
 export * as constants from './core/constants';
 
-// Camera
-export {
-  Perspective as PerspectiveCamera,
-  Orthographic as OrthographicCamera
-} from './camera/index';
-
 // Light
 export {
   Ambient as AmbientLight,

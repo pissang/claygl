@@ -24,7 +24,6 @@ import { Color, GLEnum } from './core/type';
 import { assign, genGUID, optional, setCanvasSize } from './core/util';
 import type Camera from './Camera';
 import type ClayNode from './Node';
-import type PerspectiveCamera from './camera/Perspective';
 import { preZFragment, preZVertex } from './shader/source/prez.glsl';
 import GLPipeline, {
   ExtendedRenderableObject,
@@ -671,14 +670,15 @@ class Renderer extends Notifier {
         program.setSemanticUniform(gl, 'VIEWPORT', viewportUniform);
         program.setSemanticUniform(gl, 'WINDOW_SIZE', windowSizeUniform);
         if (camera) {
-          program.setSemanticUniform(gl, 'NEAR', (camera as PerspectiveCamera).near);
-          program.setSemanticUniform(gl, 'FAR', (camera as PerspectiveCamera).far);
+          const proj = camera.projection;
+          program.setSemanticUniform(gl, 'NEAR', proj.near);
+          program.setSemanticUniform(gl, 'FAR', proj.far);
 
           if (logDepthBuffer) {
             program.setSemanticUniform(
               gl,
               'LOG_DEPTH_BUFFER_FC',
-              2.0 / (Math.log((camera as PerspectiveCamera).far + 1.0) / Math.LN2)
+              2.0 / (Math.log(proj.far + 1.0) / Math.LN2)
             );
           }
         }
@@ -776,7 +776,7 @@ class Renderer extends Notifier {
     if (this.logDepthBuffer) {
       this._prezMaterial.set(
         'logDepthBufFC',
-        2.0 / (Math.log((camera as PerspectiveCamera).far + 1.0) / Math.LN2)
+        2.0 / (Math.log(camera.projection.far + 1.0) / Math.LN2)
       );
     }
 

@@ -2,7 +2,6 @@
 import Mesh, { MeshOpts } from './Mesh';
 import CubeGeometry from './geometry/Cube';
 import Material from './Material';
-import PerspectiveCamera from './camera/Perspective';
 
 import type Scene from './Scene';
 import type TextureCube from './TextureCube';

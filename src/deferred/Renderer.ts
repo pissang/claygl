@@ -26,8 +26,6 @@ import type DirectionalLight from '../light/Directional';
 import * as mat4 from '../glmatrix/mat4';
 import type TextureCube from '../TextureCube';
 import type Light from '../Light';
-import PerspectiveCamera from '../camera/Perspective';
-import OrthographicCamera from '../camera/Orthographic';
 import * as constants from '../core/constants';
 import { preZFragment, preZVertex } from '../shader/source/prez.glsl';
 import { outputFragment } from '../shader/source/compositor/output.glsl';
@@ -386,7 +384,7 @@ class DeferredRenderer {
 
     const shadowMapPass = this.shadowMapPass;
     if (shadowMapPass && updateShadow) {
-      this._prepareLightShadow(renderer, scene, camera as PerspectiveCamera | OrthographicCamera);
+      this._prepareLightShadow(renderer, scene, camera);
     }
 
     const clearColor = renderer.clearColor;
@@ -610,11 +608,7 @@ class DeferredRenderer {
     }
   }
 
-  private _prepareLightShadow(
-    renderer: Renderer,
-    scene: Scene,
-    camera: PerspectiveCamera | OrthographicCamera
-  ) {
+  private _prepareLightShadow(renderer: Renderer, scene: Scene, camera: Camera) {
     for (let i = 0; i < scene.lights.length; i++) {
       const light = scene.lights[i] as DeferredLight;
       const volumeMesh = light.volumeMesh || this._volumeMeshMap.get(light)!;
@@ -642,7 +636,7 @@ class DeferredRenderer {
   private _prepareSingleLightShadow(
     renderer: Renderer,
     scene: Scene,
-    camera: PerspectiveCamera | OrthographicCamera,
+    camera: Camera,
     light: DeferredLight,
     material?: Material
   ) {

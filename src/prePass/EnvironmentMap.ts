@@ -1,5 +1,4 @@
 import Vector3 from '../math/Vector3';
-import PerspectiveCamera from '../camera/Perspective';
 import FrameBuffer from '../FrameBuffer';
 import TextureCube, { CubeTarget, cubeTargets } from '../TextureCube';
 import * as constants from '../core/constants';
@@ -8,6 +7,7 @@ import type ShadowMapPass from './ShadowMap';
 import type Renderer from '../Renderer';
 import type Scene from '../Scene';
 import { assign } from '../core/util';
+import Camera from '../Camera';
 
 interface EnvironmentMapPassOpts {
   /**
@@ -77,16 +77,17 @@ class EnvironmentMapPass {
    */
   shadowMapPass?: ShadowMapPass;
 
-  private _cameras: Record<CubeTarget, PerspectiveCamera>;
+  private _cameras: Record<CubeTarget, Camera<'perspective'>>;
   private _frameBuffer: FrameBuffer;
 
   constructor(opts?: Partial<EnvironmentMapPassOpts>) {
     assign(this, opts);
 
     const cameras = (this._cameras = cubeTargets.reduce((obj, target) => {
-      obj[target] = new PerspectiveCamera({ fov: 90 });
+      obj[target] = new Camera();
+      obj[target].projection.fov = 90;
       return obj;
-    }, {} as Record<CubeTarget, PerspectiveCamera>));
+    }, {} as Record<CubeTarget, Camera<'perspective'>>));
 
     cameras.px.lookAt(Vector3.POSITIVE_X, Vector3.NEGATIVE_Y);
     cameras.nx.lookAt(Vector3.NEGATIVE_X, Vector3.NEGATIVE_Y);
@@ -120,9 +121,9 @@ class EnvironmentMapPass {
       const camera = this._cameras[target];
       Vector3.copy(camera.position, this.position);
 
-      camera.far = this.far;
-      camera.near = this.near;
-      camera.fov = fov;
+      camera.projection.far = this.far;
+      camera.projection.near = this.near;
+      camera.projection.fov = fov;
 
       if (this.shadowMapPass) {
         camera.update();

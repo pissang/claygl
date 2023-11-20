@@ -17,8 +17,6 @@ import { TextureOpts } from '../Texture';
 import Texture2D, { Texture2DOpts } from '../Texture2D';
 import Skeleton from '../Skeleton';
 import Joint from '../Joint';
-import PerspectiveCamera from '../camera/Perspective';
-import OrthographicCamera from '../camera/Orthographic';
 import * as constants from '../core/constants';
 
 import BoundingBox from '../math/BoundingBox';
@@ -31,7 +29,7 @@ import Geometry from '../Geometry';
 // Import builtin shader
 import Shader from '../Shader';
 import { createStandardShader } from '../shader/create';
-import type Camera from '../Camera';
+import Camera from '../Camera';
 
 type GLTFFormat = any;
 type GLTFNode = any;
@@ -1124,28 +1122,26 @@ function parseMeshes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpt
 
 function instanceCamera(json: GLTFFormat, nodeInfo: GLTFNode) {
   const cameraInfo = json.cameras[nodeInfo.camera];
+  const camera = new Camera(cameraInfo.type);
+  const proj = camera.projection;
+  camera.name = nodeInfo.name;
 
-  if (cameraInfo.type === 'perspective') {
+  if (proj.type === 'perspective') {
     const perspectiveInfo = cameraInfo.perspective || {};
-    return new PerspectiveCamera({
-      name: nodeInfo.name,
-      aspect: perspectiveInfo.aspectRatio,
-      fov: (perspectiveInfo.yfov / Math.PI) * 180,
-      far: perspectiveInfo.zfar,
-      near: perspectiveInfo.znear
-    });
+    perspectiveInfo.yfov != null && (proj.fov = (perspectiveInfo.yfov / Math.PI) * 180);
+    perspectiveInfo.znear != null && (proj.near = perspectiveInfo.znear);
+    perspectiveInfo.zfar != null && (proj.far = perspectiveInfo.zfar);
+    perspectiveInfo.aspectRatio != null && (proj.aspect = perspectiveInfo.aspectRatio);
   } else {
     const orthographicInfo = cameraInfo.orthographic || {};
-    return new OrthographicCamera({
-      name: nodeInfo.name,
-      top: orthographicInfo.ymag,
-      right: orthographicInfo.xmag,
-      left: -orthographicInfo.xmag,
-      bottom: -orthographicInfo.ymag,
-      near: orthographicInfo.znear,
-      far: orthographicInfo.zfar
-    });
+    orthographicInfo.ymag != null && (proj.top = orthographicInfo.ymag);
+    orthographicInfo.xmag != null && (proj.right = orthographicInfo.xmag);
+    orthographicInfo.xmag != null && (proj.left = -orthographicInfo.xmag);
+    orthographicInfo.ymag != null && (proj.bottom = -orthographicInfo.ymag);
+    orthographicInfo.znear != null && (proj.near = orthographicInfo.znear);
+    orthographicInfo.zfar != null && (proj.far = orthographicInfo.zfar);
   }
+  return camera;
 }
 
 function parseNodes(json: GLTFFormat, lib: ParsedLib, opts: Partial<GLTFLoadOpts>) {
