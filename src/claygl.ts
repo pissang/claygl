@@ -17,7 +17,11 @@ export { default as Skeleton } from './Skeleton';
 export { default as Joint } from './Joint';
 export { default as FrameBuffer } from './FrameBuffer';
 export { default as Scene } from './Scene';
-export { default as Camera } from './Camera';
+export {
+  default as Camera,
+  CameraPerspectiveProjection,
+  CameraOrthographicProjection
+} from './Camera';
 
 export { default as GLPipeline } from './gl/GLPipeline';
 
