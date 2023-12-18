@@ -27,7 +27,7 @@ export const gBufferVertex = new VertexShader({
     position: POSITION(),
     texcoord: TEXCOORD_0(),
     normal: NORMAL(),
-    color: attribute('vec4', 'COLOR'),
+    a_Color: attribute('vec4', 'COLOR'),
     tangent: TANGENT()
   },
   uniforms: {
@@ -110,7 +110,7 @@ void main() {
 
 #ifdef USE_TARGET_TEXTURE3
   if (useVertexColor) {
-    v_Color = color;
+    v_Color = a_Color;
   }
   else {
     v_Color = vec4(1.0);
