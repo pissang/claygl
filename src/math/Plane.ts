@@ -117,7 +117,7 @@ class Plane {
     // Transform point on plane
     vec3.scale(pointv4 as unknown as vec3.Vec3Array, this.normal.array, this.distance);
     vec4.transformMat4(pointv4, pointv4, m4a);
-    this.distance = vec3.dot(pointv4 as unknown as vec3.Vec3Array, this.normal.array);
+
     // Transform plane normal
     mat4.invert(inverseTranspose, m4a);
     mat4.transpose(inverseTranspose, inverseTranspose);
@@ -125,6 +125,8 @@ class Plane {
     vec3.copy(normalv4 as unknown as vec3.Vec3Array, this.normal.array);
     vec4.transformMat4(normalv4, normalv4, inverseTranspose);
     vec3.copy(this.normal.array, normalv4 as unknown as vec3.Vec3Array);
+
+    this.distance = vec3.dot(pointv4 as unknown as vec3.Vec3Array, this.normal.array);
   }
 
   /**
