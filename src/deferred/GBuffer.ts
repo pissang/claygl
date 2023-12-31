@@ -397,7 +397,7 @@ class DeferredGBuffer {
       frameBuffer.attach(opts.targetTexture4 || this._gBufferTex4, gl.COLOR_ATTACHMENT2);
       outputs.push('color2');
     }
-    if (enableTargetTexture4) {
+    if (enableTargetTexture5) {
       frameBuffer.attach(opts.targetTexture5 || this._gBufferTex5, gl.COLOR_ATTACHMENT3);
       outputs.push('color3');
     }

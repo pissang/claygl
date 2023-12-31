@@ -84,9 +84,10 @@ for (let i = 0; i < 100; i++) {
   const debugMesh = new Mesh(
     sphereGeo,
     new StandardMaterial({
-      color: [0, 0, 0],
       roughness: 1,
-      emission: pointLight.color
+      color: [0, 0, 0],
+      emission: pointLight.color,
+      emissionIntensity: 1
     })
   );
   debugMesh.scale.set(0.02, 0.02, 0.02);
