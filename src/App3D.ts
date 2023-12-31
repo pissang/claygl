@@ -371,7 +371,7 @@ class App3D extends Notifier {
 
       if (this._autoUpdateCameraAspect) {
         const camera = this._scene.getMainCamera();
-        if (camera.projection.type === 'perspective') {
+        if (camera && camera.projection.type === 'perspective') {
           camera.projection.aspect = this._renderer.getViewportAspect();
         }
       }
