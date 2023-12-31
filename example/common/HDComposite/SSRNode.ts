@@ -4,9 +4,9 @@ import {
   constants,
   GroupCompositeNode,
   FilterCompositeNode,
-  PerspectiveCamera,
   Renderer,
-  Matrix4
+  Matrix4,
+  Camera
 } from 'claygl';
 import { SSRBlurFragment, SSRTraceFragment } from './SSR.glsl';
 
@@ -29,8 +29,8 @@ class SSRCompositeNode extends GroupCompositeNode<
   private _ssrNode = new FilterCompositeNode<typeof SSRTraceFragment, 'color'>(SSRTraceFragment);
   private _blurHNode = new FilterCompositeNode<typeof SSRBlurFragment, 'color'>(SSRBlurFragment);
   private _blurVNode = new FilterCompositeNode<typeof SSRBlurFragment, 'color'>(SSRBlurFragment);
-  private _camera: PerspectiveCamera;
-  constructor(camera: PerspectiveCamera, opts?: SSRCompositeNodeOpts) {
+  private _camera: Camera;
+  constructor(camera: Camera, opts?: SSRCompositeNodeOpts) {
     super();
 
     const ssrNode = this._ssrNode;
@@ -119,7 +119,7 @@ class SSRCompositeNode extends GroupCompositeNode<
     ssrNode.material.set('projection', camera.projectionMatrix.array);
     ssrNode.material.set('projectionInv', camera.invProjectionMatrix.array);
     ssrNode.material.set('viewInverseTranspose', viewInverseTranspose.array);
-    ssrNode.material.set('nearZ', camera.near);
+    ssrNode.material.set('nearZ', camera.projection.near);
   }
 }
 

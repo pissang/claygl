@@ -10,7 +10,7 @@ import {
   Texture2D
 } from 'claygl';
 
-type GBufferOutput = 'texture1' | 'texture2' | 'texture3' | 'texture4';
+type GBufferOutput = 'texture1' | 'texture2' | 'texture3' | 'texture4' | 'texture5';
 
 class GBufferCompositeNode extends CompositeNode<never, GBufferOutput> {
   name = 'GBuffer';
@@ -24,7 +24,8 @@ class GBufferCompositeNode extends CompositeNode<never, GBufferOutput> {
   enableTexture1: boolean = true;
   enableTexture2: boolean = true;
   enableTexture3: boolean = true;
-  enableTexture4: boolean = false;
+  enableTexture4: boolean = true;
+  enableTexture5: boolean = false;
 
   constructor(scene: Scene, camera: Camera) {
     super();
@@ -63,6 +64,11 @@ class GBufferCompositeNode extends CompositeNode<never, GBufferOutput> {
         type: constants.HALF_FLOAT,
         disabled: !this.enableTexture4,
         ...commonTextureOpts
+      },
+      texture5: {
+        type: constants.HALF_FLOAT,
+        disabled: !this.enableTexture5,
+        ...commonTextureOpts
       }
     };
   }
@@ -78,12 +84,14 @@ class GBufferCompositeNode extends CompositeNode<never, GBufferOutput> {
     gbuffer.enableTargetTexture2 = this.enableTexture2;
     gbuffer.enableTargetTexture3 = this.enableTexture3;
     gbuffer.enableTargetTexture4 = this.enableTexture4;
+    gbuffer.enableTargetTexture5 = this.enableTexture5;
 
     gbuffer.update(renderer, this._scene, this._camera, {
       targetTexture1: outputTextures.texture1 as Texture2D,
       targetTexture2: outputTextures.texture2 as Texture2D,
       targetTexture3: outputTextures.texture3 as Texture2D,
-      targetTexture4: outputTextures.texture4 as Texture2D
+      targetTexture4: outputTextures.texture4 as Texture2D,
+      targetTexture5: outputTextures.texture5 as Texture2D
     });
   }
 }

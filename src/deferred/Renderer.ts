@@ -95,6 +95,8 @@ class DeferredRenderer {
   private _ambientSHMat: Material;
   private _ambientCubemapMat: Material;
 
+  private _emissiveOutMat: Material;
+
   private _spotLightShader: Shader;
   private _pointLightShader: Shader;
 
@@ -153,17 +155,18 @@ class DeferredRenderer {
     mat.identity().rotateZ(Math.PI / 2);
     cylinderGeo.applyTransform(mat);
 
-    this._directionalLightMat = this._createLightPassMat(directionalLightShader);
+    this._directionalLightMat = createLightPassMat(directionalLightShader);
 
-    this._ambientMat = this._createLightPassMat(
+    this._ambientMat = createLightPassMat(
       new Shader(fullscreenQuadPassVertex, deferredAmbientLightFragment)
     );
-    this._ambientSHMat = this._createLightPassMat(
+    this._ambientSHMat = createLightPassMat(
       new Shader(fullscreenQuadPassVertex, deferredAmbientSHLightFragment)
     );
-    this._ambientCubemapMat = this._createLightPassMat(
+    this._ambientCubemapMat = createLightPassMat(
       new Shader(fullscreenQuadPassVertex, deferredAmbientCubemapLightFragment)
     );
+    this._emissiveOutMat = createLightPassMat(new Shader(fullscreenQuadPassVertex, outputFragment));
 
     this._spotLightShader = new Shader(lightVolumeVertex, deferredSpotLightFragment);
     this._pointLightShader = new Shader(lightVolumeVertex, deferredPointLightFragment);
@@ -217,6 +220,7 @@ class DeferredRenderer {
       gBufferTexture1?: Texture2D;
       gBufferTexture2?: Texture2D;
       gBufferTexture3?: Texture2D;
+      gBufferTexture4?: Texture2D;
 
       ssaoTexture?: Texture2D;
       /**
@@ -237,7 +241,8 @@ class DeferredRenderer {
     const lightAccumTex = opts.targetTexture || this._lightAccumTex;
 
     const pixelRatio = renderer.getPixelRatio();
-    const isInputGBuffer = opts.gBufferTexture1 && opts.gBufferTexture2 && opts.gBufferTexture3;
+    const isInputGBuffer =
+      opts.gBufferTexture1 && opts.gBufferTexture2 && opts.gBufferTexture3 && opts.gBufferTexture4;
 
     if (
       this.autoResize &&
@@ -262,7 +267,8 @@ class DeferredRenderer {
         ? {
             gBufferTexture1: opts.gBufferTexture1!,
             gBufferTexture2: opts.gBufferTexture2!,
-            gBufferTexture3: opts.gBufferTexture3!
+            gBufferTexture3: opts.gBufferTexture3!,
+            gBufferTexture4: opts.gBufferTexture4!
           }
         : undefined
     );
@@ -367,6 +373,7 @@ class DeferredRenderer {
       gBufferTexture1: Texture2D;
       gBufferTexture2: Texture2D;
       gBufferTexture3: Texture2D;
+      gBufferTexture4: Texture2D;
     }
   ) {
     const gl = renderer.gl;
@@ -399,14 +406,17 @@ class DeferredRenderer {
     let gBufferTexture1: Texture2D;
     let gBufferTexture2: Texture2D;
     let gBufferTexture3: Texture2D;
+    let gBufferTexture4: Texture2D;
     if (gBufferTextures) {
       gBufferTexture1 = gBufferTextures.gBufferTexture1;
       gBufferTexture2 = gBufferTextures.gBufferTexture2;
       gBufferTexture3 = gBufferTextures.gBufferTexture3;
+      gBufferTexture4 = gBufferTextures.gBufferTexture4;
     } else {
       gBufferTexture1 = gBuffer.getTargetTexture1();
       gBufferTexture2 = gBuffer.getTargetTexture2();
       gBufferTexture3 = gBuffer.getTargetTexture3();
+      gBufferTexture4 = gBuffer.getTargetTexture4();
     }
 
     // Render nothing and do the clear.
@@ -593,6 +603,14 @@ class DeferredRenderer {
       fullQuadPass.material = passMaterial;
       fullQuadPass.renderQuad(renderer, lightAccumFrameBuffer);
     }
+
+    // Add emissive
+    const emissiveOutMat = (fullQuadPass.material = this._emissiveOutMat);
+    emissiveOutMat.set('colorTex', gBufferTexture4);
+    emissiveOutMat.depthMask = false;
+    emissiveOutMat.transparent = true;
+    emissiveOutMat.blend = lightAccumulateBlendFunc;
+    fullQuadPass.renderQuad(renderer, lightAccumFrameBuffer);
   }
 
   private _updatePCFKernel(material: Material) {

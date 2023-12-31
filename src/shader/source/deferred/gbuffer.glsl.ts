@@ -89,7 +89,7 @@ void main() {
   }
   #endif
 
-  #ifdef USE_TARGET_TEXTURE4
+  #ifdef USE_TARGET_TEXTURE5
   // Weighted Sum Skinning Matrix
   // PENDING Must be assigned.
   {
@@ -127,7 +127,7 @@ void main() {
   v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
 #endif
 
-#ifdef USE_TARGET_TEXTURE4
+#ifdef USE_TARGET_TEXTURE5
   v_ViewPosition = worldViewProjection * vec4(skinnedPosition, 1.0);
   v_PrevViewPosition = prevWorldViewProjection * vec4(prevSkinnedPosition, 1.0);
 #endif
@@ -174,6 +174,10 @@ export const createGBufferFrag = (outputs: string[]) =>
       roughGlossMap: uniform('sampler2D'),
       useRoughGlossMap: uniform('bool'),
       useRoughness: uniform('bool'),
+
+      emission: uniform('vec3'),
+      emissionIntensity: uniform('float'),
+      emissiveMap: uniform('sampler2D'),
 
       doubleSided: uniform('bool'),
       alphaCutoff: uniform('float', 0.0),
@@ -237,7 +241,6 @@ void main() {
   out_color0 = vec4((N + 1.0) * 0.5, g + 0.005);
 #endif
 
-  // Texture 2
 #ifdef USE_TARGET_TEXTURE3
   float m = metalness;
 
@@ -258,15 +261,26 @@ void main() {
 #endif
 
 #ifdef USE_TARGET_TEXTURE4
+  // Emission
+  vec3 emissionRgb = emission;
+  vec3 emissionTexel = texture(emissiveMap, v_Texcoord).rgb;
+  if (linear) {
+    emissionRgb = sRGBToLinear(vec4(emissionRgb, 1.0)).rgb;
+    emissionTexel = sRGBToLinear(vec4(emissionTexel, 1.0)).rgb;
+  }
+  out_color2 = vec4(emissionRgb * emissionTexel * emissionIntensity, 1.0);
+#endif
+
+#ifdef USE_TARGET_TEXTURE5
   // Velocity
   vec2 cur = v_ViewPosition.xy / v_ViewPosition.w;
   vec2 prev = v_PrevViewPosition.xy / v_PrevViewPosition.w;
 
   if (firstRender) {
-    out_color2 = vec4(0.0, 0.0, 0.0, a);
+    out_color3 = vec4(0.0, 0.0, 0.0, a);
   }
   else {
-    out_color2 = vec4((cur - prev) * 0.5 + 0.5, 0.0, a);
+    out_color3 = vec4((cur - prev) * 0.5 + 0.5, 0.0, a);
   }
 #endif
 }`
@@ -283,12 +297,14 @@ export const gBufferDebugFragment = new FragmentShader({
      * - 3: glossiness
      * - 4: metalness
      * - 5: albedo
-     * - 6: velocity
+     * - 6: emission
+     * - 7: velocity
      */
     debug: uniform('int', 0),
 
+    gBufferTexture4: uniform('sampler2D'),
     // gbuffer1, 2, 3 already been in the gBufferReadMixin
-    gBufferTexture4: uniform('sampler2D')
+    gBufferTexture5: uniform('sampler2D')
   },
   includes: [gBufferReadMixin],
   main: glsl`
@@ -307,8 +323,10 @@ void main() {
     out_color = vec4(vec3(metalness), 1.0);
   } else if (debug == 5) {
     out_color = vec4(albedo, 1.0);
+  } else if (debug == 6){
+    out_color = vec4(texture(gBufferTexture4, uv).rgb, 1.0);
   } else {
-    vec4 color = texture(gBufferTexture4, uv);
+    vec4 color = texture(gBufferTexture5, uv);
     color.rg -= 0.5;
     color.rg *= 2.0;
     out_color = color;

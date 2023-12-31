@@ -45,7 +45,8 @@ function getGetUniformHook(
   defaultDiffuseMap: Texture2D,
   defaultNormalMap: Texture2D,
   defaultRoughnessMap: Texture2D,
-  defaultMetalnessMap: Texture2D
+  defaultMetalnessMap: Texture2D,
+  defaultEmissiveMap: Texture2D
 ) {
   return function (renderable: RenderableObject, gBufferMat: Material, symbol: string) {
     const standardMaterial = renderable.material;
@@ -67,6 +68,12 @@ function getGetUniformHook(
         return standardMaterial.get(symbol) || defaultMetalnessMap;
       case 'useMetalnessMap':
         return !!standardMaterial.get('metalnessMap');
+      case 'emission':
+        return standardMaterial.get('emission');
+      case 'emissionIntensity':
+        return standardMaterial.get('emissionIntensity') || 0;
+      case 'emissiveMap':
+        return standardMaterial.get(symbol) || defaultEmissiveMap;
       case 'linear':
         return standardMaterial.isDefined('fragment', 'SRGB_DECODE');
       case 'alphaCutoff':
@@ -124,33 +131,13 @@ const commonTextureOpts = {
 } as const;
 
 export interface DeferredGBufferOpts {
-  /**
-   * If enable gbuffer texture 1.
-   */
   enableTargetTexture1: boolean;
-
-  /**
-   * If enable gbuffer texture 2.
-   */
   enableTargetTexture2: boolean;
-
-  /**
-   * If enable gbuffer texture 3.
-   */
   enableTargetTexture3: boolean;
-
-  /**
-   * If enable gbuffer texture 4.
-   */
   enableTargetTexture4: boolean;
+  enableTargetTexture5: boolean;
 
-  /**
-   * If render opaque list. Default to be true
-   */
   renderOpaque: boolean;
-  /**
-   * If render transparent list. Default to be false
-   */
   renderTransparent: boolean;
 }
 
@@ -195,7 +182,17 @@ class DeferredGBuffer {
   // - A: metalness
   private _gBufferTex3 = new Texture2D(commonTextureOpts);
 
+  // - R: emission.r
+  // - G: emission.g
+  // - B: emission.b
+  // - A
   private _gBufferTex4 = new Texture2D({
+    // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
+    type: constants.HALF_FLOAT,
+    ...commonTextureOpts
+  });
+
+  private _gBufferTex5 = new Texture2D({
     // FLOAT Texture has bug on iOS. is HALF_FLOAT enough?
     type: constants.HALF_FLOAT,
     ...commonTextureOpts
@@ -213,6 +210,9 @@ class DeferredGBuffer {
   private _defaultDiffuseMap = new Texture2D({
     source: createFillCanvas('#fff')
   });
+  private _defaultEmissiveMap = new Texture2D({
+    source: createFillCanvas('#fff')
+  });
 
   private _frameBuffer = new FrameBuffer();
 
@@ -227,7 +227,8 @@ class DeferredGBuffer {
     this.enableTargetTexture1 = optional(opts.enableTargetTexture1, true);
     this.enableTargetTexture2 = optional(opts.enableTargetTexture2, true);
     this.enableTargetTexture3 = optional(opts.enableTargetTexture3, true);
-    this.enableTargetTexture4 = optional(opts.enableTargetTexture4, false);
+    this.enableTargetTexture4 = optional(opts.enableTargetTexture4, true);
+    this.enableTargetTexture5 = optional(opts.enableTargetTexture5, false);
     this.renderOpaque = optional(opts.renderOpaque, true);
     this.renderTransparent = optional(opts.renderTransparent, false);
   }
@@ -245,6 +246,7 @@ class DeferredGBuffer {
     this._gBufferTex2.resize(width, height);
     this._gBufferTex3.resize(width, height);
     this._gBufferTex4.resize(width, height);
+    this._gBufferTex5.resize(width, height);
   }
 
   // TODO is dpr needed?
@@ -308,6 +310,7 @@ class DeferredGBuffer {
       targetTexture2?: Texture2D;
       targetTexture3?: Texture2D;
       targetTexture4?: Texture2D;
+      targetTexture5?: Texture2D;
     }
   ) {
     opts = opts || {};
@@ -345,6 +348,8 @@ class DeferredGBuffer {
     const enableTargetTexture2 = this.enableTargetTexture2;
     const enableTargetTexture3 = this.enableTargetTexture3;
     const enableTargetTexture4 = this.enableTargetTexture4;
+    const enableTargetTexture5 = this.enableTargetTexture5;
+
     if (!enableTargetTexture1 && !enableTargetTexture3 && !enableTargetTexture4) {
       console.warn("Can't disable targetTexture1, targetTexture3, targetTexture4 both");
       enableTargetTexture1 = true;
@@ -392,6 +397,10 @@ class DeferredGBuffer {
       frameBuffer.attach(opts.targetTexture4 || this._gBufferTex4, gl.COLOR_ATTACHMENT2);
       outputs.push('color2');
     }
+    if (enableTargetTexture4) {
+      frameBuffer.attach(opts.targetTexture5 || this._gBufferTex5, gl.COLOR_ATTACHMENT3);
+      outputs.push('color3');
+    }
 
     // Render list will be updated in gbuffer.
     camera.updateOffset && camera.updateOffset(frameBuffer.getWidth(), frameBuffer.getHeight(), 1);
@@ -413,6 +422,9 @@ class DeferredGBuffer {
       }
       if (enableTargetTexture4) {
         gBufferMaterial.define('USE_TARGET_TEXTURE4');
+      }
+      if (enableTargetTexture5) {
+        gBufferMaterial.define('USE_TARGET_TEXTURE5');
       }
     }
 
@@ -449,7 +461,8 @@ class DeferredGBuffer {
         this._defaultDiffuseMap,
         this._defaultNormalMap,
         this._defaultRoughnessMap,
-        this._defaultMetalnessMap
+        this._defaultMetalnessMap,
+        this._defaultEmissiveMap
       ),
       isMaterialChanged,
       sortCompare: Renderer.opaqueSortCompare,
@@ -536,6 +549,7 @@ class DeferredGBuffer {
    * + 'glossiness'
    * + 'metalness'
    * + 'albedo'
+   * + 'emission'
    * + 'velocity'
    *
    * @param {clay.Renderer} renderer
@@ -545,7 +559,15 @@ class DeferredGBuffer {
   renderDebug(
     renderer: Renderer,
     camera: Camera,
-    type?: 'normal' | 'depth' | 'position' | 'glossiness' | 'metalness' | 'albedo' | 'velocity',
+    type?:
+      | 'normal'
+      | 'depth'
+      | 'position'
+      | 'glossiness'
+      | 'metalness'
+      | 'albedo'
+      | 'emission'
+      | 'velocity',
     viewport?: RendererViewport
   ) {
     const debugTypes = {
@@ -555,7 +577,8 @@ class DeferredGBuffer {
       glossiness: 3,
       metalness: 4,
       albedo: 5,
-      velocity: 6
+      emission: 6,
+      velocity: 7
     } as const;
     if (debugTypes[type!] == null) {
       console.warn('Unkown type "' + type + '"');
@@ -579,6 +602,7 @@ class DeferredGBuffer {
     debugPassMat.set('gBufferTexture2', this._gBufferTex2);
     debugPassMat.set('gBufferTexture3', this._gBufferTex3);
     debugPassMat.set('gBufferTexture4', this._gBufferTex4);
+    debugPassMat.set('gBufferTexture5', this._gBufferTex5);
     debugPassMat.set('debug', debugTypes[type!]);
     debugPassMat.set('viewProjectionInv', viewProjectionInv.array);
     debugPass.render(renderer);
@@ -628,11 +652,23 @@ class DeferredGBuffer {
   /**
    * Get fourth target texture.
    * Channel storage:
+   * + R: emission.r
+   * + G: emission.g
+   * + B: emission.b
+   * + A: 1.0
+   */
+  getTargetTexture4() {
+    return this._gBufferTex4;
+  }
+
+  /**
+   * Get fourth target texture.
+   * Channel storage:
    * + R: velocity.r
    * + G: velocity.g
    * @return {clay.Texture2D}
    */
-  getTargetTexture4() {
+  getTargetTexture5() {
     return this._gBufferTex4;
   }
 
