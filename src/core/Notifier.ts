@@ -148,7 +148,7 @@ class Notifier {
    * @param  {Object} [context]
    * @chainable
    */
-  off(name: string, action: Function) {
+  off(name: string, action?: Function) {
     const handlers = this._handlers || (this._handlers = {});
 
     if (!action) {
