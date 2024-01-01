@@ -1,12 +1,11 @@
 import {
   Texture2D,
   Vector3,
-  constants,
   GroupCompositeNode,
   FilterCompositeNode,
-  PerspectiveCamera,
   Renderer,
-  Matrix4
+  Matrix4,
+  Camera
 } from 'claygl';
 import { SSAOBlurFragment, SSAOEstimateFragment } from './SSAO.glsl';
 import TAACameraJitter from './TAACameraJitter';
@@ -65,12 +64,12 @@ class SSAOCompositeNode extends GroupCompositeNode<'gBufferTex' | 'depthTex', 'c
   );
   private _blurNode = new FilterCompositeNode<typeof SSAOBlurFragment, 'color'>(SSAOBlurFragment);
 
-  private _camera: PerspectiveCamera;
+  private _camera: Camera;
 
   private _kernels: Float32Array[] = [];
   private _TAAJitter?: TAACameraJitter;
 
-  constructor(camera: PerspectiveCamera, opts?: SSAOCompositeNodeOpts) {
+  constructor(camera: Camera, opts?: SSAOCompositeNodeOpts) {
     super();
     this._camera = camera;
 

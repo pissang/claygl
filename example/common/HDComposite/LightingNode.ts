@@ -23,7 +23,7 @@ import { LTC_MAT_1, LTC_MAT_2 } from './ltc';
 const rectAreaLightShader = new Shader(lightVolumeVertex, deferredAreaLightFragment);
 
 class LightingCompositeNode extends CompositeNode<
-  'gBufferTexture1' | 'gBufferTexture2' | 'gBufferTexture3',
+  'gBufferTexture1' | 'gBufferTexture2' | 'gBufferTexture3' | 'gBufferTexture4',
   'color'
 > {
   private _scene: Scene;
@@ -111,6 +111,10 @@ class LightingCompositeNode extends CompositeNode<
       gBufferTexture3: {
         node,
         output: 'texture3'
+      },
+      gBufferTexture4: {
+        node,
+        output: 'texture4'
       }
     };
   }
@@ -118,7 +122,14 @@ class LightingCompositeNode extends CompositeNode<
   prepare(renderer: Renderer): void {}
   render(
     renderer: Renderer,
-    inputTextures?: Record<'gBufferTexture1' | 'gBufferTexture2' | 'gBufferTexture3', Texture2D>,
+    inputTextures?: Record<
+      | 'gBufferTexture1'
+      | 'gBufferTexture2'
+      | 'gBufferTexture3'
+      | 'gBufferTexture4'
+      | 'gBufferTexture5',
+      Texture2D
+    >,
     outputTextures?: Record<'color', Texture2D>,
     frameBuffer?: FrameBuffer
   ): void {
@@ -134,6 +145,7 @@ class LightingCompositeNode extends CompositeNode<
       gBufferTexture1: inputTextures!.gBufferTexture1,
       gBufferTexture2: inputTextures!.gBufferTexture2,
       gBufferTexture3: inputTextures!.gBufferTexture3,
+      gBufferTexture4: inputTextures!.gBufferTexture4,
       targetTexture: outputTextures && outputTextures.color
     });
   }

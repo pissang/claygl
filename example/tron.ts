@@ -5,7 +5,6 @@ import {
   CubeGeometry,
   Material,
   Mesh,
-  DirectionalLight,
   OrbitControl,
   startTimeline,
   Compositor,

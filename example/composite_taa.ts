@@ -129,14 +129,8 @@ blendNode.material.set('weight1', 1);
 blendNode.material.set('weight2', 1);
 taaNode.inputs = {
   colorTex: blendNode,
-  gBufferTexture2: {
-    node: gbufferNode,
-    output: 'texture2'
-  },
-  gBufferTexture4: {
-    node: gbufferNode,
-    output: 'texture4'
-  }
+  gBufferTexture2: createCompositeNodeInput(gbufferNode, 'texture2'),
+  gBufferTexture5: createCompositeNodeInput(gbufferNode, 'texture5')
 };
 tonemappingNode.inputs = {
   colorTex: taaNode
