@@ -274,8 +274,8 @@ abstract class Texture<TSource = unknown> {
   }
 
   resize(width: number, height: number) {
-    this._width = width;
-    this._height = height;
+    this.width = width;
+    this.height = height;
   }
 
   /**
