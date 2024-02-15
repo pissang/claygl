@@ -19,6 +19,11 @@ class GLExtension {
   }
 
   private _createExtension(name: string) {
+    // This is not used and will warn on chrome.
+    if (name === 'WEBGL_polygon_mode') {
+      return;
+    }
+
     const gl = this.gl;
     if (gl.getExtension) {
       let ext = gl.getExtension(name);

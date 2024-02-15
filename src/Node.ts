@@ -159,7 +159,9 @@ class ClayNode extends Notifier {
 
     const scene = this._scene;
     if (scene && scene !== node._scene) {
-      node.traverse((child) => this._addSelfToScene(child));
+      node.traverse((child) => {
+        this._addSelfToScene(child);
+      });
     }
   }
 
@@ -178,7 +180,9 @@ class ClayNode extends Notifier {
     node._parent = undefined;
 
     if (this._scene) {
-      node.traverse((child) => this._removeSelfFromScene(child));
+      node.traverse((child) => {
+        this._removeSelfFromScene(child);
+      });
     }
   }
 
@@ -192,7 +196,9 @@ class ClayNode extends Notifier {
       children[idx]._parent = undefined;
 
       if (this._scene) {
-        children[idx].traverse((child) => this._removeSelfFromScene(child));
+        children[idx].traverse((child) => {
+          this._removeSelfFromScene(child);
+        });
       }
     }
 
@@ -299,45 +305,6 @@ class ClayNode extends Notifier {
   }
 
   /**
-   * Query descendant node by path
-   * @param {string} path
-   * @return {clay.Node}
-   * @example
-   *  node.queryNode('root/parent/child');
-   */
-  queryNode(path: string): ClayNode | undefined {
-    if (!path) {
-      return;
-    }
-    // TODO Name have slash ?
-    const pathArr = path.split('/');
-    let current = this as ClayNode;
-    for (let i = 0; i < pathArr.length; i++) {
-      const name = pathArr[i];
-      // Skip empty
-      if (!name) {
-        continue;
-      }
-      let found = false;
-      const children = current._children;
-      for (let j = 0; j < children.length; j++) {
-        const child = children[j];
-        if (child.name === name) {
-          current = child;
-          found = true;
-          break;
-        }
-      }
-      // Early return if not found
-      if (!found) {
-        return;
-      }
-    }
-
-    return current;
-  }
-
-  /**
    * Get query path, relative to rootNode(default is scene)
    * @param {clay.Node} [rootNode]
    * @return {string}
@@ -366,10 +333,12 @@ class ClayNode extends Notifier {
    * Depth first traverse all its descendant scene nodes.
    *
    * **WARN** Don't do `add`, `remove` operation in the callback during traverse.
-   * @param {Function} callback
+   * @param {Function} callback Return true to stop traverse
    */
-  traverse(callback: (node: ClayNode) => void) {
-    callback(this);
+  traverse(callback: (node: ClayNode) => boolean | void) {
+    if (callback(this)) {
+      return;
+    }
     const children = this._children;
     for (let i = 0, len = children.length; i < len; i++) {
       children[i].traverse(callback);
