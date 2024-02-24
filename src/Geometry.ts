@@ -10,6 +10,7 @@ import GeometryBase, {
 } from './GeometryBase';
 import type Matrix4 from './math/Matrix4';
 import { AttributeSemantic } from './Shader';
+import { mat3 } from './glmatrix';
 
 export interface GeometryOpts extends GeometryBaseOpts {}
 
@@ -514,14 +515,15 @@ class Geometry extends GeometryBase {
     const inverseTransposeMatrix = mat4.create();
     mat4.invert(inverseTransposeMatrix, matArr);
     mat4.transpose(inverseTransposeMatrix, inverseTransposeMatrix);
+    const normalMat = mat3.fromMat4(mat3.create(), inverseTransposeMatrix);
 
     const vec3ForEach = vec3.forEach;
     vec3ForEach(positions, 3, 0, undefined, vec3.transformMat4, matArr);
     if (normals) {
-      vec3ForEach(normals, 3, 0, undefined, vec3.transformMat4, inverseTransposeMatrix);
+      vec3ForEach(normals, 3, 0, undefined, vec3.transformMat3, normalMat);
     }
     if (tangents) {
-      vec3ForEach(tangents, 4, 0, undefined, vec3.transformMat4, inverseTransposeMatrix);
+      vec3ForEach(tangents, 4, 0, undefined, vec3.transformMat3, normalMat);
     }
 
     if (this.boundingBox) {
