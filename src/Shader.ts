@@ -23,6 +23,8 @@ export type UniformType =
   | 'sampler2DArray'
   | 'sampler3D'
   | 'samplerCube'
+  | 'isampler2D'
+  | 'usampler2D'
   | 'float'
   | 'vec2'
   | 'vec3'
@@ -56,6 +58,8 @@ type NativeUniformValueMap = {
   samplerCube: TextureCube;
   sampler3D: Texture3D;
   sampler2DArray: Texture2DArray;
+  isampler2D: Texture2D;
+  usampler2D: Texture2D;
   float: number;
   vec2: vec2.Vec2Array;
   vec3: vec3.Vec3Array;
@@ -75,6 +79,8 @@ type NativeUniformArrayValueMap = {
   samplerCube: TextureCube[];
   sampler3D: Texture3D[];
   sampler2DArray: Texture2DArray[];
+  isampler2D: Texture2D[];
+  usampler2D: Texture2D[];
   float: ArrayLike<number>;
   vec2: ArrayLike<number>;
   vec3: ArrayLike<number>;
@@ -472,17 +478,19 @@ function composeShaderString(stageShader: StageShader, isVertex: boolean) {
     return keys(obj)
       .map((symbol) => {
         const item = obj[symbol];
+        const itemType = item.type;
         // Use #define to define the length. Need to check #ifdef here.
         const isDefinedLen = item.array && isNaN(+item.len!);
         const arrayExpr = item.array ? `[${item.len}]` : '';
-        const needsFlat = isVaring && item.type.startsWith('i');
+        const needsHighp = itemType.startsWith('isampler') || itemType.startsWith('usampler');
+        // Int varying
+        const needsFlat = isVaring && itemType.startsWith('i');
         return (
           (isDefinedLen ? `#ifdef ${item.len!}\n` : '') +
           // `${composeStruct(item.struct, symbol)}` +
           `${needsFlat ? 'flat ' : ''}${varType} ${
-            // item.struct ? getStructName(symbol) :
-            item.type
-          } ${symbol}${arrayExpr};` +
+            needsHighp ? 'highp ' : ''
+          }${itemType} ${symbol}${arrayExpr};` +
           (isDefinedLen ? `\n#endif` : '')
         );
       })
@@ -540,7 +548,15 @@ export type PickFragmentTextureUniforms<
 > = Pick<
   T,
   {
-    [key in keyof T]: T[key]['type'] extends 'sampler2D' | 'samplerCube' ? key : never;
+    [key in keyof T]: T[key]['type'] extends
+      | 'sampler2D'
+      | 'samplerCube'
+      | 'isampler2D'
+      | 'usampler2D'
+      | 'sampler3D'
+      | 'sampler2DArray'
+      ? key
+      : never;
   }[keyof T]
 >;
 
@@ -562,7 +578,13 @@ export class Shader<
     string,
     {
       shaderType: 'fragment' | 'vertex';
-      type: 'sampler2D' | 'samplerCube';
+      type:
+        | 'sampler2D'
+        | 'samplerCube'
+        | 'isampler2D'
+        | 'usampler2D'
+        | 'sampler3D'
+        | 'sampler2DArray';
     }
   >;
   /**
@@ -656,7 +678,14 @@ export class Shader<
         const uniformType = uniform.type as UniformType;
         const uniformValue = uniform.value as UniformType;
         const uniformSemantic = uniform.semantic;
-        if (uniformType === 'sampler2D' || uniformType === 'samplerCube') {
+        if (
+          uniformType === 'sampler2D' ||
+          uniformType === 'samplerCube' ||
+          uniformType === 'isampler2D' ||
+          uniformType === 'usampler2D' ||
+          uniformType === 'sampler3D' ||
+          uniformType === 'sampler2DArray'
+        ) {
           textures[uniformName] = {
             type: uniformType,
             shaderType
@@ -748,7 +777,8 @@ export class Shader<
 }
 
 export function isTextureUniform(uniform: { type: UniformType }) {
-  return uniform.type.startsWith('sampler');
+  const type = uniform.type;
+  return type.startsWith('sampler') || type.startsWith('isampler') || type.startsWith('usampler');
 }
 
 export default Shader;

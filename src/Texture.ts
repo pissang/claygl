@@ -9,7 +9,7 @@ import { assign } from './core/util';
 
 export type TextureImageSource = HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
 export type TexturePixelSource = {
-  data: Uint8Array | Float32Array;
+  data: Uint8Array | Float32Array | Int32Array;
   width: number;
   height: number;
   depth?: number;
@@ -43,6 +43,22 @@ export function getPossiblelInternalFormat(format: number, type: number) {
         : format === constants.RG
         ? constants.RG32F
         : constants.R32F;
+    case constants.INT:
+      return format === constants.RGBA
+        ? constants.RGBA32I
+        : format === constants.RGB
+        ? constants.RGB32I
+        : format === constants.RG
+        ? constants.RG32I
+        : constants.R32I;
+    case constants.UNSIGNED_INT:
+      return format === constants.RGBA
+        ? constants.RGBA32UI
+        : format === constants.RGB
+        ? constants.RGB32UI
+        : format === constants.RG
+        ? constants.RG32UI
+        : constants.R32UI;
     case constants.UNSIGNED_BYTE:
       return format === constants.RGBA
         ? constants.RGBA8
@@ -72,10 +88,15 @@ export function getDefaultTextureFormatBySource(source?: TextureSource) {
 
 export function getDefaultTypeBySource(source?: TextureSource) {
   if (isPixelSource(source)) {
-    return source.data instanceof Float32Array
+    const data = source.data;
+    return data instanceof Float32Array
       ? constants.FLOAT
-      : source.data instanceof Uint16Array
+      : data instanceof Uint16Array
       ? constants.HALF_FLOAT
+      : data instanceof Uint32Array
+      ? constants.UNSIGNED_INT
+      : data instanceof Int32Array
+      ? constants.INT
       : constants.UNSIGNED_BYTE;
   }
   return constants.UNSIGNED_BYTE;
