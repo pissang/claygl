@@ -154,12 +154,12 @@ export function keys(obj?: any): string[] {
 export const assign = Object.assign;
 
 export function setCanvasSize(
-  canvas: HTMLCanvasElement,
+  canvas: HTMLCanvasElement | OffscreenCanvas,
   width: number,
   height: number,
   pixelRatio?: number
 ) {
-  const style = canvas.style;
+  const style = (canvas as HTMLCanvasElement).style;
   if (style) {
     style.width = width + 'px';
     style.height = height + 'px';

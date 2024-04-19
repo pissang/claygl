@@ -253,7 +253,9 @@ class App3D extends Notifier {
       this._eventManager = new EventManager(eventOpts.container || container, renderer, scene);
       this._eventManager.enable(eventOpts.trigger);
     }
-    !isDomCanvas && container.appendChild(renderer.canvas);
+    !isDomCanvas &&
+      container.appendChild &&
+      container.appendChild(renderer.canvas as HTMLCanvasElement);
 
     // Set scene to initialize.
     this._onBeforeRenderScene = this._onBeforeRenderScene.bind(this);

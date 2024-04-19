@@ -1,3 +1,4 @@
+// TODO deleteProgram
 import { assign, genGUID, isArray, keys } from '../core/util';
 import Shader, { AttributeSemantic, UniformSemantic, UniformType } from '../Shader';
 import * as constants from '../core/constants';

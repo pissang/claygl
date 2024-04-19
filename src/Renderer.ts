@@ -60,7 +60,7 @@ export interface RendererViewport {
   pixelRatio: number;
 }
 export interface RendererOpts {
-  canvas: HTMLCanvasElement | null;
+  canvas: HTMLCanvasElement | OffscreenCanvas | null;
 
   /**
    * Canvas width
@@ -147,7 +147,7 @@ interface Renderer
 class Renderer extends Notifier {
   uid = genGUID();
 
-  canvas: HTMLCanvasElement;
+  canvas: HTMLCanvasElement | OffscreenCanvas;
   /**
    * Canvas width, set by resize method
    */
