@@ -115,6 +115,8 @@ export * as textureUtil from './util/texture';
 
 export { default as App3D } from './App3D';
 
+export { EventManager, ClayMouseEvent } from './app/EventManager';
+
 // Composite
 export { default as FullscreenQuadPass } from './FullscreenQuadPass';
 export { default as Compositor } from './composite/Compositor';
