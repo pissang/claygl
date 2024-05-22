@@ -268,7 +268,7 @@ void main() {
     emissionRgb = sRGBToLinear(vec4(emissionRgb, 1.0)).rgb;
     emissionTexel = sRGBToLinear(vec4(emissionTexel, 1.0)).rgb;
   }
-  out_color2 = vec4(emissionRgb * emissionTexel * emissionIntensity, 1.0);
+  out_color2 = vec4(emissionRgb * emissionTexel * emissionIntensity, a);
 #endif
 
 #ifdef USE_TARGET_TEXTURE5
@@ -277,10 +277,10 @@ void main() {
   vec2 prev = v_PrevViewPosition.xy / v_PrevViewPosition.w;
 
   if (firstRender) {
-    out_color3 = vec4(0.0, 0.0, 0.0, a);
+    out_color3 = vec4(0.0, 0.0, 0.0, 1.0);
   }
   else {
-    out_color3 = vec4((cur - prev) * 0.5 + 0.5, 0.0, a);
+    out_color3 = vec4((cur - prev) * 0.5 + 0.5, 0.0, 1.0);
   }
 #endif
 }`
