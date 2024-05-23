@@ -10,7 +10,7 @@ class SceneCompositeNode<OutputKey extends string = 'color'> extends CompositeNo
   OutputKey
 > {
   name = 'scene';
-  scene: Scene;
+  scene?: Scene;
   camera?: Camera;
 
   autoUpdateScene = true;
@@ -18,7 +18,7 @@ class SceneCompositeNode<OutputKey extends string = 'color'> extends CompositeNo
 
   depthBuffer = true;
 
-  constructor(scene: Scene, camera?: Camera, outputs?: Record<OutputKey, CompositeNodeOutput>) {
+  constructor(scene?: Scene, camera?: Camera, outputs?: Record<OutputKey, CompositeNodeOutput>) {
     super();
     this.scene = scene;
     this.camera = camera;
@@ -38,6 +38,9 @@ class SceneCompositeNode<OutputKey extends string = 'color'> extends CompositeNo
     outputTextures?: Record<string, Texture>,
     frameBuffer?: FrameBuffer
   ): void {
+    if (!this.scene) {
+      return;
+    }
     renderer.render(this.scene, this.camera || this.scene.getMainCamera(), frameBuffer, {
       preZ: this.preZ,
       notUpdateScene: !this.autoUpdateScene
