@@ -208,8 +208,6 @@ abstract class Texture<TSource = unknown> {
   protected _width?: number;
   protected _height?: number;
 
-  __dirty = true;
-
   textureType: string = '';
 
   private _source?: TSource;
@@ -219,6 +217,8 @@ abstract class Texture<TSource = unknown> {
   private _format?: GLEnum;
   private _type?: GLEnum;
   private _internalFormat?: GLEnum;
+
+  __version = 1;
 
   constructor(opts?: Partial<TextureOpts>) {
     assign(this, opts);
@@ -283,7 +283,7 @@ abstract class Texture<TSource = unknown> {
    * Mark texture is dirty and update in the next frame
    */
   dirty() {
-    this.__dirty = true;
+    this.__version++;
   }
 
   nextHighestPowerOfTwo(x: number) {

@@ -530,15 +530,17 @@ class GLPipeline {
   private _getGLTexture(texture: Texture, notUpdate?: boolean) {
     const glTextureMap = this._glTextureMap;
     let glTexture = glTextureMap.get(texture);
-    let needsUpdate = texture.__dirty;
+    let needsUpdate = false;
     if (!glTexture) {
       glTexture = new GLTexture(texture as Texture2D | TextureCube);
       glTextureMap.set(texture, glTexture);
       needsUpdate = true;
+    } else {
+      needsUpdate = texture.__version !== glTexture.__version;
     }
     if (needsUpdate && !notUpdate) {
       glTexture.update(this.gl, this._glext);
-      texture.__dirty = false;
+      glTexture.__version = texture.__version;
     }
     return glTexture;
   }

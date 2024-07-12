@@ -48,6 +48,9 @@ class GLBuffers {
   private _idxBuff?: GLIndicesBuffer;
   private _geometry: GeometryBase;
 
+  private _attrVersions: Record<string, number> = {};
+  private _indicesVersions: number = -1;
+
   private _vao?: any;
   private _vaoExt?: any;
 
@@ -61,8 +64,11 @@ class GLBuffers {
 
   update(gl: WebGL2RenderingContext) {
     const geometry = this._geometry;
-    const attributesDirty = geometry.isAttributesDirty();
-    const indicesDirty = geometry.__indicesDirty;
+    const uploadedVersions = this._attrVersions;
+    const attributesDirty = geometry.isAttributesDirty(uploadedVersions);
+    const indicesVersion = geometry.__indicesVersion;
+    const indicesDirty = indicesVersion !== this._indicesVersions;
+
     if (!attributesDirty && !indicesDirty) {
       return;
     }
@@ -90,12 +96,14 @@ class GLBuffers {
         } else {
           buffer = gl.createBuffer()!;
         }
-        if (geometry.isAttributeDirty(attrName)) {
+
+        const attrVersion = geometry.getAttributeVersion(attrName);
+        if (attrVersion !== uploadedVersions[attrName]) {
           // Only update when they are dirty.
           // TODO: Use BufferSubData?
           gl.bindBuffer(constants.ARRAY_BUFFER, buffer);
           gl.bufferData(constants.ARRAY_BUFFER, attribute.value as Float32Array, DRAW);
-          geometry.__markAttributeUploaded(attrName);
+          uploadedVersions[attrName] = attrVersion;
         }
 
         attributeBuffers[k] = new GLAttributeBuffer(
@@ -123,7 +131,7 @@ class GLBuffers {
       gl.bindBuffer(constants.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
       gl.bufferData(constants.ELEMENT_ARRAY_BUFFER, geometry.indices!, DRAW);
     }
-    geometry.__indicesDirty = false;
+    geometry.__indicesVersion = indicesVersion;
   }
 
   bindToProgram(gl: WebGL2RenderingContext, program: GLProgram) {

@@ -35,6 +35,8 @@ class GLTexture {
    */
   slot: number = -1;
 
+  __version = 0;
+
   private _texture: AllTextureType;
 
   /**

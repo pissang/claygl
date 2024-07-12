@@ -249,9 +249,9 @@ class GeometryBase {
 
   private _attributeList: string[];
   private _enabledAttributes?: string[];
-  private _attributesUploaded: Record<string, boolean> = {};
+  private _attributesVersion: Record<string, number> = {};
 
-  __indicesDirty: boolean = true;
+  __indicesVersion: number = 1;
 
   constructor(opts?: Partial<GeometryBaseOpts>) {
     opts = opts || {};
@@ -283,7 +283,7 @@ class GeometryBase {
    * Usually called after you change the data in attributes.
    */
   dirty() {
-    this._attributesUploaded = {};
+    this._attributesVersion = {};
     this.dirtyIndices();
     this._enabledAttributes = undefined;
   }
@@ -291,39 +291,35 @@ class GeometryBase {
    * Mark the indices needs to update.
    */
   dirtyIndices() {
-    this.__indicesDirty = true;
+    this.__indicesVersion++;
   }
   /**
    * Mark the attributes needs to update.
    * @param {string} [attrName]
    */
   dirtyAttribute(attrName: string) {
-    this._attributesUploaded[attrName] = false;
+    const attributesVersion = this._attributesVersion;
+    attributesVersion[attrName] = attributesVersion[attrName] || 1;
+    attributesVersion[attrName]++;
   }
   /**
    * Is any of attributes dirty.
    */
-  isAttributesDirty() {
+  isAttributesDirty(uploadedVersion: Record<string, number>) {
     if (!this._enabledAttributes) {
       return true;
     }
     const enabledAttributes = this.getEnabledAttributes();
     for (let i = 0; i < enabledAttributes.length; i++) {
-      if (this.isAttributeDirty(enabledAttributes[i])) {
+      if (this._attributesVersion[enabledAttributes[i]] !== uploadedVersion[enabledAttributes[i]]) {
         return true;
       }
     }
     return false;
   }
 
-  isAttributeDirty(attrName: string) {
-    return !this._attributesUploaded[attrName];
-  }
-
-  // Mark this attribute has been uploaded to GPU.
-  // Used internal
-  __markAttributeUploaded(attrName: string) {
-    this._attributesUploaded[attrName] = true;
+  getAttributeVersion(attrName: string) {
+    return this._attributesVersion[attrName] || 1;
   }
 
   /**
