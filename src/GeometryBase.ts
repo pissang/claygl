@@ -283,7 +283,9 @@ class GeometryBase {
    * Usually called after you change the data in attributes.
    */
   dirty() {
-    this._attributesVersion = {};
+    Object.keys(this.attributes).forEach((name) => {
+      this.dirtyAttribute(name);
+    });
     this.dirtyIndices();
     this._enabledAttributes = undefined;
   }
@@ -299,8 +301,7 @@ class GeometryBase {
    */
   dirtyAttribute(attrName: string) {
     const attributesVersion = this._attributesVersion;
-    attributesVersion[attrName] = attributesVersion[attrName] || 1;
-    attributesVersion[attrName]++;
+    attributesVersion[attrName] = (attributesVersion[attrName] || 1) + 1;
   }
   /**
    * Is any of attributes dirty.
