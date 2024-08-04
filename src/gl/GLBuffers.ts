@@ -131,7 +131,7 @@ class GLBuffers {
       gl.bindBuffer(constants.ELEMENT_ARRAY_BUFFER, indicesBuffer.buffer);
       gl.bufferData(constants.ELEMENT_ARRAY_BUFFER, geometry.indices!, DRAW);
     }
-    geometry.__indicesVersion = indicesVersion;
+    this._indicesVersions = indicesVersion;
   }
 
   bindToProgram(gl: WebGL2RenderingContext, program: GLProgram) {
