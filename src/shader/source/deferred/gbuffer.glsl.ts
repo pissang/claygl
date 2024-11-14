@@ -19,6 +19,10 @@ import {
   WORLDVIEWPROJECTION
 } from '../shared';
 import { skinningMixin, sRGBMixin } from '../util.glsl';
+import uvprojectionGlsl, {
+  UV_PROJECTION_SPHERICAL,
+  UV_PROJECTION_TRIPLANAR
+} from '../uvprojection.glsl';
 import { gBufferReadMixin } from './chunk.glsl';
 
 export const gBufferVertex = new VertexShader({
@@ -47,6 +51,8 @@ export const gBufferVertex = new VertexShader({
     v_Color: varying('vec4'),
     v_Tangent: varying('vec3'),
     v_Bitangent: varying('vec3'),
+    v_LocalNormal: varying('vec3'),
+    v_LocalPosition: varying('vec3'),
     v_WorldPosition: varying('vec3'),
     v_ViewPosition: varying('vec4'),
     v_PrevViewPosition: varying('vec4')
@@ -118,12 +124,14 @@ void main() {
 #endif
 
 #ifdef USE_TARGET_TEXTURE1
+  v_LocalNormal = skinnedNormal;
   v_Normal = normalize((worldInverseTranspose * vec4(skinnedNormal, 0.0)).xyz);
 
   if (hasTangent) {
     v_Tangent = normalize((worldInverseTranspose * vec4(skinnedTangent, 0.0)).xyz);
     v_Bitangent = normalize(cross(v_Normal, v_Tangent) * tangent.w);
   }
+  v_LocalPosition = skinnedPosition;
   v_WorldPosition = (world * vec4(skinnedPosition, 1.0)).xyz;
 #endif
 
@@ -185,10 +193,18 @@ export const createGBufferFrag = (outputs: string[]) =>
 
       roughGlossChannel: uniform('int', 0),
 
-      firstRender: uniform('bool')
+      firstRender: uniform('bool'),
+
+      uvProjection: uniform('int', 0),
+      uvRepeat: uniform('vec2')
     },
     includes: [sRGBMixin],
+    defines: {
+      PI: Math.PI
+    },
     main: glsl`
+${uvprojectionGlsl}
+
 float indexingTexel(in vec4 texel, in int idx) {
   if (idx == 3) return texel.a;
   else if (idx == 1) return texel.g;
@@ -198,7 +214,15 @@ float indexingTexel(in vec4 texel, in int idx) {
 
 void main() {
 
-  float a = alpha * texture(diffuseMap, v_Texcoord).a;
+  vec2 uv = v_Texcoord;
+  bool isTriplanar = uvProjection == ${UV_PROJECTION_TRIPLANAR + ''};
+  if (uvProjection == ${UV_PROJECTION_SPHERICAL + ''}) {
+    uv = sphericalProjection(v_LocalNormal);
+  }
+
+  float a = alpha * (isTriplanar
+    ? triplanarProjectionSample(diffuseMap, v_LocalPosition, v_LocalNormal, uvRepeat, 0.0).a
+    : texture(diffuseMap, uv).a);
   if (a < alphaCutoff) {
     discard;
   }
@@ -213,7 +237,9 @@ void main() {
     }
   }
   if (dot(v_Tangent, v_Tangent) > 0.0) {
-    vec3 normalTexel = texture(normalMap, v_Texcoord).xyz;
+    vec3 normalTexel = isTriplanar
+      ? triplanarProjectionSample(normalMap, v_LocalPosition, v_LocalNormal, uvRepeat, 0.0).rgb
+      : texture(normalMap, uv).rgb;
     if (dot(normalTexel, normalTexel) > 0.0) { // Valid normal map
       N = normalTexel * 2.0 - 1.0;
       mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
@@ -226,7 +252,10 @@ void main() {
   float g = glossiness;
 
   if (useRoughGlossMap) {
-    float g2 = indexingTexel(texture(roughGlossMap, v_Texcoord), roughGlossChannel);
+    float g2 = indexingTexel(isTriplanar
+      ? triplanarProjectionSample(roughGlossMap, v_LocalPosition, v_LocalNormal, uvRepeat, 0.0)
+      : texture(roughGlossMap, uv), roughGlossChannel
+    );
     if (useRoughness) {
       g2 = 1.0 - g2;
     }
@@ -245,10 +274,14 @@ void main() {
   float m = metalness;
 
   if (useMetalnessMap) {
-    vec4 metalnessTexel = texture(metalnessMap, v_Texcoord);
+    vec4 metalnessTexel = isTriplanar
+      ? triplanarProjectionSample(metalnessMap, v_LocalPosition, v_LocalNormal, uvRepeat, 0.0)
+      : texture(metalnessMap, uv);
     m = clamp(metalnessTexel.r + (m * 2.0 - 1.0), 0.0, 1.0);
   }
-  vec4 texel = texture(diffuseMap, v_Texcoord);
+  vec4 texel = isTriplanar
+    ? triplanarProjectionSample(diffuseMap, v_LocalPosition, v_LocalNormal, uvRepeat, 0.0)
+    : texture(diffuseMap, uv);
   vec3 albedo = color;
   vec4 vtxColor = v_Color;
   if (linear) {
@@ -263,7 +296,9 @@ void main() {
 #ifdef USE_TARGET_TEXTURE4
   // Emission
   vec3 emissionRgb = emission;
-  vec3 emissionTexel = texture(emissiveMap, v_Texcoord).rgb;
+  vec3 emissionTexel = isTriplanar
+    ? triplanarProjectionSample(emissiveMap, v_LocalPosition, v_LocalNormal, uvRepeat, 0.0).rgb
+    : texture(emissiveMap, uv).rgb;
   if (linear) {
     emissionRgb = sRGBToLinear(vec4(emissionRgb, 1.0)).rgb;
     emissionTexel = sRGBToLinear(vec4(emissionTexel, 1.0)).rgb;

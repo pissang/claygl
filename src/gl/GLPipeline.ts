@@ -78,6 +78,7 @@ export interface GLMaterialObject {
  */
 export interface GLRenderableObject<T extends GLMaterialObject = GLMaterialObject> {
   geometry: GeometryBase;
+
   material: T;
   mode?: GLEnum;
   lightGroup?: number;

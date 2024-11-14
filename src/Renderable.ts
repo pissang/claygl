@@ -122,7 +122,7 @@ class Renderable<T extends Material = Material> extends ClayNode {
   /**
    * @return {boolean}
    */
-  isRenderable(): boolean {
+  isRenderable(): this is Renderable {
     return !!(
       this.geometry &&
       this.material &&

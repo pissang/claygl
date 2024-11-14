@@ -19,6 +19,7 @@ import {
 } from '../shader/source/deferred/gbuffer.glsl';
 import { isPixelSource, TexturePixelSource } from '../Texture';
 import { GLRenderHooks } from '../gl/GLPipeline';
+import { UV_PROJECTION_NONE } from '../shader/source/uvprojection.glsl';
 
 const renderableGBufferData = new WeakMap<
   RenderableObject,
@@ -58,6 +59,8 @@ function getGetUniformHook(
       case 'alpha':
       case 'color':
         return standardMaterial.get(symbol);
+      case 'uvProjection':
+        return standardMaterial.get('uvProjection') || UV_PROJECTION_NONE;
       case 'normalMap':
         return standardMaterial.get(symbol) || defaultNormalMap;
       case 'diffuseMap':

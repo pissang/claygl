@@ -28,6 +28,7 @@ import {
   HDREncoderMixin,
   sRGBMixin
 } from './util.glsl';
+import uvprojectionGlsl from './uvprojection.glsl';
 
 export const standardVertex = new VertexShader({
   name: 'standardVertex',
@@ -130,6 +131,9 @@ export const standardFragment = new FragmentShader({
     roughness: uniform('float', 0.5),
     roughnessMap: uniform('sampler2D'),
 
+    // uv projection. 0: none, 1: spherical, 2: triplanar
+    uvProjection: uniform('int', 0),
+
     // specular workflow
     specularColor: uniform('vec3', [0.1, 0.1, 0.1]),
     specularMap: uniform('sampler2D'),
@@ -189,18 +193,6 @@ float D_GGX(float g, float ndh) {
   return a / (PI * tmp * tmp);
 }
 
-// mat3 transpose(in mat3 inMat)
-// {
-//   vec3 i0 = inMat[0];
-//   vec3 i1 = inMat[1];
-//   vec3 i2 = inMat[2];
-
-//   return mat3(
-//     vec3(i0.x, i1.x, i2.x),
-//     vec3(i0.y, i1.y, i2.y),
-//     vec3(i0.z, i1.z, i2.z)
-//   );
-// }
 // Modified from http://apoorvaj.io/exploring-bump-mapping-with-webgl.html
 vec2 parallaxUv(vec2 uv, vec3 viewDir)
 {

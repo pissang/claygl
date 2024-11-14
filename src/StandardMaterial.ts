@@ -6,6 +6,11 @@ import Texture2D from './Texture2D';
 import type TextureCube from './TextureCube';
 import type BoundingBox from './math/BoundingBox';
 import { assign } from './core/util';
+import {
+  UV_PROJECTION_NONE,
+  UV_PROJECTION_SPHERICAL,
+  UV_PROJECTION_TRIPLANAR
+} from './shader/source/uvprojection.glsl';
 
 const TEXTURE_PROPERTIES = [
   'diffuseMap',
@@ -26,6 +31,7 @@ const SIMPLE_PROPERTIES = [
   'alpha',
   'roughness',
   'metalness',
+  'uvProjection',
   'uvRepeat',
   'uvOffset',
   'aoIntensity',
@@ -111,6 +117,11 @@ export interface StandardMaterialOpts extends Omit<MaterialOpts, 'shader'> {
 
   occlusionMap?: Texture2D;
 
+  uvProjection:
+    | typeof UV_PROJECTION_NONE
+    | typeof UV_PROJECTION_TRIPLANAR
+    | typeof UV_PROJECTION_SPHERICAL;
+
   uvRepeat: [number, number];
 
   uvOffset: [number, number];
@@ -146,8 +157,9 @@ const defaultStandardMaterialOpts = {
   doubleSided: false,
 
   uvRepeat: [1, 1],
-
   uvOffset: [0, 0],
+  uvProjection: UV_PROJECTION_NONE,
+
   aoIntensity: 1,
 
   environmentMapPrefiltered: false,

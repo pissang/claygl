@@ -25,7 +25,13 @@ export {
 
 export { default as GLPipeline } from './gl/GLPipeline';
 
+// Materials
 export { default as StandardMaterial } from './StandardMaterial';
+export {
+  UV_PROJECTION_NONE,
+  UV_PROJECTION_SPHERICAL,
+  UV_PROJECTION_TRIPLANAR
+} from './shader/source/uvprojection.glsl';
 
 export { Timeline };
 
