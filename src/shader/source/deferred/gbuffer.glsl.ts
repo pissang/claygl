@@ -179,6 +179,7 @@ export const createGBufferFrag = (outputs: string[]) =>
       linear: uniform('bool'),
 
       normalMap: uniform('sampler2D'),
+      normalScale: uniform('float', 1),
       roughGlossMap: uniform('sampler2D'),
       useRoughGlossMap: uniform('bool'),
       useRoughness: uniform('bool'),
@@ -243,6 +244,8 @@ void main() {
     if (dot(normalTexel, normalTexel) > 0.0) { // Valid normal map
       N = normalTexel * 2.0 - 1.0;
       mat3 tbn = mat3(v_Tangent, v_Bitangent, v_Normal);
+      // Apply scalar multiplier to normal vector of texture.
+      N = normalize(N * vec3(normalScale, normalScale, 1.0));
       // FIXME Why need to normalize again?
       N = normalize(tbn * N);
     }
