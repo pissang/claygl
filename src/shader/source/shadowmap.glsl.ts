@@ -155,8 +155,9 @@ float tapShadowMap(sampler2D map, vec2 uv, float z) {
   return step(z, decodeFloat(tex));
 }
 
-#ifdef PCF_KERNEL_SIZE
 ${randomFunction()}
+
+#ifdef PCF_KERNEL_SIZE
 ${rotateVec2Function()}
 
 float pcf(sampler2D map, vec2 uv, float z, float textureSize, vec2 scale) {
