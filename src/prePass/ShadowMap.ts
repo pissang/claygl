@@ -159,7 +159,7 @@ class ShadowMapPass extends Notifier {
     renderer.restoreClear();
   }
 
-  _updateReceivers(renderer: Renderer, mesh: Renderable) {
+  updateReceivers(renderer: Renderer, mesh: Renderable) {
     const material = mesh.material;
     if (mesh.receiveShadow) {
       this._receivers.push(mesh);
@@ -183,7 +183,7 @@ class ShadowMapPass extends Notifier {
     const self = this;
     scene.traverse(function (renderable) {
       if (renderable.isRenderable()) {
-        self._updateReceivers(renderer, renderable);
+        self.updateReceivers(renderer, renderable);
       }
     });
 

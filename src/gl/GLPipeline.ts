@@ -714,12 +714,12 @@ class GLPipeline {
         // Reset slot
         if (uniforms[symbol].array) {
           // TODO
-          for (let i = 0; i < uniformValue.length; i++) {
-            if (uniformValue[i] && (uniformValue as Texture).isRenderable()) {
+          for (let i = 0; i < (uniformValue ? uniformValue.length : 0); i++) {
+            if (uniformValue[i]?.isRenderable?.()) {
               getGLTexture(uniformValue[i]).slot = -1;
             }
           }
-        } else if (uniformValue && (uniformValue as Texture).isRenderable()) {
+        } else if (uniformValue?.isRenderable?.()) {
           getGLTexture(uniformValue).slot = -1;
         }
       }
@@ -749,27 +749,30 @@ class GLPipeline {
       const isUniformValueArray = uniform.array;
       const isTexture = isTextureUniform(uniform);
       const uniformType = isTexture ? 'int' : uniform.type;
-      let uniformValue = getUniformValue!(renderable, material, symbol);
+      let rawUniformValue = getUniformValue!(renderable, material, symbol);
 
-      if (isTexture) {
-        if (!uniformValue || !uniformValue.isRenderable()) {
-          uniformValue = placeholderTexture;
-        }
-      }
-
-      if (uniformValue == null) {
+      if (rawUniformValue == null) {
         continue;
       }
 
+      let uniformValue = rawUniformValue;
       if (isTexture) {
         // Texture Array
         if (isUniformValueArray) {
           uniformValue = [];
-          for (let i = 0; i < uniformValue.length; i++) {
-            uniformValue.push(getTextureSlot(uniformValue[i]));
+          for (let i = 0; i < rawUniformValue.length; i++) {
+            let texture = rawUniformValue[i];
+            if (!texture?.isRenderable?.()) {
+              texture = placeholderTexture;
+            }
+            uniformValue.push(getTextureSlot(texture));
           }
         } else {
-          uniformValue = getTextureSlot(uniformValue);
+          let texture = rawUniformValue;
+          if (!texture?.isRenderable?.()) {
+            texture = placeholderTexture;
+          }
+          uniformValue = getTextureSlot(texture);
         }
       }
 
