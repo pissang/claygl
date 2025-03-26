@@ -6,6 +6,19 @@ export const UV_PROJECTION_TRIPLANAR = 2;
 
 export default glsl`
 
+vec2 triplanarProjection(vec3 pos, vec3 normal, vec2 uvScale) {
+  vec3 absNormal = abs(normal);
+  vec2 uv = vec2(0.0);
+  if (absNormal.x > absNormal.y && absNormal.x > absNormal.z) {
+    uv = pos.yz;
+  } else if (absNormal.y > absNormal.x && absNormal.y > absNormal.z) {
+    uv = pos.xz;
+  } else {
+    uv = pos.xy;
+  }
+  return fract(uv * uvScale);
+}
+
 vec4 triplanarProjectionSample(sampler2D _map, vec3 pos, vec3 normal, vec2 uvScale, float blending) {
   vec3 absNormal = abs(normal);
   // Calculate blending power - higher expo means sharper transitions
