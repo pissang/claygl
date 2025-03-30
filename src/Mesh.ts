@@ -41,7 +41,7 @@ class Mesh<T extends Material = Material> extends Renderable<T> {
   }
 
   clone() {
-    const mesh = Renderable.prototype.clone.call(this);
+    const mesh = Renderable.prototype.clone.call(this) as Mesh;
     mesh.skeleton = this.skeleton;
     if (this.joints) {
       mesh.joints = this.joints.slice();

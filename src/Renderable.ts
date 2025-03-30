@@ -157,7 +157,7 @@ class Renderable<T extends Material = Material> extends ClayNode {
    * @return {clay.Renderable}
    */
   clone() {
-    const renderable = super.clone.call(this);
+    const renderable = super.clone.call(this) as Renderable;
 
     renderable.geometry = this.geometry;
     renderable.material = this.material;
@@ -166,7 +166,7 @@ class Renderable<T extends Material = Material> extends ClayNode {
       const name = properties[i];
       // Try not to overwrite the prototype property
       if (renderable[name] !== this[name]) {
-        renderable[name] = this[name];
+        (renderable as any)[name] = this[name];
       }
     }
 

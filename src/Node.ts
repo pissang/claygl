@@ -534,11 +534,13 @@ class ClayNode extends Notifier {
     node.rotation.copy(this.rotation);
     node.scale.copy(this.scale);
 
+    node.invisible = this.invisible;
+
     for (let i = 0; i < children.length; i++) {
       node.add(children[i].clone());
     }
 
-    return node;
+    return node as ClayNode;
   }
 
   /**
