@@ -204,7 +204,7 @@ class Camera<T extends CameraProjectionTypes = CameraProjectionTypes> extends Cl
   }
 
   clone() {
-    const camera = super.clone.call(this);
+    const camera = super.clone.call(this) as Camera;
     camera.projection = {
       ...this.projection
     };

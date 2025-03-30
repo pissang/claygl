@@ -20,7 +20,7 @@ class TubeLight extends Light {
   }
 
   clone() {
-    const light = super.clone();
+    const light = super.clone() as TubeLight;
     light.range = this.range;
     light.length = this.length;
     return light;

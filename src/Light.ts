@@ -70,7 +70,7 @@ class Light extends ClayNode {
    * @memberOf clay.Light.prototype
    */
   clone() {
-    const light = super.clone();
+    const light = super.clone() as Light;
     light.color = Array.prototype.slice.call(this.color);
     light.intensity = this.intensity;
     light.castShadow = this.castShadow;

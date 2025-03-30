@@ -26,7 +26,7 @@ class AmbientSHLight extends Light {
   }
 
   clone() {
-    const light = super.clone();
+    const light = super.clone() as AmbientSHLight;
     light.coefficients = this.coefficients;
     return light;
   }

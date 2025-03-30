@@ -12,7 +12,7 @@ class RectAreaLight extends Light {
   }
 
   clone() {
-    const light = super.clone();
+    const light = super.clone() as RectAreaLight;
     light.width = this.width;
     light.height = this.height;
     return light;

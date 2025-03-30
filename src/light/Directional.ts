@@ -40,7 +40,7 @@ class DirectionalLight extends Light {
   }
 
   clone() {
-    const light = super.clone();
+    const light = super.clone() as DirectionalLight;
     light.shadowBias = this.shadowBias;
     light.shadowSlopeScale = this.shadowSlopeScale;
     return light;

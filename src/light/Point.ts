@@ -16,7 +16,7 @@ class PointLight extends Light {
     assign(this, opts);
   }
   clone() {
-    const light = super.clone();
+    const light = super.clone() as PointLight;
     light.range = this.range;
     return light;
   }

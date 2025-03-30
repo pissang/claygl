@@ -25,7 +25,7 @@ class SpotLight extends Light {
     assign(this, opts);
   }
   clone() {
-    const light = super.clone();
+    const light = super.clone() as SpotLight;
     light.range = this.range;
     light.umbraAngle = this.umbraAngle;
     light.penumbraAngle = this.penumbraAngle;

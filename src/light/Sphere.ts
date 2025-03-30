@@ -18,7 +18,7 @@ class SphereLight extends Light {
   }
 
   clone() {
-    const light = super.clone();
+    const light = super.clone() as SphereLight;
     light.range = this.range;
     light.radius = this.radius;
     return light;

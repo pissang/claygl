@@ -210,7 +210,7 @@ class Scene extends ClayNode {
    *
    */
   cloneNode<T extends ClayNode>(node: T): T {
-    const newNode = node.clone();
+    const newNode = node.clone() as T;
     const clonedNodesMap: Record<string, ClayNode> = {};
     function buildNodesMap(sNode: ClayNode, tNode: ClayNode) {
       clonedNodesMap[sNode.uid] = tNode;
@@ -225,12 +225,12 @@ class Scene extends ClayNode {
     }
     buildNodesMap(node, newNode);
 
-    newNode.traverse(function (newChild: Mesh) {
-      if (newChild.skeleton) {
-        newChild.skeleton = newChild.skeleton.clone(clonedNodesMap);
+    newNode.traverse((newChild) => {
+      if ((newChild as Mesh).skeleton) {
+        (newChild as Mesh).skeleton = (newChild as Mesh).skeleton.clone(clonedNodesMap);
       }
-      if (newChild.material) {
-        newChild.material = newChild.material.clone();
+      if ((newChild as Mesh).material) {
+        (newChild as Mesh).material = (newChild as Mesh).material.clone();
       }
     });
 
