@@ -55,8 +55,6 @@ class RenderGraphNode {
   private _persistedTextures: Record<string, Texture2D> = {};
 
   private _needsKeepPrevFrame: Record<string, boolean> = {};
-  private _outputRefCount: Record<string, number> = {};
-  private _prevOutputRefCount: Record<string, number> = {};
 
   private _compositeNode: CompositeNode;
   private _renderGraph: RenderGraph;
@@ -170,12 +168,15 @@ class RenderGraphNode {
     const outputInfo = this._getOutputInfo(outputPin);
     const prevOutputTextures = this._prevOutputTextures;
     const outputTextures = this._outputTextures;
+    const texturePool = this._renderGraph.getTexturePool();
     if (!outputInfo) {
       return;
     }
 
     if (usePrevFrame) {
-      return prevOutputTextures[outputPin];
+      const texture = prevOutputTextures[outputPin];
+      texture && texturePool.useTexture(texture);
+      return texture;
     }
 
     if (this._rendering) {
@@ -189,9 +190,19 @@ class RenderGraphNode {
       });
 
       this.render(renderer, undefined);
+
+      keys(outputTextures).forEach((outputName) => {
+        if (this._needsKeepPrevFrame[outputName]) {
+          texturePool.useTexture(outputTextures[outputName]);
+        }
+      });
+
+      this._rendered = true;
     }
 
-    return outputTextures[outputPin];
+    const texture = outputTextures[outputPin];
+    texture && texturePool.useTexture(texture);
+    return texture;
   }
 
   hasOutput() {
@@ -254,13 +265,18 @@ class RenderGraphNode {
       } else {
         texture =
           persistedTextures[outputName] || (persistedTextures[outputName] = new Texture2D());
-        // PENDING
         assign(texture, parameters);
       }
 
       outputTextures[outputName] = texture;
       MRTOutputTextures![outputName] = texture;
     });
+
+    console.log(this._compositeNode.name);
+    console.log(Object.keys(inputTextures).map((key) => inputTextures[key].id + ',' + key));
+    if (MRTOutputTextures) {
+      console.log(Object.keys(MRTOutputTextures).map((key) => MRTOutputTextures[key].id));
+    }
 
     // The MRTOutputTextures follows the order of assigning node.outputs. It's easily to get wrong with the order of frag.outputs.
     // Align them
@@ -288,21 +304,14 @@ class RenderGraphNode {
       MRTOutputTextures,
       sharedFrameBuffer || finalFrameBuffer
     );
+
+    // Release after use.
+    keys(inputTextures).forEach((inputName) => {
+      const texture = inputTextures[inputName];
+      texturePool.releaseTexture(texture as Texture2D);
+    });
+
     compositeNode.afterRender && compositeNode.afterRender();
-
-    inputNames.forEach((inputName) => {
-      const link = inputLinks[inputName];
-      link.node.outputLinkReleased(link, inputTextures[inputName]);
-    });
-
-    // Release textures that are not linked
-    outputNames.forEach((outputName) => {
-      const texture = MRTOutputTextures![outputName] as Texture2D;
-      const outputInfo = this._getOutputInfo(outputName);
-      if (!outputLinks[outputName].length && !outputInfo.persist) {
-        texturePool.release(texture);
-      }
-    });
   }
 
   addLinkFrom(
@@ -327,9 +336,6 @@ class RenderGraphNode {
       prevFrame: usePrevFrame
     });
 
-    const refCount = usePrevFrame ? this._prevOutputRefCount : this._outputRefCount;
-    refCount[outputPinName] = refCount[outputPinName] || 0;
-    refCount[outputPinName]++;
     if (usePrevFrame) {
       this._needsKeepPrevFrame[outputPinName] = true;
     }
@@ -339,8 +345,6 @@ class RenderGraphNode {
     const rawOutputs = this._compositeNode.outputs!;
     this._inputs = {};
     this._needsKeepPrevFrame = {};
-    this._outputRefCount = {};
-    this._prevOutputRefCount = {};
     // All parameters of outputs need to be updated
     this._outputs = keys(rawOutputs)
       .filter((key) => {
@@ -359,32 +363,18 @@ class RenderGraphNode {
     this._rendered = false;
     this._outputTextures = {};
   }
-
   afterRender() {
-    const texturePool = this._renderGraph!.getTexturePool();
+    const texturePool = this._renderGraph.getTexturePool();
     // Put back all the textures to pool
     keys(this._outputs).forEach((outputName) => {
       const outputTexture = this._outputTextures[outputName];
-      const outputInfo = this._getOutputInfo(outputName);
+      if (this._prevOutputTextures[outputName]) {
+        texturePool.releaseTexture(this._prevOutputTextures[outputName]);
+      }
       if (this._needsKeepPrevFrame[outputName]) {
         this._prevOutputTextures[outputName] = outputTexture;
-      } else if (!outputInfo.persist) {
-        texturePool.release(outputTexture);
       }
     });
-  }
-
-  outputLinkReleased(link: RenderGraphNodeLink, texture: Texture) {
-    const outputName = link.pin;
-    const texturePool = this._renderGraph.getTexturePool();
-    const refCount = link.prevFrame ? this._prevOutputRefCount : this._outputRefCount;
-    refCount[outputName]--;
-    if (refCount[outputName] <= 0) {
-      const outputInfo = this._getOutputInfo(outputName);
-      if (!outputInfo.persist && (link.prevFrame || !this._needsKeepPrevFrame[outputName])) {
-        texturePool.release(texture as Texture2D);
-      }
-    }
   }
 
   // TODO Should avoid accessing the composite node too much

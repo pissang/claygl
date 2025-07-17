@@ -203,8 +203,12 @@ export interface TextureOpts<TSource = unknown> {
    */
   dynamic: boolean;
 }
+
+let id = 0;
 interface Texture<TSource> extends Omit<TextureOpts, 'width' | 'height' | 'source'> {}
 abstract class Texture<TSource = unknown> {
+  id: string = (++id).toString();
+
   protected _width?: number;
   protected _height?: number;
 

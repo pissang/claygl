@@ -43,6 +43,8 @@ class RenderGraph {
     const height = renderer.getHeight();
     const dpr = renderer.getPixelRatio();
 
+    console.log('--------------Render------------------');
+
     if (this._width !== width || this._height !== height || this._dpr !== dpr) {
       this._width = width;
       this._height = height;
@@ -65,6 +67,8 @@ class RenderGraph {
 
     // Clear up
     nodes.forEach((node) => node.afterRender());
+
+    this._texturePool.collectUnusedTextures();
   }
 
   getTexturePool() {
