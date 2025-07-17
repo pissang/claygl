@@ -27,6 +27,7 @@ class TexturePool {
 
   private _textureKeyMap = new WeakMap<Texture2D, string>();
   private _textureUsage = new WeakMap<Texture2D, number>();
+  private _textureAllocated = new WeakMap<Texture2D, boolean>();
 
   /**d
    * Allocate a new texture from pool.
@@ -46,6 +47,7 @@ class TexturePool {
     } else {
       texture = list.pop() as Texture2D;
     }
+    this._textureAllocated.set(texture, true);
     return texture;
   }
 
@@ -54,6 +56,10 @@ class TexturePool {
     // Ignore the textures that are not allocated from pool.
     if (!key) {
       return;
+    }
+    if (!this._textureAllocated.get(texture)) {
+      console.error('Use texture that is not allocated yet.');
+      debugger;
     }
     const textureUsage = this._textureUsage;
     textureUsage.set(texture, (textureUsage.get(texture) || 0) + 1);
@@ -68,7 +74,7 @@ class TexturePool {
     }
 
     const textureUsage = this._textureUsage;
-    const usage = (textureUsage.get(texture) || 1) - 1;
+    const usage = (textureUsage.get(texture) || 0) - 1;
     if (usage < 0) {
       // Already been released.
       return;
@@ -81,6 +87,7 @@ class TexturePool {
       }
       const list = this._pool[key];
       list.push(texture);
+      this._textureAllocated.delete(texture);
     }
   }
 
@@ -93,6 +100,7 @@ class TexturePool {
           const list = this._pool[key];
           list.push(texture);
         }
+        this._textureAllocated.delete(texture);
       }
     });
   }
