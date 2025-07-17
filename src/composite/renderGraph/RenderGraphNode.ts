@@ -375,14 +375,22 @@ class RenderGraphNode {
   }
 
   outputLinkReleased(link: RenderGraphNodeLink, texture: Texture) {
+    // Still needs to keep the texture and put it to prevOutputTextures
+    if (this._needsKeepPrevFrame[link.pin] && !link.prevFrame) {
+      return;
+    }
     const outputName = link.pin;
     const texturePool = this._renderGraph.getTexturePool();
     const refCount = link.prevFrame ? this._prevOutputRefCount : this._outputRefCount;
     refCount[outputName]--;
     if (refCount[outputName] <= 0) {
       const outputInfo = this._getOutputInfo(outputName);
-      if (!outputInfo.persist && (link.prevFrame || !this._needsKeepPrevFrame[outputName])) {
+      if (!outputInfo.persist) {
         texturePool.release(texture as Texture2D);
+        // Avoid texture is released again (if it's alloclated for the texture that needs to be kept) in afterRender
+        if (!link.prevFrame) {
+          delete this._outputTextures[outputName];
+        }
       }
     }
   }
