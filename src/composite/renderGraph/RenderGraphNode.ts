@@ -327,7 +327,7 @@ class RenderGraphNode {
       prevFrame: usePrevFrame
     });
 
-    const refCount = usePrevFrame ? this._prevOutputRefCount : this._outputRefCount;
+    const refCount = usePrevFrame ? fromNode._prevOutputRefCount : fromNode._outputRefCount;
     refCount[outputPinName] = refCount[outputPinName] || 0;
     refCount[outputPinName]++;
     if (usePrevFrame) {
@@ -341,7 +341,7 @@ class RenderGraphNode {
     this._needsKeepPrevFrame = {};
     this._outputRefCount = {};
     this._prevOutputRefCount = {};
-    // All parameters of outputs need to be updated
+    // Reset
     this._outputs = keys(rawOutputs)
       .filter((key) => {
         const rawOutput = this._getOutputInfo(key);

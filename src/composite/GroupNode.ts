@@ -126,6 +126,9 @@ class GroupCompositeNode<InputKey extends string, OutputKey extends string> exte
           node.renderToScreen = this.renderToScreen;
         }
       });
+      if (this.name === 'denoiseNLM') {
+        console.log(inputLinks, outputLinks);
+      }
     });
 
     // TODO what if group node set outputs to empty?
