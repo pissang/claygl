@@ -114,11 +114,12 @@ class GLBuffers {
           attribute.semantic
         );
       }
-      // Remove unused attributes buffers.
-      // PENDING
-      for (let i = k; i < attributeBuffers.length; i++) {
-        gl.deleteBuffer(attributeBuffers[i].buffer);
-      }
+
+      // NOTE: remove unusded attributes buffers will cause use delete buffer in other places.
+      // So we don't do delete here
+      // for (let i = k; i < attributeBuffers.length; i++) {
+      //   gl.deleteBuffer(attributeBuffers[i].buffer);
+      // }
       attributeBuffers.length = k;
     }
 
