@@ -63,7 +63,7 @@ export function toObject(geometry: GeometryBase, shallow?: boolean) {
   //indices
   if (geometry.indices && geometry.indices.length > 0) {
     data.indices = copyIfNecessary(geometry.indices, shallow);
-    buffers.push(data.indices!.buffer);
+    buffers.push(data.indices!.buffer as ArrayBuffer);
   }
 
   //attributes
@@ -75,7 +75,7 @@ export function toObject(geometry: GeometryBase, shallow?: boolean) {
       //ignore empty attributes
       if (attr && attr.value && attr.value.length > 0) {
         dataAttributes[p] = copyAttribute(attr, shallow);
-        buffers.push((dataAttributes[p].value as Float32Array).buffer);
+        buffers.push((dataAttributes[p].value as Float32Array).buffer as ArrayBuffer);
       }
     }
   }
