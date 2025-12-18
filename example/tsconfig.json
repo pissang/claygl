@@ -4,7 +4,6 @@
     "strict": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "keyofStringsOnly": true,
 
     "paths": {
       "claygl": ["../src/claygl.ts"],

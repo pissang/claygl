@@ -9,5 +9,5 @@ export type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) ext
 ) => any
   ? R
   : never;
-// https://stackoverflow.com/questions/49401866/all-possible-keys-of-an-union-type
-type KeysOfUnion<T> = T extends T ? keyof T : never;
+
+export type StringKeyOf<T> = keyof T & string;

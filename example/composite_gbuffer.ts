@@ -62,7 +62,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
 
 const control = new OrbitControl({
   target: camera,
-  domElement: renderer.canvas,
+  domElement: renderer.canvas as HTMLCanvasElement,
   timeline: startTimeline()
 });
 

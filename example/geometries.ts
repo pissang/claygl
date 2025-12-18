@@ -108,7 +108,7 @@ scene.add(cylinderMesh);
 scene.add(parametricSurfaceMesh);
 
 const control = new OrbitControl({
-  domElement: renderer.canvas,
+  domElement: renderer.canvas as HTMLCanvasElement,
   target: camera
 });
 startTimeline((dTime) => {

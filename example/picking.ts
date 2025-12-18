@@ -55,7 +55,7 @@ let currentCube: ClayNode | undefined;
 let point: Vector3 | undefined;
 const offset = new Vector3();
 const plane = new Plane();
-renderer.canvas.addEventListener('mousedown', function (e) {
+(renderer.canvas as HTMLCanvasElement).addEventListener('mousedown', function (e) {
   const res = pickByRay(renderer, scene, camera, e.offsetX, e.offsetY);
   if (res) {
     currentCube = res.target;
@@ -63,7 +63,7 @@ renderer.canvas.addEventListener('mousedown', function (e) {
     offset.copy(res.point);
   }
 });
-renderer.canvas.addEventListener('mousemove', function (e) {
+(renderer.canvas as HTMLCanvasElement).addEventListener('mousemove', function (e) {
   if (currentCube) {
     plane.normal.copy(camera.worldTransform.z);
     plane.distance = point!.dot(plane.normal);

@@ -94,7 +94,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf', {
 
 const control = new OrbitControl({
   target: camera,
-  domElement: renderer.canvas,
+  domElement: renderer.canvas as HTMLCanvasElement,
   zoomSensitivity: 0.2,
   // autoRotate: true,
   timeline: startTimeline()

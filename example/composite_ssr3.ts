@@ -108,7 +108,7 @@ scene.add(fillLight);
 
 const control = new OrbitControl({
   target: camera,
-  domElement: renderer.canvas
+  domElement: renderer.canvas as HTMLCanvasElement
 });
 
 const compositor = new Compositor();
@@ -137,7 +137,7 @@ startTimeline(function (deltaTime) {
 
 function resize() {
   renderer.resize(window.innerWidth, window.innerHeight);
-  camera.aspect = renderer.getViewportAspect();
+  camera.projection.aspect = renderer.getViewportAspect();
 }
 
 window.onresize = resize;

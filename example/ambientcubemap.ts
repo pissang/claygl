@@ -72,7 +72,7 @@ loadGLTF('assets/models/suzanne/suzanne_high.gltf').then((res) => {
 
 const control = new OrbitControl({
   target: camera,
-  domElement: renderer.canvas
+  domElement: renderer.canvas as HTMLCanvasElement
 });
 
 startTimeline((deltaTime) => {
@@ -82,5 +82,5 @@ startTimeline((deltaTime) => {
 
 window.onresize = function () {
   renderer.resize(window.innerWidth, window.innerHeight);
-  camera.aspect = renderer.getViewportAspect();
+  camera.projection.aspect = renderer.getViewportAspect();
 };

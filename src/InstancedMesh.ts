@@ -51,7 +51,7 @@ class InstancedMesh<T extends Material = Material> extends Mesh<T> {
     this.createInstancedAttribute('instanceMat3', 'float', 4, 1);
   }
 
-  isInstancedMesh() {
+  isInstancedMesh(): this is InstancedMesh {
     return true;
   }
 

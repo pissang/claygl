@@ -16,6 +16,7 @@ import Texture2D from './Texture2D';
 import TextureCube from './TextureCube';
 import Texture2DArray from './Texture2DArray';
 import Texture3D from './Texture3D';
+import { StringKeyOf } from './core/type';
 
 const programKeyCache: Record<string, string> = {};
 
@@ -137,13 +138,16 @@ class Material<
 
   private readonly _shader: T;
 
-  private _textureStatus = {} as Record<keyof PickTextureUniforms<T['uniformTpls']>, TextureStatus>;
+  private _textureStatus = {} as Record<
+    StringKeyOf<PickTextureUniforms<T['uniformTpls']>>,
+    TextureStatus
+  >;
 
   // shadowTransparentMap : null
 
   // PENDING enable the uniform that only used in shader.
-  private _enabledUniforms: (keyof T['uniformTpls'])[] = [];
-  private _textureUniforms: (keyof PickTextureUniforms<T['uniformTpls']>)[] = [];
+  private _enabledUniforms: StringKeyOf<T['uniformTpls']>[] = [];
+  private _textureUniforms: StringKeyOf<PickTextureUniforms<T['uniformTpls']>>[] = [];
 
   private _programKey?: string;
 
@@ -154,12 +158,12 @@ class Material<
     const uniforms = (this.uniforms = shader.createUniforms());
 
     // Make sure uniforms are set in same order to avoid texture slot wrong
-    const enabledUniforms = (this._enabledUniforms = util
-      .keys(uniforms)
-      .sort() as (keyof T['uniformTpls'])[]);
+    const enabledUniforms = (this._enabledUniforms = util.keys(uniforms).sort() as StringKeyOf<
+      T['uniformTpls']
+    >[]);
     this._textureUniforms = enabledUniforms.filter((uniformName) =>
       isTextureUniform(uniforms[uniformName])
-    ) as (keyof PickTextureUniforms<T['uniformTpls']>)[];
+    ) as StringKeyOf<PickTextureUniforms<T['uniformTpls']>>[];
 
     this.vertexDefines = util.clone(shader.vertexDefines);
     this.fragmentDefines = util.clone(shader.fragmentDefines);
@@ -194,7 +198,10 @@ class Material<
    * @param symbol
    * @param value
    */
-  set<K extends keyof T['uniformTpls']>(symbol: K, value: T['uniformTpls'][K]['value'] | null) {
+  set<K extends StringKeyOf<T['uniformTpls']>>(
+    symbol: K,
+    value: T['uniformTpls'][K]['value'] | null
+  ) {
     // PENDING. Should we GIVE WARN when value is undefined?
     if (value === undefined) {
       return;
@@ -221,15 +228,15 @@ class Material<
     });
   }
 
-  isUniformEnabled(symbol: keyof T['uniformTpls']) {
+  isUniformEnabled(symbol: StringKeyOf<T['uniformTpls']>) {
     return this._enabledUniforms.indexOf(symbol as any) >= 0;
   }
 
-  getEnabledUniforms(): (keyof T['uniformTpls'])[] {
+  getEnabledUniforms(): StringKeyOf<T['uniformTpls']>[] {
     return this._enabledUniforms;
   }
 
-  getTextureUniforms() {
+  getTextureUniforms(): StringKeyOf<PickTextureUniforms<T['uniformTpls']>>[] {
     return this._textureUniforms;
   }
 
@@ -237,7 +244,7 @@ class Material<
    * Get uniform value
    *
    */
-  get<K extends keyof T['uniformTpls']>(symbol: K) {
+  get<K extends StringKeyOf<T['uniformTpls']>>(symbol: K) {
     const uniform = this.uniforms[symbol];
     if (uniform) {
       return uniform.value as T['uniformTpls'][K]['value'];
@@ -368,8 +375,8 @@ class Material<
    */
   enableTexture(
     symbol:
-      | keyof PickTextureUniforms<T['uniformTpls']>
-      | keyof PickTextureUniforms<T['uniformTpls']>[]
+      | StringKeyOf<PickTextureUniforms<T['uniformTpls']>>
+      | StringKeyOf<PickTextureUniforms<T['uniformTpls']>>[]
   ) {
     if (util.isArray(symbol)) {
       for (let i = 0; i < symbol.length; i++) {
@@ -378,7 +385,8 @@ class Material<
       return;
     }
 
-    const status = this._textureStatus[symbol as keyof PickTextureUniforms<T['uniformTpls']>];
+    const status =
+      this._textureStatus[symbol as StringKeyOf<PickTextureUniforms<T['uniformTpls']>>];
     if (status) {
       const isEnabled = status.enabled;
       if (!isEnabled) {
@@ -403,7 +411,7 @@ class Material<
    * Disable a texture, it remove a #define macro in the shader
    * @param  {string} symbol
    */
-  disableTexture(symbol: keyof PickTextureUniforms<T['uniformTpls']>) {
+  disableTexture(symbol: StringKeyOf<PickTextureUniforms<T['uniformTpls']>>) {
     if (util.isArray(symbol)) {
       for (let i = 0; i < symbol.length; i++) {
         this.disableTexture(symbol[i]);
@@ -436,7 +444,7 @@ class Material<
    * @param  {string}  symbol
    * @return {boolean}
    */
-  isTextureEnabled(symbol: keyof PickTextureUniforms<T['uniformTpls']>): boolean {
+  isTextureEnabled(symbol: StringKeyOf<PickTextureUniforms<T['uniformTpls']>>): boolean {
     const textureStatus = this._textureStatus;
     return !!(textureStatus[symbol] && textureStatus[symbol].enabled);
   }
@@ -449,9 +457,9 @@ class Material<
     const textureStatus = this._textureStatus;
     return util
       .keys(textureStatus)
-      .filter((key) => (textureStatus as any)[key].enabled) as (keyof PickTextureUniforms<
-      T['uniformTpls']
-    >)[];
+      .filter((key) => (textureStatus as any)[key].enabled) as StringKeyOf<
+      PickTextureUniforms<T['uniformTpls']>
+    >[];
   }
 
   /**

@@ -5,7 +5,7 @@ import GeometryBase from '../GeometryBase';
 import InstancedMesh from '../InstancedMesh';
 import { GeneralMaterialUniformObject } from '../Material';
 import type { Matrix4 } from '../math';
-import Mesh from '../Mesh';
+import Mesh, { SkinnedMesh } from '../Mesh';
 import Skeleton from '../Skeleton';
 import GLProgram from './GLProgram';
 import ProgramManager from './ProgramManager';
@@ -90,7 +90,7 @@ export interface GLRenderableObject<T extends GLMaterialObject = GLMaterialObjec
   culling?: boolean;
   ignorePreZ?: boolean;
 
-  isSkinnedMesh?(): this is Mesh & { skeleton: Skeleton };
+  isSkinnedMesh?(): this is SkinnedMesh;
   isInstancedMesh?(): this is InstancedMesh;
 
   beforeRender?(): void;

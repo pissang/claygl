@@ -3,9 +3,9 @@ import {
   Vector2,
   GroupCompositeNode,
   FilterCompositeNode,
-  PerspectiveCamera,
   Renderer,
-  Matrix4
+  Matrix4,
+  Camera
 } from 'claygl';
 import { alchemyAOBlurFragment, alchemyAOEstimateFragment } from './alchemy.glsl';
 
@@ -80,9 +80,9 @@ class AlchemyAOCompositeNode extends GroupCompositeNode<
     alchemyAOBlurFragment,
     'AlchemyAO BlurV'
   );
-  private _camera: PerspectiveCamera;
+  private _camera: Camera;
 
-  constructor(camera: PerspectiveCamera, opts?: AlchemyAOCompositeNodeOpts) {
+  constructor(camera: Camera, opts?: AlchemyAOCompositeNodeOpts) {
     super();
     this._camera = camera;
 

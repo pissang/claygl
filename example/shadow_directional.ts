@@ -71,7 +71,7 @@ camera.lookAt(scene.position);
 camera.scale.set(0.1, 0.1, 0.1);
 
 const control = new OrbitControl({
-  domElement: renderer.canvas,
+  domElement: renderer.canvas as HTMLCanvasElement,
   target: camera
 });
 

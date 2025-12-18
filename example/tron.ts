@@ -49,7 +49,7 @@ const cubeMeshTronOutline = new Mesh(cube, tronMaterial, {
 scene.add(cubeMeshTronOutline);
 
 const control = new OrbitControl({
-  domElement: renderer.canvas,
+  domElement: renderer.canvas as HTMLCanvasElement,
   target: camera
 });
 control.on('update', () => {

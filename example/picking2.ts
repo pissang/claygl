@@ -26,7 +26,7 @@ camera.projection.aspect = renderer.getViewportAspect();
 camera.position.z = 3;
 
 const control = new OrbitControl({
-  domElement: renderer.canvas,
+  domElement: renderer.canvas as HTMLCanvasElement,
   target: camera
 });
 
@@ -59,7 +59,7 @@ sphere.scale.set(0.02, 0.02, 0.02);
 sphere.material.set('color', [1, 0, 0]);
 scene.add(sphere);
 
-renderer.canvas.addEventListener('mousemove', function (e) {
+(renderer.canvas as HTMLCanvasElement).addEventListener('mousemove', function (e) {
   const res = pickByRay(renderer, scene, camera, e.offsetX, e.offsetY);
   if (res) {
     sphere.position.copy(res.pointWorld);

@@ -6,6 +6,7 @@ import FrameBuffer from '../FrameBuffer';
 import Texture from '../Texture';
 import { keys } from '../core/util';
 import { FragmentShaderLoose, PickFragmentTextureUniforms } from '../Shader';
+import { StringKeyOf } from '../core/type';
 
 /**
  * Filter node
@@ -45,7 +46,7 @@ class FilterCompositeNode<
   // TODO inference from shader
   O extends string = 'color',
   S = PickFragmentTextureUniforms<T['uniforms']>
-> extends CompositeNode<keyof S, O> {
+> extends CompositeNode<StringKeyOf<S>, O> {
   pass: FullscreenQuadPass<T>;
 
   // inputs?: Record<keyof S, CompositeNode | CompositeNodeInput>;
@@ -92,7 +93,7 @@ class FilterCompositeNode<
     return this.pass.material;
   }
 
-  validateInput(inputName: string) {
+  validateInput(inputName: keyof S & string) {
     return !!this.pass.material!.uniforms[inputName];
   }
 }

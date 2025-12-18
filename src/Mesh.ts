@@ -5,6 +5,12 @@ import type Skeleton from './Skeleton';
 import type Matrix4 from './math/Matrix4';
 import Material from './Material';
 import Geometry from './Geometry';
+import InstancedMesh from './InstancedMesh';
+
+export interface SkinnedMesh extends Mesh {
+  skeleton: Skeleton;
+  joints: number[];
+}
 
 export interface MeshOpts extends RenderableOpts {
   /**
@@ -32,11 +38,11 @@ class Mesh<T extends Material = Material> extends Renderable<T> {
     }
     this.joints = optional(opts.joints, []);
   }
-  isInstancedMesh(): boolean {
+  isInstancedMesh(): this is InstancedMesh {
     return false;
   }
 
-  isSkinnedMesh(): boolean {
+  isSkinnedMesh(): this is SkinnedMesh {
     return !!(this.skeleton && this.joints && this.joints.length > 0);
   }
 

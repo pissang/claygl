@@ -39,7 +39,7 @@ loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
 
   const control = new OrbitControl({
     target: camera,
-    domElement: renderer.canvas,
+    domElement: renderer.canvas as HTMLCanvasElement,
     rotateSensitivity: 0.4
   });
 

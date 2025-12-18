@@ -25,7 +25,7 @@ camera.position.set(0, 1, 2);
 
 const control = new OrbitControl({
   target: camera,
-  domElement: renderer.canvas,
+  domElement: renderer.canvas as HTMLCanvasElement,
   panSensitivity: 0.4,
   zoomSensitivity: 0.4
 });

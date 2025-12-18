@@ -95,7 +95,7 @@ camera.position.set(0, 50, 100);
 camera.lookAt(scene.position);
 
 const control = new OrbitControl({
-  domElement: renderer.canvas,
+  domElement: renderer.canvas as HTMLCanvasElement,
   target: camera
 });
 

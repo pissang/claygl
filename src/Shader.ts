@@ -4,7 +4,7 @@
 // TODO createUniform can be assigned to varying and attributes.
 
 // import { parseToFloat } from './core/color';
-import { Dict, UnionToIntersection } from './core/type';
+import { Dict, StringKeyOf, UnionToIntersection } from './core/type';
 import { assign, genGUID, isString, keys } from './core/util';
 import { mat2, mat3, mat4, vec2, vec3, vec4 } from './glmatrix';
 import Texture2D from './Texture2D';
@@ -548,7 +548,7 @@ export type PickFragmentTextureUniforms<
 > = Pick<
   T,
   {
-    [key in keyof T]: T[key]['type'] extends
+    [key in StringKeyOf<T>]: T[key]['type'] extends
       | 'sampler2D'
       | 'samplerCube'
       | 'isampler2D'
@@ -557,7 +557,7 @@ export type PickFragmentTextureUniforms<
       | 'sampler2DArray'
       ? key
       : never;
-  }[keyof T]
+  }[StringKeyOf<T>]
 >;
 
 export class Shader<

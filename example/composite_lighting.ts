@@ -110,7 +110,7 @@ for (let i = 0; i < 50; i++) {
 
 const control = new OrbitControl({
   target: camera,
-  domElement: renderer.canvas,
+  domElement: renderer.canvas as HTMLCanvasElement,
   timeline: startTimeline(),
   zoomSensitivity: 0.4
 });

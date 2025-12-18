@@ -95,7 +95,7 @@
         timeline.start();
 
         var control = new clay.plugin.OrbitControl({
-          domElement: renderer.canvas,
+          domElement: renderer.canvas as HTMLCanvasElement,
           target: camera
         });
 

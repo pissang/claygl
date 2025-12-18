@@ -9,9 +9,9 @@ import type Scene from './Scene';
 import type Mesh from './Mesh';
 import type Geometry from './Geometry';
 import type Renderable from './Renderable';
-import type Skeleton from './Skeleton';
 import type Renderer from './Renderer';
 import type InstancedMesh from './InstancedMesh';
+import { SkinnedMesh } from './Mesh';
 
 let nameId = 0;
 const tmpMat4Arr = mat4.create();
@@ -118,9 +118,7 @@ class ClayNode extends Notifier {
    * If Node is a skinned mesh
    * @return {boolean}
    */
-  isSkinnedMesh(): this is Mesh & {
-    skeleton: Skeleton;
-  } {
+  isSkinnedMesh(): this is SkinnedMesh {
     return false;
   }
   /**

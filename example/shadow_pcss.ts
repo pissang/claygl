@@ -44,11 +44,11 @@ loadGLTF('assets/models/basic_scene/scene.gltf', {
 
   camera.position.set(2, 2, 2);
   camera.lookAt(scene.position);
-  camera.aspect = renderer.canvas.width / renderer.canvas.height;
+  camera.projection.aspect = renderer.canvas.width / renderer.canvas.height;
 
   const control = new OrbitControl({
     target: camera,
-    domElement: renderer.canvas,
+    domElement: renderer.canvas as HTMLCanvasElement,
     zoomSensitivity: 0.4
   });
 

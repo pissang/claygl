@@ -94,7 +94,7 @@
 
         var control = new clay.plugin.OrbitControl({
           target: camera,
-          domElement: renderer.canvas
+          domElement: renderer.canvas as HTMLCanvasElement
         });
 
         var compositor = createCompositor({

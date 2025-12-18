@@ -86,7 +86,7 @@ loadGLTF('assets/models/whale/whale-anim.gltf').then((res) => {
 
   const control = new OrbitControl({
     target: camera,
-    domElement: renderer.canvas,
+    domElement: renderer.canvas as HTMLCanvasElement,
     panSensitivity: 0.4,
     zoomSensitivity: 0.4
   });

@@ -49,7 +49,7 @@ camera.lookAt(Vector3.ZERO);
 
 const control = new OrbitControl({
   target: camera,
-  domElement: renderer.canvas
+  domElement: renderer.canvas as HTMLCanvasElement
 });
 
 loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
@@ -123,7 +123,7 @@ loadGLTF('assets/models/basic_scene/scene.gltf').then((res) => {
 
 function resize() {
   renderer.resize(window.innerWidth, window.innerHeight);
-  camera.aspect = renderer.getViewportAspect();
+  camera.projection.aspect = renderer.getViewportAspect();
 }
 
 window.onresize = resize;

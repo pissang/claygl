@@ -2,7 +2,7 @@
 // Use topological sort ?
 import type Renderer from '../Renderer';
 import type FrameBuffer from '../FrameBuffer';
-import { GLEnum } from '../core/type';
+import { GLEnum, StringKeyOf } from '../core/type';
 import type Texture from '../Texture';
 import { TexturePoolParameters } from './TexturePool';
 
@@ -125,7 +125,7 @@ abstract class CompositeNode<InputKey extends string = string, OutputKey extends
 
 export function createCompositeNodeInput<T extends CompositeNode>(
   node: T,
-  output?: keyof NonNullable<T['outputs']>,
+  output?: StringKeyOf<NonNullable<T['outputs']>>,
   opts?: Partial<CompositeNodeInput>
 ): CompositeNodeInput {
   return Object.assign(

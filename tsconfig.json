@@ -7,7 +7,6 @@
     "removeComments": false,
     "noEmit": false,
     "sourceMap": true,
-    "keyofStringsOnly": true,
 
     "moduleResolution": "node",
 

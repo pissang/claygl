@@ -53,7 +53,7 @@ interface FreeControl extends FreeControlOpts {}
  * @example
  *     const control = new clay.plugin.FreeControl({
  *         target: camera,
- *         domElement: renderer.canvas
+ *         domElement: renderer.canvas as HTMLCanvasElement
  *     });
  *     ...
  *     timeline.on('frame', function(frameTime) {

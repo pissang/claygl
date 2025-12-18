@@ -73,7 +73,7 @@
 
           var control = new clay.plugin.OrbitControl({
             target: camera,
-            domElement: renderer.canvas,
+            domElement: renderer.canvas as HTMLCanvasElement,
             sensitivity: 0.4
           });
 
